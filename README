@@ -19,14 +19,14 @@ About:
 
     To rank one feature more/less critical than another is strictly subjective, so
     there's really no good reason one cannot have both "comments" and "file input"
-    enabled, or both "reentrant" and "hand-rolled" lexer enabled. this order was chosen
+    enabled, or both "reentrant" and "hand-rolled lexer" enabled. this order was chosen
     based on "usefulness" within each feature category -- for instance, it is arguably
     more useful to have a reentrant parser than to have one that is non-reentrant, so the
     reentrant feature is enabled toward the "feature rich" end of the scale. It is
     unfortunate that not all permutations can be realized in code.
 
-    This tutorial is organized in this way so that anyone familiar or unfamiliar with
-    Flex/Bison can quickly identify a variation with hopefully most of the features
+    The tutorial is organized in this way so that anyone familiar or unfamiliar with
+    Flex/Bison can quickly identify a variation that has (hopefully) most of the features
     he/she desires. 
 
 Variation vs Feature Table:
