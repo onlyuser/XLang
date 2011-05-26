@@ -109,7 +109,7 @@ void begin_token(yyscan_t yyscanner, char* s)
     loc->first_column = PARM.m_prev_col_num;
     loc->last_line    = PARM.m_line_num;
     loc->last_column  = PARM.m_prev_col_num + n - 1;
-    PARM.m_prev_col_num  = PARM.m_col_num;
+    PARM.m_prev_col_num = PARM.m_col_num;
     if (n > 1)
         PARM.m_prev_col_num--;
 }
