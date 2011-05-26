@@ -53,8 +53,8 @@ Feature Detail:
 
     lexer:
 
-        flex: Use GNU flex to generate a lexer.
-              This option is preferred when regex can simplify the lexer.
+        flex: Use flex to generate a lexer.
+              This option is preferred when regex significantly simplifies the lexer.
 
         hand-rolled: Use a custom lexer.
                      This option is preferred when speed is critical -- Flex is slow.
@@ -117,4 +117,4 @@ Additional Reading:
 
 Keywords:
 
-    Lex, Yacc, Flex, Bison, Parsing, C++
+    Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
