@@ -1,5 +1,5 @@
-// Variations of a Flex-Bison parser -- based on
-// "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+// Variations of a Flex-Bison parser
+// -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 // Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,52 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_BASE_H_
-#define XLANG_NODE_BASE_H_
+#ifndef _XLANG_MVC_MODEL_H_
+#define _XLANG_MVC_MODEL_H_
 
+#include "XLangAlloc.h"
+#include "XLangNodeBase.h" // node::NodeBase
+#include "XLangParseContextBase.h" // ParseContextBase
 #include "XLangType.h" // uint32
+#include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
 
-namespace node {
+namespace mvc {
 
-class NodeBase
+class Model
 {
 public:
-    typedef enum { FLOAT, STRING, CHAR, IDENT, INNER } type_e;
-
-    virtual type_e type() const = 0;
-    virtual uint32 sym_id() const = 0;
-};
-
-class FloatNodeBase
-{
-public:
-    virtual float32 value() const = 0;
-};
-
-class StringNodeBase
-{
-public:
-    virtual std::string value() const = 0;
-};
-
-class CharNodeBase
-{
-public:
-    virtual uint8 value() const = 0;
-};
-
-class IdentNodeBase
-{
-public:
-    virtual std::string name() const = 0;
-};
-
-class InnerNodeBase
-{
-public:;
-    virtual NodeBase* child(uint32 index) const = 0;
-    virtual size_t child_count() const = 0;
+    static node::NodeBase* make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value);
+    static node::NodeBase* make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name);
+    static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...);
 };
 
 }

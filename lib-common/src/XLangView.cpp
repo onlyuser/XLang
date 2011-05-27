@@ -31,11 +31,17 @@ void View::print_lisp(const node::NodeBase* Node)
         return;
     switch (Node->type())
     {
-        case node::NodeBase::VALUE:
-            std::cout << dynamic_cast<const node::ValueNodeBase*>(Node)->value();
+        case node::NodeBase::FLOAT:
+            std::cout << dynamic_cast<const node::FloatNodeBase*>(Node)->value();
+            break;
+        case node::NodeBase::STRING:
+            std::cout << '\"' << dynamic_cast<const node::StringNodeBase*>(Node)->value() << '\"';
+            break;
+        case node::NodeBase::CHAR:
+            std::cout << '\'' << dynamic_cast<const node::CharNodeBase*>(Node)->value() << '\'';
             break;
         case node::NodeBase::IDENT:
-            std::cout << '\"' << dynamic_cast<const node::IdentNodeBase*>(Node)->name() << '\"';
+            std::cout << dynamic_cast<const node::IdentNodeBase*>(Node)->name();
             break;
         case node::NodeBase::INNER:
             {

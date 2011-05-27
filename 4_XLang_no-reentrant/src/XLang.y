@@ -34,22 +34,9 @@
 #include <iostream> // std::cout
 
 // report error
-void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t scanner, const char* s)
-{
-    if (NULL != loc)
-    {
-        std::stringstream ss;
-        ss << std::string(loc->first_column-1, '-') <<
-                std::string(loc->last_column - loc->first_column + 1, '^') << std::endl <<
-                loc->first_line << ":c" << loc->first_column << " to " <<
-                loc->last_line << ":c" << loc->last_column << std::endl;
-        errors() << ss.str();
-    }
-    errors() << s;
-}
 void _XLANG_error(const char* s)
 {
-    _XLANG_error(NULL, NULL, NULL, s);
+    errors() << s;
 }
 
 // get resource
@@ -62,8 +49,6 @@ const char* sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "ID_FLOAT",
-        "ID_STRING",
-        "ID_CHAR",
         "ID_IDENT"
         };
     switch (sym_id)
@@ -77,30 +62,32 @@ const char* sym_name(uint32 sym_id)
     }
     return _sym_name[sym_id - ID_BASE - 1];
 }
+ParseContext* &parse_context()
+{
+    static ParseContext* pc = NULL;
+    return pc;
+}
 
 %}
 
-// 'pure_parser' tells bison to use no global variables and create a
-// reentrant parser.
+// type of yylval to be set by scanner actions
+// implemented as %union in non-reentrant mode
 //
-%pure_parser
-%parse-param {ParseContext* pc}
-%parse-param {yyscan_t scanner}
-%lex-param   {scanner}
+%union
+{
+    float32 _float; // float value
+    const std::string* name; // symbol table index
+    node::NodeBase* m_Node; // node pointer
+}
 
 // show detailed parse errors
 %error-verbose
 
-// record where each token occurs in input
-%locations
-
 %nonassoc ID_BASE
 
 %token<_float> ID_FLOAT
-%token<_string> ID_STRING
-%token<_char> ID_CHAR
 %token<name> ID_IDENT
-%type<node> program statement expression
+%type<m_Node> program statement expression
 
 %left '+' '-'
 %left '*' '/'
@@ -110,50 +97,44 @@ const char* sym_name(uint32 sym_id)
 %%
 
 root:
-      program { pc->root().node = $1; }
+      program { parse_context()->root() = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = mvc::Model::make_inner(pc, ',', @$, 2, $1, $3); }
+    | statement ',' program { $$ = mvc::Model::make_inner(parse_context(), ',', 2, $1, $3); }
     ;
 
 statement:
       expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(pc, '=', @$, 2,
-                                        mvc::Model::make_ident(pc, ID_IDENT, @$, $1), $3); }
+    | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(parse_context(), '=', 2,
+                                        mvc::Model::make_ident(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, @$, $1); }
-    | ID_STRING                 { $$ = mvc::Model::make_string(pc, ID_STRING, @$, $1); }
-    | ID_CHAR                   { $$ = mvc::Model::make_char(pc, ID_CHAR, @$, $1); }
-    | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, @$, $1); }
-    | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', @$, 2, $1, $3); }
-    | expression '-' expression { $$ = mvc::Model::make_inner(pc, '-', @$, 2, $1, $3); }
-    | expression '*' expression { $$ = mvc::Model::make_inner(pc, '*', @$, 2, $1, $3); }
-    | expression '/' expression { $$ = mvc::Model::make_inner(pc, '/', @$, 2, $1, $3); }
+      ID_FLOAT                  { $$ = mvc::Model::make_float(parse_context(), ID_FLOAT, $1); }
+    | ID_IDENT                  { $$ = mvc::Model::make_ident(parse_context(), ID_IDENT, $1); }
+    | expression '+' expression { $$ = mvc::Model::make_inner(parse_context(), '+', 2, $1, $3); }
+    | expression '-' expression { $$ = mvc::Model::make_inner(parse_context(), '-', 2, $1, $3); }
+    | expression '*' expression { $$ = mvc::Model::make_inner(parse_context(), '*', 2, $1, $3); }
+    | expression '/' expression { $$ = mvc::Model::make_inner(parse_context(), '/', 2, $1, $3); }
     | '(' expression ')'        { $$ = $2; }
     ;
 
 %%
 
 ScanContext::ScanContext(char* buf)
-    : m_buf(buf), m_pos(0), m_length(strlen(buf)),
-      m_line_num(1), m_col_num(1), m_prev_col_num(1)
+    : m_buf(buf), m_pos(0), m_length(strlen(buf))
 {
 }
 
 node::NodeBase* make_ast(Allocator &alloc, char* s)
 {
-    ParseContext pc(alloc, s);
-    yyscan_t scanner = pc.scan_context().mcanner;
-    _XLANG_lex_init(&scanner);
-    _XLANG_set_extra(&pc, scanner);
-    int error = _XLANG_parse(&pc, scanner); // parser entry point
-    _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().node : NULL;
+    ParseContext* &pc = parse_context();
+    pc = new (alloc, __FILE__, __LINE__) ParseContext(alloc, s);
+    int error = _XLANG_parse(); // parser entry point
+    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc->root() : NULL;
 }
 
 int main(int argc, char** argv)

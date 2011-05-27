@@ -53,16 +53,46 @@ public:
     }
 };
 
-class ValueNode : virtual public Node, public ValueNodeBase
+class FloatNode : virtual public Node, public FloatNodeBase
 {
     float32 m_value;
 
 public:
-    ValueNode(uint32 sym_id, YYLTYPE &loc, float32 _value)
-        : Node(NodeBase::VALUE, sym_id, loc), m_value(_value)
+    FloatNode(uint32 sym_id, YYLTYPE &loc, float32 _value)
+        : Node(NodeBase::FLOAT, sym_id, loc), m_value(_value)
     {
     }
     float32 value() const
+    {
+        return m_value;
+    }
+};
+
+class StringNode : virtual public Node, public StringNodeBase
+{
+    const std::string* m_value;
+
+public:
+    StringNode(uint32 sym_id, YYLTYPE &loc, const std::string* _value)
+        : Node(NodeBase::STRING, sym_id, loc), m_value(_value)
+    {
+    }
+    std::string value() const
+    {
+        return (!!m_value) ? *m_value : "";
+    }
+};
+
+class CharNode : virtual public Node, public CharNodeBase
+{
+    uint8 m_value;
+
+public:
+    CharNode(uint32 sym_id, YYLTYPE &loc, uint8 _value)
+        : Node(NodeBase::CHAR, sym_id, loc), m_value(_value)
+    {
+    }
+    uint8 value() const
     {
         return m_value;
     }

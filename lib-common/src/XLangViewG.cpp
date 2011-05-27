@@ -30,9 +30,9 @@
 //#include "calc3.h"
 //#include "calc3.tab.h"
 
-#define typeCon node::NodeBase::VALUE
+#define typeCon node::NodeBase::FLOAT
 #define typeId node::NodeBase::IDENT
-#define typINNER node::NodeBase::INNER
+#define typeOpr node::NodeBase::INNER
 
 // prototype
 const char* sym_name(uint32 sym_id);
@@ -107,12 +107,12 @@ void exNode
     s = word;
     switch (p->type()) {
         case typeCon:
-            sprintf(word, "%f", dynamic_cast<const node::ValueNodeBase*>(p)->value());
+            sprintf(word, "%f", dynamic_cast<const node::FloatNodeBase*>(p)->value());
             break;
         case typeId:
-            sprintf(word, "\"%s\"", dynamic_cast<const node::IdentNodeBase*>(p)->name().c_str());
+            sprintf(word, "%s", dynamic_cast<const node::IdentNodeBase*>(p)->name().c_str());
             break;
-        case typINNER:
+        case typeOpr:
             s = const_cast<char*>(sym_name(p->sym_id()));
             break;
         default:

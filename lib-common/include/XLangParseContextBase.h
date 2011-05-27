@@ -25,7 +25,7 @@ class ParseContextBase
 {
 public:
     virtual Allocator &alloc() = 0;
-    virtual const std::string *get_insert_name(std::string name) = 0;
+    virtual const std::string *get_alloc_string(std::string name) = 0;
 };
 
 #endif

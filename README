@@ -12,10 +12,10 @@ About:
     With each successive variation, non-critical features are stripped until there is
     nothing left but a flex-less parser "6_XLang_no-flex".
 
-    feature <--                                                         --> feature
-    rich                                                                    poor
+    feature <--                                                                --> feature
+    rich                                                                           poor
 
-    full => no-comments => no-locations => no-reentrant => stdio => file => no-flex
+    full > no-strings > no-comments > no-locations > no-reentrant > stdio > file > no-flex
 
     To rank one feature more/less critical than another is strictly subjective, so
     there's really no good reason one cannot have both "comments" and "file input"
@@ -31,19 +31,20 @@ About:
 
 Variation vs Feature Table:
 
-                     more                                            less
-                     critical <--                                --> critical
-    +--------------+-------------+---------+-----------+-----------+----------+
-    | variation    | lexer       | input   | reentrant | locations | comments |
-    +--------------+-------------+---------+-----------+-----------+----------+
-    | full         | flex        | buffer  | yes       | yes       | yes      |
-    | no-comments  | flex        | buffer  | yes       | yes       | no       |
-    | no-locations | flex        | buffer  | yes       | no        | no       |
-    | no-reentrant | flex        | buffer  | no        | no        | no       |
-    | stdio        | flex        | stdio   | no        | no        | no       |
-    | file         | flex        | file    | no        | no        | no       |
-    | no-flex      | hand-rolled | file    | no        | no        | no       |
-    +--------------+-------------+---------+-----------+-----------+----------+
+                     more                                                       less
+                     critical <--                                           --> critical
+    +--------------+-------------+---------+-----------+-----------+----------+----------+
+    | variation    | lexer       | input   | reentrant | locations | comments | strings  |
+    +--------------+-------------+---------+-----------+-----------+----------+----------+
+    | full         | flex        | buffer  | yes       | yes       | yes      | yes      |
+    | no-strings   | flex        | buffer  | yes       | yes       | yes      | no       |
+    | no-comments  | flex        | buffer  | yes       | yes       | no       | no       |
+    | no-locations | flex        | buffer  | yes       | no        | no       | no       |
+    | no-reentrant | flex        | buffer  | no        | no        | no       | no       |
+    | stdio        | flex        | stdio   | no        | no        | no       | no       |
+    | file         | flex        | file    | no        | no        | no       | no       |
+    | no-flex      | hand-rolled | file    | no        | no        | no       | no       |
+    +--------------+-------------+---------+-----------+-----------+----------+----------+
 
     HINT: The "stdio" variation is easiest to implement, because it is the default means
           of input. It takes extra effort to hack Flex/Bison into using "buffer input" or
@@ -82,6 +83,10 @@ Feature Detail:
     comments: Tell the lexer to conditionally enable/disable certain lexer rules for
               stateful scanning. This option demonstrates the standard way to ignore
               line/block comments.
+
+    strings: Tell the lexer to conditionally enable/disable certain lexer rules for
+             stateful scanning. This option demonstrates *one* of the many ways to
+             handle strings, characters, and escaped characters.
 
 References:
 

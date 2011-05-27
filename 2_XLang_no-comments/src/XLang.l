@@ -57,22 +57,20 @@
     } while (0)
 
 void begin_token(yyscan_t yyscanner, char* s);
-char escape_char(char c);
 
 %}
 
 %option noyywrap
 %option nounput
 %option reentrant bison-bridge bison-locations
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
 
 digit    [0-9]
 alpha    [a-zA-Z]
 id       {alpha}|[_]
 ident    {id}+({digit}|{id})*
 _float   {digit}+([.]{digit}+)?
-unnamed  [,()+\-*/=]
-ignored  [ \t\n]+
+unnamed  [,()+\-*/=\n]
+ignored  [ \t]+
 
 %%
 
@@ -95,73 +93,10 @@ ignored  [ \t\n]+
 
 {ignored}   ; // ignore whitespace
 
-[\"]                    { begin_token(yyscanner, yytext); BEGIN STATE_STRING; }
-<STATE_STRING>[^\"]*    {
-                            begin_token(yyscanner, yytext);
-                            yylval->_string = yyget_extra(yyscanner)->alloc_str(yytext);
-                            char* buf = new char[yylval->_string->length()+1];
-                            strcpy(buf, yylval->_string->c_str());
-                            int n = 0;
-                            bool escape_next_char = false;
-                            int i;
-                            for (i = 0; '\0' != buf[i]; i++)
-                            {
-                                if (escape_next_char)
-                                {
-                                    escape_next_char = false;
-                                    buf[i] = escape_char(buf[i]);
-                                }
-                                else
-                                    if ('\\' == buf[i])
-                                    {
-                                        escape_next_char = true;
-                                        continue;
-                                    }
-                                buf[n++] = buf[i];
-                            }
-                            buf[n] = '\0';
-                            *yylval->_string = buf;
-                            delete []buf;
-                            return ID_STRING;
-                        }
-<STATE_STRING>[\"]      { begin_token(yyscanner, yytext); BEGIN INITIAL; }
-
-[\']                    { begin_token(yyscanner, yytext); BEGIN STATE_CHAR; }
-<STATE_CHAR>[^\']*      {
-                            begin_token(yyscanner, yytext);
-                            if ('\\' == *yytext)
-                            {
-                                yytext++;
-                                *yytext = escape_char(*yytext);
-                            }
-                            if ('\0' != *(yytext + 1))
-                                _XLANG_error("bad escape character");
-                            yylval->_char = *yytext;
-                            return ID_CHAR;
-                        }
-<STATE_CHAR>[\']        { begin_token(yyscanner, yytext); BEGIN INITIAL; }
-
-"/*"        {
-                BEGIN STATE_COMMENT_BLOCK;
-            }
-<STATE_COMMENT_BLOCK>. {}
-<STATE_COMMENT_BLOCK>"*/" {
-                BEGIN INITIAL;
-            }
-
-"//"        {
-                BEGIN STATE_COMMENT_LINE;
-            }
-<STATE_COMMENT_LINE>. {}
-<STATE_COMMENT_LINE>"\n" {
-            BEGIN INITIAL;
-            }
-
 .           {
                 begin_token(yyscanner, yytext);
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
-                BEGIN INITIAL;
             }
 
 %%
@@ -177,16 +112,4 @@ void begin_token(yyscan_t yyscanner, char* s)
     PARM.m_prev_col_num = PARM.m_col_num;
     if (n > 1)
         PARM.m_prev_col_num--;
-}
-
-char escape_char(char c)
-{
-    switch (c)
-    {
-        case 'r': return '\r';
-        case 'n': return '\n';
-        case 't': return '\t';
-        case '0': return '\0';
-    }
-    return c;
 }

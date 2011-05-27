@@ -17,38 +17,28 @@
 
 #include "XLangModel.h" // mvc::Model
 #include "XLangParseContextBase.h" // ParseContextBase
-#include "XLangNode.h" // node::Node
+#include "XLangNode.h" // node::NodeBase
 #include "XLangType.h" // uint32
 #include <stdarg.h> // va_list
 #include <string> // std::string
 
 namespace mvc {
 
-node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, float32 value)
+node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::FloatNode(sym_id, value);
+    return new (pc->alloc(), __FILE__, __LINE__) node::FloatNode(sym_id, loc, value);
 }
 
-node::NodeBase* Model::make_string(ParseContextBase* pc, uint32 sym_id, const std::string* value)
+node::NodeBase* Model::make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::StringNode(sym_id, value);
+    return new (pc->alloc(), __FILE__, __LINE__) node::IdentNode(sym_id, loc, name);
 }
 
-node::NodeBase* Model::make_char(ParseContextBase* pc, uint32 sym_id, uint8 value)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::CharNode(sym_id, value);
-}
-
-node::NodeBase* Model::make_ident(ParseContextBase* pc, uint32 sym_id, const std::string* name)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::IdentNode(sym_id, name);
-}
-
-node::NodeBase* Model::make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...)
+node::NodeBase* Model::make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...)
 {
     va_list ap;
     va_start(ap, child_count);
-    node::NodeBase* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, child_count, ap);
+    node::NodeBase* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, loc, child_count, ap);
     va_end(ap);
     return node;
 }

@@ -34,22 +34,13 @@
 #include <iostream> // std::cout
 
 // report error
-void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t scanner, const char* s)
+void _XLANG_error(ParseContext* pc, yyscan_t scanner, const char* s)
 {
-    if (NULL != loc)
-    {
-        std::stringstream ss;
-        ss << std::string(loc->first_column-1, '-') <<
-                std::string(loc->last_column - loc->first_column + 1, '^') << std::endl <<
-                loc->first_line << ":c" << loc->first_column << " to " <<
-                loc->last_line << ":c" << loc->last_column << std::endl;
-        errors() << ss.str();
-    }
     errors() << s;
 }
 void _XLANG_error(const char* s)
 {
-    _XLANG_error(NULL, NULL, NULL, s);
+    _XLANG_error(NULL, NULL, s);
 }
 
 // get resource
@@ -62,8 +53,6 @@ const char* sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "ID_FLOAT",
-        "ID_STRING",
-        "ID_CHAR",
         "ID_IDENT"
         };
     switch (sym_id)
@@ -91,14 +80,9 @@ const char* sym_name(uint32 sym_id)
 // show detailed parse errors
 %error-verbose
 
-// record where each token occurs in input
-%locations
-
 %nonassoc ID_BASE
 
 %token<_float> ID_FLOAT
-%token<_string> ID_STRING
-%token<_char> ID_CHAR
 %token<name> ID_IDENT
 %type<node> program statement expression
 
@@ -116,32 +100,29 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = mvc::Model::make_inner(pc, ',', @$, 2, $1, $3); }
+    | statement ',' program { $$ = mvc::Model::make_inner(pc, ',', 2, $1, $3); }
     ;
 
 statement:
       expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(pc, '=', @$, 2,
-                                        mvc::Model::make_ident(pc, ID_IDENT, @$, $1), $3); }
+    | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(pc, '=', 2,
+                                        mvc::Model::make_ident(pc, ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, @$, $1); }
-    | ID_STRING                 { $$ = mvc::Model::make_string(pc, ID_STRING, @$, $1); }
-    | ID_CHAR                   { $$ = mvc::Model::make_char(pc, ID_CHAR, @$, $1); }
-    | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, @$, $1); }
-    | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', @$, 2, $1, $3); }
-    | expression '-' expression { $$ = mvc::Model::make_inner(pc, '-', @$, 2, $1, $3); }
-    | expression '*' expression { $$ = mvc::Model::make_inner(pc, '*', @$, 2, $1, $3); }
-    | expression '/' expression { $$ = mvc::Model::make_inner(pc, '/', @$, 2, $1, $3); }
+      ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, $1); }
+    | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, $1); }
+    | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', 2, $1, $3); }
+    | expression '-' expression { $$ = mvc::Model::make_inner(pc, '-', 2, $1, $3); }
+    | expression '*' expression { $$ = mvc::Model::make_inner(pc, '*', 2, $1, $3); }
+    | expression '/' expression { $$ = mvc::Model::make_inner(pc, '/', 2, $1, $3); }
     | '(' expression ')'        { $$ = $2; }
     ;
 
 %%
 
 ScanContext::ScanContext(char* buf)
-    : m_buf(buf), m_pos(0), m_length(strlen(buf)),
-      m_line_num(1), m_col_num(1), m_prev_col_num(1)
+    : m_buf(buf), m_pos(0), m_length(strlen(buf))
 {
 }
 

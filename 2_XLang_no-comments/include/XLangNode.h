@@ -1,5 +1,5 @@
-// Variations of a Flex-Bison parser -- based on
-// "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+// Variations of a Flex-Bison parser
+// -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 // Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_H_
-#define XLANG_NODE_H_
+#ifndef _XLANG_NODE_H_
+#define _XLANG_NODE_H_
 
 #include "XLangNodeBase.h" // Node
 #include "XLangType.h" // uint32
+#include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
 #include <vector> // std::vector
 #include <stdarg.h> // va_list
@@ -31,10 +32,11 @@ class Node : public NodeBase
 protected:
     NodeBase::type_e m_type;
     uint32 m_sym_id;
+    YYLTYPE m_loc;
 
 public:
-    Node(NodeBase::type_e _type, uint32 _sym_id)
-        : m_type(_type), m_sym_id(_sym_id)
+    Node(NodeBase::type_e _type, uint32 _sym_id, YYLTYPE &_loc)
+        : m_type(_type), m_sym_id(_sym_id), m_loc(_loc)
     {
     }
     NodeBase::type_e type() const
@@ -45,6 +47,10 @@ public:
     {
         return m_sym_id;
     }
+    YYLTYPE loc() const
+    {
+        return m_loc;
+    }
 };
 
 class FloatNode : virtual public Node, public FloatNodeBase
@@ -52,41 +58,11 @@ class FloatNode : virtual public Node, public FloatNodeBase
     float32 m_value;
 
 public:
-    FloatNode(uint32 sym_id, float32 _value)
-        : Node(NodeBase::FLOAT, sym_id), m_value(_value)
+    FloatNode(uint32 sym_id, YYLTYPE &loc, float32 _value)
+        : Node(NodeBase::FLOAT, sym_id, loc), m_value(_value)
     {
     }
     float32 value() const
-    {
-        return m_value;
-    }
-};
-
-class StringNode : virtual public Node, public StringNodeBase
-{
-    const std::string* m_value;
-
-public:
-    StringNode(uint32 sym_id, const std::string* _value)
-        : Node(NodeBase::STRING, sym_id), m_value(_value)
-    {
-    }
-    std::string value() const
-    {
-        return (!!m_value) ? *m_value : "";
-    }
-};
-
-class CharNode : virtual public Node, public CharNodeBase
-{
-    uint8 m_value;
-
-public:
-    CharNode(uint32 sym_id, uint8 _value)
-        : Node(NodeBase::CHAR, sym_id), m_value(_value)
-    {
-    }
-    uint8 value() const
     {
         return m_value;
     }
@@ -97,8 +73,8 @@ class IdentNode : virtual public Node, public IdentNodeBase
     const std::string* m_name;
 
 public:
-    IdentNode(uint32 sym_id, const std::string* _name)
-        : Node(NodeBase::IDENT, sym_id), m_name(_name)
+    IdentNode(uint32 sym_id, YYLTYPE &loc, const std::string* _name)
+        : Node(NodeBase::IDENT, sym_id, loc), m_name(_name)
     {
     }
     std::string name() const
@@ -109,17 +85,17 @@ public:
 
 class InnerNode : virtual public Node, public InnerNodeBase
 {
-    std::vector<NodeBase*> m_child_vec;
+    std::vector<Node*> m_child_vec;
 
 public:
-    InnerNode(uint32 sym_id, size_t _child_count, va_list ap)
-        : Node(NodeBase::INNER, sym_id)
+    InnerNode(uint32 sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
+        : Node(NodeBase::INNER, sym_id, loc)
     {
         m_child_vec.resize(_child_count);
         for(size_t i = 0; i<_child_count; i++)
-            m_child_vec[i] = va_arg(ap, NodeBase*);
+            m_child_vec[i] = va_arg(ap, Node*);
     }
-    NodeBase* child(uint32 index) const
+    Node* child(uint32 index) const
     {
         return m_child_vec[index];
     }

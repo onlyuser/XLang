@@ -17,12 +17,13 @@
 
 SUBPATHS = \
     0_XLang_full \
-    1_XLang_no-comments \
-    2_XLang_no-locations \
-    3_XLang_no-reentrant \
-    4_XLang_stdio \
-    5_XLang_file \
-    6_XLang_no-flex
+    1_XLang_no-strings \
+    2_XLang_no-comments \
+    3_XLang_no-locations \
+    4_XLang_no-reentrant \
+    5_XLang_stdio \
+    6_XLang_file \
+    7_XLang_no-flex
 
 .PHONY : all
 all :

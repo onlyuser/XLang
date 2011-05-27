@@ -19,7 +19,6 @@
 #define _XLANG_H_
 
 #include "XLangType.h" // uint32
-#include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
 #include "XLangNodeBase.h" // node::NodeBase
 #include "XLangParseContextBase.h" // ParseContextBase
@@ -35,8 +34,6 @@ struct StackElem
     union
     {
         float32            _float; // float value
-        std::string*       _string; // string value
-        uint8              _char; // char value
         const std::string* name; // symbol table index
         node::NodeBase*    node; // node pointer
     };
@@ -51,11 +48,6 @@ struct ScanContext
     char* m_buf; // buffer we read from
     int   m_pos; // current position in buf
     int   m_length; // length of buf
-
-    // location placeholders
-    int m_line_num;
-    int m_col_num;
-    int m_prev_col_num;
 
     ScanContext(char* buf);
 };
@@ -95,22 +87,18 @@ public:
         }
         return *p;
     }
-    std::string* alloc_str(std::string str)
-    {
-        return new (m_alloc, __FILE__, __LINE__) std::string(str);
-    }
 };
 #define YY_EXTRA_TYPE ParseContext*
 
 // forward declaration of lexer/parser functions 
 // so the compiler shuts up about warnings
 //
-int  _XLANG_lex(YYSTYPE*, YYLTYPE*, yyscan_t);
+int  _XLANG_lex(YYSTYPE*, yyscan_t);
 int  _XLANG_lex_init(yyscan_t*);
 int  _XLANG_lex_destroy(yyscan_t);
 void _XLANG_set_extra(YY_EXTRA_TYPE, yyscan_t);
 int  _XLANG_parse(ParseContext*, yyscan_t);
-void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t Scanner, const char* s);
+void _XLANG_error(ParseContext* pc, yyscan_t Scanner, const char* s);
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();

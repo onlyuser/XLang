@@ -35,8 +35,6 @@ struct StackElem
     union
     {
         float32            _float; // float value
-        std::string*       _string; // string value
-        uint8              _char; // char value
         const std::string* name; // symbol table index
         node::NodeBase*    node; // node pointer
     };
@@ -94,10 +92,6 @@ public:
             p = m_string_set.find(&name);
         }
         return *p;
-    }
-    std::string* alloc_str(std::string str)
-    {
-        return new (m_alloc, __FILE__, __LINE__) std::string(str);
     }
 };
 #define YY_EXTRA_TYPE ParseContext*
