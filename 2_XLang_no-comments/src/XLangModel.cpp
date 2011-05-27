@@ -29,16 +29,6 @@ node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &
     return new (pc->alloc(), __FILE__, __LINE__) node::FloatNode(sym_id, loc, value);
 }
 
-node::NodeBase* Model::make_string(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* value)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::StringNode(sym_id, loc, value);
-}
-
-node::NodeBase* Model::make_char(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, uint8 value)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::CharNode(sym_id, loc, value);
-}
-
 node::NodeBase* Model::make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name)
 {
     return new (pc->alloc(), __FILE__, __LINE__) node::IdentNode(sym_id, loc, name);

@@ -31,8 +31,6 @@ class Model
 {
 public:
     static node::NodeBase* make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value);
-    static node::NodeBase* make_string(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* value);
-    static node::NodeBase* make_char(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, uint8 value);
     static node::NodeBase* make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name);
     static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...);
 };
