@@ -22,10 +22,10 @@ About:
     enabled, or both "reentrant" and "hand-rolled lexer" enabled. this order was chosen
     based on "usefulness" within each feature category -- for instance, it is arguably
     more useful to have a reentrant parser than to have one that is non-reentrant, so the
-    reentrant feature is enabled toward the "feature rich" end of the scale. It is
-    unfortunate that not all combinations can be realized in code.
+    reentrant feature is enabled on the "feature rich" end. It is unfortunate that not
+    all feature combinations can be realized in code.
 
-    The tutorial is organized in this way so that anyone familiar or unfamiliar with
+    This tutorial is organized in a way such that anyone familiar or unfamiliar with
     Flex/Bison can quickly identify a variation that has (hopefully) most of the features
     he/she desires. 
 

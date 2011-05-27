@@ -85,7 +85,7 @@ public:
     ScanContext &scan_context() { return m_sc; }
     YYSTYPE     &root()         { return m_root; }
 
-    const std::string* get_alloc_string(std::string name)
+    const std::string* alloc_unique_string(std::string name)
     {
         string_set_t::iterator p = m_string_set.find(&name);
         if(p == m_string_set.end())
@@ -95,9 +95,9 @@ public:
         }
         return *p;
     }
-    std::string* alloc_str(std::string str)
+    std::string* alloc_string(std::string s)
     {
-        return new (m_alloc, __FILE__, __LINE__) std::string(str);
+        return new (m_alloc, __FILE__, __LINE__) std::string(s);
     }
 };
 #define YY_EXTRA_TYPE ParseContext*

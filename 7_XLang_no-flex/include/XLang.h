@@ -61,7 +61,7 @@ public:
     ScanContext     &scan_context() { return m_sc; }
     node::NodeBase* &root()         { return m_root; }
 
-    const std::string* get_alloc_string(std::string name)
+    const std::string* alloc_unique_string(std::string name)
     {
         string_set_t::iterator p = m_string_set.find(&name);
         if(p == m_string_set.end())

@@ -118,7 +118,7 @@ int _XLANG_lex()
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
         }
-        _XLANG_lval.name = parse_context()->get_alloc_string(yytext);
+        _XLANG_lval.name = parse_context()->alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if (isdigit(*yytext))

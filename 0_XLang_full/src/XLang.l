@@ -78,7 +78,7 @@ ignored  [ \t\n]+
 
 {ident}     {
                 begin_token(yyscanner, yytext);
-                yylval->name = yyget_extra(yyscanner)->get_alloc_string(yytext);
+                yylval->name = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
@@ -98,7 +98,7 @@ ignored  [ \t\n]+
 [\"]                    { begin_token(yyscanner, yytext); BEGIN STATE_STRING; }
 <STATE_STRING>[^\"]*    {
                             begin_token(yyscanner, yytext);
-                            yylval->_string = yyget_extra(yyscanner)->alloc_str(yytext);
+                            yylval->_string = yyget_extra(yyscanner)->alloc_string(yytext);
                             char* buf = new char[yylval->_string->length()+1];
                             strcpy(buf, yylval->_string->c_str());
                             int n = 0;

@@ -76,7 +76,7 @@ ignored  [ \t]+
 
 {ident}     {
                 begin_token(yyscanner, yytext);
-                yylval->name = yyget_extra(yyscanner)->get_alloc_string(yytext);
+                yylval->name = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
