@@ -62,9 +62,9 @@ $(PARENT_LIBS) :
 # yacc
 #==================
 
-YACCTEMS = XLang.tab
-YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACCTEMS)) \
-        $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACCTEMS))
+YACC_STEMS = XLang.tab
+YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
+        $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
 .SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
@@ -76,8 +76,8 @@ $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 # lex
 #==================
 
-#LEXTEMS = lex.XLang
-LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEXTEMS))
+#LEX_STEMS = lex.XLang
+LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
 .SECONDARY : $(LEX_GEN)
 
 $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
@@ -96,8 +96,8 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 # binary
 #==================
 
-CPPTEMS = $(YACCTEMS) $(LEXTEMS)
-OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPPTEMS))
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
+OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BINARY) : $(PARENT_LIBS) $(LIBS) $(OBJECTS)
 	mkdir -p $(BIN_PATH)

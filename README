@@ -5,29 +5,27 @@ Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
-    This project is a tutorial.
+    This is a tutorial.
     7 variations of Flex/Bison parser are presented, varying in feature richness.
 
     The first variation, "0_XLang_full", is a full-featured parser.
     With each successive variation, non-critical features are stripped until there is
-    nothing left but a flex-less parser "6_XLang_no-flex".
+    nothing left but a flex-less parser, "6_XLang_no-flex".
 
     feature <--                                                                --> feature
     rich                                                                           poor
 
     full > no-strings > no-comments > no-locations > no-reentrant > stdio > file > no-flex
 
-    To rank one feature more/less critical than another is strictly subjective, so
-    there's really no good reason one cannot have both "comments" and "file input"
-    enabled, or both "reentrant" and "hand-rolled lexer" enabled. this order was chosen
-    based on "usefulness" within each feature category -- for instance, it is arguably
-    more useful to have a reentrant parser than to have one that is non-reentrant, so the
-    reentrant feature is enabled on the "feature rich" end. It is unfortunate that not
-    all feature combinations can be realized in code.
+    This order was chosen based on "usefulness" -- for instance, it is arguably more
+    useful to have a reentrant parser than to have one that is non-reentrant, so the
+    reentrant feature is enabled on the "feature rich" end. There's really no good reason
+    one cannot have both "comments" and "file input" enabled, or both "reentrant" and
+    "hand-rolled lexer" enabled.
 
-    This tutorial is organized in a way such that anyone familiar or unfamiliar with
-    Flex/Bison can quickly identify a variation that has (hopefully) most of the features
-    he/she desires. 
+    The tutorial is organized in this way so anyone familiar or unfamiliar with
+    Flex/Bison can quickly isolate a variation that is most relevent, and easily
+    customize it according to his/her specific needs.
 
 Variation vs Feature Table:
 
@@ -46,9 +44,9 @@ Variation vs Feature Table:
     | no-flex      | hand-rolled | file    | no        | no        | no       | no       |
     +--------------+-------------+---------+-----------+-----------+----------+----------+
 
-    HINT: The "stdio" variation is easiest to implement, because it is the default means
-          of input. It takes extra effort to hack Flex/Bison into using "buffer input" or
-          "file input".
+    HINT: The "stdio" variation is easiest to implement -- The flex lexer accepts
+          standard stream as input by default. It takes extra effort to hack flex into
+          using "buffer input" or "file input".
 
 Feature Detail:
 

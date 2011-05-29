@@ -30,7 +30,7 @@ TARGET = $(BIN_PATH)/XLang.exe
 
 COMMON = ../lib-common
 COMMON_INCLUDE_PATH = $(COMMON)/include
-COMMONRC_PATH = $(COMMON)/src
+COMMON_SRC_PATH = $(COMMON)/src
 COMMON_BUILD_PATH = $(COMMON)/build
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)
@@ -48,10 +48,10 @@ LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 # yacc-related
 #==================
 
-YACCTEMS = XLang.tab
-YACCODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACCTEMS)) \
-    $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACCTEMS))
-.SECONDARY : $(YACCODEGEN_FILES)
+YACC_STEMS = XLang.tab
+YACC_CODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
+    $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
+.SECONDARY : $(YACC_CODEGEN_FILES)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 	bison -d $<
@@ -62,9 +62,9 @@ $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 # lex-related
 #==================
 
-LEXTEMS = lex.XLang
-LEXODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEXTEMS))
-.SECONDARY : $(LEXODEGEN_FILES)
+LEX_STEMS = lex.XLang
+LEX_CODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
+.SECONDARY : $(LEX_CODEGEN_FILES)
 
 $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 	flex $<
@@ -74,10 +74,10 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 # cpp-related (common)
 #==================
 
-COMMONPPTEMS = XLangAlloc XLangView XLangViewG
-COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMONPPTEMS))
+COMMON_CPP_STEMS = XLangAlloc XLangView XLangViewG
+COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 
-$(COMMON_BUILD_PATH)/%.o : $(COMMONRC_PATH)/%.cpp
+$(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 	mkdir -p $(COMMON_BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
@@ -85,8 +85,8 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMONRC_PATH)/%.cpp
 # cpp-related
 #==================
 
-CPPTEMS = $(YACCTEMS) $(LEXTEMS) XLangModel
-OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPPTEMS))
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangModel
+OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
@@ -102,7 +102,7 @@ $(TARGET) : $(OBJECTS) $(COMMON_OBJECTS)
 
 .PHONY : clean
 clean :
-	rm $(TARGET) $(OBJECTS) $(YACCODEGEN_FILES) $(LEXODEGEN_FILES)
+	rm $(TARGET) $(OBJECTS) $(YACC_CODEGEN_FILES) $(LEX_CODEGEN_FILES)
 	rmdir $(BUILD_PATH) $(BIN_PATH)
 	-rm $(COMMON_OBJECTS)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
