@@ -83,8 +83,8 @@ const char* sym_name(uint32 sym_id)
 %nonassoc ID_BASE
 
 %token<_float> ID_FLOAT
-%token<name> ID_IDENT
-%type<node> program statement expression
+%token<ident> ID_IDENT
+%type<inner> program statement expression
 
 %left '+' '-'
 %left '*' '/'
@@ -94,7 +94,7 @@ const char* sym_name(uint32 sym_id)
 %%
 
 root:
-      program { pc->root().node = $1; }
+      program { pc->root().inner = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -134,7 +134,7 @@ node::NodeBase* make_ast(Allocator &alloc, char* s)
     _XLANG_set_extra(&pc, scanner);
     int error = _XLANG_parse(&pc, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().node : NULL;
+    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().inner : NULL;
 }
 
 int main(int argc, char** argv)

@@ -36,9 +36,9 @@ struct StackElem
     {
         float32            _float; // float value
         std::string*       _string; // string value
-        uint8              _char; // char value
-        const std::string* name; // symbol table index
-        node::NodeBase*    node; // node pointer
+        char               _char; // char value
+        const std::string* ident; // symbol table index
+        node::NodeBase*    inner; // node pointer
     };
 };
 #define YYSTYPE StackElem

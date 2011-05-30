@@ -61,7 +61,7 @@ ignored  [ \t]+
 %%
 
 {ident}     {
-                _XLANG_lval.name = parse_context()->alloc_unique_string(yytext);
+                _XLANG_lval.ident = parse_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 

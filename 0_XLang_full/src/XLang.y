@@ -99,8 +99,8 @@ const char* sym_name(uint32 sym_id)
 %token<_float> ID_FLOAT
 %token<_string> ID_STRING
 %token<_char> ID_CHAR
-%token<name> ID_IDENT
-%type<node> program statement expression
+%token<ident> ID_IDENT
+%type<inner> program statement expression
 
 %left '+' '-'
 %left '*' '/'
@@ -110,7 +110,7 @@ const char* sym_name(uint32 sym_id)
 %%
 
 root:
-      program { pc->root().node = $1; }
+      program { pc->root().inner = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -127,7 +127,7 @@ statement:
 
 expression:
       ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, @$, $1); }
-    | ID_STRING                 { $$ = mvc::Model::make_string(pc, ID_STRING, @$, $1); }
+    | ID_STRING                 { $$ = mvc::Model::make_string(pc, ID_STRING, @$, *$1); }
     | ID_CHAR                   { $$ = mvc::Model::make_char(pc, ID_CHAR, @$, $1); }
     | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, @$, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', @$, 2, $1, $3); }
@@ -153,7 +153,7 @@ node::NodeBase* make_ast(Allocator &alloc, char* s)
     _XLANG_set_extra(&pc, scanner);
     int error = _XLANG_parse(&pc, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().node : NULL;
+    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().inner : NULL;
 }
 
 int main(int argc, char** argv)

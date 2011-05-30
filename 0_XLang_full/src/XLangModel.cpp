@@ -26,22 +26,22 @@ namespace mvc {
 
 node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::FloatNode(sym_id, loc, value);
+    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<float32>(sym_id, loc, value);
 }
 
-node::NodeBase* Model::make_string(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* value)
+node::NodeBase* Model::make_string(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, std::string value)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::StringNode(sym_id, loc, value);
+    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<std::string>(sym_id, loc, value);
 }
 
-node::NodeBase* Model::make_char(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, uint8 value)
+node::NodeBase* Model::make_char(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, char value)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::CharNode(sym_id, loc, value);
+    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<char>(sym_id, loc, value);
 }
 
 node::NodeBase* Model::make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name)
 {
-    return new (pc->alloc(), __FILE__, __LINE__) node::IdentNode(sym_id, loc, name);
+    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<const std::string*>(sym_id, loc, name);
 }
 
 node::NodeBase* Model::make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...)

@@ -22,7 +22,6 @@
     #define NULL 0
 #endif
 
-typedef unsigned char uint8;
 typedef unsigned long uint32;
 typedef float float32;
 

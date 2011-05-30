@@ -76,8 +76,8 @@ ParseContext* &parse_context()
 %union
 {
     float32 _float; // float value
-    const std::string* name; // symbol table index
-    node::NodeBase* node; // node pointer
+    const std::string* ident; // symbol table index
+    node::NodeBase* inner; // node pointer
 }
 
 // show detailed parse errors
@@ -86,8 +86,8 @@ ParseContext* &parse_context()
 %nonassoc ID_BASE
 
 %token<_float> ID_FLOAT
-%token<name> ID_IDENT
-%type<node> program statement expression
+%token<ident> ID_IDENT
+%type<inner> program statement expression
 
 %left '+' '-'
 %left '*' '/'

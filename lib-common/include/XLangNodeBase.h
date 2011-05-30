@@ -32,28 +32,19 @@ public:
     virtual uint32 sym_id() const = 0;
 };
 
-class FloatNodeBase
-{
-public:
-    virtual float32 value() const = 0;
-};
+template<class T>
+class NodeTypeSelector;
 
-class StringNodeBase
-{
-public:
-    virtual std::string value() const = 0;
-};
+template<>
+class NodeTypeSelector<float32> { public: enum { type = NodeBase::FLOAT }; };
+template<>
+class NodeTypeSelector<const std::string*> { public: enum { type = NodeBase::IDENT }; };
 
-class CharNodeBase
+template<class T>
+class LeafNodeBase
 {
 public:
-    virtual uint8 value() const = 0;
-};
-
-class IdentNodeBase
-{
-public:
-    virtual std::string name() const = 0;
+    virtual T value() const = 0;
 };
 
 class InnerNodeBase

@@ -53,33 +53,20 @@ public:
     }
 };
 
-class FloatNode : virtual public Node, public FloatNodeBase
+template<class T>
+class LeafNode : virtual public Node, public LeafNodeBase<T>
 {
-    float32 m_value;
+    T m_value;
 
 public:
-    FloatNode(uint32 sym_id, YYLTYPE &loc, float32 _value)
-        : Node(NodeBase::FLOAT, sym_id, loc), m_value(_value)
+    LeafNode(uint32 sym_id, YYLTYPE &loc, T _value)
+        : Node(static_cast<NodeBase::type_e>(
+              NodeTypeSelector<T>::type), sym_id, loc), m_value(_value)
     {
     }
-    float32 value() const
+    T value() const
     {
         return m_value;
-    }
-};
-
-class IdentNode : virtual public Node, public IdentNodeBase
-{
-    const std::string* m_name;
-
-public:
-    IdentNode(uint32 sym_id, YYLTYPE &loc, const std::string* _name)
-        : Node(NodeBase::IDENT, sym_id, loc), m_name(_name)
-    {
-    }
-    std::string name() const
-    {
-        return (!!m_name) ? *m_name : "";
     }
 };
 

@@ -47,63 +47,20 @@ public:
     }
 };
 
-class FloatNode : virtual public Node, public FloatNodeBase
+template<class T>
+class LeafNode : virtual public Node, public LeafNodeBase<T>
 {
-    float32 m_value;
+    T m_value;
 
 public:
-    FloatNode(uint32 sym_id, float32 _value)
-        : Node(NodeBase::FLOAT, sym_id), m_value(_value)
+    LeafNode(uint32 sym_id, T _value)
+        : Node(static_cast<NodeBase::type_e>(
+              NodeTypeSelector<T>::type), sym_id), m_value(_value)
     {
     }
-    float32 value() const
+    T value() const
     {
         return m_value;
-    }
-};
-
-class StringNode : virtual public Node, public StringNodeBase
-{
-    const std::string* m_value;
-
-public:
-    StringNode(uint32 sym_id, const std::string* _value)
-        : Node(NodeBase::STRING, sym_id), m_value(_value)
-    {
-    }
-    std::string value() const
-    {
-        return (!!m_value) ? *m_value : "";
-    }
-};
-
-class CharNode : virtual public Node, public CharNodeBase
-{
-    uint8 m_value;
-
-public:
-    CharNode(uint32 sym_id, uint8 _value)
-        : Node(NodeBase::CHAR, sym_id), m_value(_value)
-    {
-    }
-    uint8 value() const
-    {
-        return m_value;
-    }
-};
-
-class IdentNode : virtual public Node, public IdentNodeBase
-{
-    const std::string* m_name;
-
-public:
-    IdentNode(uint32 sym_id, const std::string* _name)
-        : Node(NodeBase::IDENT, sym_id), m_name(_name)
-    {
-    }
-    std::string name() const
-    {
-        return (!!m_name) ? *m_name : "";
     }
 };
 

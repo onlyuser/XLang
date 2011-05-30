@@ -35,8 +35,8 @@ struct StackElem
     union
     {
         float32            _float; // float value
-        const std::string* name; // symbol table index
-        node::NodeBase*    node; // node pointer
+        const std::string* ident; // symbol table index
+        node::NodeBase*    inner; // node pointer
     };
 };
 #define YYSTYPE StackElem

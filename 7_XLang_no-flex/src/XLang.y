@@ -118,7 +118,7 @@ int _XLANG_lex()
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
         }
-        _XLANG_lval.name = parse_context()->alloc_unique_string(yytext);
+        _XLANG_lval.ident = parse_context()->alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if (isdigit(*yytext))
@@ -162,8 +162,8 @@ int _XLANG_lex()
 %union
 {
     float32 _float; // float value
-    const std::string* name; // symbol table index
-    node::NodeBase* node; // node pointer
+    const std::string* ident; // symbol table index
+    node::NodeBase* inner; // node pointer
 }
 
 // show detailed parse errors
@@ -172,8 +172,8 @@ int _XLANG_lex()
 %nonassoc ID_BASE
 
 %token<_float> ID_FLOAT
-%token<name> ID_IDENT
-%type<node> program statement expression
+%token<ident> ID_IDENT
+%type<inner> program statement expression
 
 %left '+' '-'
 %left '*' '/'

@@ -107,10 +107,10 @@ void exNode
     s = word;
     switch (p->type()) {
         case typeCon:
-            sprintf(word, "%f", dynamic_cast<const node::FloatNodeBase*>(p)->value());
+            sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<float32>*>(p)->value());
             break;
         case typeId:
-            sprintf(word, "%s", dynamic_cast<const node::IdentNodeBase*>(p)->name().c_str());
+            sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<const std::string*>*>(p)->value()->c_str());
             break;
         case typeOpr:
             s = const_cast<char*>(sym_name(p->sym_id()));

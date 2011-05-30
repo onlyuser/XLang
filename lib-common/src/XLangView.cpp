@@ -32,16 +32,16 @@ void View::print_lisp(const node::NodeBase* Node)
     switch (Node->type())
     {
         case node::NodeBase::FLOAT:
-            std::cout << dynamic_cast<const node::FloatNodeBase*>(Node)->value();
+            std::cout << dynamic_cast<const node::LeafNodeBase<float32>*>(Node)->value();
             break;
         case node::NodeBase::STRING:
-            std::cout << '\"' << dynamic_cast<const node::StringNodeBase*>(Node)->value() << '\"';
+            std::cout << '\"' << dynamic_cast<const node::LeafNodeBase<std::string>*>(Node)->value() << '\"';
             break;
         case node::NodeBase::CHAR:
-            std::cout << '\'' << dynamic_cast<const node::CharNodeBase*>(Node)->value() << '\'';
+            std::cout << '\'' << dynamic_cast<const node::LeafNodeBase<char>*>(Node)->value() << '\'';
             break;
         case node::NodeBase::IDENT:
-            std::cout << dynamic_cast<const node::IdentNodeBase*>(Node)->name();
+            std::cout << *dynamic_cast<const node::LeafNodeBase<const std::string*>*>(Node)->value();
             break;
         case node::NodeBase::INNER:
             {
