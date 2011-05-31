@@ -31,6 +31,9 @@ void View::print_lisp(const node::NodeBase* _node)
         return;
     switch(_node->type())
     {
+        case node::NodeBase::INT:
+            std::cout << dynamic_cast<const node::LeafNodeBase<long>*>(_node)->value();
+            break;
         case node::NodeBase::FLOAT:
             std::cout << dynamic_cast<const node::LeafNodeBase<float32>*>(_node)->value();
             break;

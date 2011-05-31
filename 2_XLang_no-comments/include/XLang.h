@@ -34,6 +34,7 @@ struct StackElem
 {
     union
     {
+        long               _int; // int value
         float32            _float; // float value
         const std::string* ident; // symbol table index
         node::NodeBase*    inner; // node pointer

@@ -52,6 +52,7 @@ std::stringstream &errors()
 const char* sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
+        "ID_INT",
         "ID_FLOAT",
         "ID_IDENT"
         };
@@ -123,18 +124,26 @@ int _XLANG_lex()
     }
     else if(isdigit(*yytext))
     {
+        bool find_decimal_point = false;
         do
         {
             prev_char = &yytext[PARM.m_pos - start_pos];
             YY_INPUT(prev_char, bytes_read, 1);
+            if(*prev_char == '.')
+                find_decimal_point = true;
         } while (bytes_read != 0 && isdigit(*prev_char));
         if(bytes_read != 0)
         {
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
         }
-        _XLANG_lval._float = atof(yytext);
-        return ID_FLOAT;
+        if(find_decimal_point)
+        {
+            _XLANG_lval._float = atof(yytext);
+            return ID_FLOAT;
+        }
+        _XLANG_lval._int = atoi(yytext);
+        return ID_INT;
     }
     else
     {
@@ -148,7 +157,7 @@ int _XLANG_lex()
             case '\n':
                 return *yytext;
             default:
-                _XLANG_error("Unknown character");
+                _XLANG_error("unknown character");
         }
     }
     return -1;
@@ -161,9 +170,10 @@ int _XLANG_lex()
 //
 %union
 {
-    float32 _float; // float value
+    long               _int; // int value
+    float32            _float; // float value
     const std::string* ident; // symbol table index
-    node::NodeBase* inner; // node pointer
+    node::NodeBase*    inner; // node pointer
 }
 
 // show detailed parse errors
@@ -171,6 +181,7 @@ int _XLANG_lex()
 
 %nonassoc ID_BASE
 
+%token<_int> ID_INT
 %token<_float> ID_FLOAT
 %token<ident> ID_IDENT
 %type<inner> program statement expression
@@ -199,7 +210,8 @@ statement:
     ;
 
 expression:
-      ID_FLOAT                  { $$ = mvc::Model::make_float(parse_context(), ID_FLOAT, $1); }
+      ID_INT                    { $$ = mvc::Model::make_int(parse_context(), ID_INT, $1); }
+    | ID_FLOAT                  { $$ = mvc::Model::make_float(parse_context(), ID_FLOAT, $1); }
     | ID_IDENT                  { $$ = mvc::Model::make_ident(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(parse_context(), '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::Model::make_inner(parse_context(), '-', 2, $1, $3); }

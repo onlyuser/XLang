@@ -26,7 +26,7 @@ namespace node {
 class NodeBase
 {
 public:
-    typedef enum { FLOAT, STRING, CHAR, IDENT, INNER } type_e;
+    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
     virtual type_e type() const = 0;
     virtual uint32 sym_id() const = 0;
@@ -35,6 +35,8 @@ public:
 template<class T>
 class NodeTypeSelector;
 
+template<>
+class NodeTypeSelector<long> { public: enum { type = NodeBase::INT }; };
 template<>
 class NodeTypeSelector<float32> { public: enum { type = NodeBase::FLOAT }; };
 template<>

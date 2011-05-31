@@ -30,7 +30,6 @@
 //#include "calc3.h"
 //#include "calc3.tab.h"
 
-#define typeCon node::NodeBase::FLOAT
 #define typeId node::NodeBase::IDENT
 #define typeOpr node::NodeBase::INNER
 
@@ -106,7 +105,10 @@ void exNode
     strcpy (word, "???"); /* should never appear */
     s = word;
     switch (p->type()) {
-        case typeCon:
+        case node::NodeBase::INT:
+            sprintf(word, "%d", dynamic_cast<const node::LeafNodeBase<long>*>(p)->value());
+            break;
+        case node::NodeBase::FLOAT:
             sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<float32>*>(p)->value());
             break;
         case typeId:
@@ -126,7 +128,7 @@ void exNode
     *cm = c + w / 2;
 
     /* node is leaf */
-    if (p->type() == typeCon || p->type() == typeId ||
+    if (p->type() != typeOpr ||
             dynamic_cast<const node::InnerNodeBase*>(p)->child_count() == 0) {
         graphDrawBox (s, cbar, l);
         return;

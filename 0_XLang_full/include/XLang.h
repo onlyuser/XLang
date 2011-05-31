@@ -34,6 +34,7 @@ struct StackElem
 {
     union
     {
+        long               _int; // int value
         float32            _float; // float value
         std::string*       _string; // string value
         char               _char; // char value

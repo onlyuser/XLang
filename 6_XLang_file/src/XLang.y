@@ -48,6 +48,7 @@ std::stringstream &errors()
 const char* sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
+        "ID_INT",
         "ID_FLOAT",
         "ID_IDENT"
         };
@@ -75,9 +76,10 @@ ParseContext* &parse_context()
 //
 %union
 {
-    float32 _float; // float value
+    long               _int; // int value
+    float32            _float; // float value
     const std::string* ident; // symbol table index
-    node::NodeBase* inner; // node pointer
+    node::NodeBase*    inner; // node pointer
 }
 
 // show detailed parse errors
@@ -85,6 +87,7 @@ ParseContext* &parse_context()
 
 %nonassoc ID_BASE
 
+%token<_int> ID_INT
 %token<_float> ID_FLOAT
 %token<ident> ID_IDENT
 %type<inner> program statement expression
@@ -113,7 +116,8 @@ statement:
     ;
 
 expression:
-      ID_FLOAT                  { $$ = mvc::Model::make_float(parse_context(), ID_FLOAT, $1); }
+      ID_INT                    { $$ = mvc::Model::make_int(parse_context(), ID_INT, $1); }
+    | ID_FLOAT                  { $$ = mvc::Model::make_float(parse_context(), ID_FLOAT, $1); }
     | ID_IDENT                  { $$ = mvc::Model::make_ident(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(parse_context(), '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::Model::make_inner(parse_context(), '-', 2, $1, $3); }

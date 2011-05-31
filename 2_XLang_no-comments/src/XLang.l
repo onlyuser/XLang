@@ -68,7 +68,8 @@ digit    [0-9]
 alpha    [a-zA-Z]
 id       {alpha}|[_]
 ident    {id}+({digit}|{id})*
-_float   {digit}+([.]{digit}+)?
+_int     {digit}+
+_float   {digit}*[.]{digit}+
 unnamed  [,()+\-*/=]
 ignored  [ \t\n]+
 
@@ -78,6 +79,12 @@ ignored  [ \t\n]+
                 begin_token(yyscanner, yytext);
                 yylval->ident = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
+            }
+
+{_int}      {
+                begin_token(yyscanner, yytext);
+                yylval->_int = atoi(yytext);
+                return ID_INT;
             }
 
 {_float}    {

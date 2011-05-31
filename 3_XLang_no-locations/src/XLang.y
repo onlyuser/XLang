@@ -52,6 +52,7 @@ std::stringstream &errors()
 const char* sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
+        "ID_INT",
         "ID_FLOAT",
         "ID_IDENT"
         };
@@ -82,6 +83,7 @@ const char* sym_name(uint32 sym_id)
 
 %nonassoc ID_BASE
 
+%token<_int> ID_INT
 %token<_float> ID_FLOAT
 %token<ident> ID_IDENT
 %type<inner> program statement expression
@@ -110,7 +112,8 @@ statement:
     ;
 
 expression:
-      ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, $1); }
+      ID_INT                    { $$ = mvc::Model::make_int(pc, ID_INT, $1); }
+    | ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, $1); }
     | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::Model::make_inner(pc, '-', 2, $1, $3); }

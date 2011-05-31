@@ -29,6 +29,7 @@ namespace mvc {
 class Model
 {
 public:
+    static node::NodeBase* make_int(ParseContextBase* pc, uint32 sym_id, long value);
     static node::NodeBase* make_float(ParseContextBase* pc, uint32 sym_id, float32 value);
     static node::NodeBase* make_ident(ParseContextBase* pc, uint32 sym_id, const std::string* name);
     static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...);

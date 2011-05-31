@@ -24,6 +24,11 @@
 
 namespace mvc {
 
+node::NodeBase* Model::make_int(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, long value)
+{
+    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<long>(sym_id, loc, value);
+}
+
 node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value)
 {
     return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<float32>(sym_id, loc, value);
