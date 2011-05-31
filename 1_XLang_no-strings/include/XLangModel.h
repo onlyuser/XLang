@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _XLANG_MVC_MODEL_H_
-#define _XLANG_MVC_MODEL_H_
+#ifndef XLANG_MVC_MODEL_H_
+#define XLANG_MVC_MODEL_H_
 
 #include "XLangAlloc.h"
 #include "XLangNodeBase.h" // node::NodeBase
+#include "XLangNode.h" // node::Node
 #include "XLangParseContextBase.h" // ParseContextBase
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE
@@ -30,9 +31,11 @@ namespace mvc {
 class Model
 {
 public:
-    static node::NodeBase* make_int(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, long value);
-    static node::NodeBase* make_float(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, float32 value);
-    static node::NodeBase* make_ident(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, const std::string* name);
+    template<class T>
+    static node::NodeBase* make_leaf(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, T value)
+    {
+        return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<T>(sym_id, loc, value);
+    }
     static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...);
 };
 

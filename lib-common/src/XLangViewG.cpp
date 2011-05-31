@@ -106,7 +106,7 @@ void exNode
     s = word;
     switch (p->type()) {
         case node::NodeBase::INT:
-            sprintf(word, "%d", dynamic_cast<const node::LeafNodeBase<long>*>(p)->value());
+            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeBase<long>*>(p)->value());
             break;
         case node::NodeBase::FLOAT:
             sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<float32>*>(p)->value());

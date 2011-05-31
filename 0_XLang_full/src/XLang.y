@@ -124,15 +124,15 @@ program:
 statement:
       expression              { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(pc, '=', @$, 2,
-                                        mvc::Model::make_ident(pc, ID_IDENT, @$, $1), $3); }
+                                        mvc::Model::make_leaf<const std::string*>(pc, ID_IDENT, @$, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = mvc::Model::make_int(pc, ID_INT, @$, $1); }
-    | ID_FLOAT                  { $$ = mvc::Model::make_float(pc, ID_FLOAT, @$, $1); }
-    | ID_STRING                 { $$ = mvc::Model::make_string(pc, ID_STRING, @$, *$1); }
-    | ID_CHAR                   { $$ = mvc::Model::make_char(pc, ID_CHAR, @$, $1); }
-    | ID_IDENT                  { $$ = mvc::Model::make_ident(pc, ID_IDENT, @$, $1); }
+      ID_INT                    { $$ = mvc::Model::make_leaf<long>(pc, ID_INT, @$, $1); }
+    | ID_FLOAT                  { $$ = mvc::Model::make_leaf<float32>(pc, ID_FLOAT, @$, $1); }
+    | ID_STRING                 { $$ = mvc::Model::make_leaf<std::string>(pc, ID_STRING, @$, *$1); }
+    | ID_CHAR                   { $$ = mvc::Model::make_leaf<char>(pc, ID_CHAR, @$, $1); }
+    | ID_IDENT                  { $$ = mvc::Model::make_leaf<const std::string*>(pc, ID_IDENT, @$, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(pc, '+', @$, 2, $1, $3); }
     | expression '-' expression { $$ = mvc::Model::make_inner(pc, '-', @$, 2, $1, $3); }
     | expression '*' expression { $$ = mvc::Model::make_inner(pc, '*', @$, 2, $1, $3); }

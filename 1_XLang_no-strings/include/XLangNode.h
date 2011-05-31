@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _XLANG_NODE_H_
-#define _XLANG_NODE_H_
+#ifndef XLANG_NODE_H_
+#define XLANG_NODE_H_
 
 #include "XLangNodeBase.h" // Node
 #include "XLangType.h" // uint32

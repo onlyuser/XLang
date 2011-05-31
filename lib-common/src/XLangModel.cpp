@@ -24,21 +24,6 @@
 
 namespace mvc {
 
-node::NodeBase* Model::make_int(ParseContextBase* pc, uint32 sym_id, long value)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<long>(sym_id, value);
-}
-
-node::NodeBase* Model::make_float(ParseContextBase* pc, uint32 sym_id, float32 value)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<float32>(sym_id, value);
-}
-
-node::NodeBase* Model::make_ident(ParseContextBase* pc, uint32 sym_id, const std::string* name)
-{
-    return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<const std::string*>(sym_id, name);
-}
-
 node::NodeBase* Model::make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...)
 {
     va_list ap;
