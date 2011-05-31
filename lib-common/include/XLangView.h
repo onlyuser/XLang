@@ -25,7 +25,7 @@ namespace mvc {
 class View
 {
 public:
-    static void print_lisp(const node::NodeBase* Node);
+    static void print_lisp(const node::NodeBase* _node);
     static void print_graph(const node::NodeBase* p);
 };
 

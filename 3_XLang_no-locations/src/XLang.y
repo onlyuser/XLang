@@ -55,7 +55,7 @@ const char* sym_name(uint32 sym_id)
         "ID_FLOAT",
         "ID_IDENT"
         };
-    switch (sym_id)
+    switch(sym_id)
     {
         case '+': return "+";
         case '-': return "-";
@@ -139,14 +139,14 @@ node::NodeBase* make_ast(Allocator &alloc, char* s)
 
 int main(int argc, char** argv)
 {
-    if (2 != argc)
+    if(2 != argc)
     {
         std::cout << "ERROR: requires 1 argument" << std::endl;
         return 1;
     }
     Allocator alloc(__FILE__);
     node::NodeBase* node = make_ast(alloc, argv[1]);
-    if (NULL == node)
+    if(NULL == node)
     {
         std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
         return 1;

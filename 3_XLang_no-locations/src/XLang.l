@@ -35,7 +35,7 @@
 //
 #define YY_INPUT(buffer, res, max_size)                        \
     do {                                                       \
-        if (PARM.m_pos >= PARM.m_length)                       \
+        if(PARM.m_pos >= PARM.m_length)                        \
             (res) = YY_NULL;                                   \
         else {                                                 \
             (res) = PARM.m_length - PARM.m_pos;                \
@@ -56,8 +56,8 @@ alpha    [a-zA-Z]
 id       {alpha}|[_]
 ident    {id}+({digit}|{id})*
 _float   {digit}+([.]{digit}+)?
-unnamed  [,()+\-*/=\n]
-ignored  [ \t]+
+unnamed  [,()+\-*/=]
+ignored  [ \t\n]+
 
 %%
 

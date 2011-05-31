@@ -25,34 +25,34 @@ const char* sym_name(uint32 sym_id);
 
 namespace mvc {
 
-void View::print_lisp(const node::NodeBase* Node)
+void View::print_lisp(const node::NodeBase* _node)
 {
-    if (NULL == Node)
+    if(NULL == _node)
         return;
-    switch (Node->type())
+    switch(_node->type())
     {
         case node::NodeBase::FLOAT:
-            std::cout << dynamic_cast<const node::LeafNodeBase<float32>*>(Node)->value();
+            std::cout << dynamic_cast<const node::LeafNodeBase<float32>*>(_node)->value();
             break;
         case node::NodeBase::STRING:
-            std::cout << '\"' << dynamic_cast<const node::LeafNodeBase<std::string>*>(Node)->value() << '\"';
+            std::cout << '\"' << dynamic_cast<const node::LeafNodeBase<std::string>*>(_node)->value() << '\"';
             break;
         case node::NodeBase::CHAR:
-            std::cout << '\'' << dynamic_cast<const node::LeafNodeBase<char>*>(Node)->value() << '\'';
+            std::cout << '\'' << dynamic_cast<const node::LeafNodeBase<char>*>(_node)->value() << '\'';
             break;
         case node::NodeBase::IDENT:
-            std::cout << *dynamic_cast<const node::LeafNodeBase<const std::string*>*>(Node)->value();
+            std::cout << *dynamic_cast<const node::LeafNodeBase<const std::string*>*>(_node)->value();
             break;
         case node::NodeBase::INNER:
             {
-                std::cout << '(' << sym_name(Node->sym_id()) << ' ';
+                std::cout << '(' << sym_name(_node->sym_id()) << ' ';
                 size_t i;
-                for(i = 0; i < dynamic_cast<const node::InnerNodeBase*>(Node)->child_count()-1; i++)
+                for(i = 0; i < dynamic_cast<const node::InnerNodeBase*>(_node)->child_count()-1; i++)
                 {
-                    print_lisp(dynamic_cast<const node::InnerNodeBase*>(Node)->child(i));
+                    print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
                     std::cout << ' ';
                 }
-                print_lisp(dynamic_cast<const node::InnerNodeBase*>(Node)->child(i));
+                print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
                 std::cout << ')';
             }
     }

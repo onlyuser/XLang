@@ -35,8 +35,8 @@ alpha    [a-zA-Z]
 id       {alpha}|[_]
 ident    {id}+({digit}|{id})*
 _float   {digit}+([.]{digit}+)?
-unnamed  [,()+\-*/=\n]
-ignored  [ \t]+
+unnamed  [,()+\-*/=]
+ignored  [ \t\n]+
 
 %%
 

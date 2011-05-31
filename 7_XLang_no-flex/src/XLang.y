@@ -55,7 +55,7 @@ const char* sym_name(uint32 sym_id)
         "ID_FLOAT",
         "ID_IDENT"
         };
-    switch (sym_id)
+    switch(sym_id)
     {
         case '+': return "+";
         case '-': return "-";
@@ -81,7 +81,7 @@ ParseContext* &parse_context()
 //
 #define YY_INPUT(buffer, res, max_size)                        \
     do {                                                       \
-        if (PARM.m_pos >= PARM.m_length)                       \
+        if(PARM.m_pos >= PARM.m_length)                        \
             (res) = 0;                                         \
         else {                                                 \
             (res) = PARM.m_length - PARM.m_pos;                \
@@ -99,9 +99,9 @@ int _XLANG_lex()
     int bytes_read = 0;
     int start_pos = PARM.m_pos;
     YY_INPUT(yytext, bytes_read, 1);
-    if (0 == bytes_read)
+    if(0 == bytes_read)
         return -1;
-    if (isalpha(*yytext) || '_' == *yytext)
+    if(isalpha(*yytext) || '_' == *yytext)
     {
         do
         {
@@ -113,7 +113,7 @@ int _XLANG_lex()
             prev_char = &yytext[PARM.m_pos - start_pos];
             YY_INPUT(prev_char, bytes_read, 1);
         }
-        if (bytes_read != 0)
+        if(bytes_read != 0)
         {
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
@@ -121,14 +121,14 @@ int _XLANG_lex()
         _XLANG_lval.ident = parse_context()->alloc_unique_string(yytext);
         return ID_IDENT;
     }
-    else if (isdigit(*yytext))
+    else if(isdigit(*yytext))
     {
         do
         {
             prev_char = &yytext[PARM.m_pos - start_pos];
             YY_INPUT(prev_char, bytes_read, 1);
         } while (bytes_read != 0 && isdigit(*prev_char));
-        if (bytes_read != 0)
+        if(bytes_read != 0)
         {
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
@@ -138,7 +138,7 @@ int _XLANG_lex()
     }
     else
     {
-        switch (*yytext)
+        switch(*yytext)
         {
             case ',':
             case '(': case ')':
@@ -227,21 +227,20 @@ node::NodeBase* make_ast(Allocator &alloc, FILE* file)
 
 int main(int argc, char** argv)
 {
-    if (2 > argc)
+    if(2 > argc)
     {
         std::cout << "ERROR: requires 1 or more filename arguments" << std::endl;
         return 1;
     }
     Allocator alloc(__FILE__);
-    int i;
-    for (i = 1; i < argc; i++)
+    for(int i = 1; i < argc; i++)
     {
         FILE* file = fopen(argv[i], "rb");
-        if (NULL == file)
+        if(NULL == file)
             break;
         node::NodeBase* node = make_ast(alloc, file);
         fclose(file);
-        if (NULL == node)
+        if(NULL == node)
         {
             std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
             continue;

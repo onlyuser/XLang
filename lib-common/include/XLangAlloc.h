@@ -57,7 +57,7 @@ public:
     void dump() const;
 };
 
-// NOTE: doesn't work for arrays
+// NOTE: doesn't work forarrays
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number);
 
 #endif

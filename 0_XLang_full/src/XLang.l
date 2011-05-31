@@ -40,12 +40,12 @@
 //
 #define YY_INPUT(buffer, res, max_size)                        \
     do {                                                       \
-        if (PARM.m_pos >= PARM.m_length)                       \
+        if(PARM.m_pos >= PARM.m_length)                        \
             (res) = YY_NULL;                                   \
         else {                                                 \
             (res) = MIN(PARM.m_length - PARM.m_pos, 1);        \
             (res) > (int) (max_size) ? (res) = (max_size) : 0; \
-            if ('\n' == PARM.m_buf[PARM.m_pos]) {              \
+            if('\n' == PARM.m_buf[PARM.m_pos]) {               \
                 PARM.m_line_num++;                             \
                 PARM.m_col_num = 1;                            \
             }                                                  \
@@ -103,16 +103,15 @@ ignored  [ \t\n]+
                             strcpy(buf, yylval->_string->c_str());
                             int n = 0;
                             bool escape_next_char = false;
-                            int i;
-                            for (i = 0; '\0' != buf[i]; i++)
+                            for(int i = 0; '\0' != buf[i]; i++)
                             {
-                                if (escape_next_char)
+                                if(escape_next_char)
                                 {
                                     escape_next_char = false;
                                     buf[i] = escape_char(buf[i]);
                                 }
                                 else
-                                    if ('\\' == buf[i])
+                                    if('\\' == buf[i])
                                     {
                                         escape_next_char = true;
                                         continue;
@@ -129,12 +128,12 @@ ignored  [ \t\n]+
 [\']                    { begin_token(yyscanner, yytext); BEGIN STATE_CHAR; }
 <STATE_CHAR>[^\']*      {
                             begin_token(yyscanner, yytext);
-                            if ('\\' == *yytext)
+                            if('\\' == *yytext)
                             {
                                 yytext++;
                                 *yytext = escape_char(*yytext);
                             }
-                            if ('\0' != *(yytext + 1))
+                            if('\0' != *(yytext + 1))
                                 _XLANG_error("bad escape character");
                             yylval->_char = *yytext;
                             return ID_CHAR;
@@ -175,13 +174,13 @@ void begin_token(yyscan_t yyscanner, char* s)
     loc->last_line    = PARM.m_line_num;
     loc->last_column  = PARM.m_prev_col_num + n - 1;
     PARM.m_prev_col_num = PARM.m_col_num;
-    if (n > 1)
+    if(n > 1)
         PARM.m_prev_col_num--;
 }
 
 char escape_char(char c)
 {
-    switch (c)
+    switch(c)
     {
         case 'r': return '\r';
         case 'n': return '\n';

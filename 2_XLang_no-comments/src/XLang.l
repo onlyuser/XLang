@@ -40,12 +40,12 @@
 //
 #define YY_INPUT(buffer, res, max_size)                        \
     do {                                                       \
-        if (PARM.m_pos >= PARM.m_length)                       \
+        if(PARM.m_pos >= PARM.m_length)                        \
             (res) = YY_NULL;                                   \
         else {                                                 \
             (res) = MIN(PARM.m_length - PARM.m_pos, 1);        \
             (res) > (int) (max_size) ? (res) = (max_size) : 0; \
-            if ('\n' == PARM.m_buf[PARM.m_pos]) {              \
+            if('\n' == PARM.m_buf[PARM.m_pos]) {               \
                 PARM.m_line_num++;                             \
                 PARM.m_col_num = 1;                            \
             }                                                  \
@@ -69,8 +69,8 @@ alpha    [a-zA-Z]
 id       {alpha}|[_]
 ident    {id}+({digit}|{id})*
 _float   {digit}+([.]{digit}+)?
-unnamed  [,()+\-*/=\n]
-ignored  [ \t]+
+unnamed  [,()+\-*/=]
+ignored  [ \t\n]+
 
 %%
 
@@ -110,6 +110,6 @@ void begin_token(yyscan_t yyscanner, char* s)
     loc->last_line    = PARM.m_line_num;
     loc->last_column  = PARM.m_prev_col_num + n - 1;
     PARM.m_prev_col_num = PARM.m_col_num;
-    if (n > 1)
+    if(n > 1)
         PARM.m_prev_col_num--;
 }
