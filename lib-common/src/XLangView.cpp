@@ -21,7 +21,7 @@
 #include <iostream> // std::cout
 
 // prototype
-const char* sym_name(uint32 sym_id);
+extern std::string sym_name(uint32 sym_id);
 
 namespace mvc {
 

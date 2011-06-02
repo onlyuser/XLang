@@ -58,7 +58,7 @@ std::stringstream &errors()
     static std::stringstream _errors;
     return _errors;
 }
-const char* sym_name(uint32 sym_id)
+std::string sym_name(uint32 sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "ID_INT",

@@ -80,7 +80,7 @@ int  _XLANG_parse();
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
-const char* sym_name(uint32 sym_id);
+std::string sym_name(uint32 sym_id);
 ParseContext* &parse_context();
 
 node::NodeBase* make_ast(Allocator &alloc, char* s);

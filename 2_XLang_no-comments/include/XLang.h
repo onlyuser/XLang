@@ -109,7 +109,7 @@ void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t Scanner, const char* 
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
-const char* sym_name(uint32 sym_id);
+std::string sym_name(uint32 sym_id);
 
 node::NodeBase* make_ast(Allocator &alloc, char* s);
 

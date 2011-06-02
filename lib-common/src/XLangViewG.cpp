@@ -18,6 +18,7 @@
 #include "XLangView.h" // mvc (owner)
 #include "XLangNodeBase.h" // node::NodeBase
 #include "XLangType.h" // uint32
+#include <string> // std::string
 
 /* source code courtesy of Frank Thomas Braun */
 /* minimally altered by Jerry Chen <mailto:onlyuser@gmail.com> */
@@ -25,7 +26,7 @@
 /* calc3d.c: Generation of the graph of the syntax tree */
 
 #include <stdio.h> // printf
-#include <string.h> // std::string
+#include <string.h> // strcpy
 
 //#include "calc3.h"
 //#include "calc3.tab.h"
@@ -34,7 +35,7 @@
 #define typeOpr node::NodeBase::INNER
 
 // prototype
-const char* sym_name(uint32 sym_id);
+extern std::string sym_name(uint32 sym_id);
 
 namespace mvc {
 
@@ -104,6 +105,7 @@ void exNode
 
     strcpy (word, "???"); /* should never appear */
     s = word;
+    std::string temp;
     switch (p->type()) {
         case node::NodeBase::INT:
             sprintf(word, "%ld", dynamic_cast<const node::LeafNodeBase<long>*>(p)->value());
@@ -115,7 +117,8 @@ void exNode
             sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<const std::string*>*>(p)->value()->c_str());
             break;
         case typeOpr:
-            s = const_cast<char*>(sym_name(p->sym_id()));
+            temp = sym_name(p->sym_id());
+            s = const_cast<char*>(temp.c_str());
             break;
         default:
             break;
