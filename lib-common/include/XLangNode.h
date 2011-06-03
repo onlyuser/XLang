@@ -55,7 +55,7 @@ class LeafNode : virtual public Node, public LeafNodeBase<T>
 public:
     LeafNode(uint32 sym_id, T _value)
         : Node(static_cast<NodeBase::type_e>(
-              NodeTypeSelector<T>::type), sym_id), m_value(_value)
+              LeafType<T>::type), sym_id), m_value(_value)
     {
     }
     T value() const

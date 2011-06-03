@@ -206,13 +206,13 @@ program:
 statement:
       expression              { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(parse_context(), '=', 2,
-                                        mvc::Model::make_leaf<const std::string*>(parse_context(), ID_IDENT, $1), $3); }
+                                        mvc::Model::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = mvc::Model::make_leaf<long>(parse_context(), ID_INT, $1); }
-    | ID_FLOAT                  { $$ = mvc::Model::make_leaf<float32>(parse_context(), ID_FLOAT, $1); }
-    | ID_IDENT                  { $$ = mvc::Model::make_leaf<const std::string*>(parse_context(), ID_IDENT, $1); }
+      ID_INT                    { $$ = mvc::Model::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
+    | ID_FLOAT                  { $$ = mvc::Model::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
+    | ID_IDENT                  { $$ = mvc::Model::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::Model::make_inner(parse_context(), '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::Model::make_inner(parse_context(), '-', 2, $1, $3); }
     | expression '*' expression { $$ = mvc::Model::make_inner(parse_context(), '*', 2, $1, $3); }

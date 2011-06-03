@@ -33,14 +33,24 @@ public:
 };
 
 template<class T>
-class NodeTypeSelector;
+class LeafType;
 
 template<>
-class NodeTypeSelector<long> { public: enum { type = NodeBase::INT }; };
+class LeafType<long> { public: enum { type = NodeBase::INT }; };
 template<>
-class NodeTypeSelector<float32> { public: enum { type = NodeBase::FLOAT }; };
+class LeafType<float32> { public: enum { type = NodeBase::FLOAT }; };
 template<>
-class NodeTypeSelector<const std::string*> { public: enum { type = NodeBase::IDENT }; };
+class LeafType<const std::string*> { public: enum { type = NodeBase::IDENT }; };
+
+template<NodeBase::type_e>
+class LeafValueType;
+
+template<>
+class LeafValueType<NodeBase::INT> { public: typedef long type; };
+template<>
+class LeafValueType<NodeBase::FLOAT> { public: typedef float32 type; };
+template<>
+class LeafValueType<NodeBase::IDENT> { public: typedef const std::string* type; };
 
 template<class T>
 class LeafNodeBase
