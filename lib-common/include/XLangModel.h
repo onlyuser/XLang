@@ -34,8 +34,7 @@ public:
     static node::NodeBase* make_leaf(ParseContextBase* pc, uint32 sym_id,
             typename node::LeafValueType<type>::type value)
     {
-        return new (pc->alloc(), __FILE__, __LINE__)
-                node::LeafNode<typename node::LeafValueType<type>::type>(sym_id, value);
+        return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, value);
     }
     static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...);
 };

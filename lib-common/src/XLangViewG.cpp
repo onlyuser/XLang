@@ -108,13 +108,13 @@ void exNode
     std::string temp;
     switch (p->type()) {
         case node::NodeBase::INT:
-            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeBase<long>*>(p)->value());
+            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeBase<node::NodeBase::INT>*>(p)->value());
             break;
         case node::NodeBase::FLOAT:
-            sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<float32>*>(p)->value());
+            sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<node::NodeBase::FLOAT>*>(p)->value());
             break;
         case typeId:
-            sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<const std::string*>*>(p)->value()->c_str());
+            sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(p)->value()->c_str());
             break;
         case typeOpr:
             temp = sym_name(p->sym_id());

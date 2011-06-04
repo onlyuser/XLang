@@ -32,16 +32,6 @@ public:
     virtual uint32 sym_id() const = 0;
 };
 
-template<class T>
-class LeafType;
-
-template<>
-class LeafType<long> { public: enum { type = NodeBase::INT }; };
-template<>
-class LeafType<float32> { public: enum { type = NodeBase::FLOAT }; };
-template<>
-class LeafType<const std::string*> { public: enum { type = NodeBase::IDENT }; };
-
 template<NodeBase::type_e>
 class LeafValueType;
 
@@ -50,13 +40,17 @@ class LeafValueType<NodeBase::INT> { public: typedef long type; };
 template<>
 class LeafValueType<NodeBase::FLOAT> { public: typedef float32 type; };
 template<>
+class LeafValueType<NodeBase::STRING> { public: typedef std::string type; };
+template<>
+class LeafValueType<NodeBase::CHAR> { public: typedef char type; };
+template<>
 class LeafValueType<NodeBase::IDENT> { public: typedef const std::string* type; };
 
-template<class T>
+template<NodeBase::type_e type>
 class LeafNodeBase
 {
 public:
-    virtual T value() const = 0;
+    virtual typename LeafValueType<type>::type value() const = 0;
 };
 
 class InnerNodeBase

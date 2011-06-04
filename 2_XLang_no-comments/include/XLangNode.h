@@ -53,18 +53,17 @@ public:
     }
 };
 
-template<class T>
-class LeafNode : virtual public Node, public LeafNodeBase<T>
+template<NodeBase::type_e _type>
+class LeafNode : virtual public Node, public LeafNodeBase<_type>
 {
-    T m_value;
+    typename LeafValueType<_type>::type m_value;
 
 public:
-    LeafNode(uint32 sym_id, YYLTYPE &loc, T _value)
-        : Node(static_cast<NodeBase::type_e>(
-              LeafType<T>::type), sym_id, loc), m_value(_value)
+    LeafNode(uint32 sym_id, YYLTYPE &loc, typename LeafValueType<_type>::type _value)
+        : Node(_type, sym_id, loc), m_value(_value)
     {
     }
-    T value() const
+    typename LeafValueType<_type>::type value() const
     {
         return m_value;
     }
