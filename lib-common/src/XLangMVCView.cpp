@@ -15,10 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "XLangView.h" // mvc (owner)
-#include "XLangNodeBase.h" // node::NodeBase
+#include "mvc/XLangMVCView.h" // mvc (owner)
+#include "node/XLangNodeBase.h" // node::NodeBase
 #include "XLangType.h" // uint32
 #include <string> // std::string
+#include <iostream>
 
 /* source code courtesy of Frank Thomas Braun */
 /* minimally altered by Jerry Chen <mailto:onlyuser@gmail.com> */
@@ -34,14 +35,47 @@
 #define typeId node::NodeBase::IDENT
 #define typeOpr node::NodeBase::INNER
 
-// prototype
-extern std::string sym_name(uint32 sym_id);
-
 namespace mvc {
+
+void MVCView::print_lisp(const node::NodeBase* _node)
+{
+    if(NULL == _node)
+        return;
+    switch(_node->type())
+    {
+        case node::NodeBase::INT:
+            std::cout << dynamic_cast<const node::LeafNodeBase<node::NodeBase::INT>*>(_node)->value();
+            break;
+        case node::NodeBase::FLOAT:
+            std::cout << dynamic_cast<const node::LeafNodeBase<node::NodeBase::FLOAT>*>(_node)->value();
+            break;
+        case node::NodeBase::STRING:
+            std::cout << '\"' << dynamic_cast<const node::LeafNodeBase<node::NodeBase::STRING>*>(_node)->value() << '\"';
+            break;
+        case node::NodeBase::CHAR:
+            std::cout << '\'' << dynamic_cast<const node::LeafNodeBase<node::NodeBase::CHAR>*>(_node)->value() << '\'';
+            break;
+        case node::NodeBase::IDENT:
+            std::cout << *dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(_node)->value();
+            break;
+        case node::NodeBase::INNER:
+            {
+                std::cout << '(' << dynamic_cast<const node::InnerNodeBase*>(_node)->name() << ' ';
+                size_t i;
+                for(i = 0; i < dynamic_cast<const node::InnerNodeBase*>(_node)->child_count()-1; i++)
+                {
+                    print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
+                    std::cout << ' ';
+                }
+                print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
+                std::cout << ')';
+            }
+    }
+}
 
 typedef const node::NodeBase nodeType;
 int ex (nodeType *p);
-void View::print_graph(nodeType* p)
+void MVCView::print_graph(nodeType* p)
 {
     ex (p);
 }
@@ -117,7 +151,7 @@ void exNode
             sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(p)->value()->c_str());
             break;
         case typeOpr:
-            temp = sym_name(p->sym_id());
+            temp = dynamic_cast<const node::InnerNodeBase*>(p)->name();
             s = const_cast<char*>(temp.c_str());
             break;
         default:

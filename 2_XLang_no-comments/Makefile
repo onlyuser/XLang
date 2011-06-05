@@ -74,7 +74,7 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 # cpp-related (common)
 #==================
 
-COMMON_CPP_STEMS = XLangAlloc XLangView XLangViewG
+COMMON_CPP_STEMS = XLangAlloc XLangMVCView
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 
 $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
@@ -85,7 +85,7 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 # cpp-related
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangModel
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodeVisitorPrinter
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp

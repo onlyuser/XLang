@@ -21,7 +21,7 @@
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
-#include "XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeBase.h" // node::NodeBase
 #include "XLangParseContextBase.h" // ParseContextBase
 #include <string> // std::string
 #include <set> // std::set

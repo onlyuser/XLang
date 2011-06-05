@@ -15,20 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "XLangModel.h" // mvc::Model
+#include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangParseContextBase.h" // ParseContextBase
-#include "XLangNode.h" // node::NodeBase
+#include "node/XLangNode.h" // node::Node
 #include "XLangType.h" // uint32
 #include <stdarg.h> // va_list
 #include <string> // std::string
 
 namespace mvc {
 
-node::NodeBase* Model::make_inner(ParseContextBase* pc, uint32 sym_id, YYLTYPE &loc, size_t child_count, ...)
+node::NodeBase* MVCModel::make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...)
 {
     va_list ap;
     va_start(ap, child_count);
-    node::NodeBase* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, loc, child_count, ap);
+    node::NodeBase* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, child_count, ap);
     va_end(ap);
     return node;
 }

@@ -19,6 +19,7 @@
 #define XLANG_NODE_H_
 
 #include "XLangNodeBase.h" // Node
+#include "XLangNodeVisitorPrinter.h" // Node
 #include "XLangType.h" // uint32
 #include <string> // std::string
 #include <vector> // std::vector
@@ -48,7 +49,7 @@ public:
 };
 
 template<NodeBase::type_e _type>
-class LeafNode : virtual public Node, public LeafNodeBase<_type>
+class LeafNode : virtual public Node, public LeafNodeBase<_type>, public NodeVisitable
 {
     typename LeafValueType<_type>::type m_value;
 
@@ -61,9 +62,13 @@ public:
     {
         return m_value;
     }
+    void accept(NodeVisitorBase* visitor) const
+    {
+        visitor->visit(this);
+    }
 };
 
-class InnerNode : virtual public Node, public InnerNodeBase
+class InnerNode : virtual public Node, public InnerNodeBase, public NodeVisitable
 {
     std::vector<NodeBase*> m_child_vec;
 
@@ -75,6 +80,7 @@ public:
         for(size_t i = 0; i<_child_count; i++)
             m_child_vec[i] = va_arg(ap, NodeBase*);
     }
+    std::string name() const;
     NodeBase* child(uint32 index) const
     {
         return m_child_vec[index];
@@ -83,6 +89,7 @@ public:
     {
         return m_child_vec.size();
     }
+    void accept(NodeVisitorBase* visitor) const;
 };
 
 }

@@ -20,7 +20,7 @@
 
 #include "XLangType.h" // uint32
 #include "XLangAlloc.h" // Allocator
-#include "XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeBase.h" // node::NodeBase
 #include "XLangParseContextBase.h" // ParseContextBase
 #include <stdio.h> // FILE
 #include <string> // std::string

@@ -15,18 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_MVC_VIEW_H_
-#define XLANG_MVC_VIEW_H_
+#ifndef XLANG_NODE_VISITOR_PRINTER_H_
+#define XLANG_NODE_VISITOR_PRINTER_H_
 
-#include "XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeBase.h" // Node
+#include "node/XLangNodeVisitorBase.h"
 
-namespace mvc {
+namespace node {
 
-class View
+class NodeVisitorPrinter : public NodeVisitorBase
 {
 public:
-    static void print_lisp(const node::NodeBase* _node);
-    static void print_graph(const node::NodeBase* p);
+    void visit(const node::LeafNodeBase<node::NodeBase::INT>* node);
+    void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* node);
+    void visit(const node::LeafNodeBase<node::NodeBase::STRING>* node);
+    void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* node);
+    void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* node);
+    void visit(const node::InnerNodeBase* node);
 };
 
 }

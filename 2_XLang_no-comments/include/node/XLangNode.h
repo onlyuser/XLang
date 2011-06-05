@@ -18,7 +18,8 @@
 #ifndef XLANG_NODE_H_
 #define XLANG_NODE_H_
 
-#include "XLangNodeBase.h" // Node
+#include "node/XLangNodeBase.h" // Node
+#include "node/XLangNodeVisitorPrinter.h"
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -67,6 +68,10 @@ public:
     {
         return m_value;
     }
+    void accept(NodeVisitorBase* visitor) const
+    {
+        visitor->visit(this);
+    }
 };
 
 class InnerNode : virtual public Node, public InnerNodeBase
@@ -81,6 +86,7 @@ public:
         for(size_t i = 0; i<_child_count; i++)
             m_child_vec[i] = va_arg(ap, Node*);
     }
+    std::string name() const;
     Node* child(uint32 index) const
     {
         return m_child_vec[index];
@@ -89,6 +95,7 @@ public:
     {
         return m_child_vec.size();
     }
+    void accept(NodeVisitorBase* visitor) const;
 };
 
 }

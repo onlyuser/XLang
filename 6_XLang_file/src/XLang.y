@@ -24,8 +24,9 @@
 #include "XLang.h" // node::NodeBase (owner)
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include "XLangAlloc.h" // Allocator
-#include "XLangView.h" // View
-#include "XLangModel.h" // mvc::Model
+#include "mvc/XLangMVCView.h" // mvc::MVCView
+#include "mvc/XLangMVCModel.h" // mvc::MVCModel
+#include "node/XLangNodeVisitorPrinter.h" // node::NodeVisitorPrinter
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // memset
@@ -106,23 +107,23 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = mvc::Model::make_inner(parse_context(), ',', 2, $1, $3); }
+    | statement ',' program { $$ = mvc::MVCModel::make_inner(parse_context(), ',', 2, $1, $3); }
     ;
 
 statement:
       expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = mvc::Model::make_inner(parse_context(), '=', 2,
-                                        mvc::Model::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
+    | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '=', 2,
+                                        mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = mvc::Model::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
-    | ID_FLOAT                  { $$ = mvc::Model::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
-    | ID_IDENT                  { $$ = mvc::Model::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
-    | expression '+' expression { $$ = mvc::Model::make_inner(parse_context(), '+', 2, $1, $3); }
-    | expression '-' expression { $$ = mvc::Model::make_inner(parse_context(), '-', 2, $1, $3); }
-    | expression '*' expression { $$ = mvc::Model::make_inner(parse_context(), '*', 2, $1, $3); }
-    | expression '/' expression { $$ = mvc::Model::make_inner(parse_context(), '/', 2, $1, $3); }
+      ID_INT                    { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
+    | ID_FLOAT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
+    | ID_IDENT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
+    | expression '+' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '+', 2, $1, $3); }
+    | expression '-' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '-', 2, $1, $3); }
+    | expression '*' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '*', 2, $1, $3); }
+    | expression '/' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '/', 2, $1, $3); }
     | '(' expression ')'        { $$ = $2; }
     ;
 
@@ -165,10 +166,10 @@ int main(int argc, char** argv)
         }
         std::cout << "INPUT: " << argv[i] << std::endl;
         std::cout << "PARSE: ";
-        mvc::View::print_lisp(node); std::cout << std::endl;
+        node::NodeVisitorPrinter visitor;
+        dynamic_cast<const node::InnerNode*>(node)->accept(&visitor); std::cout << std::endl;
         std::cout << "GRAPH:";
-        mvc::View::print_graph(node);
-        std::cout << std::endl;
+        mvc::MVCView::print_graph(node); std::cout << std::endl;
     }
     alloc.dump();
     return 0;

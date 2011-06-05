@@ -19,8 +19,8 @@
 #define XLANG_MVC_MODEL_H_
 
 #include "XLangAlloc.h"
-#include "XLangNodeBase.h" // node::NodeBase
-#include "XLangNode.h" // node::Node
+#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNode.h" // node::Node
 #include "XLangParseContextBase.h" // ParseContextBase
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE
@@ -28,7 +28,7 @@
 
 namespace mvc {
 
-class Model
+class MVCModel
 {
 public:
     template<node::NodeBase::type_e type>
