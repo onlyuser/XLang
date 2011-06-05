@@ -162,21 +162,21 @@ int main(int argc, char** argv)
         return 1;
     }
     Allocator alloc(__FILE__);
-    node::NodeBase* node = make_ast(alloc, argv[1]);
-    if(NULL == node)
+    node::NodeBase* ast = make_ast(alloc, argv[1]);
+    if(NULL == ast)
     {
         std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
         return 1;
     }
     std::cout << "PARSE: ";
 #if 0 // use mvc-pattern pretty-printer
-    mvc::MVCView::print_lisp(node); std::cout << std::endl;
+    mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer
     node::NodeVisitorPrinter visitor;
-    dynamic_cast<const node::InnerNode*>(node)->accept(&visitor); std::cout << std::endl;
+    dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor); std::cout << std::endl;
 #endif
     std::cout << "GRAPH:";
-    mvc::MVCView::print_graph(node); std::cout << std::endl;
+    mvc::MVCView::print_graph(ast); std::cout << std::endl;
     alloc.dump();
     return 0;
 }
