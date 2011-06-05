@@ -18,19 +18,19 @@
 #ifndef XLANG_NODE_VISITOR_BASE_H_
 #define XLANG_NODE_VISITOR_BASE_H_
 
-#include "XLangNodeBase.h" // Node
+#include "node/XLangNodeBase.h" // Node
 
 namespace node {
 
 class NodeVisitorBase
 {
 public:
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::INT>* node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::STRING>* node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* node) = 0;
-    virtual void visit(const node::InnerNodeBase* node) = 0;
+    virtual void visit(const node::LeafNodeBase<node::NodeBase::INT>* _node) = 0;
+    virtual void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* _node) = 0;
+    virtual void visit(const node::LeafNodeBase<node::NodeBase::STRING>* _node) = 0;
+    virtual void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* _node) = 0;
+    virtual void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* _node) = 0;
+    virtual void visit(const node::InnerNodeBase* _node) = 0;
 };
 
 class NodeVisitable

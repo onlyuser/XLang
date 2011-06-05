@@ -53,7 +53,7 @@ void InnerNode::accept(NodeVisitorBase* visitor) const
             visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(child(i)));
             break;
         case NodeBase::INNER:
-            visitor->visit(dynamic_cast<const node::InnerNodeBase*>(child(i)));
+            dynamic_cast<const node::NodeVisitable*>(child(i))->accept(visitor);
             break;
         }
         if(i < child_count()-1)

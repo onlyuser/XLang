@@ -26,12 +26,12 @@ namespace node {
 class NodeVisitorPrinter : public NodeVisitorBase
 {
 public:
-    void visit(const node::LeafNodeBase<node::NodeBase::INT>* node);
-    void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* node);
-    void visit(const node::LeafNodeBase<node::NodeBase::STRING>* node);
-    void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* node);
-    void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* node);
-    void visit(const node::InnerNodeBase* node);
+    void visit(const node::LeafNodeBase<node::NodeBase::INT>* _node);
+    void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* _node);
+    void visit(const node::LeafNodeBase<node::NodeBase::STRING>* _node);
+    void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* _node);
+    void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* _node);
+    void visit(const node::InnerNodeBase* _node);
 };
 
 }

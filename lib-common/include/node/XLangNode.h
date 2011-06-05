@@ -27,7 +27,7 @@
 
 namespace node {
 
-class Node : public NodeBase
+class Node : public NodeBase, public NodeVisitable
 {
 protected:
     NodeBase::type_e m_type;
@@ -49,7 +49,7 @@ public:
 };
 
 template<NodeBase::type_e _type>
-class LeafNode : virtual public Node, public LeafNodeBase<_type>, public NodeVisitable
+class LeafNode : virtual public Node, public LeafNodeBase<_type>
 {
     typename LeafValueType<_type>::type m_value;
 
@@ -68,7 +68,7 @@ public:
     }
 };
 
-class InnerNode : virtual public Node, public InnerNodeBase, public NodeVisitable
+class InnerNode : virtual public Node, public InnerNodeBase
 {
     std::vector<NodeBase*> m_child_vec;
 

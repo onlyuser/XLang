@@ -28,7 +28,7 @@
 
 namespace node {
 
-class Node : public NodeBase
+class Node : public NodeBase, public NodeVisitable
 {
 protected:
     NodeBase::type_e m_type;
