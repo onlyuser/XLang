@@ -152,8 +152,12 @@ int main(int argc, char** argv)
         return 1;
     }
     std::cout << "PARSE: ";
+#if 0 // use mvc-pattern pretty-printer
+    mvc::MVCView::print_lisp(node); std::cout << std::endl;
+#else // use visitor-pattern pretty-printer
     node::NodeVisitorPrinter visitor;
     dynamic_cast<const node::InnerNode*>(node)->accept(&visitor); std::cout << std::endl;
+#endif
     std::cout << "GRAPH:";
     mvc::MVCView::print_graph(node); std::cout << std::endl;
     alloc.dump();
