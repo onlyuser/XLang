@@ -26,7 +26,7 @@ INCLUDE_PATH = $(TOP)/include
 SRC_PATH = $(TOP)/src
 BUILD_PATH = $(TOP)/build
 BIN_PATH = $(TOP)/bin
-TARGET = $(BIN_PATH)/XLang.exe
+BINARY = $(BIN_PATH)/XLang.exe
 
 COMMON = ../lib-common
 COMMON_INCLUDE_PATH = $(COMMON)/include
@@ -44,14 +44,24 @@ LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
+TEST_PATH = $(TOP)/../test
+TEST_SH = $(TOP)/test.sh
+TEST_FILE_STEMS = AAA BBB CCC DDD EEE
+TEST_KEYWORD = 'LISP'
+TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
+TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
+
+.DEFAULT_GOAL : all
+all : $(BINARY)
+
 #==================
-# yacc-related
+# yacc
 #==================
 
 YACC_STEMS = XLang.tab
-YACC_CODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
+YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
     $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
-.SECONDARY : $(YACC_CODEGEN_FILES)
+.SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 	bison -d $<
@@ -59,19 +69,19 @@ $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 	mv $*.tab.h $(INCLUDE_PATH)/$*.tab.h
 
 #==================
-# lex-related
+# lex
 #==================
 
 LEX_STEMS = lex.XLang
-LEX_CODEGEN_FILES = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
-.SECONDARY : $(LEX_CODEGEN_FILES)
+LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
+.SECONDARY : $(LEX_GEN)
 
 $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 	flex $<
 	mv lex.$*.c $(SRC_PATH)/lex.$*.cpp
 
 #==================
-# cpp-related (common)
+# object (common)
 #==================
 
 COMMON_CPP_STEMS = XLangAlloc XLangMVCView
@@ -82,17 +92,21 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 #==================
-# cpp-related
+# object
 #==================
-
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodePrinter
-OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-$(TARGET) : $(OBJECTS) $(COMMON_OBJECTS)
+#==================
+# binary
+#==================
+
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodePrinter
+OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
+
+$(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
@@ -100,9 +114,16 @@ $(TARGET) : $(OBJECTS) $(COMMON_OBJECTS)
 # general
 #==================
 
+$(BUILD_PATH)/%.pass : $(BINARY) $(TEST_PATH)/%.test
+	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*
+
+.PHONY : test
+test : $(TEST_PASS_FILES)
+
 .PHONY : clean
 clean :
-	rm $(TARGET) $(OBJECTS) $(YACC_CODEGEN_FILES) $(LEX_CODEGEN_FILES)
-	rmdir $(BUILD_PATH) $(BIN_PATH)
+	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) \
+        $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+	-rmdir $(BUILD_PATH) $(BIN_PATH)
 	-rm $(COMMON_OBJECTS)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)

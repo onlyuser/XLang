@@ -31,6 +31,12 @@ all :
 	echo "make all in $$i..."; \
 	(cd $$i; $(MAKE)); done
 
+.PHONY : test
+test :
+	@for i in $(SUBPATHS); do \
+	echo "make test in $$i..."; \
+	(cd $$i; $(MAKE) test); done
+
 .PHONY : clean
 clean :
 	@for i in $(SUBPATHS); do \

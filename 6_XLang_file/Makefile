@@ -38,15 +38,22 @@ INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-#LIBTEMS = glut32 glu32 opengl32
-#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIBTEMS))
-PARENT_LIBTEMS = common
-PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIBTEMS))
+#LIB_STEMS = glut32 glu32 opengl32
+#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
+PARENT_LIB_STEMS = common
+PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 
-LIB_FLAGS = $(patsubst %, -l%, $(LIBTEMS)) \
-        $(patsubst %, -l%, $(PARENT_LIBTEMS))
+LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
+        $(patsubst %, -l%, $(PARENT_LIB_STEMS))
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+
+TEST_PATH = $(TOP)/../test
+TEST_SH = $(TOP)/test.sh
+TEST_FILE_STEMS = AAA BBB CCC DDD
+TEST_KEYWORD = 'LISP'
+TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
+TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
@@ -107,8 +114,15 @@ $(BINARY) : $(PARENT_LIBS) $(LIBS) $(OBJECTS)
 # general
 #==================
 
+$(BUILD_PATH)/%.pass : $(BINARY) $(TEST_PATH)/%.test
+	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*
+
+.PHONY : test
+test : $(TEST_PASS_FILES)
+
 .PHONY : clean
 clean :
-	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS)
+	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
+        $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BIN_PATH) $(BUILD_PATH) $(PARENT_LIB_PATH)
 	cd $(COMMON_PATH); $(MAKE) -f Makefile clean

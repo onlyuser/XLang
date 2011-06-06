@@ -165,7 +165,7 @@ int main(int argc, char** argv)
             continue;
         }
         std::cout << "INPUT: " << argv[i] << std::endl;
-        std::cout << "PARSE: ";
+        std::cout << "LISP: ";
 #if 0 // use mvc-pattern pretty-printer
         mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer

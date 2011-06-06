@@ -151,7 +151,7 @@ int main(int argc, char** argv)
         std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
         return 1;
     }
-    std::cout << "PARSE: ";
+    std::cout << "LISP: ";
 #if 0 // use mvc-pattern pretty-printer
     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer

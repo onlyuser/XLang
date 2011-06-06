@@ -132,7 +132,7 @@ int _XLANG_lex()
             YY_INPUT(prev_char, bytes_read, 1);
             if(*prev_char == '.')
                 find_decimal_point = true;
-        } while (bytes_read != 0 && isdigit(*prev_char));
+        } while (bytes_read != 0 && (isdigit(*prev_char) || *prev_char == '.'));
         if(bytes_read != 0)
         {
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
@@ -259,7 +259,7 @@ int main(int argc, char** argv)
             continue;
         }
         std::cout << "INPUT: " << argv[i] << std::endl;
-        std::cout << "PARSE: ";
+        std::cout << "LISP: ";
 #if 0 // use mvc-pattern pretty-printer
         mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer
