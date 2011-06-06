@@ -24,7 +24,7 @@ show_help()
 
 if [ $# -ne 5 ];
 then
-    echo "fail! -- operation requires 5 arguments! ==> $@"
+    echo "fail! -- requires 5 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -54,7 +54,7 @@ fi
 echo `cat $INPUT_FILE` | $EXEC | grep $KEYWORD > $TEMP
 diff $TEMP $GOLD_FILE | tee $PASS_FILE
 
-if [ ${PIPESTATUS[0]} -ne 0 ]; # $? only captures the last pipe
+if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe
 then
     echo "fail!"
     mv $PASS_FILE $FAIL_FILE
