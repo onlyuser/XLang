@@ -15,37 +15,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "node/XLangNodeVisitorPrinter.h" // node::LeafNodeVisitorPrinter
+#include "node/XLangNodePrinter.h" // node::LeafNodePrinter
 #include <iostream>
 
 namespace node {
 
-void NodeVisitorPrinter::visit(const LeafNodeBase<NodeBase::INT>* _node)
+void NodePrinter::visit(const LeafNodeBase<NodeBase::INT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeVisitorPrinter::visit(const LeafNodeBase<NodeBase::FLOAT>* _node)
+void NodePrinter::visit(const LeafNodeBase<NodeBase::FLOAT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeVisitorPrinter::visit(const LeafNodeBase<NodeBase::STRING>* _node)
+void NodePrinter::visit(const LeafNodeBase<NodeBase::STRING>* _node)
 {
     std::cout << '\"' << _node->value() << '\"';
 }
 
-void NodeVisitorPrinter::visit(const LeafNodeBase<NodeBase::CHAR>* _node)
+void NodePrinter::visit(const LeafNodeBase<NodeBase::CHAR>* _node)
 {
     std::cout << '\'' << _node->value() << '\'';
 }
 
-void NodeVisitorPrinter::visit(const LeafNodeBase<NodeBase::IDENT>* _node)
+void NodePrinter::visit(const LeafNodeBase<NodeBase::IDENT>* _node)
 {
     std::cout << *_node->value();
 }
 
-void NodeVisitorPrinter::visit(const InnerNodeBase* _node)
+void NodePrinter::visit(const InnerNodeBase* _node)
 {
     std::cout << _node->name();
 }

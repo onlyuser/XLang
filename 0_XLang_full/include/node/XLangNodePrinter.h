@@ -23,7 +23,7 @@
 
 namespace node {
 
-class NodeVisitorPrinter : public NodeVisitorBase
+class NodePrinter : public NodeVisitorBase
 {
 public:
     void visit(const node::LeafNodeBase<node::NodeBase::INT>* _node);

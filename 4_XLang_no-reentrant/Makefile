@@ -107,6 +107,9 @@ $(BINARY) : $(PARENT_LIBS) $(LIBS) $(OBJECTS)
 # general
 #==================
 
+.PHONY : test
+test :
+
 .PHONY : clean
 clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS)

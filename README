@@ -23,9 +23,9 @@ About:
     one cannot have both "comments" and "file input" enabled, or both "reentrant" and
     "hand-rolled lexer" enabled.
 
-    The tutorial is organized in a way that anyone familiar or unfamiliar with Flex/Bison
-    can quickly isolate a variation that is most relevent, and most readily customizable
-    according to his/her specific needs.
+    The tutorial is organized in a way that anyone unfamiliar with Flex/Bison can quickly
+    isolate a variation that is most relevent, and most readily customizable according to
+    his/her specific needs.
 
 Variation vs Feature Table:
 

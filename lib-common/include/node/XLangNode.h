@@ -19,7 +19,7 @@
 #define XLANG_NODE_H_
 
 #include "XLangNodeBase.h" // Node
-#include "XLangNodeVisitorPrinter.h" // Node
+#include "XLangNodePrinter.h" // Node
 #include "XLangType.h" // uint32
 #include <string> // std::string
 #include <vector> // std::vector
@@ -27,7 +27,7 @@
 
 namespace node {
 
-class Node : public NodeBase, public NodeVisitable
+class Node : public NodeBase, public VisitableNode
 {
 protected:
     NodeBase::type_e m_type;

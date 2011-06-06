@@ -33,7 +33,7 @@ public:
     virtual void visit(const node::InnerNodeBase* _node) = 0;
 };
 
-class NodeVisitable
+class VisitableNode
 {
 public:
     virtual void accept(NodeVisitorBase* visitor) const = 0;

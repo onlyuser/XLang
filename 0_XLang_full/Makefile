@@ -85,7 +85,7 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 # cpp-related
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodeVisitorPrinter
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodePrinter
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp

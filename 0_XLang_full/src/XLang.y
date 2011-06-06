@@ -26,7 +26,7 @@
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
-#include "node/XLangNodeVisitorPrinter.h" // node::NodeVisitorPrinter
+#include "node/XLangNodePrinter.h" // node::NodePrinter
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // strlen
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 #if 0 // use mvc-pattern pretty-printer
     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer
-    node::NodeVisitorPrinter visitor;
+    node::NodePrinter visitor;
     dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor); std::cout << std::endl;
 #endif
     std::cout << "GRAPH:";
