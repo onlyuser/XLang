@@ -120,7 +120,7 @@ int _XLANG_lex()
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
             yytext[PARM.m_pos - start_pos] = 0;
         }
-        _XLANG_lval.ident = parse_context()->alloc_unique_string(yytext);
+        _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if(isdigit(*yytext))
@@ -140,10 +140,10 @@ int _XLANG_lex()
         }
         if(find_decimal_point)
         {
-            _XLANG_lval._float = atof(yytext);
+            _XLANG_lval.float_value = atof(yytext);
             return ID_FLOAT;
         }
-        _XLANG_lval._int = atoi(yytext);
+        _XLANG_lval.int_value = atoi(yytext);
         return ID_INT;
     }
     else
@@ -171,10 +171,10 @@ int _XLANG_lex()
 //
 %union
 {
-    long               _int; // int value
-    float32            _float; // float value
-    const std::string* ident; // symbol table index
-    node::NodeBase*    inner; // node pointer
+    long               int_value; // int value
+    float32            float_value; // float value
+    const std::string* ident_value; // symbol table index
+    node::NodeBase*    inner_value; // node pointer
 }
 
 // show detailed parse errors
@@ -182,10 +182,10 @@ int _XLANG_lex()
 
 %nonassoc ID_BASE
 
-%token<_int> ID_INT
-%token<_float> ID_FLOAT
-%token<ident> ID_IDENT
-%type<inner> program statement expression
+%token<int_value> ID_INT
+%token<float_value> ID_FLOAT
+%token<ident_value> ID_IDENT
+%type<inner_value> program statement expression
 
 %left '+' '-'
 %left '*' '/'

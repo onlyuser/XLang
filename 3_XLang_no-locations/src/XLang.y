@@ -84,10 +84,10 @@ std::string sym_name(uint32 sym_id)
 
 %nonassoc ID_BASE
 
-%token<_int> ID_INT
-%token<_float> ID_FLOAT
-%token<ident> ID_IDENT
-%type<inner> program statement expression
+%token<int_value> ID_INT
+%token<float_value> ID_FLOAT
+%token<ident_value> ID_IDENT
+%type<inner_value> program statement expression
 
 %left '+' '-'
 %left '*' '/'
@@ -97,7 +97,7 @@ std::string sym_name(uint32 sym_id)
 %%
 
 root:
-      program { pc->root().inner = $1; }
+      program { pc->root().inner_value = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -138,7 +138,7 @@ node::NodeBase* make_ast(Allocator &alloc, char* s)
     _XLANG_set_extra(&pc, scanner);
     int error = _XLANG_parse(&pc, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().inner : NULL;
+    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().inner_value : NULL;
 }
 
 int main(int argc, char** argv)

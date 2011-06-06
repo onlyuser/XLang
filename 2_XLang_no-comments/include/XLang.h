@@ -34,10 +34,10 @@ struct StackElem
 {
     union
     {
-        long               _int; // int value
-        float32            _float; // float value
-        const std::string* ident; // symbol table index
-        node::NodeBase*    inner; // node pointer
+        long               int_value; // int value
+        float32            float_value; // float value
+        const std::string* ident_value; // symbol table index
+        node::NodeBase*    inner_value; // node pointer
     };
 };
 #define YYSTYPE StackElem

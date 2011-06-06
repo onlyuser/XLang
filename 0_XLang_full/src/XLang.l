@@ -79,19 +79,19 @@ ignored  [ \t\n]+
 
 {ident}     {
                 begin_token(yyscanner, yytext);
-                yylval->ident = yyget_extra(yyscanner)->alloc_unique_string(yytext);
+                yylval->ident_value = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {_int}      {
                 begin_token(yyscanner, yytext);
-                yylval->_int = atoi(yytext);
+                yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {_float}    {
                 begin_token(yyscanner, yytext);
-                yylval->_float = atof(yytext);
+                yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
@@ -105,9 +105,9 @@ ignored  [ \t\n]+
 [\"]                    { begin_token(yyscanner, yytext); BEGIN STATE_STRING; }
 <STATE_STRING>[^\"]*    {
                             begin_token(yyscanner, yytext);
-                            yylval->_string = yyget_extra(yyscanner)->alloc_string(yytext);
-                            char* buf = new char[yylval->_string->length()+1];
-                            strcpy(buf, yylval->_string->c_str());
+                            yylval->string_value = yyget_extra(yyscanner)->alloc_string(yytext);
+                            char* buf = new char[yylval->string_value->length()+1];
+                            strcpy(buf, yylval->string_value->c_str());
                             int n = 0;
                             bool escape_next_char = false;
                             for(int i = 0; '\0' != buf[i]; i++)
@@ -126,7 +126,7 @@ ignored  [ \t\n]+
                                 buf[n++] = buf[i];
                             }
                             buf[n] = '\0';
-                            *yylval->_string = buf;
+                            *yylval->string_value = buf;
                             delete []buf;
                             return ID_STRING;
                         }
@@ -142,7 +142,7 @@ ignored  [ \t\n]+
                             }
                             if('\0' != *(yytext + 1))
                                 _XLANG_error("bad escape character");
-                            yylval->_char = *yytext;
+                            yylval->char_value = *yytext;
                             return ID_CHAR;
                         }
 <STATE_CHAR>[\']        { begin_token(yyscanner, yytext); BEGIN INITIAL; }

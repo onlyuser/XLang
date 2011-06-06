@@ -63,17 +63,17 @@ ignored  [ \t\n]+
 %%
 
 {ident}     {
-                yylval->ident = yyget_extra(yyscanner)->alloc_unique_string(yytext);
+                yylval->ident_value = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {_int}      {
-                yylval->_int = atoi(yytext);
+                yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {_float}    {
-                yylval->_float = atof(yytext);
+                yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

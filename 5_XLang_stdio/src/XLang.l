@@ -42,17 +42,17 @@ ignored  [ \t\n]+
 %%
 
 {ident}     {
-                _XLANG_lval.ident = parse_context()->alloc_unique_string(yytext);
+                _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {_int}      {
-                _XLANG_lval._int = atoi(yytext);
+                _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {_float}    {
-                _XLANG_lval._float = atof(yytext);
+                _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
