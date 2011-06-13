@@ -48,6 +48,10 @@ public:
     {
         return m_sym_id;
     }
+    bool is_same_type(NodeBase* _node) const
+    {
+    	return m_type == _node->type() && m_sym_id == _node->sym_id();
+    }
     YYLTYPE loc() const
     {
         return m_loc;
@@ -60,8 +64,8 @@ class LeafNode : virtual public Node, public LeafNodeBase<_type>
     typename LeafValueType<_type>::type m_value;
 
 public:
-    LeafNode(uint32 sym_id, YYLTYPE &loc, typename LeafValueType<_type>::type _value)
-        : Node(_type, sym_id, loc), m_value(_value)
+    LeafNode(uint32 _sym_id, YYLTYPE &loc, typename LeafValueType<_type>::type _value)
+        : Node(_type, _sym_id, loc), m_value(_value)
     {
     }
     typename LeafValueType<_type>::type value() const
@@ -76,18 +80,33 @@ public:
 
 class InnerNode : virtual public Node, public InnerNodeBase
 {
-    std::vector<Node*> m_child_vec;
+	typedef std::vector<NodeBase*> child_vec_t;
+	child_vec_t m_child_vec;
 
-public:
-    InnerNode(uint32 sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
-        : Node(NodeBase::INNER, sym_id, loc)
+    const child_vec_t &child_vec() const
     {
-        m_child_vec.resize(_child_count);
+    	return m_child_vec;
+    }
+public:
+    InnerNode(uint32 _sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
+        : Node(NodeBase::INNER, _sym_id, loc)
+    {
         for(size_t i = 0; i<_child_count; i++)
-            m_child_vec[i] = va_arg(ap, Node*);
+        {
+            NodeBase* _node = va_arg(ap, NodeBase*);
+            if(is_same_type(_node))
+            {
+                InnerNode* inner_node = dynamic_cast<InnerNode*>(_node);
+                m_child_vec.insert(m_child_vec.end(),
+                		inner_node->child_vec().begin(),
+                		inner_node->child_vec().end());
+                continue;
+            }
+            m_child_vec.push_back(_node);
+        }
     }
     std::string name() const;
-    Node* child(uint32 index) const
+    NodeBase* child(uint32 index) const
     {
         return m_child_vec[index];
     }

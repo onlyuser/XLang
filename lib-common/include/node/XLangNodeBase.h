@@ -30,6 +30,7 @@ public:
 
     virtual type_e type() const = 0;
     virtual uint32 sym_id() const = 0;
+    virtual bool is_same_type(NodeBase* node) const = 0;
 };
 
 template<NodeBase::type_e>
