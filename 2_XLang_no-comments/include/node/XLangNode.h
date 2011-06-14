@@ -48,10 +48,6 @@ public:
     {
         return m_sym_id;
     }
-    bool is_same_type(NodeBase* _node) const
-    {
-    	return m_type == _node->type() && m_sym_id == _node->sym_id();
-    }
     YYLTYPE loc() const
     {
         return m_loc;
