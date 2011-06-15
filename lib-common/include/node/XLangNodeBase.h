@@ -30,7 +30,7 @@ public:
 
     virtual type_e type() const = 0;
     virtual uint32 sym_id() const = 0;
-    bool is_same_type(NodeBase* _node) const
+    bool is_same_type(const NodeBase* _node) const
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
     }
