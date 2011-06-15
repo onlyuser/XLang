@@ -76,12 +76,12 @@ public:
 
 class InnerNode : virtual public Node, public InnerNodeBase
 {
-	typedef std::vector<NodeBase*> child_vec_t;
-	child_vec_t m_child_vec;
+    typedef std::vector<NodeBase*> child_vec_t;
+    child_vec_t m_child_vec;
 
     const child_vec_t &child_vec() const
     {
-    	return m_child_vec;
+        return m_child_vec;
     }
 public:
     InnerNode(uint32 _sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
@@ -94,8 +94,8 @@ public:
             {
                 InnerNode* inner_node = dynamic_cast<InnerNode*>(_node);
                 m_child_vec.insert(m_child_vec.end(),
-                		inner_node->child_vec().begin(),
-                		inner_node->child_vec().end());
+                        inner_node->child_vec().begin(),
+                        inner_node->child_vec().end());
                 continue;
             }
             m_child_vec.push_back(_node);

@@ -44,7 +44,7 @@ PARENT_LIB_STEMS = common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 
 LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
-        $(patsubst %, -l%, $(PARENT_LIB_STEMS))
+		$(patsubst %, -l%, $(PARENT_LIB_STEMS))
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
@@ -71,7 +71,7 @@ $(PARENT_LIBS) :
 
 YACC_STEMS = XLang.tab
 YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
-        $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
+		$(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
 .SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
@@ -123,6 +123,6 @@ test : $(TEST_PASS_FILES)
 .PHONY : clean
 clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
-        $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+		$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BIN_PATH) $(BUILD_PATH) $(PARENT_LIB_PATH)
 	cd $(COMMON_PATH); $(MAKE) -f Makefile clean

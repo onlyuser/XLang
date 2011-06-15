@@ -34,12 +34,12 @@ struct StackElem
 {
     union
     {
-        long               int_value; // int value
-        float32            float_value; // float value
-        std::string*       string_value; // string value
-        char               char_value; // char value
+        long int_value; // int value
+        float32 float_value; // float value
+        std::string* string_value; // string value
+        char char_value; // char value
         const std::string* ident_value; // symbol table index
-        node::NodeBase*    inner_value; // node pointer
+        node::NodeBase* inner_value; // node pointer
     };
 };
 #define YYSTYPE StackElem
@@ -50,8 +50,8 @@ struct ScanContext
     yyscan_t mcanner; // state of the lexer
 
     char* m_buf; // buffer we read from
-    int   m_pos; // current position in buf
-    int   m_length; // length of buf
+    int m_pos; // current position in buf
+    int m_length; // length of buf
 
     // location placeholders
     int m_line_num;
@@ -65,15 +65,15 @@ struct ScanContext
 class ParseContext : public ParseContextBase
 {
 private:
-    Allocator   &m_alloc;
-    ScanContext  m_sc;
-    YYSTYPE      m_root; // parse result (AST root)
+    Allocator &m_alloc;
+    ScanContext m_sc;
+    YYSTYPE m_root; // parse result (AST root)
 
     struct str_ptr_compare
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
-           return *s1 < *s2;
+         return *s1 < *s2;
         }
     };
     typedef std::set<std::string*, str_ptr_compare> string_set_t;
@@ -82,9 +82,9 @@ private:
 public:
     ParseContext(Allocator &alloc, char* s)
         : m_alloc(alloc), m_sc(s) {}
-    Allocator   &alloc()        { return m_alloc; }
+    Allocator &alloc() { return m_alloc; }
     ScanContext &scan_context() { return m_sc; }
-    YYSTYPE     &root()         { return m_root; }
+    YYSTYPE &root() { return m_root; }
 
     const std::string* alloc_unique_string(std::string name)
     {
@@ -103,14 +103,14 @@ public:
 };
 #define YY_EXTRA_TYPE ParseContext*
 
-// forward declaration of lexer/parser functions 
+// forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
 //
-int  _XLANG_lex(YYSTYPE*, YYLTYPE*, yyscan_t);
-int  _XLANG_lex_init(yyscan_t*);
-int  _XLANG_lex_destroy(yyscan_t);
+int _XLANG_lex(YYSTYPE*, YYLTYPE*, yyscan_t);
+int _XLANG_lex_init(yyscan_t*);
+int _XLANG_lex_destroy(yyscan_t);
 void _XLANG_set_extra(YY_EXTRA_TYPE, yyscan_t);
-int  _XLANG_parse(ParseContext*, yyscan_t);
+int _XLANG_parse(ParseContext*, yyscan_t);
 void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t Scanner, const char* s);
 void _XLANG_error(const char* s);
 

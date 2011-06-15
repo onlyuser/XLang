@@ -60,7 +60,7 @@ all : $(BINARY)
 
 YACC_STEMS = XLang.tab
 YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
-    $(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
+	$(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
 .SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
@@ -123,7 +123,7 @@ test : $(TEST_PASS_FILES)
 .PHONY : clean
 clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) \
-        $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+		$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
 	-rm $(COMMON_OBJECTS)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)

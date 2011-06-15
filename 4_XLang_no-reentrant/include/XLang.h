@@ -29,8 +29,8 @@
 struct ScanContext
 {
     char* m_buf; // buffer we read from
-    int   m_pos; // current position in buf
-    int   m_length; // length of buf
+    int m_pos; // current position in buf
+    int m_length; // length of buf
 
     ScanContext(char* buf);
 };
@@ -39,15 +39,15 @@ struct ScanContext
 class ParseContext : public ParseContextBase
 {
 private:
-    Allocator      &m_alloc;
-    ScanContext     m_sc;
+    Allocator &m_alloc;
+    ScanContext m_sc;
     node::NodeBase* m_root; // parse result (AST root)
 
     struct str_ptr_compare
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
-           return *s1 < *s2;
+         return *s1 < *s2;
         }
     };
     typedef std::set<std::string*, str_ptr_compare> string_set_t;
@@ -56,9 +56,9 @@ private:
 public:
     ParseContext(Allocator &alloc, char* s)
         : m_alloc(alloc), m_sc(s), m_root(NULL) {}
-    Allocator       &alloc()        { return m_alloc; }
-    ScanContext     &scan_context() { return m_sc; }
-    node::NodeBase* &root()         { return m_root; }
+    Allocator &alloc() { return m_alloc; }
+    ScanContext &scan_context() { return m_sc; }
+    node::NodeBase* &root() { return m_root; }
 
     const std::string* alloc_unique_string(std::string name)
     {
@@ -72,11 +72,11 @@ public:
     }
 };
 
-// forward declaration of lexer/parser functions 
+// forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
 //
-int  _XLANG_lex();
-int  _XLANG_parse();
+int _XLANG_lex();
+int _XLANG_parse();
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();

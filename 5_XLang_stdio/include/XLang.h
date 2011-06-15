@@ -30,14 +30,14 @@
 class ParseContext : public ParseContextBase
 {
 private:
-    Allocator      &m_alloc;
+    Allocator &m_alloc;
     node::NodeBase* m_root; // parse result (AST root)
 
     struct str_ptr_compare
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
-           return *s1 < *s2;
+         return *s1 < *s2;
         }
     };
     typedef std::set<std::string*, str_ptr_compare> string_set_t;
@@ -46,8 +46,8 @@ private:
 public:
     ParseContext(Allocator &alloc)
         : m_alloc(alloc), m_root(NULL) {}
-    Allocator       &alloc() { return m_alloc; }
-    node::NodeBase* &root()  { return m_root; }
+    Allocator &alloc() { return m_alloc; }
+    node::NodeBase* &root() { return m_root; }
 
     const std::string* alloc_unique_string(std::string name)
     {
@@ -61,11 +61,11 @@ public:
     }
 };
 
-// forward declaration of lexer/parser functions 
+// forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
 //
-int  _XLANG_lex();
-int  _XLANG_parse();
+int _XLANG_lex();
+int _XLANG_parse();
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();

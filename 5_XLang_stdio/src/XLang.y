@@ -77,10 +77,10 @@ ParseContext* &parse_context()
 //
 %union
 {
-    long               int_value; // int value
-    float32            float_value; // float value
+    long int_value; // int value
+    float32 float_value; // float value
     const std::string* ident_value; // symbol table index
-    node::NodeBase*    inner_value; // node pointer
+    node::NodeBase* inner_value; // node pointer
 }
 
 // show detailed parse errors
@@ -101,30 +101,30 @@ ParseContext* &parse_context()
 %%
 
 root:
-      program { parse_context()->root() = $1; YYACCEPT; }
-    | error   { yyclearin; /* yyerrok; YYABORT; */ }
+     program { parse_context()->root() = $1; YYACCEPT; }
+    | error { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
-      statement             { $$ = $1; }
+     statement { $$ = $1; }
     | statement ',' program { $$ = mvc::MVCModel::make_inner(parse_context(), ',', 2, $1, $3); }
     ;
 
 statement:
-      expression              { $$ = $1; }
+     expression { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '=', 2,
-                                        mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
+                                     mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
-    | ID_FLOAT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
-    | ID_IDENT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
+     ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
+    | ID_FLOAT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
+    | ID_IDENT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '-', 2, $1, $3); }
     | expression '*' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '*', 2, $1, $3); }
     | expression '/' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '/', 2, $1, $3); }
-    | '(' expression ')'        { $$ = $2; }
+    | '(' expression ')' { $$ = $2; }
     ;
 
 %%

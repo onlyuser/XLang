@@ -23,7 +23,7 @@
 
 #include "XLang.h" // node::NodeBase
 #include "XLang.tab.h" // ID_XXX (generated code)
-#include <stdio.h>  // fread
+#include <stdio.h> // fread
 #include <stdlib.h> // atoi
 
 // When in the lexer you have to access parm through the extra data.
@@ -33,56 +33,56 @@
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 //
-#define YY_INPUT(buffer, res, max_size)                        \
-    do {                                                       \
-        if(PARM.m_pos >= PARM.m_length)                        \
-            (res) = YY_NULL;                                   \
-        else {                                                 \
-            (res) = PARM.m_length - PARM.m_pos;                \
+#define YY_INPUT(buffer, res, max_size) \
+    do { \
+        if(PARM.m_pos >= PARM.m_length) \
+            (res) = YY_NULL; \
+        else { \
+            (res) = PARM.m_length - PARM.m_pos; \
             (res) > (int) (max_size) ? (res) = (max_size) : 0; \
             fread((buffer), sizeof(char), (res), PARM.m_file); \
-            PARM.m_pos += (res);                               \
-        }                                                      \
-    } while (0)
+            PARM.m_pos += (res); \
+        } \
+    } while(0)
 
 %}
 
 %option noyywrap
 %option nounput
 
-digit    [0-9]
-alpha    [a-zA-Z]
-id       {alpha}|[_]
-ident    {id}+({digit}|{id})*
-_int     {digit}+
-_float   {digit}*[.]{digit}+
-unnamed  [,()+\-*/=]
-ignored  [ \t\n]+
+digit [0-9]
+alpha [a-zA-Z]
+id {alpha}|[_]
+ident {id}+({digit}|{id})*
+_int {digit}+
+_float {digit}*[.]{digit}+
+unnamed [,()+\-*/=]
+ignored [ \t\n]+
 
 %%
 
-{ident}     {
+{ident} {
                 _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int}      {
+{_int} {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float}    {
+{_float} {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
-{unnamed}   {
+{unnamed} {
                 return *yytext;
             }
 
-{ignored}   ; // ignore whitespace
+{ignored} ; // ignore whitespace
 
-.           {
+. {
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
             }

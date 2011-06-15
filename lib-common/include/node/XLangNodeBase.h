@@ -32,7 +32,7 @@ public:
     virtual uint32 sym_id() const = 0;
     bool is_same_type(NodeBase* _node) const
     {
-    	return type() == _node->type() && sym_id() == _node->sym_id();
+        return type() == _node->type() && sym_id() == _node->sym_id();
     }
 };
 

@@ -30,39 +30,39 @@
 %option noyywrap
 %option nounput
 
-digit    [0-9]
-alpha    [a-zA-Z]
-id       {alpha}|[_]
-ident    {id}+({digit}|{id})*
-_int     {digit}+
-_float   {digit}*[.]{digit}+
-unnamed  [,()+\-*/=]
-ignored  [ \t\n]+
+digit [0-9]
+alpha [a-zA-Z]
+id {alpha}|[_]
+ident {id}+({digit}|{id})*
+_int {digit}+
+_float {digit}*[.]{digit}+
+unnamed [,()+\-*/=]
+ignored [ \t\n]+
 
 %%
 
-{ident}     {
+{ident} {
                 _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int}      {
+{_int} {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float}    {
+{_float} {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
-{unnamed}   {
+{unnamed} {
                 return *yytext;
             }
 
-{ignored}   ; // ignore whitespace
+{ignored} ; // ignore whitespace
 
-.           {
+. {
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
             }

@@ -81,17 +81,17 @@ ParseContext* &parse_context()
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 //
-#define YY_INPUT(buffer, res, max_size)                        \
-    do {                                                       \
-        if(PARM.m_pos >= PARM.m_length)                        \
-            (res) = 0;                                         \
-        else {                                                 \
-            (res) = PARM.m_length - PARM.m_pos;                \
+#define YY_INPUT(buffer, res, max_size) \
+    do { \
+        if(PARM.m_pos >= PARM.m_length) \
+            (res) = 0; \
+        else { \
+            (res) = PARM.m_length - PARM.m_pos; \
             (res) > (int) (max_size) ? (res) = (max_size) : 0; \
             fread((buffer), sizeof(char), (res), PARM.m_file); \
-            PARM.m_pos += (res);                               \
-        }                                                      \
-    } while (0)
+            PARM.m_pos += (res); \
+        } \
+    } while(0)
 
 int _XLANG_lex()
 {
@@ -109,8 +109,8 @@ int _XLANG_lex()
         {
             prev_char = &yytext[PARM.m_pos - start_pos];
             YY_INPUT(prev_char, bytes_read, 1);
-        } while (bytes_read != 0 && (isalpha(*prev_char) || '_' == *prev_char));
-        while (bytes_read != 0 && (isdigit(*prev_char) || isalpha(*prev_char) || '_' == *prev_char))
+        } while(bytes_read != 0 && (isalpha(*prev_char) || '_' == *prev_char));
+        while(bytes_read != 0 && (isdigit(*prev_char) || isalpha(*prev_char) || '_' == *prev_char))
         {
             prev_char = &yytext[PARM.m_pos - start_pos];
             YY_INPUT(prev_char, bytes_read, 1);
@@ -132,7 +132,7 @@ int _XLANG_lex()
             YY_INPUT(prev_char, bytes_read, 1);
             if(*prev_char == '.')
                 find_decimal_point = true;
-        } while (bytes_read != 0 && (isdigit(*prev_char) || *prev_char == '.'));
+        } while(bytes_read != 0 && (isdigit(*prev_char) || *prev_char == '.'));
         if(bytes_read != 0)
         {
             fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
@@ -171,10 +171,10 @@ int _XLANG_lex()
 //
 %union
 {
-    long               int_value; // int value
-    float32            float_value; // float value
+    long int_value; // int value
+    float32 float_value; // float value
     const std::string* ident_value; // symbol table index
-    node::NodeBase*    inner_value; // node pointer
+    node::NodeBase* inner_value; // node pointer
 }
 
 // show detailed parse errors
@@ -195,30 +195,30 @@ int _XLANG_lex()
 %%
 
 root:
-      program { parse_context()->root() = $1; }
-    | error   { yyclearin; /* yyerrok; YYABORT; */ }
+     program { parse_context()->root() = $1; }
+    | error { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
-      statement             { $$ = $1; }
+     statement { $$ = $1; }
     | statement ',' program { $$ = mvc::MVCModel::make_inner(parse_context(), ',', 2, $1, $3); }
     ;
 
 statement:
-      expression              { $$ = $1; }
+     expression { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '=', 2,
-                                        mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
+                                     mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
-    | ID_FLOAT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
-    | ID_IDENT                  { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
+     ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
+    | ID_FLOAT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
+    | ID_IDENT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '+', 2, $1, $3); }
     | expression '-' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '-', 2, $1, $3); }
     | expression '*' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '*', 2, $1, $3); }
     | expression '/' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '/', 2, $1, $3); }
-    | '(' expression ')'        { $$ = $2; }
+    | '(' expression ')' { $$ = $2; }
     ;
 
 %%
