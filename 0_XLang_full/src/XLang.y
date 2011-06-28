@@ -179,7 +179,13 @@ int main(int argc, char** argv)
     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer
     node::NodePrinter visitor;
-    dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor); std::cout << std::endl;
+    if(ast->type() == node::NodeBase::INNER)
+    {
+        dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor);
+        std::cout << std::endl;
+    }
+    else
+        std::cout << "visitor can only print inner-node" << std::endl;
 #endif
     std::cout << "GRAPH:";
     mvc::MVCView::print_graph(ast); std::cout << std::endl;
