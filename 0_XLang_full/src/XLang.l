@@ -104,47 +104,47 @@ ignored [ \t\n]+
 
 [\"] { begin_token(yyscanner, yytext); BEGIN STATE_STRING; }
 <STATE_STRING>[^\"]* {
-                            begin_token(yyscanner, yytext);
-                            yylval->string_value = yyget_extra(yyscanner)->alloc_string(yytext);
-                            char* buf = new char[yylval->string_value->length()+1];
-                            strcpy(buf, yylval->string_value->c_str());
-                            int n = 0;
-                            bool escape_next_char = false;
-                            for(int i = 0; '\0' != buf[i]; i++)
-                            {
-                                if(escape_next_char)
-                                {
-                                    escape_next_char = false;
-                                    buf[i] = escape_char(buf[i]);
-                                }
-                                else
-                                    if('\\' == buf[i])
-                                    {
-                                     escape_next_char = true;
-                                     continue;
-                                    }
-                                buf[n++] = buf[i];
-                            }
-                            buf[n] = '\0';
-                            *yylval->string_value = buf;
-                            delete []buf;
-                            return ID_STRING;
+                begin_token(yyscanner, yytext);
+                yylval->string_value = yyget_extra(yyscanner)->alloc_string(yytext);
+                char* buf = new char[yylval->string_value->length()+1];
+                strcpy(buf, yylval->string_value->c_str());
+                int n = 0;
+                bool escape_next_char = false;
+                for(int i = 0; '\0' != buf[i]; i++)
+                {
+                    if(escape_next_char)
+                    {
+                        escape_next_char = false;
+                        buf[i] = escape_char(buf[i]);
+                    }
+                    else
+                        if('\\' == buf[i])
+                        {
+                         escape_next_char = true;
+                         continue;
                         }
+                    buf[n++] = buf[i];
+                }
+                buf[n] = '\0';
+                *yylval->string_value = buf;
+                delete []buf;
+                return ID_STRING;
+            }
 <STATE_STRING>[\"] { begin_token(yyscanner, yytext); BEGIN INITIAL; }
 
 [\'] { begin_token(yyscanner, yytext); BEGIN STATE_CHAR; }
 <STATE_CHAR>[^\']* {
-                            begin_token(yyscanner, yytext);
-                            if('\\' == *yytext)
-                            {
-                                yytext++;
-                                *yytext = escape_char(*yytext);
-                            }
-                            if('\0' != *(yytext + 1))
-                                _XLANG_error("bad escape character");
-                            yylval->char_value = *yytext;
-                            return ID_CHAR;
-                        }
+                begin_token(yyscanner, yytext);
+                if('\\' == *yytext)
+                {
+                    yytext++;
+                    *yytext = escape_char(*yytext);
+                }
+                if('\0' != *(yytext + 1))
+                    _XLANG_error("bad escape character");
+                yylval->char_value = *yytext;
+                return ID_CHAR;
+            }
 <STATE_CHAR>[\'] { begin_token(yyscanner, yytext); BEGIN INITIAL; }
 
 "/*" {
