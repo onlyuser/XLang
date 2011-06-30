@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Variations of a Flex-Bison parser
 # -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
