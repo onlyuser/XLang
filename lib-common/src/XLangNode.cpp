@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "node/XLangNode.h"
-#include <iostream>
+#include "node/XLangNode.h" // node::NodeBase
+#include <iostream> // std::cout
 
 // prototype
 extern std::string sym_name(uint32 sym_id);

@@ -20,7 +20,7 @@
 
 #include "XLangAlloc.h"
 #include "node/XLangNodeBase.h" // node::NodeBase
-#include "node/XLangNode.h" // node::Node
+#include "node/XLangNode.h" // node::LeafNode
 #include "XLangParseContextBase.h" // ParseContextBase
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE

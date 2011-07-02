@@ -1,5 +1,5 @@
-// Variations of a Flex-Bison parser -- based on
-// "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+// Variations of a Flex-Bison parser
+// -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 // Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_VISITOR_PRINTER_H_
-#define XLANG_NODE_VISITOR_PRINTER_H_
+#ifndef XLANG_NODE_PRINTER_H_
+#define XLANG_NODE_PRINTER_H_
 
-#include "node/XLangNodeBase.h" // Node
-#include "node/XLangNodeVisitorBase.h"
+#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeVisitorBase.h" // node::NodeVisitorBase
 
 namespace node {
 

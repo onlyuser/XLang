@@ -1,5 +1,5 @@
-// Variations of a Flex-Bison parser -- based on
-// "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+// Variations of a Flex-Bison parser
+// -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 // Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #ifndef XLANG_PARSE_CONTEXT_BASE_H_
 #define XLANG_PARSE_CONTEXT_BASE_H_
 
-#include "XLangAlloc.h"
+#include "XLangAlloc.h" // Allocator
 #include <string> // std::string
 
 class ParseContextBase

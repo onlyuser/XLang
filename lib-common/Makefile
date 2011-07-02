@@ -40,9 +40,9 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 #LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 #PARENT_LIB_STEMS = common
 #PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
-
 LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
-        $(patsubst %, -l%, $(PARENT_LIB_STEMS))
+		$(patsubst %, -l%, $(PARENT_LIB_STEMS))
+
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 

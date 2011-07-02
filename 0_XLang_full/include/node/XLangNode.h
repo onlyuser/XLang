@@ -18,8 +18,8 @@
 #ifndef XLANG_NODE_H_
 #define XLANG_NODE_H_
 
-#include "node/XLangNodeBase.h" // Node
-#include "node/XLangNodePrinter.h"
+#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeVisitorBase.h" // node::VisitableNode
 #include "XLangType.h" // uint32
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string

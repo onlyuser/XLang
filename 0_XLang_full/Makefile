@@ -23,6 +23,7 @@ CXX=g++
 
 TOP = .
 INCLUDE_PATH = $(TOP)/include
+LIB_PATH = $(TOP)/lib
 SRC_PATH = $(TOP)/src
 BUILD_PATH = $(TOP)/build
 BIN_PATH = $(TOP)/bin
@@ -34,11 +35,13 @@ COMMON_SRC_PATH = $(COMMON)/src
 COMMON_BUILD_PATH = $(COMMON)/build
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)
-#LIB_PATHS = $(TOP)/lib
-#LIBS = glut32 glu32 opengl32
-
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
+
+LIB_PATHS = $(LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
+
+#LIB_STEMS = glut32 glu32 opengl32
+#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
 
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
@@ -60,7 +63,7 @@ all : $(BINARY)
 
 YACC_STEMS = XLang.tab
 YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
-	$(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
+		$(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
 .SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
@@ -84,7 +87,7 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 # object (common)
 #==================
 
-COMMON_CPP_STEMS = XLangAlloc XLangMVCView
+COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinter XLangMVCView
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 
 $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
@@ -103,7 +106,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangNode XLangMVCModel XLangNodePrinter
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
@@ -123,7 +126,7 @@ test : $(TEST_PASS_FILES)
 .PHONY : clean
 clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) \
-		$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
 	-rm $(COMMON_OBJECTS)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)

@@ -20,13 +20,13 @@
 
 %{
 
-#include "XLangType.h" // char*
-#include "XLang.h" // node::NodeBase (owner)
+#include "XLang.h" // node::NodeBase
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "node/XLangNodePrinter.h" // node::NodePrinter
+#include "XLangType.h" // uint32
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // memset

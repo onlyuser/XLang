@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "node/XLangNodePrinter.h" // node::LeafNodePrinter
-#include <iostream>
+#include "node/XLangNodePrinter.h" // node::NodePrinter
+#include <iostream> // std::cout
 
 namespace node {
 

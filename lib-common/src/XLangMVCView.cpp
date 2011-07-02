@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "mvc/XLangMVCView.h" // mvc (owner)
+#include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "node/XLangNodeBase.h" // node::NodeBase
 #include "XLangType.h" // uint32
 #include <string> // std::string
-#include <iostream>
+#include <iostream> // std::cout
 
 /* source code courtesy of Frank Thomas Braun */
 /* minimally altered by Jerry Chen <mailto:onlyuser@gmail.com> */

@@ -29,8 +29,9 @@ SRC_PATH = $(TOP)/src
 BUILD_PATH = $(TOP)/build
 BIN_PATH = $(TOP)/bin
 BINARY = $(BIN_PATH)/XLang.exe
-COMMON_PATH = ../lib-common
-COMMON_INCLUDE_PATH = $(COMMON_PATH)/include
+
+COMMON = ../lib-common
+COMMON_INCLUDE_PATH = $(COMMON)/include
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
@@ -42,9 +43,9 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 #LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 PARENT_LIB_STEMS = common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
-
 LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
 		$(patsubst %, -l%, $(PARENT_LIB_STEMS))
+
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
@@ -63,7 +64,7 @@ all : $(BINARY)
 #==================
 
 $(PARENT_LIBS) :
-	cd $(COMMON_PATH); $(MAKE) -f Makefile all
+	cd $(COMMON); $(MAKE) -f Makefile all
 
 #==================
 # yacc
@@ -106,7 +107,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
-$(BINARY) : $(PARENT_LIBS) $(LIBS) $(OBJECTS)
+$(BINARY) : $(OBJECTS) $(LIBS) $(PARENT_LIBS)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
@@ -123,6 +124,6 @@ test : $(TEST_PASS_FILES)
 .PHONY : clean
 clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
-		$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BIN_PATH) $(BUILD_PATH) $(PARENT_LIB_PATH)
-	cd $(COMMON_PATH); $(MAKE) -f Makefile clean
+	cd $(COMMON); $(MAKE) -f Makefile clean

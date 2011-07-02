@@ -17,7 +17,7 @@
 
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangParseContextBase.h" // ParseContextBase
-#include "node/XLangNode.h" // node::Node
+#include "node/XLangNode.h" // node::NodeBase
 #include "XLangType.h" // uint32
 #include <stdarg.h> // va_list
 #include <string> // std::string

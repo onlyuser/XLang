@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "XLangAlloc.h" // Allocator (owner)
+#include "XLangAlloc.h" // Allocator
 #include <string> // std::string
 #include <iostream> // std::cout
 #include <stdlib.h> // malloc
