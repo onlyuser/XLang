@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: test <EXEC> <INPUT_FILE> <KEYWORD> <GOLD_FILE> <RESULT_FILE>"
+    echo "SYNTAX: test <EXEC> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <RESULT_FILE>"
 }
 
 if [ $# -ne 5 ];
@@ -29,12 +29,12 @@ then
     exit 1
 fi
 
-TEMP=`mktemp`
-trap "rm $TEMP" EXIT
+TEMP_FILE=`mktemp`
+trap "rm $TEMP_FILE" EXIT
 
 EXEC=$1
 INPUT_FILE=$2
-KEYWORD=$3
+GOLD_KEYWORD=$3
 GOLD_FILE=$4
 RESULT_FILE=$5
 PASS_FILE=${RESULT_FILE}.pass
@@ -51,8 +51,8 @@ then
     exit 1
 fi
 
-$EXEC `cat $INPUT_FILE` | grep $KEYWORD > $TEMP
-diff $TEMP $GOLD_FILE | tee $PASS_FILE
+$EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE
+diff $TEMP_FILE $GOLD_FILE | tee $PASS_FILE
 
 if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe
 then
