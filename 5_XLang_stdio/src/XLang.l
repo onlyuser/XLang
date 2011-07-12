@@ -41,28 +41,28 @@ ignored [ \t\n]+
 
 %%
 
-{ident} {
+{ident}     {
                 _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int} {
+{_int}      {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float} {
+{_float}    {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
-{unnamed} {
+{unnamed}   {
                 return *yytext;
             }
 
 {ignored} ; // ignore whitespace
 
-. {
+.           {
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
             }

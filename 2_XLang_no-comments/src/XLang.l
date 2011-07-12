@@ -26,6 +26,7 @@
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
+#include <algorithm> // std::min
 
 // When in the lexer you have to access parm through the extra data.
 //
@@ -38,25 +39,24 @@
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 //
-#define YY_INPUT(buffer, res, max_size) \
+#define YY_INPUT(buf, result, max_size) \
     do { \
         if(PARM.m_pos >= PARM.m_length) \
-            (res) = YY_NULL; \
+            (result) = YY_NULL; \
         else { \
-            (res) = MIN(PARM.m_length - PARM.m_pos, 1); \
-            (res) > (int) (max_size) ? (res) = (max_size) : 0; \
+            (result) = std::min(PARM.m_length - PARM.m_pos, std::min(static_cast<int>(max_size), 1)); \
             if('\n' == PARM.m_buf[PARM.m_pos]) { \
                 PARM.m_line_num++; \
                 PARM.m_col_num = 1; \
             } \
             else \
                 PARM.m_col_num++; \
-            memcpy((buffer), PARM.m_buf + PARM.m_pos, (res)); \
-            PARM.m_pos += (res); \
+            memcpy((buf), PARM.m_buf + PARM.m_pos, (result)); \
+            PARM.m_pos += (result); \
         } \
     } while(0)
 
-void begin_token(yyscan_t yyscanner, char* s);
+void begin_token(yyscan_t yyscanner, size_t length);
 
 %}
 
@@ -75,48 +75,47 @@ ignored [ \t\n]+
 
 %%
 
-{ident} {
-                begin_token(yyscanner, yytext);
+{ident}     {
+                begin_token(yyscanner, yyleng);
                 yylval->ident_value = yyget_extra(yyscanner)->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int} {
-                begin_token(yyscanner, yytext);
+{_int}      {
+                begin_token(yyscanner, yyleng);
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float} {
-                begin_token(yyscanner, yytext);
+{_float}    {
+                begin_token(yyscanner, yyleng);
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
-{unnamed} {
-                begin_token(yyscanner, yytext);
+{unnamed}   {
+                begin_token(yyscanner, yyleng);
                 return *yytext;
             }
 
 {ignored} ; // ignore whitespace
 
-. {
-                begin_token(yyscanner, yytext);
+.           {
+                begin_token(yyscanner, yyleng);
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
             }
 
 %%
 
-void begin_token(yyscan_t yyscanner, char* s)
+void begin_token(yyscan_t yyscanner, size_t length)
 {
-    int n = strlen(s);
     YYLTYPE* loc = yyget_lloc(yyscanner);
     loc->first_line = PARM.m_line_num;
     loc->first_column = PARM.m_prev_col_num;
     loc->last_line = PARM.m_line_num;
-    loc->last_column = PARM.m_prev_col_num + n - 1;
+    loc->last_column = PARM.m_prev_col_num + length - 1;
     PARM.m_prev_col_num = PARM.m_col_num;
-    if(n > 1)
+    if(length > 1)
         PARM.m_prev_col_num--;
 }

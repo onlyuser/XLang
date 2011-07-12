@@ -97,23 +97,23 @@ std::string sym_name(uint32 sym_id)
 %%
 
 root:
-     program { pc->root().inner_value = $1; }
+      program { pc->root().inner_value = $1; }
     | error { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
-     statement { $$ = $1; }
+      statement { $$ = $1; }
     | statement ',' program { $$ = mvc::MVCModel::make_inner(pc, ',', 2, $1, $3); }
     ;
 
 statement:
-     expression { $$ = $1; }
+      expression { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(pc, '=', 2,
                                      mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(pc, ID_IDENT, $1), $3); }
     ;
 
 expression:
-     ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(pc, ID_INT, $1); }
+      ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(pc, ID_INT, $1); }
     | ID_FLOAT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(pc, ID_FLOAT, $1); }
     | ID_IDENT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(pc, ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::MVCModel::make_inner(pc, '+', 2, $1, $3); }

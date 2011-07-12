@@ -35,8 +35,9 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
+#include <algorithm> // std::min
 
-#define SIZE_BUFMALL 160
+#define SIZE_BUF_SMALL 160
 
 // report error
 void _XLANG_error(const char* s)
@@ -81,62 +82,64 @@ ParseContext* &parse_context()
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 //
-#define YY_INPUT(buffer, res, max_size) \
+#define YY_INPUT(buf, result, max_size) \
     do { \
         if(PARM.m_pos >= PARM.m_length) \
-            (res) = 0; \
+            (result) = 0; \
         else { \
-            (res) = PARM.m_length - PARM.m_pos; \
-            (res) > (int) (max_size) ? (res) = (max_size) : 0; \
-            fread((buffer), sizeof(char), (res), PARM.m_file); \
-            PARM.m_pos += (res); \
+            (result) = std::min(PARM.m_length - PARM.m_pos, static_cast<int>(max_size)); \
+            fread((buf), sizeof(char), (result), PARM.m_file); \
+            PARM.m_pos += (result); \
+        } \
+    } while(0)
+
+#define YY_REWIND(n_less) \
+    do { \
+        if(PARM.m_pos - (n_less) >= 0) { \
+            fseek(PARM.m_file, sizeof(char) * -(n_less), SEEK_CUR); \
+            PARM.m_pos -= (n_less); \
         } \
     } while(0)
 
 int _XLANG_lex()
 {
-    char yytext[SIZE_BUFMALL];
+    char yytext[SIZE_BUF_SMALL];
     memset(yytext, 0, sizeof(yytext));
-    char* prev_char = NULL;
-    int bytes_read = 0;
     int start_pos = PARM.m_pos;
-    YY_INPUT(yytext, bytes_read, 1);
+    char* cur_ptr = &yytext[PARM.m_pos - start_pos];
+    int bytes_read = 0;
+    YY_INPUT(cur_ptr, bytes_read, 1);
     if(0 == bytes_read)
         return -1;
-    if(isalpha(*yytext) || '_' == *yytext)
+    if(isalpha(*cur_ptr) || *cur_ptr == '_')
     {
         do
         {
-            prev_char = &yytext[PARM.m_pos - start_pos];
-            YY_INPUT(prev_char, bytes_read, 1);
-        } while(bytes_read != 0 && (isalpha(*prev_char) || '_' == *prev_char));
-        while(bytes_read != 0 && (isdigit(*prev_char) || isalpha(*prev_char) || '_' == *prev_char))
-        {
-            prev_char = &yytext[PARM.m_pos - start_pos];
-            YY_INPUT(prev_char, bytes_read, 1);
-        }
+            cur_ptr = &yytext[PARM.m_pos - start_pos];
+            YY_INPUT(cur_ptr, bytes_read, 1);
+        } while(bytes_read != 0 && (isdigit(*cur_ptr) || isalpha(*cur_ptr) || *cur_ptr == '_'));
         if(bytes_read != 0)
         {
-            fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
-            yytext[PARM.m_pos - start_pos] = 0;
+            YY_REWIND(1);
+            yytext[PARM.m_pos - start_pos] = '\0';
         }
         _XLANG_lval.ident_value = parse_context()->alloc_unique_string(yytext);
         return ID_IDENT;
     }
-    else if(isdigit(*yytext))
+    else if(isdigit(*cur_ptr))
     {
         bool find_decimal_point = false;
         do
         {
-            prev_char = &yytext[PARM.m_pos - start_pos];
-            YY_INPUT(prev_char, bytes_read, 1);
-            if(*prev_char == '.')
+            cur_ptr = &yytext[PARM.m_pos - start_pos];
+            YY_INPUT(cur_ptr, bytes_read, 1);
+            if(*cur_ptr == '.')
                 find_decimal_point = true;
-        } while(bytes_read != 0 && (isdigit(*prev_char) || *prev_char == '.'));
+        } while(bytes_read != 0 && (isdigit(*cur_ptr) || *cur_ptr == '.'));
         if(bytes_read != 0)
         {
-            fseek(PARM.m_file, -1, SEEK_CUR); PARM.m_pos--;
-            yytext[PARM.m_pos - start_pos] = 0;
+            YY_REWIND(1);
+            yytext[PARM.m_pos - start_pos] = '\0';
         }
         if(find_decimal_point)
         {
@@ -147,8 +150,7 @@ int _XLANG_lex()
         return ID_INT;
     }
     else
-    {
-        switch(*yytext)
+        switch(*cur_ptr)
         {
             case ',':
             case '(': case ')':
@@ -156,11 +158,10 @@ int _XLANG_lex()
             case '*': case '/':
             case '=':
             case '\n':
-                return *yytext;
+                return *cur_ptr;
             default:
                 _XLANG_error("unknown character");
         }
-    }
     return -1;
 }
 
@@ -195,23 +196,23 @@ int _XLANG_lex()
 %%
 
 root:
-     program { parse_context()->root() = $1; }
+      program { parse_context()->root() = $1; }
     | error { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
-     statement { $$ = $1; }
+      statement { $$ = $1; }
     | statement ',' program { $$ = mvc::MVCModel::make_inner(parse_context(), ',', 2, $1, $3); }
     ;
 
 statement:
-     expression { $$ = $1; }
+      expression { $$ = $1; }
     | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '=', 2,
                                      mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1), $3); }
     ;
 
 expression:
-     ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
+      ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, $1); }
     | ID_FLOAT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, $1); }
     | ID_IDENT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, $1); }
     | expression '+' expression { $$ = mvc::MVCModel::make_inner(parse_context(), '+', 2, $1, $3); }
