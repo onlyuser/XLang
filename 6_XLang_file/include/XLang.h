@@ -48,7 +48,7 @@ private:
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
-         return *s1 < *s2;
+            return *s1 < *s2;
         }
     };
     typedef std::set<std::string*, str_ptr_compare> string_set_t;
