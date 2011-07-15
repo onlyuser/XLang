@@ -70,12 +70,12 @@ std::string sym_name(uint32 sym_id)
         };
     switch(sym_id)
     {
-        case '+': return "+";
-        case '-': return "-";
-        case '*': return "*";
-        case '/': return "/";
-        case '=': return "=";
-        case ',': return ",";
+    case '+': return "+";
+    case '-': return "-";
+    case '*': return "*";
+    case '/': return "/";
+    case '=': return "=";
+    case ',': return ",";
     }
     return _sym_name[sym_id - ID_BASE - 1];
 }

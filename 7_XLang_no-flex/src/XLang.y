@@ -60,12 +60,12 @@ std::string sym_name(uint32 sym_id)
         };
     switch(sym_id)
     {
-        case '+': return "+";
-        case '-': return "-";
-        case '*': return "*";
-        case '/': return "/";
-        case '=': return "=";
-        case ',': return ",";
+    case '+': return "+";
+    case '-': return "-";
+    case '*': return "*";
+    case '/': return "/";
+    case '=': return "=";
+    case ',': return ",";
     }
     return _sym_name[sym_id - ID_BASE - 1];
 }
@@ -152,15 +152,15 @@ int _XLANG_lex()
     else
         switch(*cur_ptr)
         {
-            case ',':
-            case '(': case ')':
-            case '+': case '-':
-            case '*': case '/':
-            case '=':
-            case '\n':
-                return *cur_ptr;
-            default:
-                _XLANG_error("unknown character");
+        case ',':
+        case '(': case ')':
+        case '+': case '-':
+        case '*': case '/':
+        case '=':
+        case '\n':
+            return *cur_ptr;
+        default:
+            _XLANG_error("unknown character");
         }
     return -1;
 }
