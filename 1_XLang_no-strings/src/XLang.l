@@ -30,7 +30,7 @@
 
 // When in the lexer you have to access parm through the extra data.
 //
-#define PARM yyget_extra(yyscanner)->scan_context()
+#define PARM yyget_extra(yyscanner)->scanner_context()
 
 #ifndef MIN
     #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -46,11 +46,10 @@
         else { \
             (result) = std::min(PARM.m_length - PARM.m_pos, std::min(static_cast<int>(max_size), 1)); \
             if('\n' == PARM.m_buf[PARM.m_pos]) { \
-                PARM.m_line_num++; \
-                PARM.m_col_num = 1; \
-            } \
-            else \
-                PARM.m_col_num++; \
+                PARM.m_line++; \
+                PARM.m_column = 1; \
+            } else \
+                PARM.m_column++; \
             memcpy((buf), PARM.m_buf + PARM.m_pos, (result)); \
             PARM.m_pos += (result); \
         } \
@@ -129,11 +128,11 @@ ignored [ \t\n]+
 void begin_token(yyscan_t yyscanner, size_t length)
 {
     YYLTYPE* loc = yyget_lloc(yyscanner);
-    loc->first_line = PARM.m_line_num;
-    loc->first_column = PARM.m_prev_col_num;
-    loc->last_line = PARM.m_line_num;
-    loc->last_column = PARM.m_prev_col_num + length - 1;
-    PARM.m_prev_col_num = PARM.m_col_num;
+    loc->first_line = PARM.m_line;
+    loc->first_column = PARM.m_prev_column;
+    loc->last_line = PARM.m_line;
+    loc->last_column = PARM.m_prev_column + length - 1;
+    PARM.m_prev_column = PARM.m_column;
     if(length > 1)
-        PARM.m_prev_col_num--;
+        PARM.m_prev_column--;
 }

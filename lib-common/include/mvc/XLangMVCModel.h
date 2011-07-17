@@ -21,7 +21,7 @@
 #include "XLangAlloc.h"
 #include "node/XLangNodeBase.h" // node::NodeBase
 #include "node/XLangNode.h" // node::LeafNode
-#include "XLangParseContextBase.h" // ParseContextBase
+#include "XLangParserContextBase.h" // ParserContextBase
 #include "XLangType.h" // uint32
 #include <string> // std::string
 
@@ -31,12 +31,12 @@ class MVCModel
 {
 public:
     template<node::NodeBase::type_e type>
-    static node::NodeBase* make_leaf(ParseContextBase* pc, uint32 sym_id,
+    static node::NodeBase* make_leaf(ParserContextBase* pc, uint32 sym_id,
             typename node::LeafValueType<type>::type value)
     {
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, value);
     }
-    static node::NodeBase* make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...);
+    static node::NodeBase* make_inner(ParserContextBase* pc, uint32 sym_id, size_t child_count, ...);
 };
 
 }

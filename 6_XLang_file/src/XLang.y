@@ -64,9 +64,9 @@ std::string sym_name(uint32 sym_id)
     }
     return _sym_name[sym_id - ID_BASE - 1];
 }
-ParseContext* &parse_context()
+ParserContext* &parse_context()
 {
-    static ParseContext* pc = NULL;
+    static ParserContext* pc = NULL;
     return pc;
 }
 
@@ -129,7 +129,7 @@ expression:
 
 %%
 
-ScanContext::ScanContext(FILE* file)
+ScannerContext::ScannerContext(FILE* file)
     : m_file(file), m_pos(0)
 {
     fseek(file, 0, SEEK_END);
@@ -139,9 +139,9 @@ ScanContext::ScanContext(FILE* file)
 
 node::NodeBase* make_ast(Allocator &alloc, FILE* file)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__) ParseContext(alloc, file);
+    parse_context() = new (alloc, __FILE__, __LINE__) ParserContext(alloc, file);
     int error = _XLANG_parse(); // parser entry point
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) parse_context()->root() : NULL;
+    return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
 }
 
 int main(int argc, char** argv)

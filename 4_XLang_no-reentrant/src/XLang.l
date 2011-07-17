@@ -29,7 +29,7 @@
 
 // When in the lexer you have to access parm through the extra data.
 //
-#define PARM parse_context()->scan_context()
+#define PARM parse_context()->scanner_context()
 
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')

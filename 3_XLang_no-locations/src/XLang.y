@@ -35,7 +35,7 @@
 #include <iostream> // std::cout
 
 // report error
-void _XLANG_error(ParseContext* pc, yyscan_t scanner, const char* s)
+void _XLANG_error(ParserContext* pc, yyscan_t scanner, const char* s)
 {
     errors() << s;
 }
@@ -75,7 +75,7 @@ std::string sym_name(uint32 sym_id)
 // reentrant parser.
 //
 %pure_parser
-%parse-param {ParseContext* pc}
+%parse-param {ParserContext* pc}
 %parse-param {yyscan_t scanner}
 %lex-param {scanner}
 
@@ -125,20 +125,20 @@ expression:
 
 %%
 
-ScanContext::ScanContext(char* buf)
+ScannerContext::ScannerContext(char* buf)
     : m_buf(buf), m_pos(0), m_length(strlen(buf))
 {
 }
 
 node::NodeBase* make_ast(Allocator &alloc, char* s)
 {
-    ParseContext pc(alloc, s);
-    yyscan_t scanner = pc.scan_context().mcanner;
+    ParserContext parser_context(alloc, s);
+    yyscan_t scanner = parser_context.scanner_context().m_scanner;
     _XLANG_lex_init(&scanner);
-    _XLANG_set_extra(&pc, scanner);
-    int error = _XLANG_parse(&pc, scanner); // parser entry point
+    _XLANG_set_extra(&parser_context, scanner);
+    int error = _XLANG_parse(&parser_context, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? (node::NodeBase*) pc.root().inner_value : NULL;
+    return ((0 == error) && errors().str().empty()) ? parser_context.root().inner_value : NULL;
 }
 
 int main(int argc, char** argv)

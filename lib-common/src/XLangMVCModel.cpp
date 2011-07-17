@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
-#include "XLangParseContextBase.h" // ParseContextBase
+#include "XLangParserContextBase.h" // ParserContextBase
 #include "node/XLangNode.h" // node::NodeBase
 #include "XLangType.h" // uint32
 #include <stdarg.h> // va_list
@@ -24,7 +24,7 @@
 
 namespace mvc {
 
-node::NodeBase* MVCModel::make_inner(ParseContextBase* pc, uint32 sym_id, size_t child_count, ...)
+node::NodeBase* MVCModel::make_inner(ParserContextBase* pc, uint32 sym_id, size_t child_count, ...)
 {
     va_list ap;
     va_start(ap, child_count);

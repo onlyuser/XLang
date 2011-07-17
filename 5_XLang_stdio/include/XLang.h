@@ -21,30 +21,30 @@
 #include "XLangType.h" // uint32
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeBase.h" // node::NodeBase
-#include "XLangParseContextBase.h" // ParseContextBase
+#include "XLangParserContextBase.h" // ParserContextBase
 #include <string> // std::string
 #include <set> // std::set
 #include <sstream> // std::stringstream
 
 // context type to hold shared data between bison and flex
-class ParseContext : public ParseContextBase
+class ParserContext : public ParserContextBase
 {
 private:
     Allocator &m_alloc;
     node::NodeBase* m_root; // parse result (AST root)
 
-    struct str_ptr_compare
+    struct str_ptr_compare_t
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
             return *s1 < *s2;
         }
     };
-    typedef std::set<std::string*, str_ptr_compare> string_set_t;
+    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
     string_set_t m_string_set;
 
 public:
-    ParseContext(Allocator &alloc)
+    ParserContext(Allocator &alloc)
         : m_alloc(alloc), m_root(NULL) {}
     Allocator &alloc() { return m_alloc; }
     node::NodeBase* &root() { return m_root; }
@@ -70,7 +70,7 @@ void _XLANG_error(const char* s);
 
 std::stringstream &errors();
 std::string sym_name(uint32 sym_id);
-ParseContext* &parse_context();
+ParserContext* &parse_context();
 
 node::NodeBase* make_ast(Allocator &alloc);
 

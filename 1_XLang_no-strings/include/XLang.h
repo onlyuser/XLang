@@ -22,7 +22,7 @@
 #include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeBase.h" // node::NodeBase
-#include "XLangParseContextBase.h" // ParseContextBase
+#include "XLangParserContextBase.h" // ParserContextBase
 #include <string> // std::string
 #include <set> // std::set
 #include <sstream> // std::stringstream
@@ -30,7 +30,7 @@
 // type of yylval to be set by scanner actions
 // implemented as %union in non-reentrant mode
 //
-struct StackElem
+struct SynthAttrib
 {
     union
     {
@@ -40,48 +40,48 @@ struct StackElem
         node::NodeBase* inner_value; // node pointer
     };
 };
-#define YYSTYPE StackElem
+#define YYSTYPE SynthAttrib
 
 typedef void* yyscan_t;
-struct ScanContext
+struct ScannerContext
 {
-    yyscan_t mcanner; // state of the lexer
+    yyscan_t m_scanner; // state of the lexer
 
     char* m_buf; // buffer we read from
     int m_pos; // current position in buf
     int m_length; // length of buf
 
     // location placeholders
-    int m_line_num;
-    int m_col_num;
-    int m_prev_col_num;
+    int m_line;
+    int m_column;
+    int m_prev_column;
 
-    ScanContext(char* buf);
+    ScannerContext(char* buf);
 };
 
 // context type to hold shared data between bison and flex
-class ParseContext : public ParseContextBase
+class ParserContext : public ParserContextBase
 {
 private:
     Allocator &m_alloc;
-    ScanContext m_sc;
+    ScannerContext m_scanner_context;
     YYSTYPE m_root; // parse result (AST root)
 
-    struct str_ptr_compare
+    struct str_ptr_compare_t
     {
         bool operator()(const std::string* s1, const std::string* s2)
         {
             return *s1 < *s2;
         }
     };
-    typedef std::set<std::string*, str_ptr_compare> string_set_t;
+    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
     string_set_t m_string_set;
 
 public:
-    ParseContext(Allocator &alloc, char* s)
-        : m_alloc(alloc), m_sc(s) {}
+    ParserContext(Allocator &alloc, char* s)
+        : m_alloc(alloc), m_scanner_context(s) {}
     Allocator &alloc() { return m_alloc; }
-    ScanContext &scan_context() { return m_sc; }
+    ScannerContext &scanner_context() { return m_scanner_context; }
     YYSTYPE &root() { return m_root; }
 
     const std::string* alloc_unique_string(std::string name)
@@ -95,7 +95,7 @@ public:
         return *p;
     }
 };
-#define YY_EXTRA_TYPE ParseContext*
+#define YY_EXTRA_TYPE ParserContext*
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
@@ -104,8 +104,8 @@ int _XLANG_lex(YYSTYPE*, YYLTYPE*, yyscan_t);
 int _XLANG_lex_init(yyscan_t*);
 int _XLANG_lex_destroy(yyscan_t);
 void _XLANG_set_extra(YY_EXTRA_TYPE, yyscan_t);
-int _XLANG_parse(ParseContext*, yyscan_t);
-void _XLANG_error(YYLTYPE* loc, ParseContext* pc, yyscan_t Scanner, const char* s);
+int _XLANG_parse(ParserContext*, yyscan_t);
+void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s);
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
