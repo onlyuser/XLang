@@ -18,11 +18,12 @@
 #ifndef XLANG_TYPE_H_
 #define XLANG_TYPE_H_
 
+#include <stdint.h>
+
 #ifndef NULL
     #define NULL 0
 #endif
 
-typedef unsigned long uint32;
-typedef float float32;
+typedef float float32_t;
 
 #endif

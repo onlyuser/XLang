@@ -17,7 +17,7 @@
 
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "node/XLangNodeBase.h" // node::NodeBase
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <iostream> // std::cout
 
@@ -130,7 +130,7 @@ void exNode
     int w, h; /* node width and height */
     char *s; /* node text */
     int cbar; /* "real" start column of node (centred above subnodes) */
-    uint32 k; /* child number */
+    uint32_t k; /* child number */
     int che, chm; /* end column and mid of children */
     int cs; /* start column of children */
     char word[20]; /* extended node text */
@@ -247,7 +247,7 @@ void graphBox (char *s, int *w, int *h) {
 }
 
 void graphDrawBox (char *s, int c, int l) {
-    uint32 i;
+    uint32_t i;
     graphTest (l, c+strlen(s)-1+del);
     for(i = 0; i < strlen (s); i++) {
         graph[l][c+i+del] = s[i];

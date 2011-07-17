@@ -26,7 +26,7 @@
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "node/XLangNodePrinter.h" // node::NodePrinter
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <stdio.h> // fread
 #include <stdarg.h> // va_start
 #include <string.h> // memset
@@ -51,7 +51,7 @@ std::stringstream &errors()
     static std::stringstream _errors;
     return _errors;
 }
-std::string sym_name(uint32 sym_id)
+std::string sym_name(uint32_t sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "ID_INT",
@@ -173,7 +173,7 @@ int _XLANG_lex()
 %union
 {
     long int_value; // int value
-    float32 float_value; // float value
+    float32_t float_value; // float value
     const std::string* ident_value; // symbol table index
     node::NodeBase* inner_value; // node pointer
 }

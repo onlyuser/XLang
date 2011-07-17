@@ -26,7 +26,7 @@
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "node/XLangNodePrinter.h" // node::NodePrinter
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // strlen
@@ -59,7 +59,7 @@ std::stringstream &errors()
     static std::stringstream _errors;
     return _errors;
 }
-std::string sym_name(uint32 sym_id)
+std::string sym_name(uint32_t sym_id)
 {
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "ID_INT",

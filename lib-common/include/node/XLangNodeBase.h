@@ -18,7 +18,7 @@
 #ifndef XLANG_NODE_BASE_H_
 #define XLANG_NODE_BASE_H_
 
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <string> // std::string
 
 namespace node {
@@ -29,7 +29,7 @@ public:
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
     virtual type_e type() const = 0;
-    virtual uint32 sym_id() const = 0;
+    virtual uint32_t sym_id() const = 0;
     bool is_same_type(const NodeBase* _node) const
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
@@ -42,7 +42,7 @@ class LeafValueType;
 template<>
 class LeafValueType<NodeBase::INT> { public: typedef long type; };
 template<>
-class LeafValueType<NodeBase::FLOAT> { public: typedef float32 type; };
+class LeafValueType<NodeBase::FLOAT> { public: typedef float32_t type; };
 template<>
 class LeafValueType<NodeBase::STRING> { public: typedef std::string type; };
 template<>
@@ -61,7 +61,7 @@ class InnerNodeBase
 {
 public:
     virtual std::string name() const = 0;
-    virtual NodeBase* child(uint32 index) const = 0;
+    virtual NodeBase* child(uint32_t index) const = 0;
     virtual size_t child_count() const = 0;
 };
 

@@ -18,13 +18,13 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangParserContextBase.h" // ParserContextBase
 #include "node/XLangNode.h" // node::NodeBase
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <stdarg.h> // va_list
 #include <string> // std::string
 
 namespace mvc {
 
-node::NodeBase* MVCModel::make_inner(ParserContextBase* pc, uint32 sym_id, size_t child_count, ...)
+node::NodeBase* MVCModel::make_inner(ParserContextBase* pc, uint32_t sym_id, size_t child_count, ...)
 {
     va_list ap;
     va_start(ap, child_count);

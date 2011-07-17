@@ -20,7 +20,7 @@
 
 #include "node/XLangNodeBase.h" // node::NodeBase
 #include "node/XLangNodeVisitorBase.h" // node::VisitableNode
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <vector> // std::vector
 #include <stdarg.h> // va_list
@@ -31,10 +31,10 @@ class Node : public NodeBase, public VisitableNode
 {
 protected:
     NodeBase::type_e m_type;
-    uint32 m_sym_id;
+    uint32_t m_sym_id;
 
 public:
-    Node(NodeBase::type_e _type, uint32 _sym_id)
+    Node(NodeBase::type_e _type, uint32_t _sym_id)
         : m_type(_type), m_sym_id(_sym_id)
     {
     }
@@ -42,7 +42,7 @@ public:
     {
         return m_type;
     }
-    uint32 sym_id() const
+    uint32_t sym_id() const
     {
         return m_sym_id;
     }
@@ -54,7 +54,7 @@ class LeafNode : virtual public Node, public LeafNodeBase<_type>
     typename LeafValueType<_type>::type m_value;
 
 public:
-    LeafNode(uint32 _sym_id, typename LeafValueType<_type>::type _value)
+    LeafNode(uint32_t _sym_id, typename LeafValueType<_type>::type _value)
         : Node(_type, _sym_id), m_value(_value)
     {
     }
@@ -78,7 +78,7 @@ class InnerNode : virtual public Node, public InnerNodeBase
         return m_child_vec;
     }
 public:
-    InnerNode(uint32 _sym_id, size_t _child_count, va_list ap)
+    InnerNode(uint32_t _sym_id, size_t _child_count, va_list ap)
         : Node(NodeBase::INNER, _sym_id)
     {
         for(size_t i = 0; i<_child_count; i++)
@@ -96,7 +96,7 @@ public:
         }
     }
     std::string name() const;
-    NodeBase* child(uint32 index) const
+    NodeBase* child(uint32_t index) const
     {
         return m_child_vec[index];
     }

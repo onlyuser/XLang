@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_PARSE_CONTEXT_BASE_H_
-#define XLANG_PARSE_CONTEXT_BASE_H_
+#ifndef XLANG_PARSER_CONTEXT_BASE_H_
+#define XLANG_PARSER_CONTEXT_BASE_H_
 
 #include "XLangAlloc.h" // Allocator
 #include <string> // std::string

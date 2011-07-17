@@ -18,7 +18,7 @@
 #ifndef XLANG_H_
 #define XLANG_H_
 
-#include "XLangType.h" // uint32
+#include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeBase.h" // node::NodeBase
@@ -35,7 +35,7 @@ struct SynthAttrib
     union
     {
         long int_value; // int value
-        float32 float_value; // float value
+        float32_t float_value; // float value
         const std::string* ident_value; // symbol table index
         node::NodeBase* inner_value; // node pointer
     };
@@ -109,7 +109,7 @@ void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char*
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
-std::string sym_name(uint32 sym_id);
+std::string sym_name(uint32_t sym_id);
 
 node::NodeBase* make_ast(Allocator &alloc, char* s);
 

@@ -19,7 +19,7 @@
 #include <iostream> // std::cout
 
 // prototype
-extern std::string sym_name(uint32 sym_id);
+extern std::string sym_name(uint32_t sym_id);
 
 namespace node {
 
