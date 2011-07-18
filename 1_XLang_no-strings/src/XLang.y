@@ -81,9 +81,9 @@ std::string sym_name(uint32_t sym_id)
 %}
 
 // 'pure_parser' tells bison to use no global variables and create a
-// reentrant parser.
+// reentrant parser (NOTE: deprecated, use "%define api.pure" instead).
 //
-%pure_parser
+%define api.pure
 %parse-param {ParserContext* pc}
 %parse-param {yyscan_t scanner}
 %lex-param {scanner}
