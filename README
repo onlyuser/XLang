@@ -18,8 +18,8 @@ About:
     full > no-strings > no-comments > no-locations > no-reentrant > stdio > file > no-flex
 
     The order is chosen based on "usefulness" -- for instance, it is arguably more useful
-    to have a reentrant parser than to have one that is non-reentrant, so the reentrant
-    feature is enabled on the "feature rich" end. There's really no good reason one
+    to have a reentrant parser than to have a non-reentrant parser, so the reentrant
+    feature is enabled on the "feature rich" end. There's really no good reason one cannot
     cannot have both "comments" and "file input" enabled, or both "reentrant" and "hand-
     rolled lexer" enabled.
 
