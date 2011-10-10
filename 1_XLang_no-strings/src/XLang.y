@@ -34,6 +34,11 @@
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
 
+#define MAKE_INT(...) mvc::MVCModel::make_leaf<node::NodeBase::INT>(pc, ID_INT, ##__VA_ARGS__)
+#define MAKE_FLOAT(...) mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(pc, ID_FLOAT, ##__VA_ARGS__)
+#define MAKE_IDENT(...) mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(pc, ID_IDENT, ##__VA_ARGS__)
+#define MAKE_INNER(...) mvc::MVCModel::make_inner(pc, ##__VA_ARGS__)
+
 // report error
 void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
 {
@@ -115,23 +120,22 @@ root:
 
 program:
       statement { $$ = $1; }
-    | statement ',' program { $$ = mvc::MVCModel::make_inner(pc, ',', @$, 2, $1, $3); }
+    | statement ',' program { $$ = MAKE_INNER(',', @$, 2, $1, $3); }
     ;
 
 statement:
       expression { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = mvc::MVCModel::make_inner(pc, '=', @$, 2,
-                                     mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(pc, ID_IDENT, @$, $1), $3); }
+    | ID_IDENT '=' expression { $$ = MAKE_INNER('=', @$, 2, MAKE_IDENT(@$, $1), $3); }
     ;
 
 expression:
-      ID_INT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::INT>(pc, ID_INT, @$, $1); }
-    | ID_FLOAT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(pc, ID_FLOAT, @$, $1); }
-    | ID_IDENT { $$ = mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(pc, ID_IDENT, @$, $1); }
-    | expression '+' expression { $$ = mvc::MVCModel::make_inner(pc, '+', @$, 2, $1, $3); }
-    | expression '-' expression { $$ = mvc::MVCModel::make_inner(pc, '-', @$, 2, $1, $3); }
-    | expression '*' expression { $$ = mvc::MVCModel::make_inner(pc, '*', @$, 2, $1, $3); }
-    | expression '/' expression { $$ = mvc::MVCModel::make_inner(pc, '/', @$, 2, $1, $3); }
+      ID_INT { $$ = MAKE_INT(@$, $1); }
+    | ID_FLOAT { $$ = MAKE_FLOAT(@$, $1); }
+    | ID_IDENT { $$ = MAKE_IDENT(@$, $1); }
+    | expression '+' expression { $$ = MAKE_INNER('+', @$, 2, $1, $3); }
+    | expression '-' expression { $$ = MAKE_INNER('-', @$, 2, $1, $3); }
+    | expression '*' expression { $$ = MAKE_INNER('*', @$, 2, $1, $3); }
+    | expression '/' expression { $$ = MAKE_INNER('/', @$, 2, $1, $3); }
     | '(' expression ')' { $$ = $2; }
     ;
 
