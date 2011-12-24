@@ -22,7 +22,7 @@
 #include <stddef.h> // size_t
 
 MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number)
-    : m_size_bytes(_size_bytes), m_filename(_filename), m_lineber(_line_number)
+    : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number)
 {
     m_ptr = malloc(_size_bytes);
 }
@@ -35,7 +35,7 @@ MemChunk::~MemChunk()
 
 void MemChunk::dump() const
 {
-    std::cout << m_filename << ":" << m_lineber << " .. " << m_size_bytes << " bytes";
+    std::cout << m_filename << ":" << m_line_number << " .. " << m_size_bytes << " bytes";
 }
 
 Allocator::Allocator(std::string name)

@@ -27,7 +27,7 @@ class MemChunk
     void* m_ptr;
     size_t m_size_bytes;
     std::string m_filename;
-    size_t m_lineber;
+    size_t m_line_number;
 
 public:
     MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number);
@@ -35,7 +35,7 @@ public:
     void* ptr() const { return m_ptr; }
     size_t size() const { return m_size_bytes; }
     std::string filename() const { return m_filename; }
-    size_t line_number() const { return m_lineber; }
+    size_t line_number() const { return m_line_number; }
     void dump() const;
 };
 
