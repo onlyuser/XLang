@@ -21,7 +21,7 @@
 #include "XLangType.h" // uint32_t
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLangParserContextBase.h" // ParserContextBase
+#include "XLangParserContextIFace.h" // ParserContextIFace
 #include <stdio.h> // FILE
 #include <string> // std::string
 #include <set> // std::set
@@ -37,7 +37,7 @@ struct ScannerContext
 };
 
 // context type to hold shared data between bison and flex
-class ParserContext : public ParserContextBase
+class ParserContext : public ParserContextIFace
 {
 private:
     Allocator &m_alloc;

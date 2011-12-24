@@ -36,8 +36,7 @@ protected:
 public:
     Node(NodeIdentIFace::type_e _type, uint32_t _sym_id)
         : m_type(_type), m_sym_id(_sym_id)
-    {
-    }
+    { }
     NodeIdentIFace::type_e type() const
     {
         return m_type;
@@ -56,8 +55,7 @@ class LeafNode : virtual public Node, public LeafNodeIFace<_type>
 public:
     LeafNode(uint32_t _sym_id, typename LeafTypeTraits<_type>::type _value)
         : Node(_type, _sym_id), m_value(_value)
-    {
-    }
+    { }
     typename LeafTypeTraits<_type>::type value() const
     {
         return m_value;

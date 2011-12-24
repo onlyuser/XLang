@@ -15,15 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_PARSER_CONTEXT_BASE_H_
-#define XLANG_PARSER_CONTEXT_BASE_H_
+#ifndef XLANG_PARSER_CONTEXT_IFACE_H_
+#define XLANG_PARSER_CONTEXT_IFACE_H_
 
 #include "XLangAlloc.h" // Allocator
 #include <string> // std::string
 
-class ParserContextBase
+class ParserContextIFace
 {
 public:
+	virtual ~ParserContextIFace() { }
     virtual Allocator &alloc() = 0;
     virtual const std::string *alloc_unique_string(std::string name) = 0;
 };

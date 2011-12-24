@@ -22,7 +22,7 @@
 #include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLangParserContextBase.h" // ParserContextBase
+#include "XLangParserContextIFace.h" // ParserContextIFace
 #include <string> // std::string
 #include <set> // std::set
 #include <sstream> // std::stringstream
@@ -60,7 +60,7 @@ struct ScannerContext
 };
 
 // context type to hold shared data between bison and flex
-class ParserContext : public ParserContextBase
+class ParserContext : public ParserContextIFace
 {
 private:
     Allocator &m_alloc;
