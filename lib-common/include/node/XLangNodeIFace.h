@@ -15,53 +15,56 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_BASE_H_
-#define XLANG_NODE_BASE_H_
+#ifndef XLANG_NODE_IFACE_H_
+#define XLANG_NODE_IFACE_H_
 
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
 namespace node {
 
-class NodeBase
+class NodeIdentIFace
 {
 public:
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
+	virtual ~NodeIdentIFace() { }
     virtual type_e type() const = 0;
     virtual uint32_t sym_id() const = 0;
-    bool is_same_type(const NodeBase* _node) const
+    bool is_same_type(const NodeIdentIFace* _node) const
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
     }
 };
 
-template<NodeBase::type_e>
-class LeafValueType;
+template<NodeIdentIFace::type_e>
+class LeafTypeTraits;
 
 template<>
-class LeafValueType<NodeBase::INT> { public: typedef long type; };
+class LeafTypeTraits<NodeIdentIFace::INT> { public: typedef long type; };
 template<>
-class LeafValueType<NodeBase::FLOAT> { public: typedef float32_t type; };
+class LeafTypeTraits<NodeIdentIFace::FLOAT> { public: typedef float32_t type; };
 template<>
-class LeafValueType<NodeBase::STRING> { public: typedef std::string type; };
+class LeafTypeTraits<NodeIdentIFace::STRING> { public: typedef std::string type; };
 template<>
-class LeafValueType<NodeBase::CHAR> { public: typedef char type; };
+class LeafTypeTraits<NodeIdentIFace::CHAR> { public: typedef char type; };
 template<>
-class LeafValueType<NodeBase::IDENT> { public: typedef const std::string* type; };
+class LeafTypeTraits<NodeIdentIFace::IDENT> { public: typedef const std::string* type; };
 
-template<NodeBase::type_e type>
-class LeafNodeBase
+template<NodeIdentIFace::type_e type>
+class LeafNodeIFace
 {
 public:
-    virtual typename LeafValueType<type>::type value() const = 0;
+	virtual ~LeafNodeIFace() { }
+    virtual typename LeafTypeTraits<type>::type value() const = 0;
 };
 
-class InnerNodeBase
+class InnerNodeIFace
 {
 public:
+	virtual ~InnerNodeIFace() { }
     virtual std::string name() const = 0;
-    virtual NodeBase* child(uint32_t index) const = 0;
+    virtual NodeIdentIFace* child(uint32_t index) const = 0;
     virtual size_t child_count() const = 0;
 };
 

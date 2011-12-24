@@ -21,7 +21,7 @@
 
 %{
 
-#include "XLang.h" // node::NodeBase
+#include "XLang.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include <stdlib.h> // atoi
 

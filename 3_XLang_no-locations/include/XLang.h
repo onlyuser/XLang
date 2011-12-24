@@ -20,7 +20,7 @@
 
 #include "XLangType.h" // uint32_t
 #include "XLangAlloc.h" // Allocator
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangParserContextBase.h" // ParserContextBase
 #include <string> // std::string
 #include <set> // std::set
@@ -36,7 +36,7 @@ struct SynthAttrib
         long int_value; // int value
         float32_t float_value; // float value
         const std::string* ident_value; // symbol table index
-        node::NodeBase* inner_value; // node pointer
+        node::NodeIdentIFace* inner_value; // node pointer
     };
 };
 #define YYSTYPE SynthAttrib
@@ -105,6 +105,6 @@ void _XLANG_error(const char* s);
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
 
-node::NodeBase* make_ast(Allocator &alloc, char* s);
+node::NodeIdentIFace* make_ast(Allocator &alloc, char* s);
 
 #endif

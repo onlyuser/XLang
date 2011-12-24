@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "mvc/XLangMVCView.h" // mvc::MVCView
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <iostream> // std::cout
@@ -32,48 +32,48 @@
 //#include "calc3.h"
 //#include "calc3.tab.h"
 
-#define typeId node::NodeBase::IDENT
-#define typeOpr node::NodeBase::INNER
+#define typeId node::NodeIdentIFace::IDENT
+#define typeOpr node::NodeIdentIFace::INNER
 
 namespace mvc {
 
-void MVCView::print_lisp(const node::NodeBase* _node)
+void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
     if(NULL == _node)
         return;
     switch(_node->type())
     {
-        case node::NodeBase::INT:
-            std::cout << dynamic_cast<const node::LeafNodeBase<node::NodeBase::INT>*>(_node)->value();
+        case node::NodeIdentIFace::INT:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
             break;
-        case node::NodeBase::FLOAT:
-            std::cout << dynamic_cast<const node::LeafNodeBase<node::NodeBase::FLOAT>*>(_node)->value();
+        case node::NodeIdentIFace::FLOAT:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
             break;
-        case node::NodeBase::STRING:
-            std::cout << '\"' << dynamic_cast<const node::LeafNodeBase<node::NodeBase::STRING>*>(_node)->value() << '\"';
+        case node::NodeIdentIFace::STRING:
+            std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
             break;
-        case node::NodeBase::CHAR:
-            std::cout << '\'' << dynamic_cast<const node::LeafNodeBase<node::NodeBase::CHAR>*>(_node)->value() << '\'';
+        case node::NodeIdentIFace::CHAR:
+            std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
             break;
-        case node::NodeBase::IDENT:
-            std::cout << *dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(_node)->value();
+        case node::NodeIdentIFace::IDENT:
+            std::cout << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value();
             break;
-        case node::NodeBase::INNER:
+        case node::NodeIdentIFace::INNER:
             {
-                std::cout << '(' << dynamic_cast<const node::InnerNodeBase*>(_node)->name() << ' ';
+                std::cout << '(' << dynamic_cast<const node::InnerNodeIFace*>(_node)->name() << ' ';
                 size_t i;
-                for(i = 0; i < dynamic_cast<const node::InnerNodeBase*>(_node)->child_count()-1; i++)
+                for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count()-1; i++)
                 {
-                    print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
+                    print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
                     std::cout << ' ';
                 }
-                print_lisp(dynamic_cast<const node::InnerNodeBase*>(_node)->child(i));
+                print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
                 std::cout << ')';
             }
     }
 }
 
-typedef const node::NodeBase nodeType;
+typedef const node::NodeIdentIFace nodeType;
 int ex (nodeType *p);
 void MVCView::print_graph(nodeType* p)
 {
@@ -141,17 +141,17 @@ void exNode
     s = word;
     std::string temp;
     switch(p->type()) {
-        case node::NodeBase::INT:
-            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeBase<node::NodeBase::INT>*>(p)->value());
+        case node::NodeIdentIFace::INT:
+            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(p)->value());
             break;
-        case node::NodeBase::FLOAT:
-            sprintf(word, "%f", dynamic_cast<const node::LeafNodeBase<node::NodeBase::FLOAT>*>(p)->value());
+        case node::NodeIdentIFace::FLOAT:
+            sprintf(word, "%f", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(p)->value());
             break;
         case typeId:
-            sprintf(word, "%s", dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(p)->value()->c_str());
+            sprintf(word, "%s", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(p)->value()->c_str());
             break;
         case typeOpr:
-            temp = dynamic_cast<const node::InnerNodeBase*>(p)->name();
+            temp = dynamic_cast<const node::InnerNodeIFace*>(p)->name();
             s = const_cast<char*>(temp.c_str());
             break;
         default:
@@ -166,15 +166,15 @@ void exNode
 
     /* node is leaf */
     if(p->type() != typeOpr ||
-            dynamic_cast<const node::InnerNodeBase*>(p)->child_count() == 0) {
+            dynamic_cast<const node::InnerNodeIFace*>(p)->child_count() == 0) {
         graphDrawBox (s, cbar, l);
         return;
     }
 
     /* node has children */
     cs = c;
-    for(k = 0; k < dynamic_cast<const node::InnerNodeBase*>(p)->child_count(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeBase*>(p)->child(k), cs, l+h+eps, &che, &chm);
+    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->child_count(); k++) {
+        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->child(k), cs, l+h+eps, &che, &chm);
         cs = che;
     }
 
@@ -190,8 +190,8 @@ void exNode
 
     /* draw arrows (not optimal: children are drawn a second time) */
     cs = c;
-    for(k = 0; k < dynamic_cast<const node::InnerNodeBase*>(p)->child_count(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeBase*>(p)->child(k), cs, l+h+eps, &che, &chm);
+    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->child_count(); k++) {
+        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->child(k), cs, l+h+eps, &che, &chm);
         graphDrawArrow (*cm, l+h, chm, l+h+eps-1);
         cs = che;
     }

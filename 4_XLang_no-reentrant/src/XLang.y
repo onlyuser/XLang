@@ -20,12 +20,12 @@
 
 %{
 
-#include "XLang.h" // node::NodeBase
+#include "XLang.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
-#include "node/XLangNodePrinter.h" // node::NodePrinter
+#include "node/XLangNodePrinterVisitor.h" // node::NodePrinterVisitor
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
@@ -34,9 +34,9 @@
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
 
-#define MAKE_INT(...) mvc::MVCModel::make_leaf<node::NodeBase::INT>(parse_context(), ID_INT, ##__VA_ARGS__)
-#define MAKE_FLOAT(...) mvc::MVCModel::make_leaf<node::NodeBase::FLOAT>(parse_context(), ID_FLOAT, ##__VA_ARGS__)
-#define MAKE_IDENT(...) mvc::MVCModel::make_leaf<node::NodeBase::IDENT>(parse_context(), ID_IDENT, ##__VA_ARGS__)
+#define MAKE_INT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::INT>(parse_context(), ID_INT, ##__VA_ARGS__)
+#define MAKE_FLOAT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::FLOAT>(parse_context(), ID_FLOAT, ##__VA_ARGS__)
+#define MAKE_IDENT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::IDENT>(parse_context(), ID_IDENT, ##__VA_ARGS__)
 #define MAKE_INNER(...) mvc::MVCModel::make_inner(parse_context(), ##__VA_ARGS__)
 
 // report error
@@ -85,7 +85,7 @@ ParserContext* &parse_context()
     long int_value; // int value
     float32_t float_value; // float value
     const std::string* ident_value; // symbol table index
-    node::NodeBase* inner_value; // node pointer
+    node::NodeIdentIFace* inner_value; // node pointer
 }
 
 // show detailed parse errors
@@ -138,7 +138,7 @@ ScannerContext::ScannerContext(char* buf)
 {
 }
 
-node::NodeBase* make_ast(Allocator &alloc, char* s)
+node::NodeIdentIFace* make_ast(Allocator &alloc, char* s)
 {
     parse_context() = new (alloc, __FILE__, __LINE__) ParserContext(alloc, s);
     int error = _XLANG_parse(); // parser entry point
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
         return 1;
     }
     Allocator alloc(__FILE__);
-    node::NodeBase* ast = make_ast(alloc, argv[1]);
+    node::NodeIdentIFace* ast = make_ast(alloc, argv[1]);
     if(NULL == ast)
     {
         std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
@@ -163,8 +163,8 @@ int main(int argc, char** argv)
 #if 0 // use mvc-pattern pretty-printer
     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
 #else // use visitor-pattern pretty-printer
-    node::NodePrinter visitor;
-    if(ast->type() == node::NodeBase::INNER)
+    node::NodePrinterVisitor visitor;
+    if(ast->type() == node::NodeIdentIFace::INNER)
     {
         dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor);
         std::cout << std::endl;

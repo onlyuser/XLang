@@ -18,15 +18,15 @@
 #ifndef XLANG_MVC_VIEW_H_
 #define XLANG_MVC_VIEW_H_
 
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 
 namespace mvc {
 
 class MVCView
 {
 public:
-    static void print_lisp(const node::NodeBase* _node);
-    static void print_graph(const node::NodeBase* p);
+    static void print_lisp(const node::NodeIdentIFace* _node);
+    static void print_graph(const node::NodeIdentIFace* p);
 };
 
 }

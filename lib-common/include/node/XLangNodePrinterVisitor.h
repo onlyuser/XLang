@@ -15,28 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_VISITOR_BASE_H_
-#define XLANG_NODE_VISITOR_BASE_H_
+#ifndef XLANG_NODE_PRINTER_VISITOR_H_
+#define XLANG_NODE_PRINTER_VISITOR_H_
 
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "node/XLangNodeVisitorIFace.h" // node::NodeVisitorIFace
 
 namespace node {
 
-class NodeVisitorBase
+class NodePrinterVisitor : public NodeVisitorIFace
 {
 public:
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::INT>* _node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* _node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::STRING>* _node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* _node) = 0;
-    virtual void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* _node) = 0;
-    virtual void visit(const node::InnerNodeBase* _node) = 0;
-};
-
-class VisitableNode
-{
-public:
-    virtual void accept(NodeVisitorBase* visitor) const = 0;
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    void visit(const node::InnerNodeIFace* _node);
 };
 
 }

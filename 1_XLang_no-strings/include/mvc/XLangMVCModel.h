@@ -19,7 +19,7 @@
 #define XLANG_MVC_MODEL_H_
 
 #include "XLangAlloc.h"
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "node/XLangNode.h" // node::LeafNode
 #include "XLangParserContextBase.h" // ParserContextBase
 #include "XLangType.h" // uint32_t
@@ -31,13 +31,13 @@ namespace mvc {
 class MVCModel
 {
 public:
-    template<node::NodeBase::type_e type>
-    static node::NodeBase* make_leaf(ParserContextBase* pc, uint32_t sym_id, YYLTYPE &loc,
-            typename node::LeafValueType<type>::type value)
+    template<node::NodeIdentIFace::type_e type>
+    static node::NodeIdentIFace* make_leaf(ParserContextBase* pc, uint32_t sym_id, YYLTYPE &loc,
+            typename node::LeafTypeTraits<type>::type value)
     {
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, loc, value);
     }
-    static node::NodeBase* make_inner(ParserContextBase* pc, uint32_t sym_id, YYLTYPE &loc, size_t child_count, ...);
+    static node::NodeIdentIFace* make_inner(ParserContextBase* pc, uint32_t sym_id, YYLTYPE &loc, size_t child_count, ...);
 };
 
 }

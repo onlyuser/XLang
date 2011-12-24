@@ -87,7 +87,7 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 # object (common)
 #==================
 
-COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinter XLangMVCView
+COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 
 $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp

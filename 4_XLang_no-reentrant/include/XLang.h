@@ -20,7 +20,7 @@
 
 #include "XLangType.h" // uint32_t
 #include "XLangAlloc.h" // Allocator
-#include "node/XLangNodeBase.h" // node::NodeBase
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangParserContextBase.h" // ParserContextBase
 #include <string> // std::string
 #include <set> // std::set
@@ -41,7 +41,7 @@ class ParserContext : public ParserContextBase
 private:
     Allocator &m_alloc;
     ScannerContext m_scanner_context;
-    node::NodeBase* m_root; // parse result (AST root)
+    node::NodeIdentIFace* m_root; // parse result (AST root)
 
     struct str_ptr_compare_t
     {
@@ -58,7 +58,7 @@ public:
         : m_alloc(alloc), m_scanner_context(s), m_root(NULL) {}
     Allocator &alloc() { return m_alloc; }
     ScannerContext &scanner_context() { return m_scanner_context; }
-    node::NodeBase* &root() { return m_root; }
+    node::NodeIdentIFace* &root() { return m_root; }
 
     const std::string* alloc_unique_string(std::string name)
     {
@@ -83,6 +83,6 @@ std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
 ParserContext* &parse_context();
 
-node::NodeBase* make_ast(Allocator &alloc, char* s);
+node::NodeIdentIFace* make_ast(Allocator &alloc, char* s);
 
 #endif

@@ -18,8 +18,8 @@
 #ifndef XLANG_NODE_H_
 #define XLANG_NODE_H_
 
-#include "node/XLangNodeBase.h" // node::NodeBase
-#include "node/XLangNodeVisitorBase.h" // node::VisitableNode
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "node/XLangNodeVisitorIFace.h" // node::VisitableNodeIFace
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -28,19 +28,19 @@
 
 namespace node {
 
-class Node : public NodeBase, public VisitableNode
+class Node : public NodeIdentIFace, public VisitableNodeIFace
 {
 protected:
-    NodeBase::type_e m_type;
+    NodeIdentIFace::type_e m_type;
     uint32_t m_sym_id;
     YYLTYPE m_loc;
 
 public:
-    Node(NodeBase::type_e _type, uint32_t _sym_id, YYLTYPE &_loc)
+    Node(NodeIdentIFace::type_e _type, uint32_t _sym_id, YYLTYPE &_loc)
         : m_type(_type), m_sym_id(_sym_id), m_loc(_loc)
     {
     }
-    NodeBase::type_e type() const
+    NodeIdentIFace::type_e type() const
     {
         return m_type;
     }
@@ -54,29 +54,29 @@ public:
     }
 };
 
-template<NodeBase::type_e _type>
-class LeafNode : virtual public Node, public LeafNodeBase<_type>
+template<NodeIdentIFace::type_e _type>
+class LeafNode : virtual public Node, public LeafNodeIFace<_type>
 {
-    typename LeafValueType<_type>::type m_value;
+    typename LeafTypeTraits<_type>::type m_value;
 
 public:
-    LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafValueType<_type>::type _value)
+    LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafTypeTraits<_type>::type _value)
         : Node(_type, _sym_id, loc), m_value(_value)
     {
     }
-    typename LeafValueType<_type>::type value() const
+    typename LeafTypeTraits<_type>::type value() const
     {
         return m_value;
     }
-    void accept(NodeVisitorBase* visitor) const
+    void accept(NodeVisitorIFace* visitor) const
     {
         visitor->visit(this);
     }
 };
 
-class InnerNode : virtual public Node, public InnerNodeBase
+class InnerNode : virtual public Node, public InnerNodeIFace
 {
-    typedef std::vector<NodeBase*> child_vec_t;
+    typedef std::vector<NodeIdentIFace*> child_vec_t;
     child_vec_t m_child_vec;
 
     const child_vec_t &child_vec() const
@@ -85,11 +85,11 @@ class InnerNode : virtual public Node, public InnerNodeBase
     }
 public:
     InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
-        : Node(NodeBase::INNER, _sym_id, loc)
+        : Node(NodeIdentIFace::INNER, _sym_id, loc)
     {
         for(size_t i = 0; i<_child_count; i++)
         {
-            NodeBase* _node = va_arg(ap, NodeBase*);
+            NodeIdentIFace* _node = va_arg(ap, NodeIdentIFace*);
             if(is_same_type(_node))
             {
                 InnerNode* inner_node = dynamic_cast<InnerNode*>(_node);
@@ -102,7 +102,7 @@ public:
         }
     }
     std::string name() const;
-    NodeBase* child(uint32_t index) const
+    NodeIdentIFace* child(uint32_t index) const
     {
         return m_child_vec[index];
     }
@@ -110,7 +110,7 @@ public:
     {
         return m_child_vec.size();
     }
-    void accept(NodeVisitorBase* visitor) const;
+    void accept(NodeVisitorIFace* visitor) const;
 };
 
 }

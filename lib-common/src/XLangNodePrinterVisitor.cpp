@@ -15,25 +15,39 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_PRINTER_H_
-#define XLANG_NODE_PRINTER_H_
-
-#include "node/XLangNodeBase.h" // node::NodeBase
-#include "node/XLangNodeVisitorBase.h" // node::NodeVisitorBase
+#include "node/XLangNodePrinterVisitor.h" // node::NodePrinterVisitor
+#include <iostream> // std::cout
 
 namespace node {
 
-class NodePrinter : public NodeVisitorBase
+void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::INT>* _node)
 {
-public:
-    void visit(const node::LeafNodeBase<node::NodeBase::INT>* _node);
-    void visit(const node::LeafNodeBase<node::NodeBase::FLOAT>* _node);
-    void visit(const node::LeafNodeBase<node::NodeBase::STRING>* _node);
-    void visit(const node::LeafNodeBase<node::NodeBase::CHAR>* _node);
-    void visit(const node::LeafNodeBase<node::NodeBase::IDENT>* _node);
-    void visit(const node::InnerNodeBase* _node);
-};
-
+    std::cout << _node->value();
 }
 
-#endif
+void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::FLOAT>* _node)
+{
+    std::cout << _node->value();
+}
+
+void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::STRING>* _node)
+{
+    std::cout << '\"' << _node->value() << '\"';
+}
+
+void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::CHAR>* _node)
+{
+    std::cout << '\'' << _node->value() << '\'';
+}
+
+void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node)
+{
+    std::cout << *_node->value();
+}
+
+void NodePrinterVisitor::visit(const InnerNodeIFace* _node)
+{
+    std::cout << _node->name();
+}
+
+}

@@ -22,7 +22,7 @@
 %{
 
 #include "XLangType.h" // char*
-#include "XLang.h" // NodeBase
+#include "XLang.h" // NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (generated code)
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi

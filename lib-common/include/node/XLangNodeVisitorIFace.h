@@ -15,28 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_MVC_MODEL_H_
-#define XLANG_MVC_MODEL_H_
+#ifndef XLANG_NODE_VISITOR_IFACE_H_
+#define XLANG_NODE_VISITOR_IFACE_H_
 
-#include "XLangAlloc.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNode.h" // node::LeafNode
-#include "XLangParserContextBase.h" // ParserContextBase
-#include "XLangType.h" // uint32_t
-#include <string> // std::string
 
-namespace mvc {
+namespace node {
 
-class MVCModel
+class NodeVisitorIFace
 {
 public:
-    template<node::NodeIdentIFace::type_e type>
-    static node::NodeIdentIFace* make_leaf(ParserContextBase* pc, uint32_t sym_id,
-            typename node::LeafTypeTraits<type>::type value)
-    {
-        return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, value);
-    }
-    static node::NodeIdentIFace* make_inner(ParserContextBase* pc, uint32_t sym_id, size_t child_count, ...);
+	virtual ~NodeVisitorIFace() { }
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node) = 0;
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node) = 0;
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node) = 0;
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node) = 0;
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node) = 0;
+    virtual void visit(const node::InnerNodeIFace* _node) = 0;
+};
+
+class VisitableNodeIFace
+{
+public:
+	virtual ~VisitableNodeIFace() { }
+    virtual void accept(NodeVisitorIFace* visitor) const = 0;
 };
 
 }

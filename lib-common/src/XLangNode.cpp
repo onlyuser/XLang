@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "node/XLangNode.h" // node::NodeBase
+#include "node/XLangNode.h" // node::NodeIdentIFace
 #include <iostream> // std::cout
 
 // prototype
@@ -27,7 +27,7 @@ std::string InnerNode::name() const
 {
     return sym_name(sym_id());
 }
-void InnerNode::accept(NodeVisitorBase* visitor) const
+void InnerNode::accept(NodeVisitorIFace* visitor) const
 {
     std::cout << '(';
     visitor->visit(this);
@@ -37,23 +37,23 @@ void InnerNode::accept(NodeVisitorBase* visitor) const
     {
         switch(child(i)->type())
         {
-        case NodeBase::FLOAT:
-            visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::FLOAT>*>(child(i)));
+        case NodeIdentIFace::FLOAT:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child(i)));
             break;
-        case NodeBase::INT:
-            visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::INT>*>(child(i)));
+        case NodeIdentIFace::INT:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child(i)));
             break;
-        case NodeBase::STRING:
-            visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::STRING>*>(child(i)));
+        case NodeIdentIFace::STRING:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child(i)));
             break;
-        case NodeBase::CHAR:
-            visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::CHAR>*>(child(i)));
+        case NodeIdentIFace::CHAR:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child(i)));
             break;
-        case NodeBase::IDENT:
-            visitor->visit(dynamic_cast<const node::LeafNodeBase<node::NodeBase::IDENT>*>(child(i)));
+        case NodeIdentIFace::IDENT:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child(i)));
             break;
-        case NodeBase::INNER:
-            dynamic_cast<const node::VisitableNode*>(child(i))->accept(visitor);
+        case NodeIdentIFace::INNER:
+            dynamic_cast<const node::VisitableNodeIFace*>(child(i))->accept(visitor);
             break;
         }
         if(i < child_count()-1)

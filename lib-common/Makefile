@@ -61,7 +61,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 # binary
 #==================
 
-CPP_STEMS = XLangAlloc XLangNode XLangNodePrinter XLangMVCModel XLangMVCView
+CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCModel XLangMVCView
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 
 $(BINARY) : $(LIBS) $(OBJECTS)
