@@ -29,20 +29,20 @@ About:
 
 Variation vs Feature Table:
 
-                     more                                                       less
-                     critical <--                                           --> critical
-    +--------------+-------------+---------+-----------+-----------+----------+----------+
-    | variation    | lexer       | input   | reentrant | locations | comments | strings  |
-    +--------------+-------------+---------+-----------+-----------+----------+----------+
-    | full         | flex        | buffer  | yes       | yes       | yes      | yes      |
-    | no-strings   | flex        | buffer  | yes       | yes       | yes      | no       |
-    | no-comments  | flex        | buffer  | yes       | yes       | no       | no       |
-    | no-locations | flex        | buffer  | yes       | no        | no       | no       |
-    | no-reentrant | flex        | buffer  | no        | no        | no       | no       |
-    | stdio        | flex        | stdio   | no        | no        | no       | no       |
-    | file         | flex        | file    | no        | no        | no       | no       |
-    | no-flex      | hand-rolled | file    | no        | no        | no       | no       |
-    +--------------+-------------+---------+-----------+-----------+----------+----------+
+                 more                                                       less
+                 critical <--                                           --> critical
++--------------+-------------+---------+-----------+-----------+----------+---------+
+| variation    | lexer       | input   | reentrant | locations | comments | strings |
++--------------+-------------+---------+-----------+-----------+----------+---------+
+| full         | flex        | buffer  | yes       | yes       | yes      | yes     |
+| no-strings   | flex        | buffer  | yes       | yes       | yes      | no      |
+| no-comments  | flex        | buffer  | yes       | yes       | no       | no      |
+| no-locations | flex        | buffer  | yes       | no        | no       | no      |
+| no-reentrant | flex        | buffer  | no        | no        | no       | no      |
+| stdio        | flex        | stdio   | no        | no        | no       | no      |
+| file         | flex        | file    | no        | no        | no       | no      |
+| no-flex      | hand-rolled | file    | no        | no        | no       | no      |
++--------------+-------------+---------+-----------+-----------+----------+---------+
 
     HINT: The "stdio" variation is easiest to implement -- The flex lexer accepts
           standard stream input by default. It takes extra effort to hack flex into using
