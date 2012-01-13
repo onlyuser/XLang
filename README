@@ -5,27 +5,28 @@ Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
-    This is a tutorial inspired by Tom Niemann's excellent "Compact Guide to Lex/Yacc".
-    7 variations of Flex/Bison parser are presented, varying in feature richness.
+    This is a tutorial inspired by Tom Niemann's excellent "Compact Guide to
+    Lex/Yacc". 7 variations of Flex/Bison parser are presented, varying in feature
+    richness.
 
     The first variation, "0_XLang_full", is a full-featured parser.
     With each successive variation, non-critical features are stripped until there is
     nothing left but a flex-less parser, "7_XLang_no-flex".
 
-    feature <--                                                                --> feature
-    rich                                                                           poor
+    feature <--                                                         --> feature
+    rich                                                                    poor
 
-    full > no-strings > no-comments > no-locations > no-reentrant > stdio > file > no-flex
+    full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
-    The order is chosen based on "usefulness" -- for instance, it is arguably more useful
-    to have a reentrant parser than to have a non-reentrant parser, so the reentrant
-    feature is enabled on the "feature rich" end. There's really no good reason one cannot
-    cannot have both "comments" and "file input" enabled, or both "reentrant" and "hand-
-    rolled lexer" enabled.
+    The order is chosen based on "usefulness" -- for instance, it is arguably more
+    useful to have a reentrant parser than to have a non-reentrant parser, so the
+    reentrant feature is enabled on the "feature rich" end. There's really no good
+    reason one cannot cannot have both "comments" and "file input" enabled, or both
+    "reentrant" and "hand-rolled lexer" enabled.
 
-    The tutorial is organized in a way that anyone unfamiliar with Flex/Bison can quickly
-    isolate a variation that is most relevent, and most readily customizable according to
-    his/her specific requirements.
+    The tutorial is organized in a way that anyone unfamiliar with Flex/Bison can
+    quickly isolate a variation that is most relevent, and most readily customizable
+    according to his/her specific requirements.
 
 Variation vs Feature Table:
 
@@ -45,8 +46,8 @@ Variation vs Feature Table:
 +--------------+-------------+---------+-----------+-----------+----------+---------+
 
     HINT: The "stdio" variation is easiest to implement -- The flex lexer accepts
-          standard stream input by default. It takes extra effort to hack flex into using
-          "buffer input" or "file input".
+          standard stream input by default. It takes extra effort to hack flex into
+          using "buffer input" or "file input".
 
 Feature Detail:
 
@@ -63,10 +64,10 @@ Feature Detail:
     input:
 
         buffer: Use in-memory buffer as input.
-                This option is preferred when speed is critical -- Standard streams are
-                slow. This option is also preferred when the input string already resides
-                in memory and does not require passing through a standard stream in order
-                to be used.
+                This option is preferred when speed is critical -- Standard streams
+                are slow. This option is also preferred when the input string
+                already resides in memory and does not require passing through a
+                standard stream in order to be used.
 
         stdio: Use standard input.
                This is the default behavior.
@@ -100,8 +101,10 @@ References:
     http://epaperpress.com/lexandyacc/
 
     "UsualCoding.eu Reentrant Flex-Bison example"
-    http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison
-    (code example needs "void yyerror(){}" inserted in declaration section of parser.y)
+    http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-
+    Flex/Bison
+    (code example needs "void yyerror(){}" inserted in declaration section of
+    parser.y)
 
     "Better error handling using Flex and Bison"
     http://www.ibm.com/developerworks/library/l-flexbison.html
@@ -116,7 +119,8 @@ Additional Reading:
 
     http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
     http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
-    http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
+    http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/
+    softDevGuide_6.html
 
 Keywords:
 
