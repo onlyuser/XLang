@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: lint <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
+    echo "SYNTAX: lint <LINT_EXEC> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
 }
 
 if [ $# -lt 3 ];
