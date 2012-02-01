@@ -1,0 +1,4 @@
+Checking ../lib-common/src/XLangNodePrinterVisitor.cpp...
+[../lib-common/include/XLangType.h:21]: (debug) Include file: "stdint.h" not found.
+[../lib-common/include/node/XLangNodeIFace.h:22]: (debug) Include file: "string" not found.
+[../lib-common/src/XLangNodePrinterVisitor.cpp:18]: (debug) Include file: "iostream" not found.

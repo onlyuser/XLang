@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CXX=g++
+CXX = g++
+LINT = cppcheck
 
 #==================
 # compile flags
@@ -45,6 +46,9 @@ LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS))
 
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
+
+LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
@@ -56,6 +60,7 @@ all : $(BINARY)
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # binary
@@ -63,6 +68,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 
 CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCModel XLangMVCView
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
+LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
 $(BINARY) : $(LIBS) $(OBJECTS)
 	mkdir -p $(BIN_PATH)
@@ -76,5 +82,5 @@ $(BINARY) : $(LIBS) $(OBJECTS)
 
 .PHONY : clean
 clean :
-	-rm $(BINARY) $(OBJECTS)
+	-rm $(BINARY) $(OBJECTS) $(LINT_FILES)
 	-rmdir $(BIN_PATH) $(BUILD_PATH)

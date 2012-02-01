@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CXX=g++
+CXX = g++
+LINT = cppcheck
 
 #==================
 # compile flags
@@ -49,6 +50,7 @@ LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
 
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 TEST_PATH = $(TOP)/../test
 TEST_SH = $(TOP)/test.sh
@@ -56,6 +58,8 @@ TEST_FILE_STEMS = AAA BBB CCC DDD #EEE
 TEST_KEYWORD = 'LISP'
 TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
 TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
+
+LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
@@ -92,10 +96,12 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 
 COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
+COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
 
 $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 	mkdir -p $(COMMON_BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	-$(LINT_SH) $(LINT) $< $(COMMON_BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # object
@@ -104,6 +110,7 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # binary
@@ -111,6 +118,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 
 CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
+LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
 $(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
 	mkdir -p $(BIN_PATH)
@@ -131,5 +139,5 @@ clean :
 	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) \
 			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
-	-rm $(COMMON_OBJECTS)
+	-rm $(COMMON_OBJECTS) $(COMMON_LINT_FILES)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
