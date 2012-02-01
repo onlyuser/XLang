@@ -51,7 +51,7 @@ do
 done
 
 echo "$LINT_EXEC $INPUT_FILE $LINT_FLAGS >& $OUTPUT_FILE"
-$LINT_EXEC $INPUT_FILE $LINT_FLAGS |& grep -v "not found" >& $OUTPUT_FILE
+$LINT_EXEC $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" >& $OUTPUT_FILE
 
 echo "success!"
 exit 0

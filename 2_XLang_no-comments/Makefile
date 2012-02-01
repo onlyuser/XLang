@@ -48,6 +48,7 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 #LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
 
+#DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
@@ -136,7 +137,7 @@ test : $(TEST_PASS_FILES)
 
 .PHONY : clean
 clean :
-	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) \
+	-rm $(BINARY) $(OBJECTS) $(LINT_FILES) $(YACC_GEN) $(LEX_GEN) \
 			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
 	-rm $(COMMON_OBJECTS) $(COMMON_LINT_FILES)

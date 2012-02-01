@@ -44,6 +44,7 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 #LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS))
 
+#DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all

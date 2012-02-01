@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 CXX = g++
+LINT = cppcheck
 
 #==================
 # compile flags
@@ -49,9 +50,10 @@ PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
 		$(patsubst %, -l%, $(PARENT_LIB_STEMS))
 
-DEBUG = -g
+#DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 TEST_PATH = $(TOP)/../test
 TEST_SH = $(TOP)/test.sh
@@ -59,6 +61,8 @@ TEST_FILE_STEMS = AAA BBB CCC DDD
 TEST_KEYWORD = 'LISP'
 TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
 TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
+
+LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
@@ -103,6 +107,7 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # binary
@@ -110,6 +115,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 
 CPP_STEMS = $(YACC_STEMS) #$(LEX_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
+LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
 $(BINARY) : $(OBJECTS) $(LIBS) $(PARENT_LIBS)
 	mkdir -p $(BIN_PATH)
@@ -127,7 +133,7 @@ test : $(TEST_PASS_FILES)
 
 .PHONY : clean
 clean :
-	-rm $(BINARY) $(OBJECTS) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
+	-rm $(BINARY) $(OBJECTS) $(LINT_FILES) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
 			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 	-rmdir $(BIN_PATH) $(BUILD_PATH) $(PARENT_LIB_PATH)
 	cd $(COMMON); $(MAKE) -f Makefile clean
