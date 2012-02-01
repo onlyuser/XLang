@@ -40,6 +40,9 @@ INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 LIB_PATHS = $(LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
+# NOTE: this project does not use OpenGL, but just for example, additional libs
+#       can be added here.
+
 #LIB_STEMS = glut32 glu32 opengl32
 #LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
