@@ -51,7 +51,11 @@ do
 done
 
 echo "$LINT_EXEC $INPUT_FILE $LINT_FLAGS >& $OUTPUT_FILE"
-$LINT_EXEC $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" >& $OUTPUT_FILE
+FILE_DATA=`$LINT_EXEC $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
+if [ -n "$FILE_DATA" ];
+then
+    echo $FILE_DATA > $OUTPUT_FILE
+fi
 
 echo "success!"
 exit 0
