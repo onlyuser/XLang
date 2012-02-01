@@ -24,7 +24,7 @@
 class ParserContextIFace
 {
 public:
-	virtual ~ParserContextIFace() { }
+    virtual ~ParserContextIFace() { }
     virtual Allocator &alloc() = 0;
     virtual const std::string *alloc_unique_string(std::string name) = 0;
 };

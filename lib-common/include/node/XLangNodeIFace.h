@@ -28,7 +28,7 @@ class NodeIdentIFace
 public:
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
-	virtual ~NodeIdentIFace() { }
+    virtual ~NodeIdentIFace() { }
     virtual type_e type() const = 0;
     virtual uint32_t sym_id() const = 0;
     bool is_same_type(const NodeIdentIFace* _node) const
@@ -55,14 +55,14 @@ template<NodeIdentIFace::type_e type>
 class LeafNodeIFace
 {
 public:
-	virtual ~LeafNodeIFace() { }
+    virtual ~LeafNodeIFace() { }
     virtual typename LeafTypeTraits<type>::type value() const = 0;
 };
 
 class InnerNodeIFace
 {
 public:
-	virtual ~InnerNodeIFace() { }
+    virtual ~InnerNodeIFace() { }
     virtual std::string name() const = 0;
     virtual NodeIdentIFace* child(uint32_t index) const = 0;
     virtual size_t child_count() const = 0;
