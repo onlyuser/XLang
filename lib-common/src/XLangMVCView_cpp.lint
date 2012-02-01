@@ -1,7 +1,0 @@
-Checking ../lib-common/src/XLangMVCView.cpp...
-[../lib-common/include/XLangType.h:21]: (debug) Include file: "stdint.h" not found.
-[../lib-common/include/node/XLangNodeIFace.h:22]: (debug) Include file: "string" not found.
-[../lib-common/src/XLangMVCView.cpp:20]: (debug) Include file: "string" not found.
-[../lib-common/src/XLangMVCView.cpp:21]: (debug) Include file: "iostream" not found.
-[../lib-common/src/XLangMVCView.cpp:28]: (debug) Include file: "stdio.h" not found.
-[../lib-common/src/XLangMVCView.cpp:29]: (debug) Include file: "string.h" not found.

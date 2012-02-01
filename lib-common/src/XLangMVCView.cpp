@@ -70,6 +70,7 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
                 print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
                 std::cout << ')';
             }
+            break;
     }
 }
 

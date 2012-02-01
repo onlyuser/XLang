@@ -1,7 +1,0 @@
-Checking ../lib-common/src/XLangNode.cpp...
-[../lib-common/include/XLangType.h:21]: (debug) Include file: "stdint.h" not found.
-[../lib-common/include/node/XLangNodeIFace.h:22]: (debug) Include file: "string" not found.
-[./include/node/XLangNode.h:25]: (debug) Include file: "string" not found.
-[./include/node/XLangNode.h:26]: (debug) Include file: "vector" not found.
-[./include/node/XLangNode.h:27]: (debug) Include file: "stdarg.h" not found.
-[../lib-common/src/XLangNode.cpp:18]: (debug) Include file: "iostream" not found.

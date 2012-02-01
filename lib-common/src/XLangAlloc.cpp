@@ -69,7 +69,7 @@ void Allocator::_free(void* ptr)
 
 void Allocator::_free()
 {
-    for(internal_type::iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); p++)
+    for(internal_type::iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
         delete (*p).second;
     m_chunk_map.clear();
 }
@@ -77,7 +77,7 @@ void Allocator::_free()
 void Allocator::dump() const
 {
     std::cout << "dumping allocator: " << m_name << std::endl;
-    for(internal_type::const_iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); p++)
+    for(internal_type::const_iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
     {
         (*p).second->dump();
         std::cout << std::endl;
