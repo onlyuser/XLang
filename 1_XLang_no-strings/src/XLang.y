@@ -142,7 +142,7 @@ expression:
 %%
 
 ScannerContext::ScannerContext(char* buf)
-    : m_buf(buf), m_pos(0), m_length(strlen(buf)),
+    : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
       m_line(1), m_column(1), m_prev_column(1)
 {
 }
