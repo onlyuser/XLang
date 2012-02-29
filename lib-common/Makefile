@@ -49,6 +49,7 @@ CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
+LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
@@ -61,7 +62,7 @@ all : $(BINARY)
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
-	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
+	-$(LINT_SH) $(LINT_ENABLE) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # binary

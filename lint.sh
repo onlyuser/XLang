@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: lint <LINT_EXEC> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
+    echo "SYNTAX: lint <LINT_ENABLE={1/0}> <LINT_EXEC> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
 }
 
 if [ $# -lt 3 ];
@@ -29,10 +29,16 @@ then
     exit 1
 fi
 
-LINT_EXEC=$1
-INPUT_FILE=$2
-OUTPUT_FILE=$3
+LINT_ENABLE=$1
+LINT_EXEC=$2
+INPUT_FILE=$3
+OUTPUT_FILE=$4
 
+if [ $LINT_ENABLE -eq 0 ];
+then
+    echo "skipping lint.."
+    exit 0
+fi
 if [ ! -f $INPUT_FILE ];
 then
     echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"

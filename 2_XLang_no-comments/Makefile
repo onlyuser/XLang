@@ -60,6 +60,7 @@ TEST_KEYWORD = 'LISP'
 TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
 TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
 
+LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
@@ -102,7 +103,7 @@ COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEM
 $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 	mkdir -p $(COMMON_BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
-	-$(LINT_SH) $(LINT) $< $(COMMON_BUILD_PATH)/$*.lint $(LINTFLAGS)
+	-$(LINT_SH) $(LINT_ENABLE) $(LINT) $< $(COMMON_BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # object
@@ -111,7 +112,7 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
-	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
+	-$(LINT_SH) $(LINT_ENABLE) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 #==================
 # binary
