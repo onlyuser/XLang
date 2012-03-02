@@ -60,7 +60,7 @@ TEST_KEYWORD = 'LISP'
 TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
 TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
 
-LINT_ENABLE = 1
+LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
 .DEFAULT_GOAL : all
