@@ -107,28 +107,28 @@ ParserContext* &parse_context()
 
 root:
       program { parse_context()->root() = $1; }
-    | error { yyclearin; /* yyerrok; YYABORT; */ }
+    | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
 program:
-      statement { $$ = $1; }
+      statement             { $$ = $1; }
     | statement ',' program { $$ = MAKE_INNER(',', 2, $1, $3); }
     ;
 
 statement:
-      expression { $$ = $1; }
+      expression              { $$ = $1; }
     | ID_IDENT '=' expression { $$ = MAKE_INNER('=', 2, MAKE_IDENT($1), $3); }
     ;
 
 expression:
-      ID_INT { $$ = MAKE_INT($1); }
-    | ID_FLOAT { $$ = MAKE_FLOAT($1); }
-    | ID_IDENT { $$ = MAKE_IDENT($1); }
+      ID_INT                    { $$ = MAKE_INT($1); }
+    | ID_FLOAT                  { $$ = MAKE_FLOAT($1); }
+    | ID_IDENT                  { $$ = MAKE_IDENT($1); }
     | expression '+' expression { $$ = MAKE_INNER('+', 2, $1, $3); }
     | expression '-' expression { $$ = MAKE_INNER('-', 2, $1, $3); }
     | expression '*' expression { $$ = MAKE_INNER('*', 2, $1, $3); }
     | expression '/' expression { $$ = MAKE_INNER('/', 2, $1, $3); }
-    | '(' expression ')' { $$ = $2; }
+    | '(' expression ')'        { $$ = $2; }
     ;
 
 %%
