@@ -29,7 +29,7 @@ MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_numbe
 
 MemChunk::~MemChunk()
 {
-    if(!!m_ptr)
+    if(m_ptr)
         free(m_ptr);
 }
 
