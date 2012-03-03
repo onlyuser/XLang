@@ -23,9 +23,8 @@
 
 namespace node {
 
-class NodePrinterVisitor : public NodeVisitorIFace
+struct NodePrinterVisitor : public NodeVisitorIFace
 {
-public:
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);

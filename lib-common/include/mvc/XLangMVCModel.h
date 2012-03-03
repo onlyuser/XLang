@@ -27,9 +27,8 @@
 
 namespace mvc {
 
-class MVCModel
+struct MVCModel
 {
-public:
     template<node::NodeIdentIFace::type_e type>
     static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id,
             typename node::LeafTypeTraits<type>::type value)

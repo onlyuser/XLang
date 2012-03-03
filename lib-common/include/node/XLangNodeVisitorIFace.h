@@ -22,9 +22,8 @@
 
 namespace node {
 
-class NodeVisitorIFace
+struct NodeVisitorIFace
 {
-public:
     virtual ~NodeVisitorIFace() { }
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node) = 0;
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node) = 0;
@@ -34,9 +33,8 @@ public:
     virtual void visit(const node::InnerNodeIFace* _node) = 0;
 };
 
-class VisitableNodeIFace
+struct VisitableNodeIFace
 {
-public:
     virtual ~VisitableNodeIFace() { }
     virtual void accept(NodeVisitorIFace* visitor) const = 0;
 };

@@ -29,10 +29,6 @@ namespace node {
 
 class Node : public NodeIdentIFace, public VisitableNodeIFace
 {
-protected:
-    NodeIdentIFace::type_e m_type;
-    uint32_t m_sym_id;
-
 public:
     Node(NodeIdentIFace::type_e _type, uint32_t _sym_id)
         : m_type(_type), m_sym_id(_sym_id)
@@ -45,13 +41,15 @@ public:
     {
         return m_sym_id;
     }
+
+protected:
+    NodeIdentIFace::type_e m_type;
+    uint32_t m_sym_id;
 };
 
 template<NodeIdentIFace::type_e _type>
 class LeafNode : virtual public Node, public LeafNodeIFace<_type>
 {
-    typename LeafTypeTraits<_type>::type m_value;
-
 public:
     LeafNode(uint32_t _sym_id, typename LeafTypeTraits<_type>::type _value)
         : Node(_type, _sym_id), m_value(_value)
@@ -64,17 +62,13 @@ public:
     {
         visitor->visit(this);
     }
+
+private:
+    typename LeafTypeTraits<_type>::type m_value;
 };
 
 class InnerNode : virtual public Node, public InnerNodeIFace
 {
-    typedef std::vector<NodeIdentIFace*> child_vec_t;
-    child_vec_t m_child_vec;
-
-    const child_vec_t &child_vec() const
-    {
-        return m_child_vec;
-    }
 public:
     InnerNode(uint32_t _sym_id, size_t _child_count, va_list ap)
         : Node(NodeIdentIFace::INNER, _sym_id)
@@ -86,8 +80,8 @@ public:
             {
                 InnerNode* inner_node = dynamic_cast<InnerNode*>(_node);
                 m_child_vec.insert(m_child_vec.end(),
-                        inner_node->child_vec().begin(),
-                        inner_node->child_vec().end());
+                        inner_node->m_child_vec.begin(),
+                        inner_node->m_child_vec.end());
                 continue;
             }
             m_child_vec.push_back(_node);
@@ -103,6 +97,10 @@ public:
         return m_child_vec.size();
     }
     void accept(NodeVisitorIFace* visitor) const;
+
+private:
+    typedef std::vector<NodeIdentIFace*> child_vec_t;
+    child_vec_t m_child_vec;
 };
 
 }

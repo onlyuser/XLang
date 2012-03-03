@@ -23,9 +23,8 @@
 
 namespace node {
 
-class NodeIdentIFace
+struct NodeIdentIFace
 {
-public:
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
     virtual ~NodeIdentIFace() { }
@@ -38,30 +37,28 @@ public:
 };
 
 template<NodeIdentIFace::type_e>
-class LeafTypeTraits;
+struct LeafTypeTraits;
 
 template<>
-class LeafTypeTraits<NodeIdentIFace::INT> { public: typedef long type; };
+struct LeafTypeTraits<NodeIdentIFace::INT> { typedef long type; };
 template<>
-class LeafTypeTraits<NodeIdentIFace::FLOAT> { public: typedef float32_t type; };
+struct LeafTypeTraits<NodeIdentIFace::FLOAT> { typedef float32_t type; };
 template<>
-class LeafTypeTraits<NodeIdentIFace::STRING> { public: typedef std::string type; };
+struct LeafTypeTraits<NodeIdentIFace::STRING> { typedef std::string type; };
 template<>
-class LeafTypeTraits<NodeIdentIFace::CHAR> { public: typedef char type; };
+struct LeafTypeTraits<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
-class LeafTypeTraits<NodeIdentIFace::IDENT> { public: typedef const std::string* type; };
+struct LeafTypeTraits<NodeIdentIFace::IDENT> { typedef const std::string* type; };
 
 template<NodeIdentIFace::type_e type>
-class LeafNodeIFace
+struct LeafNodeIFace
 {
-public:
     virtual ~LeafNodeIFace() { }
     virtual typename LeafTypeTraits<type>::type value() const = 0;
 };
 
-class InnerNodeIFace
+struct InnerNodeIFace
 {
-public:
     virtual ~InnerNodeIFace() { }
     virtual std::string name() const = 0;
     virtual NodeIdentIFace* child(uint32_t index) const = 0;

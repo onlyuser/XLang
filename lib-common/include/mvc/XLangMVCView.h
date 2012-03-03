@@ -22,9 +22,8 @@
 
 namespace mvc {
 
-class MVCView
+struct MVCView
 {
-public:
     static void print_lisp(const node::NodeIdentIFace* _node);
     static void print_graph(const node::NodeIdentIFace* p);
 };

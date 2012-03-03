@@ -24,11 +24,6 @@
 
 class MemChunk
 {
-    void* m_ptr;
-    size_t m_size_bytes;
-    std::string m_filename;
-    size_t m_line_number;
-
 public:
     MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number);
     ~MemChunk();
@@ -37,15 +32,16 @@ public:
     std::string filename() const { return m_filename; }
     size_t line_number() const { return m_line_number; }
     void dump() const;
+
+private:
+    void* m_ptr;
+    size_t m_size_bytes;
+    std::string m_filename;
+    size_t m_line_number;
 };
 
 class Allocator
 {
-    typedef std::map<void*, MemChunk*> internal_type;
-    std::string m_name;
-    internal_type m_chunk_map;
-    size_t m_size_bytes;
-
 public:
     Allocator(std::string _filename);
     ~Allocator();
@@ -55,6 +51,12 @@ public:
     void _free(void* ptr);
     void _free();
     void dump() const;
+
+private:
+    typedef std::map<void*, MemChunk*> internal_type;
+    std::string m_name;
+    internal_type m_chunk_map;
+    size_t m_size_bytes;
 };
 
 // NOTE: doesn't work forarrays
