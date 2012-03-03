@@ -99,8 +99,7 @@ public:
     void accept(NodeVisitorIFace* visitor) const;
 
 private:
-    typedef std::vector<NodeIdentIFace*> child_vec_t;
-    child_vec_t m_child_vec;
+    std::vector<NodeIdentIFace*> m_child_vec;
 };
 
 }
