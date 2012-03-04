@@ -39,9 +39,7 @@
 
 #define SIZE_BUF_SMALL 160
 
-#define MAKE_INT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::INT>(parse_context(), ID_INT, ##__VA_ARGS__)
-#define MAKE_FLOAT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::FLOAT>(parse_context(), ID_FLOAT, ##__VA_ARGS__)
-#define MAKE_IDENT(...) mvc::MVCModel::make_leaf<node::NodeIdentIFace::IDENT>(parse_context(), ID_IDENT, ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf_auto(parse_context(), sym_id, ##__VA_ARGS__)
 #define MAKE_INNER(...) mvc::MVCModel::make_inner(parse_context(), ##__VA_ARGS__)
 
 // report error
@@ -212,13 +210,13 @@ program:
 
 statement:
       expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_INNER('=', 2, MAKE_IDENT($1), $3); }
+    | ID_IDENT '=' expression { $$ = MAKE_INNER('=', 2, MAKE_LEAF(ID_IDENT, $1), $3); }
     ;
 
 expression:
-      ID_INT                    { $$ = MAKE_INT($1); }
-    | ID_FLOAT                  { $$ = MAKE_FLOAT($1); }
-    | ID_IDENT                  { $$ = MAKE_IDENT($1); }
+      ID_INT                    { $$ = MAKE_LEAF(ID_INT, $1); }
+    | ID_FLOAT                  { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    | ID_IDENT                  { $$ = MAKE_LEAF(ID_IDENT, $1); }
     | expression '+' expression { $$ = MAKE_INNER('+', 2, $1, $3); }
     | expression '-' expression { $$ = MAKE_INNER('-', 2, $1, $3); }
     | expression '*' expression { $$ = MAKE_INNER('*', 2, $1, $3); }

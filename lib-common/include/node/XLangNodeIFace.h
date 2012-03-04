@@ -38,7 +38,6 @@ struct NodeIdentIFace
 
 template<NodeIdentIFace::type_e>
 struct LeafTypeTraits;
-
 template<>
 struct LeafTypeTraits<NodeIdentIFace::INT> { typedef long type; };
 template<>
@@ -49,6 +48,19 @@ template<>
 struct LeafTypeTraits<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
 struct LeafTypeTraits<NodeIdentIFace::IDENT> { typedef const std::string* type; };
+
+template<class T>
+struct LeafTypeTraitsR;
+template<>
+struct LeafTypeTraitsR<long> { enum { value = NodeIdentIFace::INT}; };
+template<>
+struct LeafTypeTraitsR<float32_t> { enum { value = NodeIdentIFace::FLOAT}; };
+template<>
+struct LeafTypeTraitsR<std::string> { enum { value = NodeIdentIFace::STRING}; };
+template<>
+struct LeafTypeTraitsR<char> { enum { value = NodeIdentIFace::CHAR}; };
+template<>
+struct LeafTypeTraitsR<const std::string*> { enum { value = NodeIdentIFace::IDENT}; };
 
 template<NodeIdentIFace::type_e type>
 struct LeafNodeIFace
