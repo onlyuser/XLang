@@ -52,6 +52,10 @@ LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
+#==================
+# all
+#==================
+
 .DEFAULT_GOAL : all
 all : $(BINARY)
 
@@ -79,7 +83,7 @@ $(BINARY) : $(LIBS) $(OBJECTS)
 	cp $@ $(PARENT_LIB_PATH)
 
 #==================
-# general
+# clean
 #==================
 
 .PHONY : clean

@@ -55,19 +55,19 @@ LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 TEST_PATH = $(TOP)/../test
 TEST_SH = $(TOP)/test.sh
-TEST_FILE_STEMS = AAA BBB CCC DDD EEE
-TEST_KEYWORD = 'LISP'
-TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
-TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
 
 LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
+
+#==================
+# all
+#==================
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
 
 #==================
-# yacc
+# yacc-gen
 #==================
 
 YACC_STEMS = XLang.tab
@@ -81,7 +81,7 @@ $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 	mv $*.tab.h $(INCLUDE_PATH)/$*.tab.h
 
 #==================
-# lex
+# lex-gen
 #==================
 
 LEX_STEMS = lex.XLang
@@ -127,14 +127,23 @@ $(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 #==================
-# general
+# test
 #==================
+
+TEST_FILE_STEMS = AAA BBB CCC DDD EEE
+TEST_KEYWORD = 'LISP'
+TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
+TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
+
+#==================
+# clean
+#==================
 
 .PHONY : clean
 clean :
