@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: test <EXEC> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <RESULT_FILE>"
+    echo "SYNTAX: test <EXEC> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE>"
 }
 
 if [ $# -ne 5 ];
@@ -29,16 +29,18 @@ then
     exit 1
 fi
 
-TEMP_FILE=`mktemp`
-trap "rm $TEMP_FILE" EXIT
+TEMP_FILE_0=`mktemp`
+trap "rm $TEMP_FILE_0" EXIT
+TEMP_FILE_1=`mktemp`
+trap "rm $TEMP_FILE_1" EXIT
 
 EXEC=$1
 INPUT_FILE=$2
 GOLD_KEYWORD=$3
 GOLD_FILE=$4
-RESULT_FILE=$5
-PASS_FILE=${RESULT_FILE}.pass
-FAIL_FILE=${RESULT_FILE}.fail
+OUTPUT_FILE=$5
+PASS_FILE=${OUTPUT_FILE}.pass
+FAIL_FILE=${OUTPUT_FILE}.fail
 
 if [ ! -f $INPUT_FILE ];
 then
@@ -51,19 +53,15 @@ then
     exit 1
 fi
 
-$EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE
-diff $TEMP_FILE $GOLD_FILE | tee $PASS_FILE
+$EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 
 if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe
 then
     echo "fail!"
-    mv $PASS_FILE $FAIL_FILE
+    cp $TEMP_FILE_1 $FAIL_FILE # already trapped exit for TEMP_FILE_1
     exit 1
 fi
 
-if [ -f $FAIL_FILE ];
-then
-    rm $FAIL_FILE
-fi
 echo "success!" | tee $PASS_FILE
 exit 0

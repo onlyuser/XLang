@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 CXX = g++
-LINT = cppcheck
+LINT_TOOL = cppcheck
 
 #==================
 # compile flags
@@ -58,7 +58,6 @@ LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 TEST_PATH = $(TOP)/../test
 TEST_SH = $(TOP)/test.sh
 
-LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
 #==================
@@ -89,6 +88,10 @@ $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
 	mv $*.tab.c $(SRC_PATH)/$*.tab.cpp
 	mv $*.tab.h $(INCLUDE_PATH)/$*.tab.h
 
+.PHONY : clean_yacc
+clean_yacc :
+	-rm $(YACC_GEN)
+
 #==================
 # lex-gen
 #==================
@@ -101,6 +104,10 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 	flex $<
 	mv lex.$*.c $(SRC_PATH)/lex.$*.cpp
 
+.PHONY : clean_lex
+clean_lex :
+	-rm $(LEX_GEN)
+
 #==================
 # object
 #==================
@@ -108,7 +115,10 @@ $(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
-	-$(LINT_SH) $(LINT_ENABLE) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
+
+.PHONY : clean_objects
+clean_objects :
+	-rm $(OBJECTS)
 
 #==================
 # binary
@@ -122,28 +132,53 @@ $(BINARY) : $(OBJECTS) $(LIBS) $(PARENT_LIBS)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
+.PHONY : clean_binary
+clean_binary :
+	-rm $(BINARY)
+
 #==================
 # test
 #==================
 
 TEST_FILE_STEMS = AAA BBB CCC DDD
-TEST_KEYWORD = 'LISP'
-TEST_PASS_FILES = $(patsubst %, $(BUILD_PATH)/%.pass, $(TEST_FILE_STEMS))
-TEST_FAIL_FILES = $(patsubst %, $(BUILD_PATH)/%.fail, $(TEST_FILE_STEMS))
+TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
+TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
+TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
+TEST_FILT_KEYWORD = 'LISP'
 
-$(BUILD_PATH)/%.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*
+$(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
+	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*.test
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
+
+.PHONY : clean_tests
+clean_tests :
+	-rm $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+
+#==================
+# lint
+#==================
+
+LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
+LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
+
+$(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
+	mkdir -p $(BUILD_PATH)
+	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
+
+.PHONY : lint
+lint : $(LINT_PASS_FILES) common_lint
+
+.PHONY : clean_lint
+clean_lint :
+	-rm $(LINT_PASS_FILES) $(LINT_FAIL_FILES)
 
 #==================
 # clean
 #==================
 
 .PHONY : clean
-clean :
-	-rm $(BINARY) $(OBJECTS) $(LINT_FILES) $(YACC_GEN) $(LEX_GEN) $(PARENT_LIBS) \
-			$(TEST_PASS_FILES) $(TEST_FAIL_FILES)
-	-rmdir $(BIN_PATH) $(BUILD_PATH) $(PARENT_LIB_PATH)
+clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_lint
+	-rmdir $(BUILD_PATH) $(BIN_PATH) $(PARENT_LIB_PATH)
 	cd $(COMMON); $(MAKE) -f Makefile clean

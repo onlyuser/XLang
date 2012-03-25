@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: lint <LINT_ENABLE={1/0}> <LINT_EXEC> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
+    echo "SYNTAX: lint <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
 }
 
 if [ $# -lt 3 ];
@@ -29,16 +29,15 @@ then
     exit 1
 fi
 
-LINT_ENABLE=$1
-LINT_EXEC=$2
-INPUT_FILE=$3
-OUTPUT_FILE=$4
+TEMP_FILE=`mktemp`
+trap "rm $TEMP_FILE" EXIT
 
-if [ $LINT_ENABLE -eq 0 ];
-then
-    echo "skipping lint.."
-    exit 0
-fi
+LINT_TOOL=$1
+INPUT_FILE=$2
+OUTPUT_FILE=$3
+PASS_FILE=${OUTPUT_FILE}.pass
+FAIL_FILE=${OUTPUT_FILE}.fail
+
 if [ ! -f $INPUT_FILE ];
 then
     echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
@@ -56,12 +55,14 @@ do
     LINT_FLAGS="$LINT_FLAGS $ARG"
 done
 
-echo "$LINT_EXEC $INPUT_FILE $LINT_FLAGS >& $OUTPUT_FILE"
-FILE_DATA=`$LINT_EXEC $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
+echo "$LINT_TOOL $INPUT_FILE $LINT_FLAGS >& $TEMP_FILE"
+FILE_DATA=`$LINT_TOOL $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
 if [ -n "$FILE_DATA" ];
 then
-    echo -e "$FILE_DATA" > $OUTPUT_FILE
+    echo "fail!"
+    echo -e "$FILE_DATA" > $FAIL_FILE
+    exit 1
 fi
 
-echo "success!"
+echo "success!" | tee $PASS_FILE
 exit 0

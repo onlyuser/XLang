@@ -30,6 +30,7 @@ SRC_PATH = $(TOP)/src
 BUILD_PATH = $(TOP)/build
 BIN_PATH = $(TOP)/bin
 BINARY = $(BIN_PATH)/libcommon.a
+INSTALL_BINARY = $(PARENT_LIB_PATH)/libcommon.a
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
@@ -49,7 +50,6 @@ CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
-LINT_ENABLE = 0
 LINT_SH = $(TOP)/../lint.sh
 
 #==================
@@ -66,7 +66,10 @@ all : $(BINARY)
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
-	-$(LINT_SH) $(LINT_ENABLE) $(LINT) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
+
+.PHONY : clean_objects
+clean_objects :
+	-rm $(OBJECTS)
 
 #==================
 # binary
@@ -82,11 +85,33 @@ $(BINARY) : $(LIBS) $(OBJECTS)
 	mkdir -p $(PARENT_LIB_PATH)
 	cp $@ $(PARENT_LIB_PATH)
 
+.PHONY : clean_binary
+clean_binary :
+	-rm $(BINARY)
+	-rm $(INSTALL_BINARY)
+
+#==================
+# lint
+#==================
+
+LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
+LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
+
+$(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
+	mkdir -p $(BUILD_PATH)
+	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
+
+.PHONY : lint
+lint : $(LINT_PASS_FILES)
+
+.PHONY : clean_lint
+clean_lint :
+	-rm $(LINT_PASS_FILES) $(LINT_FAIL_FILES)
+
 #==================
 # clean
 #==================
 
 .PHONY : clean
-clean :
-	-rm $(BINARY) $(OBJECTS) $(LINT_FILES)
-	-rmdir $(BIN_PATH) $(BUILD_PATH)
+clean : clean_binary clean_objects clean_lint
+	-rmdir $(BUILD_PATH) $(BIN_PATH) $(PARENT_LIB_PATH)
