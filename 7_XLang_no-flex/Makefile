@@ -165,10 +165,10 @@ LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
 
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
-	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
+	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
 
 .PHONY : lint
-lint : $(LINT_PASS_FILES) common_lint
+lint : $(LINT_PASS_FILES)
 
 .PHONY : clean_lint
 clean_lint :
