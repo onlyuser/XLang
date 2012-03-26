@@ -83,7 +83,7 @@ $(BINARY) : $(LIBS) $(OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(AR) -cvq $@ $^
 	mkdir -p $(PARENT_LIB_PATH)
-	cp $@ $(PARENT_LIB_PATH)
+	cp $@ $(INSTALL_BINARY)
 
 .PHONY : clean_binary
 clean_binary :

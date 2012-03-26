@@ -41,14 +41,15 @@ all : test
 # test
 #==================
 
-TEST_FILE_STEMS = AAA BBB CCC DDD #EEE
+TEST_FILE_STEMS = AAA BBB CCC DDD EEE
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 TEST_FILT_KEYWORD = 'LISP'
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*.test
+	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) $(TEST_PATH)/$*.gold \
+			$(BUILD_PATH)/$*.test
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
