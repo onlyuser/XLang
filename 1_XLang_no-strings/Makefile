@@ -112,7 +112,7 @@ $(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
 
 .PHONY : clean_common_objects
 clean_common_objects :
-	-rm $(COMMON_OBJECTS) $(COMMON_LINT_FILES)
+	-rm $(COMMON_OBJECTS)
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
 
 #==================
