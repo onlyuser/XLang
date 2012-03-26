@@ -57,7 +57,6 @@ LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 TEST_PATH = $(TOP)/../test
 TEST_SH = $(TOP)/test.sh
-
 LINT_SH = $(TOP)/../lint.sh
 
 #==================
@@ -140,21 +139,14 @@ clean_binary :
 # test
 #==================
 
-TEST_FILE_STEMS = AAA BBB CCC DDD
-TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
-TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
-TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
-TEST_FILT_KEYWORD = 'LISP'
-
-$(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) $(TEST_PATH)/$*.gold $(BUILD_PATH)/$*.test
-
 .PHONY : test
-test : $(TEST_PASS_FILES)
+test : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH))
 
 .PHONY : clean_tests
 clean_tests :
-	-rm $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean BUILD_PATH=$(abspath $(BUILD_PATH))
 
 #==================
 # lint
