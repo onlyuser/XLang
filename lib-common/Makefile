@@ -60,7 +60,7 @@ LINT_SH = $(TOP)/../lint.sh
 all : $(BINARY)
 
 #==================
-# object
+# objects
 #==================
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp

@@ -53,9 +53,10 @@ CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
-TEST_PATH = $(TOP)/../test
-TEST_SH = $(TOP)/test.sh
-LINT_SH = $(TOP)/../lint.sh
+SCRIPT_PATH = $(TOP)/../scripts
+TEST_PATH = $(TOP)/../tests
+TEST_SH = $(SCRIPT_PATH)/test_buf.sh
+LINT_SH = $(SCRIPT_PATH)/lint.sh
 
 #==================
 # all
@@ -99,7 +100,7 @@ clean_lex :
 	-rm $(LEX_GEN)
 
 #==================
-# object (common)
+# objects (common)
 #==================
 
 COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView
@@ -116,7 +117,7 @@ clean_common_objects :
 	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
 
 #==================
-# object
+# objects
 #==================
 
 $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
@@ -149,12 +150,22 @@ clean_binary :
 
 .PHONY : test
 test : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH))
+	cd $(TEST_PATH); $(MAKE) -f Makefile \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH)) \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH)) \
+			ADVANCED_SUITE=1
 
 .PHONY : clean_tests
 clean_tests :
-	cd $(TEST_PATH); $(MAKE) -f Makefile clean BUILD_PATH=$(abspath $(BUILD_PATH))
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE=1
 
 #==================
 # lint (common)

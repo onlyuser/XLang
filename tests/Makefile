@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #==================
-# external depends
+# external defines
 #==================
 
 # BUILD_PATH
@@ -28,7 +28,6 @@
 #==================
 
 TOP = .
-TEST_PATH = $(TOP)
 
 #==================
 # all
@@ -41,7 +40,14 @@ all : test
 # test
 #==================
 
-TEST_FILE_STEMS = AAA BBB CCC DDD EEE
+ifneq ($(strip $(BASIC_SUITE)),)
+    TEST_PATH = $(TOP)/basic_suite
+    TEST_FILE_STEMS = 0_simple 1_op_prec 2_grouping 3_identifier
+endif
+ifneq ($(strip $(ADVANCED_SUITE)),)
+    TEST_PATH = $(TOP)/advanced_suite
+    TEST_FILE_STEMS = 4_comments 5_strings
+endif
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
