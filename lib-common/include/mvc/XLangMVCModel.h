@@ -29,14 +29,8 @@ namespace mvc {
 
 struct MVCModel
 {
-    template<node::NodeIdentIFace::type_e type>
-    static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id,
-            typename node::LeafTypeTraits<type>::type value)
-    {
-        return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, value);
-    }
     template<class T>
-    static node::NodeIdentIFace* make_leaf_auto(ParserContextIFace* pc, uint32_t sym_id, T value)
+    static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id, T value)
     {
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)

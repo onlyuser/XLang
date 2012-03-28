@@ -34,7 +34,7 @@
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
 
-#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf_auto(pc, sym_id, ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(pc, sym_id, ##__VA_ARGS__)
 #define MAKE_INNER(...) mvc::MVCModel::make_inner(pc, ##__VA_ARGS__)
 
 // report error

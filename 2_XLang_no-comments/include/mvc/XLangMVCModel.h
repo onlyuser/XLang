@@ -37,7 +37,7 @@ struct MVCModel
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<type>(sym_id, loc, value);
     }
     template<class T>
-    static node::NodeIdentIFace* make_leaf_auto(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, T value)
+    static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
