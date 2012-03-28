@@ -25,7 +25,7 @@ SUBPATHS = \
     6_XLang_file \
     7_XLang_no-flex
 
-.PHONY : all
+.DEFAULT_GOAL : all
 all :
 	@for i in $(SUBPATHS); do \
 	echo "make all in $$i..."; \

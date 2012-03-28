@@ -31,7 +31,7 @@ BUILD_PATH = $(TOP)/build
 BIN_PATH = $(TOP)/bin
 BINARY = $(BIN_PATH)/XLang.exe
 
-COMMON = ../lib-common
+COMMON = $(TOP)/../lib-common
 COMMON_INCLUDE_PATH = $(COMMON)/include
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)

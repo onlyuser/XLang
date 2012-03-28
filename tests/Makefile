@@ -50,11 +50,13 @@ ifneq ($(strip $(BASIC_SUITE)),)
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
     TEST_PATH = $(TOP)/advanced_suite
-    TEST_FILE_STEMS = 4_comments
+    TEST_FILE_STEMS = \
+            4_comments
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
     TEST_PATH = $(TOP)/advanced_suite
-    TEST_FILE_STEMS = 5_strings
+    TEST_FILE_STEMS = \
+            5_strings
 endif
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
