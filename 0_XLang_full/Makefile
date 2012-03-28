@@ -103,7 +103,7 @@ clean_lex :
 # objects (common)
 #==================
 
-COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView
+COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView #XLangMVCModel
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
 

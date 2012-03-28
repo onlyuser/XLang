@@ -75,7 +75,7 @@ clean_objects :
 # binary
 #==================
 
-CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCModel XLangMVCView
+CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView XLangMVCModel
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
