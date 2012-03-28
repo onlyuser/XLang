@@ -103,7 +103,12 @@ clean_lex :
 # objects (common)
 #==================
 
-COMMON_CPP_STEMS = XLangAlloc XLangNode XLangNodePrinterVisitor XLangMVCView
+COMMON_CPP_STEMS = \
+        XLangAlloc \
+        XLangNode \
+        XLangNodePrinterVisitor \
+        XLangMVCView #\
+        XLangMVCModel
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
 
@@ -153,12 +158,18 @@ test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH)) \
+			ADVANCED_SUITE_COMMENTS=1
 
 .PHONY : clean_tests
 clean_tests :
 	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
 
 #==================
 # lint (common)
