@@ -19,12 +19,12 @@
 
 show_help()
 {
-    echo "SYNTAX: test <EXEC> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE>"
+    echo "SYNTAX: test <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE>"
 }
 
-if [ $# -ne 5 ];
+if [ $# -ne 6 ];
 then
-    echo "fail! -- requires 5 arguments! ==> $@"
+    echo "fail! -- requires 6 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -35,10 +35,11 @@ TEMP_FILE_1=`mktemp`
 trap "rm $TEMP_FILE_1" EXIT
 
 EXEC=$1
-INPUT_FILE=$2
-GOLD_KEYWORD=$3
-GOLD_FILE=$4
-OUTPUT_FILE=$5
+INPUT_MODE=$2
+INPUT_FILE=$3
+GOLD_KEYWORD=$4
+GOLD_FILE=$5
+OUTPUT_FILE=$6
 PASS_FILE=${OUTPUT_FILE}.pass
 FAIL_FILE=${OUTPUT_FILE}.fail
 
@@ -53,7 +54,21 @@ then
     exit 1
 fi
 
-$EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+case $INPUT_MODE in
+    "file")
+        $EXEC $INPUT_FILE | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        ;;
+    "stdio")
+        echo `cat $INPUT_FILE` | $EXEC | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        ;;
+    "buf")
+        $EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        ;;
+    *)
+        echo "fail! -- invalid input mode"
+        exit 1
+        ;;
+esac
 diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 
 if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe

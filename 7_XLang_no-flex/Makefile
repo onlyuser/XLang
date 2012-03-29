@@ -57,7 +57,6 @@ LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 SCRIPT_PATH = $(TOP)/../scripts
 TEST_PATH = $(TOP)/../tests
-TEST_SH = $(SCRIPT_PATH)/test_file.sh
 LINT_SH = $(SCRIPT_PATH)/lint.sh
 
 #==================
@@ -143,7 +142,7 @@ clean_binary :
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) TEST_SH=$(abspath $(TEST_SH)) \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
 			BASIC_SUITE=1
 
 .PHONY : clean_tests
