@@ -37,6 +37,12 @@ test :
 	echo "make test in $$i..."; \
 	(cd $$i; $(MAKE) test); done
 
+.PHONY : pure
+pure :
+	@for i in $(SUBPATHS); do \
+	echo "make pure in $$i..."; \
+	(cd $$i; $(MAKE) pure); done
+
 .PHONY : lint
 lint :
 	@for i in $(SUBPATHS); do \
