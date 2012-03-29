@@ -27,6 +27,8 @@
 # compile flags
 #==================
 
+PURE_TOOL = valgrind
+
 TOP = .
 SCRIPT_PATH = $(TOP)/../scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
@@ -63,6 +65,10 @@ endif
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
+PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
+PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
+PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
+
 TEST_FILT_KEYWORD = 'LISP'
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
@@ -77,8 +83,27 @@ clean_tests :
 	-rm $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 
 #==================
+# pure
+#==================
+
+PURE_FILT_KEYWORD = '=='
+PURIFY = 1
+
+$(BUILD_PATH)/%.test.pure.pass : $(BINARY) $(TEST_PATH)/%.test
+	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(PURE_FILT_KEYWORD) \
+			$(TOP)/blank.gold.pure $(BUILD_PATH)/$*.test.pure \
+			$(PURE_TOOL)
+
+.PHONY : pure
+pure : $(PURE_PASS_FILES)
+
+.PHONY : clean_pure
+clean_pure :
+	-rm $(PURE_PASS_FILES) $(PURE_FAIL_FILES)
+
+#==================
 # clean
 #==================
 
 .PHONY : clean
-clean : clean_tests
+clean : clean_tests clean_pure

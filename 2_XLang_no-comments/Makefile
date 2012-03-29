@@ -165,6 +165,22 @@ clean_tests :
 			BASIC_SUITE=1
 
 #==================
+# pure
+#==================
+
+.PHONY : pure
+pure : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile pure \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="buf" \
+			BASIC_SUITE=1
+
+.PHONY : clean_pure
+clean_pure :
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean_pure \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+
+#==================
 # lint (common)
 #==================
 
@@ -205,5 +221,5 @@ clean_lint : clean_common_lint
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_lint
+clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_lint
 	-rmdir $(BUILD_PATH) $(BIN_PATH)

@@ -19,12 +19,12 @@
 
 show_help()
 {
-    echo "SYNTAX: test <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE>"
+    echo "SYNTAX: test <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE_STEM> [PURE_TOOL]"
 }
 
-if [ $# -ne 6 ];
+if [ $# -ne 6 -a $# -ne 7 ];
 then
-    echo "fail! -- requires 6 arguments! ==> $@"
+    echo "fail! -- requires 6 or 7 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -39,9 +39,10 @@ INPUT_MODE=$2
 INPUT_FILE=$3
 GOLD_KEYWORD=$4
 GOLD_FILE=$5
-OUTPUT_FILE=$6
-PASS_FILE=${OUTPUT_FILE}.pass
-FAIL_FILE=${OUTPUT_FILE}.fail
+OUTPUT_FILE_STEM=$6
+PURE_TOOL=$7
+PASS_FILE=${OUTPUT_FILE_STEM}.pass
+FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
 if [ ! -f $INPUT_FILE ];
 then
@@ -53,16 +54,20 @@ then
     echo "fail! -- <GOLD_FILE> not found! ==> $GOLD_FILE"
     exit 1
 fi
+if [ $PURE_TOOL == "valgrind" ];
+then
+    RUN_PREFIX="valgrind --leak-check=full"
+fi
 
 case $INPUT_MODE in
     "file")
-        $EXEC $INPUT_FILE | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $RUN_PREFIX $EXEC $INPUT_FILE |& grep $GOLD_KEYWORD > $TEMP_FILE_0
         ;;
     "stdio")
-        echo `cat $INPUT_FILE` | $EXEC | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        echo `cat $INPUT_FILE` | $RUN_PREFIX $EXEC |& grep $GOLD_KEYWORD > $TEMP_FILE_0
         ;;
     "buf")
-        $EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $RUN_PREFIX $EXEC `cat $INPUT_FILE` |& grep $GOLD_KEYWORD > $TEMP_FILE_0
         ;;
     *)
         echo "fail! -- invalid input mode"
