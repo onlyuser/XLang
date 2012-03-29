@@ -21,13 +21,15 @@
 
 # BUILD_PATH
 # BINARY
-# TEST_SH
+# INPUT_MODE
 
 #==================
 # compile flags
 #==================
 
 TOP = .
+SCRIPT_PATH = $(TOP)/../scripts
+TEST_SH = $(SCRIPT_PATH)/test.sh
 
 #==================
 # all
@@ -64,8 +66,8 @@ TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 TEST_FILT_KEYWORD = 'LISP'
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) $(TEST_PATH)/$*.gold \
-			$(BUILD_PATH)/$*.test
+	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) \
+			$(TEST_PATH)/$*.gold $(BUILD_PATH)/$*.test
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
