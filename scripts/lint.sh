@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: lint <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE> <LINT_FLAGS..>"
+    echo "SYNTAX: lint <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> <LINT_FLAGS..>"
 }
 
 if [ $# -lt 3 ];
@@ -34,9 +34,9 @@ trap "rm $TEMP_FILE" EXIT
 
 LINT_TOOL=$1
 INPUT_FILE=$2
-OUTPUT_FILE=$3
-PASS_FILE=${OUTPUT_FILE}.pass
-FAIL_FILE=${OUTPUT_FILE}.fail
+OUTPUT_FILE_STEM=$3
+PASS_FILE=${OUTPUT_FILE_STEM}.pass
+FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
 if [ ! -f $INPUT_FILE ];
 then
