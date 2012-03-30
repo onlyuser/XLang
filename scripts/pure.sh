@@ -19,27 +19,24 @@
 
 show_help()
 {
-    echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <OUTPUT_FILE_STEM>"
 }
 
-if [ $# -ne 6 ];
+if [ $# -ne 5 ];
 then
     echo "fail! -- expect 6 arguments! ==> $@"
     show_help
     exit 1
 fi
 
-TEMP_FILE_0=`mktemp`
-trap "rm $TEMP_FILE_0" EXIT
-TEMP_FILE_1=`mktemp`
-trap "rm $TEMP_FILE_1" EXIT
+TEMP_FILE=`mktemp`
+trap "rm $TEMP_FILE" EXIT
 
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
 GOLD_KEYWORD=$4
-GOLD_FILE=$5
-OUTPUT_FILE_STEM=$6
+OUTPUT_FILE_STEM=$5
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
@@ -54,27 +51,28 @@ then
     exit 1
 fi
 
+PURE_TOOL="valgrind"
+PURE_FLAGS="--leak-check=full"
 case $INPUT_MODE in
     "file")
-        $EXEC $INPUT_FILE | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $PURE_TOOL $PURE_FLAGS $EXEC $INPUT_FILE 2> $TEMP_FILE
         ;;
     "stdio")
-        echo `cat $INPUT_FILE` | $EXEC | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        echo `cat $INPUT_FILE` | $PURE_TOOL $PURE_FLAGS $EXEC 2> $TEMP_FILE
         ;;
     "buf")
-        $EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $PURE_TOOL $PURE_FLAGS $EXEC `cat $INPUT_FILE` 2> $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"
         exit 1
         ;;
 esac
-diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 
-if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe
+if [ -z "`grep \"$GOLD_KEYWORD\" \"$TEMP_FILE\"`" ];
 then
     echo "fail!"
-    cp $TEMP_FILE_1 $FAIL_FILE # TEMP_FILE_1 already trapped on exit
+    cp $TEMP_FILE $FAIL_FILE # TEMP_FILE already trapped on exit
     exit 1
 fi
 

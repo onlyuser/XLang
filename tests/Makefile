@@ -27,11 +27,10 @@
 # compile flags
 #==================
 
-PURE_TOOL = valgrind
-
 TOP = .
 SCRIPT_PATH = $(TOP)/../scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
+PURE_SH = $(SCRIPT_PATH)/pure.sh
 
 #==================
 # all
@@ -86,13 +85,11 @@ clean_tests :
 # pure
 #==================
 
-PURE_FILT_KEYWORD = '=='
-PURIFY = 1
+PURE_FILT_KEYWORD = 'All heap blocks were freed -- no leaks are possible'
 
 $(BUILD_PATH)/%.test.pure.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(PURE_FILT_KEYWORD) \
-			$(TOP)/blank.gold.pure $(BUILD_PATH)/$*.test.pure \
-			$(PURE_TOOL)
+	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(PURE_FILT_KEYWORD) \
+			$(BUILD_PATH)/$*.test.pure
 
 .PHONY : pure
 pure : $(PURE_PASS_FILES)

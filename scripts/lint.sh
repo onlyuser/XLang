@@ -19,12 +19,12 @@
 
 show_help()
 {
-    echo "SYNTAX: lint <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> <LINT_FLAGS..>"
+    echo "SYNTAX: `basename 0` <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> <LINT_FLAGS..>"
 }
 
 if [ $# -lt 3 ];
 then
-    echo "fail! -- requires at least 3 arguments! ==> $@"
+    echo "fail! -- expect at least 3 arguments! ==> $@"
     show_help
     exit 1
 fi
