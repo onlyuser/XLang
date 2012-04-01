@@ -22,8 +22,7 @@ show_help()
     echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE_STEM>"
 }
 
-if [ $# -ne 6 ];
-then
+if [ $# -ne 6 ]; then
     echo "fail! -- expect 6 arguments! ==> $@"
     show_help
     exit 1
@@ -43,13 +42,12 @@ OUTPUT_FILE_STEM=$6
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
-if [ ! -f $INPUT_FILE ];
-then
+if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
     exit 1
 fi
-if [ ! -f $GOLD_FILE ];
-then
+
+if [ ! -f $GOLD_FILE ]; then
     echo "fail! -- <GOLD_FILE> not found! ==> $GOLD_FILE"
     exit 1
 fi
@@ -71,8 +69,7 @@ case $INPUT_MODE in
 esac
 diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 
-if [ ${PIPESTATUS[0]} -ne 0 ]; # $? captures the last pipe
-then
+if [ ${PIPESTATUS[0]} -ne 0 ]; then # $? captures the last pipe
     echo "fail!"
     cp $TEMP_FILE_1 $FAIL_FILE # TEMP_FILE_1 already trapped on exit
     exit 1

@@ -22,8 +22,7 @@ show_help()
     echo "SYNTAX: `basename 0` <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> <LINT_FLAGS..>"
 }
 
-if [ $# -lt 3 ];
-then
+if [ $# -lt 3 ]; then
     echo "fail! -- expect at least 3 arguments! ==> $@"
     show_help
     exit 1
@@ -38,27 +37,22 @@ OUTPUT_FILE_STEM=$3
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
-if [ ! -f $INPUT_FILE ];
-then
+if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
     exit 1
 fi
 
 COUNT=0
-for ARG in "$@"
-do
+for ARG in "$@"; do
     ((COUNT+=1))
-    if [ $COUNT -le 3 ];
-    then
-        continue
+    if [ $COUNT -gt 3 ]; then
+        LINT_FLAGS="$LINT_FLAGS $ARG"
     fi
-    LINT_FLAGS="$LINT_FLAGS $ARG"
 done
 
-echo "$LINT_TOOL $INPUT_FILE $LINT_FLAGS >& $TEMP_FILE"
+echo "$LINT_TOOL $INPUT_FILE $LINT_FLAGS" >& $TEMP_FILE
 FILE_DATA=`$LINT_TOOL $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
-if [ -n "$FILE_DATA" ];
-then
+if [ -n "$FILE_DATA" ]; then
     echo "fail!"
     echo -e "$FILE_DATA" > $FAIL_FILE
     exit 1

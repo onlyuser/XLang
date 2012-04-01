@@ -22,8 +22,7 @@ show_help()
     echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <OUTPUT_FILE_STEM>"
 }
 
-if [ $# -ne 5 ];
-then
+if [ $# -ne 5 ]; then
     echo "fail! -- expect 6 arguments! ==> $@"
     show_help
     exit 1
@@ -40,13 +39,12 @@ OUTPUT_FILE_STEM=$5
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
-if [ ! -f $INPUT_FILE ];
-then
+if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
     exit 1
 fi
-if [ ! -f $GOLD_FILE ];
-then
+
+if [ ! -f $GOLD_FILE ]; then
     echo "fail! -- <GOLD_FILE> not found! ==> $GOLD_FILE"
     exit 1
 fi
@@ -69,8 +67,7 @@ case $INPUT_MODE in
         ;;
 esac
 
-if [ -z "`grep \"$GOLD_KEYWORD\" \"$TEMP_FILE\"`" ];
-then
+if [ -z "`grep \"$GOLD_KEYWORD\" $TEMP_FILE`" ]; then
     echo "fail!"
     cp $TEMP_FILE $FAIL_FILE # TEMP_FILE already trapped on exit
     exit 1
