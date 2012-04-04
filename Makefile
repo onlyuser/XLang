@@ -25,6 +25,8 @@ SUBPATHS = \
     6_XLang_file \
     7_XLang_no-flex
 
+DOC_PATH = doc
+
 .DEFAULT_GOAL : all
 all :
 	@for i in $(SUBPATHS); do \
@@ -54,3 +56,11 @@ clean :
 	@for i in $(SUBPATHS); do \
 	echo "make clean in $$i..."; \
 	(cd $$i; $(MAKE) clean); done
+
+.PHONY : doc
+doc :
+	cd $(DOC_PATH); $(MAKE) -f Makefile
+
+.PHONY : clean_doc
+clean_doc :
+	cd $(DOC_PATH); $(MAKE) -f Makefile clean
