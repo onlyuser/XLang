@@ -57,6 +57,9 @@ SCRIPT_PATH = $(TOP)/../scripts
 TEST_PATH = $(TOP)/../tests
 LINT_SH = $(SCRIPT_PATH)/lint.sh
 
+DOXY_CONFIG_PATH = $(TOP)/../doc
+DOXY_CONFIG_FILE = XLang.config
+
 #==================
 # all
 #==================
@@ -217,9 +220,24 @@ clean_lint : clean_common_lint
 	-rm $(LINT_PASS_FILES) $(LINT_FAIL_FILES)
 
 #==================
+# doc
+#==================
+
+.PHONY : doc
+doc :
+	mkdir -p $(BUILD_PATH)
+	-ln -s ../$(DOXY_CONFIG_PATH)/$(DOXY_CONFIG_FILE) $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
+	cd $(BUILD_PATH); doxygen $(DOXY_CONFIG_FILE)
+
+.PHONY : clean_doc
+clean_doc :
+	rm -rf $(BUILD_PATH)/html
+	rm -rf $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
+
+#==================
 # clean
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_lint
+clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
