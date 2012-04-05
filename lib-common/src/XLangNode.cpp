@@ -32,16 +32,15 @@ void InnerNode::accept(NodeVisitorIFace* visitor) const
     std::cout << '(';
     visitor->visit(this);
     std::cout << ' ';
-    size_t i;
-    for(i = 0; i < child_count(); i++)
+    for(size_t i = 0; i < child_count(); i++)
     {
         switch(child(i)->type())
         {
-        case NodeIdentIFace::FLOAT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child(i)));
-            break;
         case NodeIdentIFace::INT:
             visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child(i)));
+            break;
+        case NodeIdentIFace::FLOAT:
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child(i)));
             break;
         case NodeIdentIFace::STRING:
             visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child(i)));
