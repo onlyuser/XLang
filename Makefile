@@ -28,35 +28,35 @@ SUBPATHS = \
 .DEFAULT_GOAL : all
 all :
 	@for i in $(SUBPATHS); do \
-	echo "make all in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE)); done
 
 .PHONY : test
 test :
 	@for i in $(SUBPATHS); do \
-	echo "make test in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) test); done
 
 .PHONY : pure
 pure :
 	@for i in $(SUBPATHS); do \
-	echo "make pure in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) pure); done
 
 .PHONY : lint
 lint :
 	@for i in $(SUBPATHS); do \
-	echo "make lint in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) lint); done
 
 .PHONY : doc
 doc :
 	@for i in $(SUBPATHS); do \
-	echo "make doc in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) doc); done
 
 .PHONY : clean
 clean :
 	@for i in $(SUBPATHS); do \
-	echo "make clean in $$i..."; \
+	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) clean); done
