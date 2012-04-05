@@ -32,7 +32,8 @@ void InnerNode::accept(NodeVisitorIFace* visitor) const
     std::cout << '(';
     visitor->visit(this);
     std::cout << ' ';
-    for(size_t i = 0; i < child_count(); i++)
+    size_t i;
+    for(i = 0; i < child_count(); i++)
     {
         switch(child(i)->type())
         {

@@ -39,7 +39,7 @@ namespace mvc {
 
 void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
-    if (NULL == _node)
+    if(NULL == _node)
         return;
     switch(_node->type())
     {
@@ -62,7 +62,7 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
             {
                 std::cout << '(' << dynamic_cast<const node::InnerNodeIFace*>(_node)->name() << ' ';
                 size_t i;
-                for (i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count()-1; i++)
+                for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count()-1; i++)
                 {
                     print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
                     std::cout << ' ';
