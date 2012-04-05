@@ -25,6 +25,7 @@ namespace mvc {
 struct MVCView
 {
     static void print_lisp(const node::NodeIdentIFace* _node);
+    static void print_dot(const node::NodeIdentIFace* _node, size_t depth = 0);
     static void print_graph(const node::NodeIdentIFace* p);
 };
 

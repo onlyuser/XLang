@@ -20,6 +20,7 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <iostream> // std::cout
+#include <sstream> // std::stringstream
 
 /* source code courtesy of Frank Thomas Braun */
 /* minimally altered by Jerry Chen <mailto:onlyuser@gmail.com> */
@@ -72,6 +73,58 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
             }
             break;
     }
+}
+
+void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
+{
+    if(NULL == _node)
+        return;
+    if(depth == 0)
+    	std::cout << "digraph g {" << std::endl;
+    std::stringstream ss; ss << _node; std::string node_uid = ss.str().substr(2);
+    std::cout << "\"" << node_uid << "\" [" << std::endl <<
+    		"label=\"";
+    switch(_node->type())
+    {
+        case node::NodeIdentIFace::INT:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
+            break;
+        case node::NodeIdentIFace::FLOAT:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
+            break;
+        case node::NodeIdentIFace::STRING:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value();
+            break;
+        case node::NodeIdentIFace::CHAR:
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value();
+            break;
+        case node::NodeIdentIFace::IDENT:
+            std::cout << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value();
+            break;
+        case node::NodeIdentIFace::INNER:
+            std::cout << dynamic_cast<const node::InnerNodeIFace*>(_node)->name();
+            break;
+    }
+    std::cout << "\"," << std::endl <<
+    		"shape=\"ellipse\"" << std::endl <<
+    		"];" << std::endl;
+    switch(_node->type())
+    {
+        case node::NodeIdentIFace::INNER:
+            {
+                for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count(); i++)
+                {
+                	const node::NodeIdentIFace* child =
+                			dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
+                    std::stringstream ss; ss << child; std::string child_uid = ss.str().substr(2);
+                    std::cout << node_uid << "->" << child_uid << ";" << std::endl;
+                	print_dot(child, depth+1);
+                }
+            }
+            break;
+    }
+    if(depth == 0)
+    	std::cout << "}" << std::endl;
 }
 
 typedef const node::NodeIdentIFace nodeType;
