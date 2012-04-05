@@ -608,6 +608,8 @@ int main(int argc, char** argv)
 #endif
     std::cout << "GRAPH:";
     mvc::MVCView::print_graph(ast); std::cout << std::endl;
+    std::cout << "DOT: " << std::endl;
+    mvc::MVCView::print_dot(ast); std::cout << std::endl;
     alloc.dump();
     return 0;
 }

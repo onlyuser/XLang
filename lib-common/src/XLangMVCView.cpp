@@ -82,8 +82,8 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
     if(depth == 0)
     	std::cout << "digraph g {" << std::endl;
     std::stringstream ss; ss << _node; std::string node_uid = ss.str().substr(2);
-    std::cout << "\"" << node_uid << "\" [" << std::endl <<
-    		"label=\"";
+    std::cout << "\t\"" << node_uid << "\" [" << std::endl <<
+    		"\t\tlabel=\"";
     switch(_node->type())
     {
         case node::NodeIdentIFace::INT:
@@ -106,8 +106,8 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
             break;
     }
     std::cout << "\"," << std::endl <<
-    		"shape=\"ellipse\"" << std::endl <<
-    		"];" << std::endl;
+    		"\t\tshape=\"ellipse\"" << std::endl <<
+    		"\t];" << std::endl;
     switch(_node->type())
     {
         case node::NodeIdentIFace::INNER:
@@ -117,7 +117,7 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
                 	const node::NodeIdentIFace* child =
                 			dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
                     std::stringstream ss; ss << child; std::string child_uid = ss.str().substr(2);
-                    std::cout << node_uid << "->" << child_uid << ";" << std::endl;
+                    std::cout << '\t' << node_uid << "->" << child_uid << ";" << std::endl;
                 	print_dot(child, depth+1);
                 }
             }
