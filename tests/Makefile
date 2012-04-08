@@ -68,11 +68,9 @@ PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 
-TEST_FILT_KEYWORD = "LISP"
-
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_FILT_KEYWORD) \
-			$(TEST_PATH)/$*.gold $(BUILD_PATH)/$*.test
+	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
+			$(BUILD_PATH)/$*.test
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
@@ -85,10 +83,10 @@ clean_tests :
 # pure
 #==================
 
-PURE_FILT_KEYWORD = "All heap blocks were freed -- no leaks are possible"
+GOLD_KEYWORD = "All heap blocks were freed -- no leaks are possible"
 
 $(BUILD_PATH)/%.test.pure.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(PURE_FILT_KEYWORD) \
+	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(GOLD_KEYWORD) \
 			$(BUILD_PATH)/$*.test.pure
 
 .PHONY : pure

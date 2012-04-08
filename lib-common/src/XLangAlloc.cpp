@@ -33,9 +33,9 @@ MemChunk::~MemChunk()
         free(m_ptr);
 }
 
-void MemChunk::dump() const
+void MemChunk::dump(std::string indent) const
 {
-    std::cout << m_filename << ":" << m_line_number << " .. " << m_size_bytes << " bytes";
+    std::cout << indent << m_filename << ":" << m_line_number << " .. " << m_size_bytes << " bytes";
 }
 
 Allocator::Allocator(std::string name)
@@ -74,14 +74,15 @@ void Allocator::_free()
     m_chunk_map.clear();
 }
 
-void Allocator::dump() const
+void Allocator::dump(std::string indent) const
 {
-    std::cout << "dumping allocator: " << m_name << std::endl;
+    std::cout << '\"' << m_name << "\" {" << std::endl;
     for(internal_type::const_iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
     {
-        (*p).second->dump();
+        (*p).second->dump(indent);
         std::cout << std::endl;
     }
+    std::cout << "};" << std::endl;
 }
 
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number)

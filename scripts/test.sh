@@ -19,10 +19,10 @@
 
 show_help()
 {
-    echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
 }
 
-if [ $# -ne 6 ]; then
+if [ $# -ne 5 ]; then
     echo "fail! -- expect 6 arguments! ==> $@"
     show_help
     exit 1
@@ -36,9 +36,8 @@ trap "rm $TEMP_FILE_1" EXIT
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
-GOLD_KEYWORD=$4
-GOLD_FILE=$5
-OUTPUT_FILE_STEM=$6
+GOLD_FILE=$4
+OUTPUT_FILE_STEM=$5
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
@@ -54,13 +53,13 @@ fi
 
 case $INPUT_MODE in
     "file")
-        $EXEC $INPUT_FILE | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $EXEC --lisp --file $INPUT_FILE > $TEMP_FILE_0
         ;;
     "stdio")
-        echo `cat $INPUT_FILE` | $EXEC | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        echo `cat $INPUT_FILE` | $EXEC --lisp > $TEMP_FILE_0
         ;;
     "buf")
-        $EXEC `cat $INPUT_FILE` | grep $GOLD_KEYWORD > $TEMP_FILE_0
+        $EXEC --lisp --input `cat $INPUT_FILE` > $TEMP_FILE_0
         ;;
     *)
         echo "fail! -- invalid input mode"

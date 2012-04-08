@@ -108,21 +108,15 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
     std::cout << "\"," << std::endl <<
     		"\t\tshape=\"ellipse\"" << std::endl <<
     		"\t];" << std::endl;
-    switch(_node->type())
-    {
-        case node::NodeIdentIFace::INNER:
-            {
-                for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count(); i++)
-                {
-                	const node::NodeIdentIFace* child =
-                			dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
-                    std::stringstream ss; ss << child; std::string child_uid = ss.str().substr(2);
-                    std::cout << '\t' << node_uid << "->" << child_uid << ";" << std::endl;
-                	print_dot(child, depth+1);
-                }
-            }
-            break;
-    }
+    if(_node->type() == node::NodeIdentIFace::INNER)
+		for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count(); i++)
+		{
+			const node::NodeIdentIFace* child =
+					dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
+			std::stringstream ss; ss << child; std::string child_uid = ss.str().substr(2);
+			std::cout << '\t' << node_uid << "->" << child_uid << ";" << std::endl;
+			print_dot(child, depth+1);
+		}
     if(depth == 0)
     	std::cout << "}" << std::endl;
 }
@@ -301,7 +295,7 @@ void graphBox (char *s, int *w, int *h) {
 }
 
 void graphDrawBox (char *s, int c, int l) {
-    int i;
+    size_t i;
     graphTest (l, c+strlen(s)-1+del);
     for (i = 0; i < strlen (s); i++) {
         graph[l][c+i+del] = s[i];

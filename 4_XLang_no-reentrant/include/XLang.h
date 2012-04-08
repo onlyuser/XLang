@@ -28,18 +28,18 @@
 
 struct ScannerContext
 {
-    char* m_buf; // buffer we read from
+    const char* m_buf; // buffer we read from
     int m_pos; // current position in buf
     int m_length; // length of buf
 
-    ScannerContext(char* buf);
+    ScannerContext(const char* buf);
 };
 
 // context type to hold shared data between bison and flex
 class ParserContext : public ParserContextIFace
 {
 public:
-    ParserContext(Allocator &alloc, char* s)
+    ParserContext(Allocator &alloc, const char* s)
         : m_alloc(alloc), m_scanner_context(s), m_root(NULL) {}
     Allocator &alloc() { return m_alloc; }
     ScannerContext &scanner_context() { return m_scanner_context; }

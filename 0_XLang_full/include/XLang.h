@@ -49,7 +49,7 @@ struct ScannerContext
 {
     yyscan_t m_scanner; // state of the lexer
 
-    char* m_buf; // buffer we read from
+    const char* m_buf; // buffer we read from
     int m_pos; // current position in buf
     int m_length; // length of buf
 
@@ -58,14 +58,14 @@ struct ScannerContext
     int m_column;
     int m_prev_column;
 
-    ScannerContext(char* buf);
+    ScannerContext(const char* buf);
 };
 
 // context type to hold shared data between bison and flex
 class ParserContext : public ParserContextIFace
 {
 public:
-    ParserContext(Allocator &alloc, char* s)
+    ParserContext(Allocator &alloc, const char* s)
         : m_alloc(alloc), m_scanner_context(s) {}
     Allocator &alloc() { return m_alloc; }
     ScannerContext &scanner_context() { return m_scanner_context; }

@@ -33,6 +33,8 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
+#include <stdlib.h> // EXIT_SUCCESS
+#include <getopt.h> // getopt_long
 
 #define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(parse_context(), sym_id, ##__VA_ARGS__)
 #define MAKE_INNER(...) mvc::MVCModel::make_inner(parse_context(), ##__VA_ARGS__)
@@ -146,45 +148,130 @@ node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
     return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
 }
 
+void display_usage(bool verbose)
+{
+    std::cout << "Usage: XLang OPTION [-m] -f FILE" << std::endl;
+    if(verbose)
+        std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
+                << "Output control:" << std::endl
+                << "  -f, --file" << std::endl
+                << "  -l, --lisp" << std::endl
+                << "  -g, --graph" << std::endl
+                << "  -d, --dot" << std::endl
+                << "  -m, --memory" << std::endl;
+    else
+        std::cout << "Try `XLang --help\' for more information." << std::endl;
+}
+
+struct args_t
+{
+    typedef enum
+    {
+        MODE_NONE,
+        MODE_LISP,
+        MODE_GRAPH,
+        MODE_DOT,
+        MODE_HELP
+    } mode_e;
+
+    mode_e mode;
+    std::string filename;
+    bool dump_memory;
+
+    args_t()
+        : mode(MODE_NONE), dump_memory(false) {}
+};
+
+bool parse_args(int argc, char** argv, args_t &args)
+{
+    int opt = 0;
+    int longIndex = 0;
+    static const char *optString = "flgdmh?";
+    static const struct option longOpts[] = {
+                { "file",   required_argument, NULL, 'f' },
+                { "lisp",   no_argument,       NULL, 'l' },
+                { "graph",  no_argument,       NULL, 'g' },
+                { "dot",    no_argument,       NULL, 'd' },
+                { "memory", no_argument,       NULL, 'm' },
+                { "help",   no_argument,       NULL, 'h' },
+                { NULL,     no_argument,       NULL, 0 }
+            };
+    opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
+    while(opt != -1)
+    {
+        switch(opt)
+        {
+            case 'f': args.filename = optarg; break;
+            case 'l': args.mode = args_t::MODE_LISP; break;
+            case 'g': args.mode = args_t::MODE_GRAPH; break;
+            case 'd': args.mode = args_t::MODE_DOT; break;
+            case 'm': args.dump_memory = true; break;
+            case 'h':
+            case '?': args.mode = args_t::MODE_HELP; break;
+            case 0: // reserved
+            default:
+                break;
+        }
+        opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
+    }
+    if(args_t::MODE_NONE == args.mode)
+    {
+        display_usage(false);
+        return false;
+    }
+    return true;
+}
+
+bool do_work(args_t &args)
+{
+    Allocator alloc(__FILE__);
+    FILE* file = fopen(args.filename.c_str(), "rb");
+    if(NULL == file)
+    {
+        std::cout << "cannot open file" << std::endl;
+        return false;
+    }
+    node::NodeIdentIFace* ast = make_ast(alloc, file);
+    if(NULL == ast)
+    {
+        std::cout << errors().str().c_str() << std::endl;
+        return false;
+    }
+    switch(args.mode)
+    {
+        case args_t::MODE_LISP:
+            {
+                #if 1 // use mvc-pattern pretty-printer
+                    mvc::MVCView::print_lisp(ast); std::cout << std::endl;
+                #else // use visitor-pattern pretty-printer
+                    node::NodePrinterVisitor visitor;
+                    if(ast->type() == node::NodeIdentIFace::INNER)
+                    {
+                        dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor);
+                        std::cout << std::endl;
+                    }
+                    else
+                        std::cout << "visitor can only print inner-node" << std::endl;
+                #endif
+            }
+            break;
+        case args_t::MODE_GRAPH: mvc::MVCView::print_graph(ast); break;
+        case args_t::MODE_DOT:   mvc::MVCView::print_dot(ast); break;
+        case args_t::MODE_HELP:  display_usage(true); break;
+        default:
+            break;
+    }
+    if(args.dump_memory)
+        alloc.dump(std::string(1, '\t'));
+    return true;
+}
+
 int main(int argc, char** argv)
 {
-    if(2 > argc)
-    {
-        std::cout << "ERROR: requires 1 or more filename arguments" << std::endl;
-        return 1;
-    }
-    Allocator alloc(__FILE__);
-    for(int i = 1; i < argc; i++)
-    {
-        FILE* file = fopen(argv[i], "rb");
-        if(NULL == file)
-            break;
-        node::NodeIdentIFace* ast = make_ast(alloc, file);
-        fclose(file);
-        if(NULL == ast)
-        {
-            std::cout << argv[1] << std::endl << errors().str().c_str() << std::endl;
-            continue;
-        }
-        std::cout << "INPUT: " << argv[i] << std::endl;
-        std::cout << "LISP: ";
-#if 0 // use mvc-pattern pretty-printer
-        mvc::MVCView::print_lisp(ast); std::cout << std::endl;
-#else // use visitor-pattern pretty-printer
-        node::NodePrinterVisitor visitor;
-        if(ast->type() == node::NodeIdentIFace::INNER)
-        {
-            dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor);
-            std::cout << std::endl;
-        }
-        else
-            std::cout << "visitor can only print inner-node" << std::endl;
-#endif
-        std::cout << "GRAPH:";
-        mvc::MVCView::print_graph(ast); std::cout << std::endl;
-        std::cout << "DOT: " << std::endl;
-        mvc::MVCView::print_dot(ast); std::cout << std::endl;
-    }
-    alloc.dump();
-    return 0;
+    args_t args;
+    if(!parse_args(argc, argv, args))
+        return EXIT_FAILURE;
+    if(!do_work(args))
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
