@@ -273,5 +273,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_lint clean_doc
+clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_dot clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)

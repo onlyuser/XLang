@@ -44,13 +44,13 @@ fi
 
 case $INPUT_MODE in
     "file")
-        $EXEC --dot --file $INPUT_FILE > $TEMP_FILE
+        $EXEC --dot --file $INPUT_FILE | tee $TEMP_FILE
         ;;
     "stdin")
-        echo `cat $INPUT_FILE` | $EXEC --dot > $TEMP_FILE
+        echo `cat $INPUT_FILE` | $EXEC --dot | tee $TEMP_FILE
         ;;
     "arg")
-        $EXEC --dot --input `cat $INPUT_FILE` > $TEMP_FILE
+        $EXEC --dot --input `cat $INPUT_FILE` | tee $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"

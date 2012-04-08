@@ -75,13 +75,21 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
     }
 }
 
+static std::string dot_node_uid(const void* x)
+{
+    std::stringstream ss;
+    ss << '_' << x;
+    std::string s = ss.str();
+    return s;
+}
+
 void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
 {
     if(NULL == _node)
         return;
     if(depth == 0)
     	std::cout << "digraph g {" << std::endl;
-    std::stringstream ss; ss << _node; std::string node_uid = ss.str().substr(2);
+    std::string node_uid = dot_node_uid(_node);
     std::cout << "\t\"" << node_uid << "\" [" << std::endl <<
     		"\t\tlabel=\"";
     switch(_node->type())
@@ -113,8 +121,7 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
 		{
 			const node::NodeIdentIFace* child =
 					dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
-			std::stringstream ss; ss << child; std::string child_uid = ss.str().substr(2);
-			std::cout << '\t' << node_uid << "->" << child_uid << ";" << std::endl;
+			std::cout << '\t' << node_uid << "->" << dot_node_uid(child) << ";" << std::endl;
 			print_dot(child, depth+1);
 		}
     if(depth == 0)
