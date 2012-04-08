@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE GOLD_FILE OUTPUT_FILE_STEM"
 }
 
 if [ $# -ne 5 ]; then
@@ -42,12 +42,12 @@ PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
 if [ ! -f $INPUT_FILE ]; then
-    echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
+    echo "fail! -- INPUT_FILE not found! ==> $INPUT_FILE"
     exit 1
 fi
 
 if [ ! -f $GOLD_FILE ]; then
-    echo "fail! -- <GOLD_FILE> not found! ==> $GOLD_FILE"
+    echo "fail! -- GOLD_FILE not found! ==> $GOLD_FILE"
     exit 1
 fi
 
@@ -75,4 +75,3 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then # $? captures the last pipe
 fi
 
 echo "success!" | tee $PASS_FILE
-exit 0

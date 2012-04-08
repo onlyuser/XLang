@@ -208,6 +208,34 @@ clean_pure :
 			ADVANCED_SUITE_STRINGS=1
 
 #==================
+# dot
+#==================
+
+.PHONY : dot
+dot : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="buf" \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="buf" \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="buf" \
+			ADVANCED_SUITE_STRINGS=1
+
+.PHONY : clean_dot
+clean_dot :
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean_dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean_dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean_dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
+
+#==================
 # lint (common)
 #==================
 

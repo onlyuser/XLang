@@ -184,6 +184,22 @@ clean_pure :
 			BASIC_SUITE=1
 
 #==================
+# dot
+#==================
+
+.PHONY : dot
+dot : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="buf" \
+			BASIC_SUITE=1
+
+.PHONY : clean_dot
+clean_dot :
+	cd $(TEST_PATH); $(MAKE) -f Makefile clean_dot \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+
+#==================
 # lint (common)
 #==================
 

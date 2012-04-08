@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "SYNTAX: `basename 0` <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> <LINT_FLAGS..>"
+    echo "Usage: `basename 0` LINT_TOOL INPUT_FILE OUTPUT_FILE_STEM LINT_FLAGS.."
 }
 
 if [ $# -lt 3 ]; then
@@ -38,7 +38,7 @@ PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
 if [ ! -f $INPUT_FILE ]; then
-    echo "fail! -- <INPUT_FILE> not found! ==> $INPUT_FILE"
+    echo "fail! -- INPUT_FILE not found! ==> $INPUT_FILE"
     exit 1
 fi
 
@@ -59,4 +59,3 @@ if [ -n "$FILE_DATA" ]; then
 fi
 
 echo "success!" | tee $PASS_FILE
-exit 0

@@ -31,6 +31,7 @@ TOP = .
 SCRIPT_PATH = $(TOP)/../scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
+DOT_SH = $(SCRIPT_PATH)/dot.sh
 
 #==================
 # all
@@ -67,6 +68,8 @@ TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
+DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
+DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
@@ -97,8 +100,23 @@ clean_pure :
 	-rm $(PURE_PASS_FILES) $(PURE_FAIL_FILES)
 
 #==================
+# dot
+#==================
+
+$(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
+	-$(DOT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+			$(BUILD_PATH)/$*.test.dot
+
+.PHONY : dot
+dot : $(DOT_PNG_FILES)
+
+.PHONY : clean_dot
+clean_dot :
+	-rm $(DOT_PNG_FILES)
+
+#==================
 # clean
 #==================
 
 .PHONY : clean
-clean : clean_tests clean_pure
+clean : clean_tests clean_pure clean_dot

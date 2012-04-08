@@ -19,11 +19,11 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE GOLD_KEYWORD OUTPUT_FILE_STEM"
+    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE OUTPUT_FILE_STEM"
 }
 
-if [ $# -ne 5 ]; then
-    echo "fail! -- expect 5 arguments! ==> $@"
+if [ $# -ne 4 ]; then
+    echo "fail! -- expect 4 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -34,32 +34,23 @@ trap "rm $TEMP_FILE" EXIT
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
-GOLD_KEYWORD=$4
-OUTPUT_FILE_STEM=$5
-PASS_FILE=${OUTPUT_FILE_STEM}.pass
-FAIL_FILE=${OUTPUT_FILE_STEM}.fail
+OUTPUT_FILE_STEM=$4
+PNG_FILE=${OUTPUT_FILE_STEM}.png
 
 if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- INPUT_FILE not found! ==> $INPUT_FILE"
     exit 1
 fi
 
-if [ ! -f $GOLD_FILE ]; then
-    echo "fail! -- GOLD_FILE not found! ==> $GOLD_FILE"
-    exit 1
-fi
-
-PURE_TOOL="valgrind"
-PURE_FLAGS="--leak-check=full"
 case $INPUT_MODE in
     "file")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --file $INPUT_FILE 2> $TEMP_FILE
+        $EXEC --dot --file $INPUT_FILE > $TEMP_FILE
         ;;
     "stdio")
-        echo `cat $INPUT_FILE` | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
+        echo `cat $INPUT_FILE` | $EXEC --dot > $TEMP_FILE
         ;;
     "buf")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --input `cat $INPUT_FILE` 2> $TEMP_FILE
+        $EXEC --dot --input `cat $INPUT_FILE` > $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"
@@ -67,10 +58,8 @@ case $INPUT_MODE in
         ;;
 esac
 
-if [ -z "`grep \"$GOLD_KEYWORD\" $TEMP_FILE`" ]; then
-    echo "fail!"
-    cp $TEMP_FILE $FAIL_FILE # TEMP_FILE already trapped on exit
-    exit 1
-fi
+DOT_TOOL="dot"
+DOT_FLAGS="-Tpng"
+$DOT_TOOL $DOT_FLAGS -o $PNG_FILE $TEMP_FILE
 
-echo "success!" | tee $PASS_FILE
+echo "success!"

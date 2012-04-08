@@ -35,28 +35,34 @@ all :
 test :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
-	(cd $$i; $(MAKE) test); done
+	(cd $$i; $(MAKE) $@); done
 
 .PHONY : pure
 pure :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
-	(cd $$i; $(MAKE) pure); done
+	(cd $$i; $(MAKE) $@); done
+
+.PHONY : dot
+dot :
+	@for i in $(SUBPATHS); do \
+	echo "make $@ in $$i..."; \
+	(cd $$i; $(MAKE) $@); done
 
 .PHONY : lint
 lint :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
-	(cd $$i; $(MAKE) lint); done
+	(cd $$i; $(MAKE) $@); done
 
 .PHONY : doc
 doc :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
-	(cd $$i; $(MAKE) doc); done
+	(cd $$i; $(MAKE) $@); done
 
 .PHONY : clean
 clean :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
-	(cd $$i; $(MAKE) clean); done
+	(cd $$i; $(MAKE) $@); done
