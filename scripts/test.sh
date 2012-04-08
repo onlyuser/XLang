@@ -55,10 +55,10 @@ case $INPUT_MODE in
     "file")
         $EXEC --lisp --file $INPUT_FILE > $TEMP_FILE_0
         ;;
-    "stdio")
+    "stdin")
         echo `cat $INPUT_FILE` | $EXEC --lisp > $TEMP_FILE_0
         ;;
-    "buf")
+    "arg")
         $EXEC --lisp --input `cat $INPUT_FILE` > $TEMP_FILE_0
         ;;
     *)

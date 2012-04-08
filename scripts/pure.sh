@@ -55,10 +55,10 @@ case $INPUT_MODE in
     "file")
         $PURE_TOOL $PURE_FLAGS $EXEC --lisp --file $INPUT_FILE 2> $TEMP_FILE
         ;;
-    "stdio")
+    "stdin")
         echo `cat $INPUT_FILE` | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
         ;;
-    "buf")
+    "arg")
         $PURE_TOOL $PURE_FLAGS $EXEC --lisp --input `cat $INPUT_FILE` 2> $TEMP_FILE
         ;;
     *)

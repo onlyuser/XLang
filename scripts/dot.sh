@@ -46,10 +46,10 @@ case $INPUT_MODE in
     "file")
         $EXEC --dot --file $INPUT_FILE > $TEMP_FILE
         ;;
-    "stdio")
+    "stdin")
         echo `cat $INPUT_FILE` | $EXEC --dot > $TEMP_FILE
         ;;
-    "buf")
+    "arg")
         $EXEC --dot --input `cat $INPUT_FILE` > $TEMP_FILE
         ;;
     *)
