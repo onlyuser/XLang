@@ -22,15 +22,15 @@ LINT_TOOL = cppcheck
 # compile flags
 #==================
 
-TOP = .
-INCLUDE_PATH = $(TOP)/include
-LIB_PATH = $(TOP)/lib
-SRC_PATH = $(TOP)/src
-BUILD_PATH = $(TOP)/build
-BIN_PATH = $(TOP)/bin
+OUTTER_PATH = ..
+INCLUDE_PATH = include
+LIB_PATH = lib
+SRC_PATH = src
+BUILD_PATH = build
+BIN_PATH = bin
 BINARY = $(BIN_PATH)/XLang.exe
 
-COMMON = $(TOP)/../lib-common
+COMMON = $(OUTTER_PATH)/lib-common
 COMMON_INCLUDE_PATH = $(COMMON)/include
 COMMON_SRC_PATH = $(COMMON)/src
 COMMON_BUILD_PATH = $(COMMON)/build
@@ -53,11 +53,11 @@ CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
-SCRIPT_PATH = $(TOP)/../scripts
-TEST_PATH = $(TOP)/../tests
+SCRIPT_PATH = $(OUTTER_PATH)/scripts
+TEST_PATH = $(OUTTER_PATH)/tests
 LINT_SH = $(SCRIPT_PATH)/lint.sh
 
-DOXY_CONFIG_PATH = $(TOP)/../doc
+DOXY_CONFIG_PATH = $(OUTTER_PATH)/doc
 DOXY_CONFIG_FILE = XLang.config
 
 #==================

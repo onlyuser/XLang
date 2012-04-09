@@ -28,7 +28,8 @@
 #==================
 
 TOP = .
-SCRIPT_PATH = $(TOP)/../scripts
+OUTTER_PATH = ..
+SCRIPT_PATH = $(OUTTER_PATH)/scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
 DOT_SH = $(SCRIPT_PATH)/dot.sh
@@ -45,7 +46,7 @@ all : test
 #==================
 
 ifneq ($(strip $(BASIC_SUITE)),)
-    TEST_PATH = $(TOP)/basic_suite
+    TEST_PATH = basic_suite
     TEST_FILE_STEMS = \
             0_simple \
             1_op_prec \
@@ -53,12 +54,12 @@ ifneq ($(strip $(BASIC_SUITE)),)
             3_identifier
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
-    TEST_PATH = $(TOP)/advanced_suite
+    TEST_PATH = advanced_suite
     TEST_FILE_STEMS = \
             4_comments
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
-    TEST_PATH = $(TOP)/advanced_suite
+    TEST_PATH = advanced_suite
     TEST_FILE_STEMS = \
             5_strings
 endif
