@@ -19,11 +19,11 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE OUTPUT_FILE_STEM"
+    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE OUTPUT_FILE_TYPE OUTPUT_FILE_STEM"
 }
 
-if [ $# -ne 4 ]; then
-    echo "fail! -- expect 4 arguments! ==> $@"
+if [ $# -ne 5 ]; then
+    echo "fail! -- expect 5 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -34,7 +34,8 @@ trap "rm $TEMP_FILE" EXIT
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
-OUTPUT_FILE_STEM=$4
+OUTPUT_FILE_TYPE=$4
+OUTPUT_FILE_STEM=$5
 PNG_FILE=${OUTPUT_FILE_STEM}.png
 
 if [ ! -f $INPUT_FILE ]; then
@@ -59,7 +60,7 @@ case $INPUT_MODE in
 esac
 
 DOT_TOOL="dot"
-DOT_FLAGS="-Tpng"
+DOT_FLAGS="-T$OUTPUT_FILE_TYPE"
 $DOT_TOOL $DOT_FLAGS -o $PNG_FILE $TEMP_FILE
 
 echo "success!"

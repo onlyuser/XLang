@@ -66,8 +66,8 @@ case $INPUT_MODE in
         exit 1
         ;;
 esac
-diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 
+diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 if [ ${PIPESTATUS[0]} -ne 0 ]; then # $? captures the last pipe
     echo "fail!"
     cp $TEMP_FILE_1 $FAIL_FILE # TEMP_FILE_1 already trapped on exit

@@ -69,7 +69,7 @@ PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
-DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
+DOT_PNG_FILES = $(patsubst %, %.$(OUTPUT_FILE_TYPE), $(DOT_FILES))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
@@ -103,8 +103,11 @@ clean_pure :
 # dot
 #==================
 
-$(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
+OUTPUT_FILE_TYPE="png"
+
+$(BUILD_PATH)/%.test.dot.$(OUTPUT_FILE_TYPE) : $(BINARY) $(TEST_PATH)/%.test
 	-$(DOT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+			$(OUTPUT_FILE_TYPE) \
 			$(BUILD_PATH)/$*.test.dot
 
 .PHONY : dot
