@@ -59,7 +59,7 @@ private:
     size_t m_size_bytes;
 };
 
-// NOTE: doesn't work forarrays
+// NOTE: doesn't work for arrays
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number);
 
 #endif
