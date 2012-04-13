@@ -24,11 +24,24 @@
 
 namespace mvc {
 
+template<>
+node::NodeIdentIFace* MVCModel::make_leaf<std::string>(ParserContextIFace* pc, uint32_t sym_id, std::string value)
+{
+	node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
+			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
+			}) node::LeafNode<
+					static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<std::string>::value)
+					>(sym_id, value);
+	return node;
+}
+
 node::NodeIdentIFace* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_id, size_t child_count, ...)
 {
     va_list ap;
     va_start(ap, child_count);
-    node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, child_count, ap);
+    node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
+			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
+			}) node::InnerNode(sym_id, child_count, ap);
     va_end(ap);
     return node;
 }

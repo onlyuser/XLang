@@ -133,6 +133,19 @@ expression:
 
 %%
 
+const std::string* ParserContext::alloc_unique_string(std::string name)
+{
+    string_set_t::iterator p = m_string_set.find(&name);
+    if(p == m_string_set.end())
+    {
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
+                reinterpret_cast<std::string*>(x)->~basic_string();
+                }) std::string(name));
+        p = m_string_set.find(&name);
+    }
+    return *p;
+}
+
 ScannerContext::ScannerContext(FILE* file)
     : m_file(file), m_pos(0)
 {
@@ -143,8 +156,11 @@ ScannerContext::ScannerContext(FILE* file)
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__) ParserContext(alloc, file);
+    parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<ParserContext*>(x)->~ParserContext();
+            }) ParserContext(alloc, file);
     int error = _XLANG_parse(); // parser entry point
+    _XLANG_lex_destroy();
     return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
 }
 
@@ -232,6 +248,7 @@ bool do_work(args_t &args)
         return false;
     }
     node::NodeIdentIFace* ast = make_ast(alloc, file);
+    fclose(file);
     if(NULL == ast)
     {
         std::cout << errors().str().c_str() << std::endl;

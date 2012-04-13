@@ -49,7 +49,7 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
 
 #DEBUG = -g
-CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS)
+CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 

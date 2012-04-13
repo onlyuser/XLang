@@ -133,6 +133,19 @@ expression:
 
 %%
 
+const std::string* ParserContext::alloc_unique_string(std::string name)
+{
+    string_set_t::iterator p = m_string_set.find(&name);
+    if(p == m_string_set.end())
+    {
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
+                reinterpret_cast<std::string*>(x)->~basic_string();
+                }) std::string(name));
+        p = m_string_set.find(&name);
+    }
+    return *p;
+}
+
 ScannerContext::ScannerContext(const char* buf)
     : m_buf(buf), m_pos(0), m_length(strlen(buf))
 {
@@ -140,8 +153,11 @@ ScannerContext::ScannerContext(const char* buf)
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__) ParserContext(alloc, s);
+    parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<ParserContext*>(x)->~ParserContext();
+            }) ParserContext(alloc, s);
     int error = _XLANG_parse(); // parser entry point
+    _XLANG_lex_destroy();
     return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
 }
 

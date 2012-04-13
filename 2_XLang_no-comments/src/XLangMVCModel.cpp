@@ -28,7 +28,9 @@ node::NodeIdentIFace* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_
 {
     va_list ap;
     va_start(ap, child_count);
-    node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__) node::InnerNode(sym_id, loc, child_count, ap);
+    node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
+			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
+			}) node::InnerNode(sym_id, loc, child_count, ap);
     va_end(ap);
     return node;
 }

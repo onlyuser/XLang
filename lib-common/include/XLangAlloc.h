@@ -21,11 +21,13 @@
 #include <map> // std::map
 #include <string> // std::string
 #include <stddef.h> // size_t
+#include <list> // std::list
 
 class MemChunk
 {
 public:
-    MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number);
+    typedef void (*dtor_type)(void*);
+    MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_type dtor = NULL);
     ~MemChunk();
     void* ptr() const { return m_ptr; }
     size_t size() const { return m_size_bytes; }
@@ -34,10 +36,11 @@ public:
     void dump(std::string indent) const;
 
 private:
-    void* m_ptr;
     size_t m_size_bytes;
     std::string m_filename;
     size_t m_line_number;
+    dtor_type m_dtor;
+    void* m_ptr;
 };
 
 class Allocator
@@ -47,7 +50,7 @@ public:
     ~Allocator();
     std::string name() const { return m_name; }
     size_t size() const { return m_size_bytes; }
-    void* _malloc(size_t size_bytes, std::string filename, size_t line_number);
+    void* _malloc(size_t size_bytes, std::string filename, size_t line_number, MemChunk::dtor_type dtor = NULL);
     void _free(void* ptr);
     void _free();
     void dump(std::string indent) const;
@@ -60,6 +63,8 @@ private:
 };
 
 // NOTE: doesn't work for arrays
+void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number,
+		MemChunk::dtor_type dtor);
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number);
 
 #endif

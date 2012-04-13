@@ -147,6 +147,26 @@ expression:
 
 %%
 
+const std::string* ParserContext::alloc_unique_string(std::string name)
+{
+    string_set_t::iterator p = m_string_set.find(&name);
+    if(p == m_string_set.end())
+    {
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
+                reinterpret_cast<std::string*>(x)->~basic_string();
+                }) std::string(name));
+        p = m_string_set.find(&name);
+    }
+    return *p;
+}
+
+std::string* ParserContext::alloc_string(std::string s)
+{
+    return new (m_alloc, __FILE__, __LINE__, [](void *x) {
+            reinterpret_cast<std::string*>(x)->~basic_string();
+            }) std::string(s);
+}
+
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
       m_line(1), m_column(1), m_prev_column(1)

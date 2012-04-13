@@ -21,8 +21,8 @@
 #include <stdlib.h> // malloc
 #include <stddef.h> // size_t
 
-MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number)
-    : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number)
+MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_type dtor)
+    : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number), m_dtor(dtor)
 {
     m_ptr = malloc(_size_bytes);
 }
@@ -30,7 +30,11 @@ MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_numbe
 MemChunk::~MemChunk()
 {
     if(m_ptr)
+    {
+    	if(m_dtor)
+    		m_dtor(m_ptr);
         free(m_ptr);
+    }
 }
 
 void MemChunk::dump(std::string indent) const
@@ -47,9 +51,10 @@ Allocator::~Allocator()
     _free();
 }
 
-void* Allocator::_malloc(size_t size_bytes, std::string filename, size_t line_number)
+void* Allocator::_malloc(size_t size_bytes, std::string filename, size_t line_number,
+		MemChunk::dtor_type dtor)
 {
-    MemChunk* chunk = new MemChunk(size_bytes, filename, line_number);
+    MemChunk* chunk = new MemChunk(size_bytes, filename, line_number, dtor);
     m_size_bytes += size_bytes;
     m_chunk_map.insert(internal_type::value_type(chunk->ptr(), chunk));
     return chunk->ptr();
@@ -85,7 +90,13 @@ void Allocator::dump(std::string indent) const
     std::cout << "};" << std::endl;
 }
 
+void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number,
+		MemChunk::dtor_type dtor)
+{
+    return alloc._malloc(size_bytes, filename, line_number, dtor);
+}
+
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number)
 {
-    return alloc._malloc(size_bytes, filename, line_number);
+    return alloc._malloc(size_bytes, filename, line_number, NULL);
 }

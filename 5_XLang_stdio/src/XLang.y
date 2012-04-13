@@ -133,10 +133,26 @@ expression:
 
 %%
 
+const std::string* ParserContext::alloc_unique_string(std::string name)
+{
+    string_set_t::iterator p = m_string_set.find(&name);
+    if(p == m_string_set.end())
+    {
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
+                reinterpret_cast<std::string*>(x)->~basic_string();
+                }) std::string(name));
+        p = m_string_set.find(&name);
+    }
+    return *p;
+}
+
 node::NodeIdentIFace* make_ast(Allocator &alloc)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__) ParserContext(alloc);
+    parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<ParserContext*>(x)->~ParserContext();
+            }) ParserContext(alloc);
     int error = _XLANG_parse(); // parser entry point
+    _XLANG_lex_destroy();
     return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
 }
 

@@ -34,17 +34,7 @@ public:
         : m_alloc(alloc), m_root(NULL) {}
     Allocator &alloc() { return m_alloc; }
     node::NodeIdentIFace* &root() { return m_root; }
-
-    const std::string* alloc_unique_string(std::string name)
-    {
-        string_set_t::iterator p = m_string_set.find(&name);
-        if(p == m_string_set.end())
-        {
-            m_string_set.insert(new (m_alloc, __FILE__, __LINE__) std::string(name));
-            p = m_string_set.find(&name);
-        }
-        return *p;
-    }
+    const std::string* alloc_unique_string(std::string name);
 
 private:
     Allocator &m_alloc;
@@ -65,8 +55,10 @@ private:
 // so the compiler shuts up about warnings
 //
 int _XLANG_lex();
+int _XLANG_lex_destroy();
 int _XLANG_parse();
 void _XLANG_error(const char* s);
+int _XLANG_lex_destroy();
 
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
