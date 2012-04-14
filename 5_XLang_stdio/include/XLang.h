@@ -58,7 +58,6 @@ int _XLANG_lex();
 int _XLANG_lex_destroy();
 int _XLANG_parse();
 void _XLANG_error(const char* s);
-int _XLANG_lex_destroy();
 
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);

@@ -228,6 +228,14 @@ expression:
 
 %%
 
+ScannerContext::ScannerContext(FILE* file)
+    : m_file(file), m_pos(0)
+{
+    fseek(file, 0, SEEK_END);
+    m_length = ftell(file);
+    rewind(file);
+}
+
 const std::string* ParserContext::alloc_unique_string(std::string name)
 {
     string_set_t::iterator p = m_string_set.find(&name);
@@ -239,14 +247,6 @@ const std::string* ParserContext::alloc_unique_string(std::string name)
         p = m_string_set.find(&name);
     }
     return *p;
-}
-
-ScannerContext::ScannerContext(FILE* file)
-    : m_file(file), m_pos(0)
-{
-    fseek(file, 0, SEEK_END);
-    m_length = ftell(file);
-    rewind(file);
 }
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)

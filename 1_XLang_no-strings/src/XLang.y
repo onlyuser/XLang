@@ -141,6 +141,12 @@ expression:
 
 %%
 
+ScannerContext::ScannerContext(const char* buf)
+    : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
+      m_line(1), m_column(1), m_prev_column(1)
+{
+}
+
 const std::string* ParserContext::alloc_unique_string(std::string name)
 {
     string_set_t::iterator p = m_string_set.find(&name);
@@ -152,12 +158,6 @@ const std::string* ParserContext::alloc_unique_string(std::string name)
         p = m_string_set.find(&name);
     }
     return *p;
-}
-
-ScannerContext::ScannerContext(const char* buf)
-    : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
-      m_line(1), m_column(1), m_prev_column(1)
-{
 }
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)

@@ -147,6 +147,13 @@ expression:
 
 %%
 
+std::string* ParserContext::alloc_string(std::string s)
+{
+    return new (m_alloc, __FILE__, __LINE__, [](void *x) {
+            reinterpret_cast<std::string*>(x)->~basic_string();
+            }) std::string(s);
+}
+
 const std::string* ParserContext::alloc_unique_string(std::string name)
 {
     string_set_t::iterator p = m_string_set.find(&name);
@@ -158,13 +165,6 @@ const std::string* ParserContext::alloc_unique_string(std::string name)
         p = m_string_set.find(&name);
     }
     return *p;
-}
-
-std::string* ParserContext::alloc_string(std::string s)
-{
-    return new (m_alloc, __FILE__, __LINE__, [](void *x) {
-            reinterpret_cast<std::string*>(x)->~basic_string();
-            }) std::string(s);
 }
 
 ScannerContext::ScannerContext(const char* buf)
