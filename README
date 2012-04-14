@@ -5,13 +5,13 @@ Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
-    This is a tutorial inspired by Tom Niemann's excellent "Compact Guide to
-    Lex/Yacc". 7 variations of Flex/Bison parser are presented, varying in feature
-    richness.
+    This is a parser "framework" inspired by Tom Niemann's excellent "Compact Guide
+    to Lex/Yacc". 7 variations of Flex/Bison parser are presented, varying in
+    feature richness.
 
-    The first variation, "0_XLang_full", is a full-featured parser.
-    With each successive variation, non-critical features are stripped until there is
-    nothing left but a flex-less parser, "7_XLang_no-flex".
+    The first variation, "0_XLang_full", is a full-featured parser. With each
+    successive variation, non-critical features are stripped until there is nothing
+    left but a flex-less parser, "7_XLang_no-flex".
 
     feature <--                                                         --> feature
     rich                                                                    poor
@@ -24,26 +24,26 @@ About:
     reason one cannot cannot have both "comments" and "file input" enabled, or both
     "reentrant" and "hand-rolled lexer" enabled.
 
-    The tutorial is organized in a way that anyone unfamiliar with Flex/Bison can
+    The code is organized in a way that anyone unfamiliar with Flex/Bison can
     quickly isolate a variation that is most relevent, and most readily customizable
-    according to his/her specific requirements.
+    to his/her specific requirements.
 
 Variation vs Feature Table:
 
                  more                                                       less
                  critical <--                                           --> critical
-+--------------+-------------+---------+-----------+-----------+----------+---------+
-| variation    | lexer       | input   | reentrant | locations | comments | strings |
-+--------------+-------------+---------+-----------+-----------+----------+---------+
-| full         | flex        | buffer  | yes       | yes       | yes      | yes     |
-| no-strings   | flex        | buffer  | yes       | yes       | yes      | no      |
-| no-comments  | flex        | buffer  | yes       | yes       | no       | no      |
-| no-locations | flex        | buffer  | yes       | no        | no       | no      |
-| no-reentrant | flex        | buffer  | no        | no        | no       | no      |
-| stdio        | flex        | stdio   | no        | no        | no       | no      |
-| file         | flex        | file    | no        | no        | no       | no      |
-| no-flex      | hand-rolled | file    | no        | no        | no       | no      |
-+--------------+-------------+---------+-----------+-----------+----------+---------+
++--------------+-------------+--------+-----------+-----------+----------+---------+
+| variation    | lexer       | input  | reentrant | locations | comments | strings |
++--------------+-------------+--------+-----------+-----------+----------+---------+
+| full         | flex        | buffer | yes       | yes       | yes      | yes     |
+| no-strings   | flex        | buffer | yes       | yes       | yes      | no      |
+| no-comments  | flex        | buffer | yes       | yes       | no       | no      |
+| no-locations | flex        | buffer | yes       | no        | no       | no      |
+| no-reentrant | flex        | buffer | no        | no        | no       | no      |
+| stdio        | flex        | stdio  | no        | no        | no       | no      |
+| file         | flex        | file   | no        | no        | no       | no      |
+| no-flex      | hand-rolled | file   | no        | no        | no       | no      |
++--------------+-------------+--------+-----------+-----------+----------+---------+
 
     HINT: The "stdio" variation is easiest to implement -- The flex lexer accepts
           standard stream input by default. It takes extra effort to hack flex into
@@ -54,12 +54,14 @@ Feature Detail:
     lexer:
 
         flex: Use flex to generate a lexer.
-              This option is preferred when regex significantly simplifies the lexer.
+              This option is preferred when regex significantly simplifies the
+              lexer.
 
         hand-rolled: Use a custom lexer.
-                     This option is preferred when speed is critical -- Flex is slow.
-                     This option is also preferred when unicode support is needed --
-                     Flex has no unicode support as of the time of this writing.
+                     This option is preferred when speed is critical -- Flex is
+                     slow. This option is also preferred when unicode support is
+                     needed -- Flex has no unicode support as of the time of this
+                     writing.
 
     input:
 
