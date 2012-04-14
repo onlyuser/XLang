@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE OUTPUT_FILE_TYPE OUTPUT_FILE_STEM"
+    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE_TYPE> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
@@ -48,7 +48,7 @@ case $INPUT_MODE in
         $EXEC --dot --file $INPUT_FILE | tee $TEMP_FILE
         ;;
     "stdin")
-        echo `cat $INPUT_FILE` | $EXEC --dot | tee $TEMP_FILE
+        cat $INPUT_FILE | $EXEC --dot | tee $TEMP_FILE
         ;;
     "arg")
         $EXEC --dot --input `cat $INPUT_FILE` | tee $TEMP_FILE

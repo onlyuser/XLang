@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename 0` LINT_TOOL INPUT_FILE OUTPUT_FILE_STEM LINT_FLAGS.."
+    echo "Usage: `basename 0` <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> [LINT_FLAGS..]"
 }
 
 if [ $# -lt 3 ]; then

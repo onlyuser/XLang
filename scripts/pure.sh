@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE GOLD_KEYWORD OUTPUT_FILE_STEM"
+    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_KEYWORD> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
@@ -56,7 +56,7 @@ case $INPUT_MODE in
         $PURE_TOOL $PURE_FLAGS $EXEC --lisp --file $INPUT_FILE 2> $TEMP_FILE
         ;;
     "stdin")
-        echo `cat $INPUT_FILE` | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
+        cat $INPUT_FILE | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
         ;;
     "arg")
         $PURE_TOOL $PURE_FLAGS $EXEC --lisp --input `cat $INPUT_FILE` 2> $TEMP_FILE

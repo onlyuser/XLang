@@ -19,11 +19,11 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` EXEC INPUT_MODE INPUT_FILE GOLD_FILE OUTPUT_FILE_STEM"
+    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
-    echo "fail! -- expect 6 arguments! ==> $@"
+    echo "fail! -- expect 5 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -56,7 +56,7 @@ case $INPUT_MODE in
         $EXEC --lisp --file $INPUT_FILE > $TEMP_FILE_0
         ;;
     "stdin")
-        echo `cat $INPUT_FILE` | $EXEC --lisp > $TEMP_FILE_0
+        cat $INPUT_FILE | $EXEC --lisp > $TEMP_FILE_0
         ;;
     "arg")
         $EXEC --lisp --input `cat $INPUT_FILE` > $TEMP_FILE_0
