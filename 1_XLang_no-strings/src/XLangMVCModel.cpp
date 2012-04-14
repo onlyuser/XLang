@@ -24,13 +24,13 @@
 
 namespace mvc {
 
-node::NodeIdentIFace* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t child_count, ...)
+node::NodeIdentIFace* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
 {
     va_list ap;
-    va_start(ap, child_count);
+    va_start(ap, size);
     node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
-			}) node::InnerNode(sym_id, loc, child_count, ap);
+			}) node::InnerNode(sym_id, loc, size, ap);
     va_end(ap);
     return node;
 }

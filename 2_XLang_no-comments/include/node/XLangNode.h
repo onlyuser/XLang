@@ -78,10 +78,10 @@ private:
 class InnerNode : virtual public Node, public InnerNodeIFace
 {
 public:
-    InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _child_count, va_list ap)
+    InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
         : Node(NodeIdentIFace::INNER, _sym_id, loc)
     {
-        for(size_t i = 0; i<_child_count; i++)
+        for(size_t i = 0; i<_size; i++)
         {
             NodeIdentIFace* _node = va_arg(ap, NodeIdentIFace*);
             if(is_same_type(_node))
@@ -100,7 +100,7 @@ public:
     {
         return m_child_vec[index];
     }
-    size_t child_count() const
+    size_t size() const
     {
         return m_child_vec.size();
     }

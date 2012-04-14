@@ -33,30 +33,31 @@ void InnerNode::accept(NodeVisitorIFace* visitor) const
     visitor->visit(this);
     std::cout << ' ';
     size_t i;
-    for(i = 0; i < child_count(); i++)
+    for(i = 0; i < size(); i++)
     {
-        switch(child(i)->type())
+    	NodeIdentIFace* child = operator[](i);
+        switch(child->type())
         {
         case NodeIdentIFace::INT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child(i)));
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child));
             break;
         case NodeIdentIFace::FLOAT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child(i)));
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child));
             break;
         case NodeIdentIFace::STRING:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child(i)));
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child));
             break;
         case NodeIdentIFace::CHAR:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child(i)));
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child));
             break;
         case NodeIdentIFace::IDENT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child(i)));
+            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child));
             break;
         case NodeIdentIFace::INNER:
-            dynamic_cast<const node::VisitableNodeIFace*>(child(i))->accept(visitor);
+            dynamic_cast<const node::VisitableNodeIFace*>(child)->accept(visitor);
             break;
         }
-        if(i < child_count()-1)
+        if(i < size()-1)
             std::cout << ' ';
     }
     std::cout << ')';

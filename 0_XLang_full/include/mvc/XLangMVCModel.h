@@ -37,7 +37,7 @@ struct MVCModel
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
                 >(sym_id, loc, value);
     }
-    static node::NodeIdentIFace* make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t child_count, ...);
+    static node::NodeIdentIFace* make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
 };
 
 }

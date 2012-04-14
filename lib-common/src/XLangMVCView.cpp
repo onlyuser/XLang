@@ -63,12 +63,12 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
             {
                 std::cout << '(' << dynamic_cast<const node::InnerNodeIFace*>(_node)->name() << ' ';
                 size_t i;
-                for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count()-1; i++)
+                for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size()-1; i++)
                 {
-                    print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
+                    print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i));
                     std::cout << ' ';
                 }
-                print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i));
+                print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i));
                 std::cout << ')';
             }
             break;
@@ -117,10 +117,10 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
     		"\t\tshape=\"ellipse\"" << std::endl <<
     		"\t];" << std::endl;
     if(_node->type() == node::NodeIdentIFace::INNER)
-		for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->child_count(); i++)
+		for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
 		{
 			const node::NodeIdentIFace* child =
-					dynamic_cast<const node::InnerNodeIFace*>(_node)->child(i);
+					dynamic_cast<const node::InnerNodeIFace*>(_node)->operator [](i);
 			std::cout << '\t' << node_uid << "->" << dot_node_uid(child) << ";" << std::endl;
 			print_dot(child, depth+1);
 		}
@@ -221,15 +221,15 @@ void exNode
 
     /* node is leaf */
     if (p->type() != typeOpr ||
-            dynamic_cast<const node::InnerNodeIFace*>(p)->child_count() == 0) {
+            dynamic_cast<const node::InnerNodeIFace*>(p)->size() == 0) {
         graphDrawBox (s, cbar, l);
         return;
     }
 
     /* node has children */
     cs = c;
-    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->child_count(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->child(k), cs, l+h+eps, &che, &chm);
+    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
+        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         cs = che;
     }
 
@@ -245,8 +245,8 @@ void exNode
 
     /* draw arrows (not optimal: children are drawn a second time) */
     cs = c;
-    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->child_count(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->child(k), cs, l+h+eps, &che, &chm);
+    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
+        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         graphDrawArrow (*cm, l+h, chm, l+h+eps-1);
         cs = che;
     }

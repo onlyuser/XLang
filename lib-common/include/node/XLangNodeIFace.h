@@ -73,8 +73,8 @@ struct InnerNodeIFace
 {
     virtual ~InnerNodeIFace() { }
     virtual std::string name() const = 0;
-    virtual NodeIdentIFace* child(uint32_t index) const = 0;
-    virtual size_t child_count() const = 0;
+    virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
+    virtual size_t size() const = 0;
 };
 
 }
