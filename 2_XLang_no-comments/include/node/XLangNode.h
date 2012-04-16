@@ -96,7 +96,7 @@ public:
         }
     }
     std::string name() const;
-    NodeIdentIFace* child(uint32_t index) const
+    NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
     }

@@ -16,16 +16,16 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 CXX = g++
-LINT = cppcheck
+LINT_TOOL = cppcheck
 
 #==================
 # compile flags
 #==================
 
-OUTTER_PATH = ..
+PARENT_PATH = ..
 INCLUDE_PATH = include
 LIB_PATH = lib
-PARENT_LIB_PATH = $(OUTTER_PATH)/lib
+PARENT_LIB_PATH = $(PARENT_PATH)/lib
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
@@ -50,9 +50,9 @@ CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
-LINT_SH = $(OUTTER_PATH)/lint.sh
+LINT_SH = $(PARENT_PATH)/lint.sh
 
-DOXY_CONFIG_PATH = $(OUTTER_PATH)/doc
+DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
 DOXY_CONFIG_FILE = XLang.config
 
 #==================
@@ -107,7 +107,7 @@ LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
 
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
-	-$(LINT_SH) $(LINT) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
+	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
 
 .PHONY : lint
 lint : $(LINT_PASS_FILES)

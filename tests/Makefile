@@ -28,8 +28,8 @@
 #==================
 
 TOP = .
-OUTTER_PATH = ..
-SCRIPT_PATH = $(OUTTER_PATH)/scripts
+PARENT = ..
+SCRIPT_PATH = $(PARENT)/scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
 DOT_SH = $(SCRIPT_PATH)/dot.sh
