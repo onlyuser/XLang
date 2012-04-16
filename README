@@ -89,6 +89,22 @@ Feature Detail:
              stateful scanning. This option demonstrates *one* of the many ways to
              handle strings, characters, and escaped characters.
 
+Requirements:
+
+    gcc (with -std=c++0x support), valgrind, cppcheck, doxygen, dot
+
+Make targets:
+
+    all, test, pure, dot, lint, doc, clean.
+
+    all:   make binaries
+    test:  all + run tests
+    pure:  test + use valgrind to check for memory leaks
+    dot:   test + generate .png graph for tests
+    lint:  use cppcheck to run static analysis on .cpp files
+    doc:   use doxygen to generate documentation
+    clean: remove all target-generated files
+
 References:
 
     "Flex your lexical analysis muscles"
