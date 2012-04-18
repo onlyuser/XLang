@@ -19,21 +19,17 @@
 
 show_help()
 {
-    echo "Usage: `basename 0` <LINT_TOOL> <INPUT_FILE> <OUTPUT_FILE_STEM> [LINT_FLAGS..]"
+    echo "Usage: `basename 0` <INPUT_FILE> <OUTPUT_FILE_STEM> [LINT_FLAGS..]"
 }
 
-if [ $# -lt 3 ]; then
-    echo "fail! -- expect at least 3 arguments! ==> $@"
+if [ $# -lt 2 ]; then
+    echo "fail! -- expect at least 2 arguments! ==> $@"
     show_help
     exit 1
 fi
 
-TEMP_FILE=`mktemp`
-trap "rm $TEMP_FILE" EXIT
-
-LINT_TOOL=$1
-INPUT_FILE=$2
-OUTPUT_FILE_STEM=$3
+INPUT_FILE=$1
+OUTPUT_FILE_STEM=$2
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 
@@ -45,13 +41,14 @@ fi
 COUNT=0
 for ARG in "$@"; do
     ((COUNT+=1))
-    if [ $COUNT -gt 3 ]; then
-        LINT_FLAGS="$LINT_FLAGS $ARG"
+    if [ $COUNT -gt 2 ]; then
+        INCLUDE_PATH_FLAGS="$INCLUDE_PATH_FLAGS $ARG"
     fi
 done
 
-echo "$LINT_TOOL $INPUT_FILE $LINT_FLAGS" >& $TEMP_FILE
-FILE_DATA=`$LINT_TOOL $INPUT_FILE $LINT_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
+LINT_TOOL="cppcheck"
+LINT_FLAGS="-v --enable=all"
+FILE_DATA=`$LINT_TOOL $LINT_FLAGS $INPUT_FILE $INCLUDE_PATH_FLAGS |& grep -v "not found\|Checking" |& sed "/^$/d"`
 if [ -n "$FILE_DATA" ]; then
     echo "fail!"
     echo -e "$FILE_DATA" > $FAIL_FILE

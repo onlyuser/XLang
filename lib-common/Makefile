@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CXX = g++
-LINT_TOOL = cppcheck
-
 #==================
 # compile flags
 #==================
@@ -41,19 +38,16 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 # NOTE: this project does not use OpenGL, but just for example, additional libs
 #       can be added here.
 
-#LIB_STEMS = glut32 glu32 opengl32
-#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
-LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS))
+#EXTERN_LIB_STEMS = glut32 glu32 opengl32
+#EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
+CXX = g++
 #DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
-LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
-LINT_SH = $(PARENT_PATH)/lint.sh
-
-DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
-DOXY_CONFIG_FILE = XLang.config
+SCRIPT_PATH = $(PARENT_PATH)/scripts
 
 #==================
 # all
@@ -87,14 +81,14 @@ CPP_STEMS = \
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(LIBS) $(OBJECTS)
+$(BINARY) : $(EXTERN_LIBS) $(OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(AR) -cvq $@ $^
 	mkdir -p $(PARENT_LIB_PATH)
 	cp $@ $(INSTALL_BINARY)
 
 .PHONY : clean_binary
-clean_binary :
+clean_binary : clean_objects
 	-rm $(BINARY)
 	-rm $(INSTALL_BINARY)
 
@@ -105,9 +99,11 @@ clean_binary :
 LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
 LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
 
+LINT_SH = $(SCRIPT_PATH)/lint.sh
+
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
-	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint.pass $(LINTFLAGS)
+	-$(LINT_SH) $< $(BUILD_PATH)/$*.lint $(INCLUDE_PATH_FLAGS)
 
 .PHONY : lint
 lint : $(LINT_PASS_FILES)
@@ -120,21 +116,25 @@ clean_lint :
 # doc
 #==================
 
+DOC_PATH = $(PARENT_PATH)/doc
+DOC_CONFIG_FILE = XLang.config
+DOC_TOOL = doxygen
+
 .PHONY : doc
 doc :
 	mkdir -p $(BUILD_PATH)
-	-ln -s ../$(DOXY_CONFIG_PATH)/$(DOXY_CONFIG_FILE) $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
-	cd $(BUILD_PATH); doxygen $(DOXY_CONFIG_FILE)
+	-ln -s ../$(DOC_PATH)/$(DOC_CONFIG_FILE) $(BUILD_PATH)/$(DOC_CONFIG_FILE)
+	cd $(BUILD_PATH); $(DOC_TOOL) $(DOC_CONFIG_FILE)
 
 .PHONY : clean_doc
 clean_doc :
 	rm -rf $(BUILD_PATH)/html
-	rm -rf $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
+	rm -rf $(BUILD_PATH)/$(DOC_CONFIG_FILE)
 
 #==================
 # clean
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_lint clean_doc
-	-rmdir $(BUILD_PATH) $(BIN_PATH) $(PARENT_LIB_PATH)
+clean : clean_binary clean_lint clean_doc
+	-rmdir $(BUILD_PATH) $(BIN_PATH)

@@ -51,9 +51,6 @@ LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS)) \
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
-LINT_TOOL = cppcheck
-LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
-
 SCRIPT_PATH = $(PARENT_PATH)/scripts
 TEST_PATH = $(PARENT_PATH)/tests
 
@@ -196,7 +193,7 @@ LINT_SH = $(SCRIPT_PATH)/lint.sh
 
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
-	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
+	-$(LINT_SH) $< $(BUILD_PATH)/$*.lint $(INCLUDE_PATH_FLAGS)
 
 .PHONY : lint
 lint : $(LINT_PASS_FILES)
@@ -209,19 +206,20 @@ clean_lint :
 # doc
 #==================
 
-DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
-DOXY_CONFIG_FILE = XLang.config
+DOC_PATH = $(PARENT_PATH)/doc
+DOC_CONFIG_FILE = XLang.config
+DOC_TOOL = doxygen
 
 .PHONY : doc
 doc :
 	mkdir -p $(BUILD_PATH)
-	-ln -s ../$(DOXY_CONFIG_PATH)/$(DOXY_CONFIG_FILE) $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
-	cd $(BUILD_PATH); doxygen $(DOXY_CONFIG_FILE)
+	-ln -s ../$(DOC_PATH)/$(DOC_CONFIG_FILE) $(BUILD_PATH)/$(DOC_CONFIG_FILE)
+	cd $(BUILD_PATH); $(DOC_TOOL) $(DOC_CONFIG_FILE)
 
 .PHONY : clean_doc
 clean_doc :
 	rm -rf $(BUILD_PATH)/html
-	rm -rf $(BUILD_PATH)/$(DOXY_CONFIG_FILE)
+	rm -rf $(BUILD_PATH)/$(DOC_CONFIG_FILE)
 
 #==================
 # clean
