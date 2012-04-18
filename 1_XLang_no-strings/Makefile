@@ -15,13 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#DEBUG = -g
-CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
-LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
-
-LINT_TOOL = cppcheck
-LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
-
 #==================
 # compile flags
 #==================
@@ -51,6 +44,13 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 #EXTERN_LIB_STEMS = glut32 glu32 opengl32
 #EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIBS))
+
+#DEBUG = -g
+CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+
+LINT_TOOL = cppcheck
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
 TEST_PATH = $(PARENT_PATH)/tests
