@@ -179,6 +179,7 @@ void display_usage(bool verbose)
                 << "Output control:" << std::endl
                 << "  -i, --input" << std::endl
                 << "  -l, --lisp" << std::endl
+                << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
                 << "  -d, --dot" << std::endl
                 << "  -m, --memory" << std::endl;
@@ -192,6 +193,7 @@ struct args_t
     {
         MODE_NONE,
         MODE_LISP,
+        MODE_XML,
         MODE_GRAPH,
         MODE_DOT,
         MODE_HELP
@@ -209,10 +211,11 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "i:lgdmh?";
+    static const char *optString = "i:lxgdmh?";
     static const struct option longOpts[] = {
                 { "input",  required_argument, NULL, 'i' },
                 { "lisp",   no_argument, NULL, 'l' },
+                { "xml",    no_argument, NULL, 'x' },
                 { "graph",  no_argument, NULL, 'g' },
                 { "dot",    no_argument, NULL, 'd' },
                 { "memory", no_argument, NULL, 'm' },
@@ -226,6 +229,7 @@ bool parse_args(int argc, char** argv, args_t &args)
         {
             case 'i': args.input = optarg; break;
             case 'l': args.mode = args_t::MODE_LISP; break;
+            case 'x': args.mode = args_t::MODE_XML; break;
             case 'g': args.mode = args_t::MODE_GRAPH; break;
             case 'd': args.mode = args_t::MODE_DOT; break;
             case 'm': args.dump_memory = true; break;
@@ -272,6 +276,7 @@ bool do_work(args_t &args)
                 #endif
             }
             break;
+        case args_t::MODE_XML:   mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: mvc::MVCView::print_graph(ast); break;
         case args_t::MODE_DOT:   mvc::MVCView::print_dot(ast); break;
         case args_t::MODE_HELP:  display_usage(true); break;

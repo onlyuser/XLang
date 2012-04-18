@@ -156,13 +156,13 @@ clean_tests :
 
 .PHONY : pure
 pure : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile pure \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_pure
 clean_pure :
-	cd $(TEST_PATH); $(MAKE) -f Makefile clean_pure \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
 
@@ -172,13 +172,29 @@ clean_pure :
 
 .PHONY : dot
 dot : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile dot \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_dot
 clean_dot :
-	cd $(TEST_PATH); $(MAKE) -f Makefile clean_dot \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+
+#==================
+# xml
+#==================
+
+.PHONY : xml
+xml : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
+
+.PHONY : clean_xml
+clean_xml :
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
 

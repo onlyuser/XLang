@@ -75,6 +75,55 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
     }
 }
 
+void MVCView::print_xml(const node::NodeIdentIFace* _node, size_t depth)
+{
+    if(NULL == _node)
+        return;
+    std::cout << std::string(depth, '\t');
+    switch(_node->type())
+    {
+        case node::NodeIdentIFace::INT:
+            std::cout << "<leaf type=\"int\" value=";
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
+            std::cout << "/>";
+            break;
+        case node::NodeIdentIFace::FLOAT:
+            std::cout << "<leaf type=\"float\" value=";
+            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
+            std::cout << "/>";
+            break;
+        case node::NodeIdentIFace::STRING:
+            std::cout << "<leaf type=\"string\" value=";
+            std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
+            std::cout << "/>";
+            break;
+        case node::NodeIdentIFace::CHAR:
+            std::cout << "<leaf type=\"char\" value=";
+            std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
+            std::cout << "/>";
+            break;
+        case node::NodeIdentIFace::IDENT:
+            std::cout << "<leaf type=\"ident\" value=";
+            std::cout << '\"' << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value() << '\"';
+            std::cout << "/>";
+            break;
+        case node::NodeIdentIFace::INNER:
+            {
+                std::cout << "<inner name=\"" << dynamic_cast<const node::InnerNodeIFace*>(_node)->name()
+                		<< "\">" << std::endl;
+                for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
+                {
+                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i), depth+1);
+                    std::cout << std::endl;
+                }
+                std::cout << std::string(depth, '\t') << "</inner>";
+            }
+            break;
+    }
+    if(depth == 0)
+    	std::cout << std::endl;
+}
+
 static std::string dot_node_uid(const void* x)
 {
     std::stringstream ss;
@@ -83,11 +132,11 @@ static std::string dot_node_uid(const void* x)
     return s;
 }
 
-void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
+void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
 {
     if(NULL == _node)
         return;
-    if(depth == 0)
+    if(root)
     	std::cout << "digraph g {" << std::endl;
     std::string node_uid = dot_node_uid(_node);
     std::cout << "\t\"" << node_uid << "\" [" << std::endl <<
@@ -122,9 +171,9 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, size_t depth)
 			const node::NodeIdentIFace* child =
 					dynamic_cast<const node::InnerNodeIFace*>(_node)->operator [](i);
 			std::cout << '\t' << node_uid << "->" << dot_node_uid(child) << ";" << std::endl;
-			print_dot(child, depth+1);
+			print_dot(child, false);
 		}
-    if(depth == 0)
+    if(root)
     	std::cout << "}" << std::endl;
 }
 

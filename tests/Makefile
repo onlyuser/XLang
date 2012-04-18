@@ -32,7 +32,7 @@ PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
-DOT_SH = $(SCRIPT_PATH)/dot.sh
+EMIT_SH = $(SCRIPT_PATH)/emit.sh
 
 #==================
 # all
@@ -70,7 +70,8 @@ PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
-DOT_PNG_FILES = $(patsubst %, %.$(OUTPUT_FILE_TYPE), $(DOT_FILES))
+DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
+XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
@@ -104,11 +105,9 @@ clean_pure :
 # dot
 #==================
 
-OUTPUT_FILE_TYPE="png"
-
-$(BUILD_PATH)/%.test.dot.$(OUTPUT_FILE_TYPE) : $(BINARY) $(TEST_PATH)/%.test
-	-$(DOT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
-			$(OUTPUT_FILE_TYPE) \
+$(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
+	-$(EMIT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+			png \
 			$(BUILD_PATH)/$*.test.dot
 
 .PHONY : dot
@@ -119,8 +118,24 @@ clean_dot :
 	-rm $(DOT_PNG_FILES)
 
 #==================
+# xml
+#==================
+
+$(BUILD_PATH)/%.test.xml : $(BINARY) $(TEST_PATH)/%.test
+	-$(EMIT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+			xml \
+			$(BUILD_PATH)/$*.test
+
+.PHONY : xml
+xml : $(XML_FILES)
+
+.PHONY : clean_xml
+clean_xml :
+	-rm $(XML_FILES)
+
+#==================
 # clean
 #==================
 
 .PHONY : clean
-clean : clean_tests clean_pure clean_dot
+clean : clean_tests clean_pure clean_dot clean_xml

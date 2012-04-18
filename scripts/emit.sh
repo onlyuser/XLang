@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE_TYPE> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
@@ -28,38 +28,35 @@ if [ $# -ne 5 ]; then
     exit 1
 fi
 
-TEMP_FILE_0=`mktemp`
-trap "rm $TEMP_FILE_0" EXIT
-TEMP_FILE_1=`mktemp`
-trap "rm $TEMP_FILE_1" EXIT
+TEMP_FILE=`mktemp`
+trap "rm $TEMP_FILE" EXIT
 
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
-GOLD_FILE=$4
+OUTPUT_FILE_TYPE=$4
 OUTPUT_FILE_STEM=$5
-PASS_FILE=${OUTPUT_FILE_STEM}.pass
-FAIL_FILE=${OUTPUT_FILE_STEM}.fail
+OUTPUT_FILE="${OUTPUT_FILE_STEM}.$OUTPUT_FILE_TYPE"
 
 if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- INPUT_FILE not found! ==> $INPUT_FILE"
     exit 1
 fi
 
-if [ ! -f $GOLD_FILE ]; then
-    echo "fail! -- GOLD_FILE not found! ==> $GOLD_FILE"
-    exit 1
-fi
+case $OUTPUT_FILE_TYPE in
+    "bmp"|"jpg"|"gif"|"png") EXEC_FLAGS="--dot" ;;
+    "xml")                   EXEC_FLAGS="--xml" ;;
+esac
 
 case $INPUT_MODE in
     "file")
-        $EXEC --lisp --file $INPUT_FILE > $TEMP_FILE_0
+        $EXEC $EXEC_FLAGS --file $INPUT_FILE | tee $TEMP_FILE
         ;;
     "stdin")
-        cat $INPUT_FILE | $EXEC --lisp > $TEMP_FILE_0
+        cat $INPUT_FILE | $EXEC $EXEC_FLAGS | tee $TEMP_FILE
         ;;
     "arg")
-        $EXEC --lisp --input `cat $INPUT_FILE` > $TEMP_FILE_0
+        $EXEC $EXEC_FLAGS --input `cat $INPUT_FILE` | tee $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"
@@ -67,11 +64,12 @@ case $INPUT_MODE in
         ;;
 esac
 
-diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
-if [ ${PIPESTATUS[0]} -ne 0 ]; then # $? captures the last pipe
-    echo "fail!"
-    cp $TEMP_FILE_1 $FAIL_FILE # TEMP_FILE_1 already trapped on exit!
-    exit 1
+if [ $EXEC_FLAGS == "--dot" ]; then
+    DOT_TOOL="dot"
+    DOT_FLAGS="-T$OUTPUT_FILE_TYPE"
+    $DOT_TOOL $DOT_FLAGS -o $OUTPUT_FILE $TEMP_FILE
+elif [ $EXEC_FLAGS == "--xml" ]; then
+    cp $TEMP_FILE $OUTPUT_FILE # TEMP_FILE already trapped on exit!
 fi
 
-echo "success!" | tee $PASS_FILE
+echo "success!"

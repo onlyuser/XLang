@@ -69,7 +69,7 @@ esac
 
 if [ -z "`grep \"$GOLD_KEYWORD\" $TEMP_FILE`" ]; then
     echo "fail!"
-    cp $TEMP_FILE $FAIL_FILE # TEMP_FILE already trapped on exit
+    cp $TEMP_FILE $FAIL_FILE # TEMP_FILE already trapped on exit!
     exit 1
 fi
 

@@ -52,6 +52,12 @@ dot :
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
 
+.PHONY : xml
+xml :
+	@for i in $(SUBPATHS); do \
+	echo "make $@ in $$i..."; \
+	(cd $$i; $(MAKE) $@); done
+
 .PHONY : lint
 lint :
 	@for i in $(SUBPATHS); do \
