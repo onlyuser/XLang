@@ -16,7 +16,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 CXX = g++
+#DEBUG = -g
+CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+
 LINT_TOOL = cppcheck
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 #==================
 # compile flags
@@ -43,24 +48,15 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 # NOTE: this project does not use OpenGL, but just for example, additional libs
 #       can be added here.
 
-#LIB_STEMS = glut32 glu32 opengl32
-#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
+#EXTERN_LIB_STEMS = glut32 glu32 opengl32
+#EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 PARENT_LIB_STEMS = common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
-LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS)) \
+LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS)) \
 		$(patsubst %, -l%, $(PARENT_LIB_STEMS))
-
-#DEBUG = -g
-CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
-LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
-LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
 TEST_PATH = $(PARENT_PATH)/tests
-LINT_SH = $(SCRIPT_PATH)/lint.sh
-
-DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
-DOXY_CONFIG_FILE = XLang.config
 
 #==================
 # all
@@ -70,11 +66,15 @@ DOXY_CONFIG_FILE = XLang.config
 all : $(BINARY)
 
 #==================
-# lib
+# libs
 #==================
 
 $(PARENT_LIBS) :
 	cd $(COMMON); $(MAKE) -f Makefile
+
+.PHONY : clean_parent_libs
+clean_parent_libs :
+	cd $(COMMON); $(MAKE) -f Makefile clean
 
 #==================
 # yacc-gen
@@ -102,7 +102,7 @@ LEX_STEMS = lex.XLang
 LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
 .SECONDARY : $(LEX_GEN)
 
-$(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
+$(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l $(YACC_GEN)
 	flex $<
 	mv lex.$*.c $(SRC_PATH)/lex.$*.cpp
 
@@ -119,7 +119,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY : clean_objects
-clean_objects :
+clean_objects : clean_yacc clean_lex
 	-rm $(OBJECTS)
 
 #==================
@@ -130,12 +130,12 @@ CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(OBJECTS) $(LIBS) $(PARENT_LIBS)
+$(BINARY) : $(OBJECTS) $(PARENT_LIBS)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY : clean_binary
-clean_binary :
+clean_binary : clean_objects clean_parent_libs
 	-rm $(BINARY)
 
 #==================
@@ -193,6 +193,8 @@ clean_dot :
 LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
 LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
 
+LINT_SH = $(SCRIPT_PATH)/lint.sh
+
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
@@ -207,6 +209,9 @@ clean_lint :
 #==================
 # doc
 #==================
+
+DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
+DOXY_CONFIG_FILE = XLang.config
 
 .PHONY : doc
 doc :
@@ -224,6 +229,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_dot clean_lint clean_doc
-	-rmdir $(BUILD_PATH) $(BIN_PATH) $(PARENT_LIB_PATH)
-	cd $(COMMON); $(MAKE) -f Makefile clean
+clean : clean_binary clean_tests clean_pure clean_dot clean_lint clean_doc
+	-rmdir $(BUILD_PATH) $(BIN_PATH)

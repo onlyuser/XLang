@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CXX = g++
+#DEBUG = -g
+CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+
 LINT_TOOL = cppcheck
+LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
 
 #==================
 # compile flags
@@ -44,21 +48,12 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 # NOTE: this project does not use OpenGL, but just for example, additional libs
 #       can be added here.
 
-#LIB_STEMS = glut32 glu32 opengl32
-#LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(LIB_STEMS))
-LIB_FLAGS = $(patsubst %, -l%, $(LIBS))
-
-#DEBUG = -g
-CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
-LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
-LINTFLAGS = $(INCLUDE_PATH_FLAGS) -v --enable=all
+#EXTERN_LIB_STEMS = glut32 glu32 opengl32
+#EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIBS))
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
 TEST_PATH = $(PARENT_PATH)/tests
-LINT_SH = $(SCRIPT_PATH)/lint.sh
-
-DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
-DOXY_CONFIG_FILE = XLang.config
 
 #==================
 # all
@@ -93,7 +88,7 @@ LEX_STEMS = lex.XLang
 LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
 .SECONDARY : $(LEX_GEN)
 
-$(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l
+$(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l $(YACC_GEN)
 	flex $<
 	mv lex.$*.c $(SRC_PATH)/lex.$*.cpp
 
@@ -132,7 +127,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY : clean_objects
-clean_objects : clean_common_objects
+clean_objects : clean_common_objects clean_yacc clean_lex
 	-rm $(OBJECTS)
 
 #==================
@@ -148,7 +143,7 @@ $(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY : clean_binary
-clean_binary :
+clean_binary : clean_objects
 	-rm $(BINARY)
 
 #==================
@@ -224,6 +219,8 @@ clean_common_lint :
 LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
 LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
 
+LINT_SH = $(SCRIPT_PATH)/lint.sh
+
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	mkdir -p $(BUILD_PATH)
 	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH)/$*.lint $(LINTFLAGS)
@@ -238,6 +235,9 @@ clean_lint : clean_common_lint
 #==================
 # doc
 #==================
+
+DOXY_CONFIG_PATH = $(PARENT_PATH)/doc
+DOXY_CONFIG_FILE = XLang.config
 
 .PHONY : doc
 doc :
@@ -255,5 +255,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_objects clean_yacc clean_lex clean_tests clean_pure clean_dot clean_lint clean_doc
+clean : clean_binary clean_tests clean_pure clean_dot clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)

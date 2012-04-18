@@ -22,7 +22,7 @@
 %{
 
 #include "XLang.h" // NodeIdentIFace
-#include "XLang.tab.h" // ID_XXX (generated code)
+#include "XLang.tab.h" // ID_XXX (yacc generated)
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
 #include <algorithm> // std::min

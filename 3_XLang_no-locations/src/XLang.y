@@ -21,7 +21,7 @@
 %{
 
 #include "XLang.h" // node::NodeIdentIFace
-#include "XLang.tab.h" // ID_XXX (generated code)
+#include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel

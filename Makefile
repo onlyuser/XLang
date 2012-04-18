@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+LIB_PATH = lib
+
 SUBPATHS = \
     0_XLang_full \
     1_XLang_no-strings \
@@ -66,3 +68,4 @@ clean :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
+	-rmdir $(LIB_PATH)
