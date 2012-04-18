@@ -41,7 +41,10 @@ struct SynthAttrib
 };
 #define YYSTYPE SynthAttrib
 
-typedef void* yyscan_t;
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
+	typedef void* yyscan_t;
+#endif
 struct ScannerContext
 {
     yyscan_t m_scanner; // state of the lexer
@@ -58,7 +61,7 @@ class ParserContext : public ParserContextIFace
 {
 public:
     ParserContext(Allocator &alloc, const char* s)
-        : m_alloc(alloc), m_scanner_context(s) {}
+        : m_alloc(alloc), m_scanner_context(s), m_root() {}
     Allocator &alloc() { return m_alloc; }
     ScannerContext &scanner_context() { return m_scanner_context; }
     YYSTYPE &root() { return m_root; }
