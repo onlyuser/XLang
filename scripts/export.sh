@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC> <EXEC_FLAGS> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE>"
+    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE_TYPE> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
@@ -28,31 +28,39 @@ if [ $# -ne 5 ]; then
     exit 1
 fi
 
+TEMP_FILE=`mktemp`
+trap "rm $TEMP_FILE" EXIT
+
 EXEC=$1
-EXEC_FLAGS=$2
-INPUT_MODE=$3
-INPUT_FILE=$4
-OUTPUT_FILE=$5
+INPUT_MODE=$2
+INPUT_FILE=$3
+OUTPUT_FILE_TYPE=$4
+OUTPUT_FILE_STEM=$5
+OUTPUT_FILE="${OUTPUT_FILE_STEM}.$OUTPUT_FILE_TYPE"
 
 if [ ! -f $INPUT_FILE ]; then
     echo "fail! -- INPUT_FILE not found! ==> $INPUT_FILE"
     exit 1
 fi
 
-case $INPUT_MODE in
-    "file")
-        $EXEC $EXEC_FLAGS --file $INPUT_FILE > $OUTPUT_FILE
-        ;;
-    "stdin")
-        cat $INPUT_FILE | $EXEC $EXEC_FLAGS > $OUTPUT_FILE
-        ;;
-    "arg")
-        $EXEC $EXEC_FLAGS --input `cat $INPUT_FILE` > $OUTPUT_FILE
-        ;;
+case $OUTPUT_FILE_TYPE in
+    "bmp"|"jpg"|"gif"|"png") EXEC_FLAGS="--dot" ;;
+    "lisp"|"xml")            EXEC_FLAGS="--$OUTPUT_FILE_TYPE" ;;
     *)
-        echo "fail! -- invalid input mode"
+        echo "fail! -- invalid output file type"
         exit 1
         ;;
 esac
 
-#echo "success!"
+EMIT_SH=`dirname $0`/"emit.sh"
+$EMIT_SH $EXEC $EXEC_FLAGS $INPUT_MODE $INPUT_FILE $TEMP_FILE
+
+if [ $EXEC_FLAGS == "--dot" ]; then
+    DOT_TOOL="dot"
+    DOT_FLAGS="-T$OUTPUT_FILE_TYPE"
+    $DOT_TOOL $DOT_FLAGS -o $OUTPUT_FILE $TEMP_FILE
+elif [ $EXEC_FLAGS == "--xml" ]; then
+    cp $TEMP_FILE $OUTPUT_FILE # TEMP_FILE already trapped on exit!
+fi
+
+echo "success!"

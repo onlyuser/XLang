@@ -51,21 +51,9 @@ if [ ! -f $GOLD_FILE ]; then
     exit 1
 fi
 
-case $INPUT_MODE in
-    "file")
-        $EXEC --lisp --file $INPUT_FILE > $TEMP_FILE_0
-        ;;
-    "stdin")
-        cat $INPUT_FILE | $EXEC --lisp > $TEMP_FILE_0
-        ;;
-    "arg")
-        $EXEC --lisp --input `cat $INPUT_FILE` > $TEMP_FILE_0
-        ;;
-    *)
-        echo "fail! -- invalid input mode"
-        exit 1
-        ;;
-esac
+EMIT_SH=`dirname $0`/"emit.sh"
+EXEC_FLAGS="--lisp"
+$EMIT_SH $EXEC $EXEC_FLAGS $INPUT_MODE $INPUT_FILE $TEMP_FILE_0
 
 diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
 if [ ${PIPESTATUS[0]} -ne 0 ]; then # $? captures the last pipe

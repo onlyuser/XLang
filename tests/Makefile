@@ -27,12 +27,11 @@
 # compile flags
 #==================
 
-TOP = .
 PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
 TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
-EMIT_SH = $(SCRIPT_PATH)/emit.sh
+EXPORT_SH = $(SCRIPT_PATH)/export.sh
 
 #==================
 # all
@@ -105,7 +104,7 @@ clean_pure :
 #==================
 
 $(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
-	-$(EMIT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
 			png \
 			$(BUILD_PATH)/$*.test.dot
 
@@ -121,7 +120,7 @@ clean_dot :
 #==================
 
 $(BUILD_PATH)/%.test.xml : $(BINARY) $(TEST_PATH)/%.test
-	-$(EMIT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
 			xml \
 			$(BUILD_PATH)/$*.test
 
