@@ -59,7 +59,7 @@ case $INPUT_MODE in
         cat $INPUT_FILE | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
         ;;
     "arg")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --input `cat $INPUT_FILE` 2> $TEMP_FILE
+        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --expr `cat $INPUT_FILE` 2> $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"

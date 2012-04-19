@@ -47,7 +47,7 @@ case $INPUT_MODE in
         cat $INPUT_FILE | $EXEC $EXEC_FLAGS > $OUTPUT_FILE
         ;;
     "arg")
-        $EXEC $EXEC_FLAGS --input `cat $INPUT_FILE` > $OUTPUT_FILE
+        $EXEC $EXEC_FLAGS --expr `cat $INPUT_FILE` > $OUTPUT_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"

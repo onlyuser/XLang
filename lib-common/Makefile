@@ -29,17 +29,18 @@ BIN_PATH = bin
 BINARY = $(BIN_PATH)/libcommon.a
 INSTALL_BINARY = $(PARENT_LIB_PATH)/libcommon.a
 
-INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH)
+EXTERN_DEPENDS = $(PARENT_PATH)/extern-depends
+EXTERN_INCLUDE_PATH = $(EXTERN_DEPENDS)/include
+EXTERN_LIB_PATH = $(EXTERN_DEPENDS)/lib
+
+INCLUDE_PATHS = $(INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 
-LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH)
+LIB_PATHS = $(LIB_PATH) $(EXTERN_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-# NOTE: this project does not use OpenGL, but just for example, additional libs
-#       can be added here.
-
-#EXTERN_LIB_STEMS = glut32 glu32 opengl32
-#EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+EXTERN_LIB_STEMS = ticppd
+EXTERN_LIBS = $(patsubst %, $(EXTERN_LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++

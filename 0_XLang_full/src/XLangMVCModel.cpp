@@ -22,7 +22,21 @@
 #include <stdarg.h> // va_list
 #include <string> // std::string
 
+#define TIXML_USE_TICPP
+#ifdef TIXML_USE_TICPP
+	#include <ticpp/ticpp.h>
+#endif
+
 namespace mvc {
+
+node::NodeIdentIFace* MVCModel::make_ast(Allocator &alloc, std::string filename)
+{
+#ifdef TIXML_USE_TICPP
+	ticpp::Document doc(filename.c_str());
+	doc.LoadFile();
+#endif
+	return NULL;
+}
 
 template<>
 node::NodeIdentIFace* MVCModel::make_leaf<std::string>(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, std::string value)

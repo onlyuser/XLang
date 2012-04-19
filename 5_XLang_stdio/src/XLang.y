@@ -158,10 +158,11 @@ node::NodeIdentIFace* make_ast(Allocator &alloc)
 
 void display_usage(bool verbose)
 {
-    std::cout << "Usage: XLang OPTION [-m]" << std::endl;
+    std::cout << "Usage: XLang [--import=filename] OPTION [-m]" << std::endl;
     if(verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << "Output control:" << std::endl
+                << "  -i, --import" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
@@ -184,6 +185,7 @@ struct args_t
     } mode_e;
 
     mode_e mode;
+    std::string import_filename;
     bool dump_memory;
 
     args_t()
@@ -194,8 +196,9 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "lxgdmh?";
+    static const char *optString = "ilxgdmh?";
     static const struct option longOpts[] = {
+                { "import", required_argument, NULL, 'i' },
                 { "lisp",   no_argument, NULL, 'l' },
                 { "xml",    no_argument, NULL, 'x' },
                 { "graph",  no_argument, NULL, 'g' },
@@ -209,6 +212,7 @@ bool parse_args(int argc, char** argv, args_t &args)
     {
         switch(opt)
         {
+            case 'i': args.import_filename = optarg; break;
             case 'l': args.mode = args_t::MODE_LISP; break;
             case 'x': args.mode = args_t::MODE_XML; break;
             case 'g': args.mode = args_t::MODE_GRAPH; break;
@@ -222,7 +226,7 @@ bool parse_args(int argc, char** argv, args_t &args)
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    if(args_t::MODE_NONE == args.mode)
+    if(args_t::MODE_NONE == args.mode && !args.dump_memory)
     {
         display_usage(false);
         return false;
@@ -233,11 +237,24 @@ bool parse_args(int argc, char** argv, args_t &args)
 bool do_work(args_t &args)
 {
     Allocator alloc(__FILE__);
-    node::NodeIdentIFace* ast = make_ast(alloc);
-    if(NULL == ast)
+    node::NodeIdentIFace* ast = NULL;
+    if(args.import_filename != "")
     {
-        std::cout << errors().str().c_str() << std::endl;
-        return false;
+        ast = mvc::MVCModel::make_ast(alloc, args.import_filename);
+        if(NULL == ast)
+        {
+            std::cout << "import fail!" << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        ast = make_ast(alloc);
+        if(NULL == ast)
+        {
+            std::cout << errors().str().c_str() << std::endl;
+            return false;
+        }
     }
     switch(args.mode)
     {

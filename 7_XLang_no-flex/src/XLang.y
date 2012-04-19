@@ -260,10 +260,11 @@ node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
 
 void display_usage(bool verbose)
 {
-    std::cout << "Usage: XLang OPTION [-m] -f FILE" << std::endl;
+    std::cout << "Usage: XLang [--import=filename] OPTION [-m] -f FILE" << std::endl;
     if(verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << "Output control:" << std::endl
+                << "  -i, --import" << std::endl
                 << "  -f, --file" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
@@ -288,6 +289,7 @@ struct args_t
 
     mode_e mode;
     std::string filename;
+    std::string import_filename;
     bool dump_memory;
 
     args_t()
@@ -300,6 +302,7 @@ bool parse_args(int argc, char** argv, args_t &args)
     int longIndex = 0;
     static const char *optString = "flxgdmh?";
     static const struct option longOpts[] = {
+                { "import", required_argument, NULL, 'i' },
                 { "file",   required_argument, NULL, 'f' },
                 { "lisp",   no_argument,       NULL, 'l' },
                 { "xml",    no_argument,       NULL, 'x' },
@@ -314,6 +317,7 @@ bool parse_args(int argc, char** argv, args_t &args)
     {
         switch(opt)
         {
+            case 'i': args.import_filename = optarg; break;
             case 'f': args.filename = optarg; break;
             case 'l': args.mode = args_t::MODE_LISP; break;
             case 'x': args.mode = args_t::MODE_XML; break;
@@ -328,7 +332,7 @@ bool parse_args(int argc, char** argv, args_t &args)
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    if(args_t::MODE_NONE == args.mode)
+    if(args_t::MODE_NONE == args.mode && !args.dump_memory)
     {
         display_usage(false);
         return false;
@@ -339,18 +343,31 @@ bool parse_args(int argc, char** argv, args_t &args)
 bool do_work(args_t &args)
 {
     Allocator alloc(__FILE__);
-    FILE* file = fopen(args.filename.c_str(), "rb");
-    if(NULL == file)
+    node::NodeIdentIFace* ast = NULL;
+    if(args.import_filename != "")
     {
-        std::cout << "cannot open file" << std::endl;
-        return false;
+        ast = mvc::MVCModel::make_ast(alloc, args.import_filename);
+        if(NULL == ast)
+        {
+            std::cout << "import fail!" << std::endl;
+            return false;
+        }
     }
-    node::NodeIdentIFace* ast = make_ast(alloc, file);
-    fclose(file);
-    if(NULL == ast)
+    else
     {
-        std::cout << errors().str().c_str() << std::endl;
-        return false;
+        FILE* file = fopen(args.filename.c_str(), "rb");
+        if(NULL == file)
+        {
+            std::cout << "cannot open file" << std::endl;
+            return false;
+        }
+        ast = make_ast(alloc, file);
+        fclose(file);
+        if(NULL == ast)
+        {
+            std::cout << errors().str().c_str() << std::endl;
+            return false;
+        }
     }
     switch(args.mode)
     {

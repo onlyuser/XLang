@@ -30,6 +30,7 @@ namespace mvc {
 
 struct MVCModel
 {
+	static node::NodeIdentIFace* make_ast(Allocator &alloc, std::string filename);
     template<class T>
     static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
