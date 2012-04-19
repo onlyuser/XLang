@@ -68,7 +68,8 @@ TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
-DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot.png, $(TEST_FILE_STEMS))
+DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
+DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
 XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
@@ -109,11 +110,11 @@ $(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
 			$(BUILD_PATH)/$*.test.dot
 
 .PHONY : dot
-dot : $(DOT_FILES)
+dot : $(DOT_PNG_FILES)
 
 .PHONY : clean_dot
 clean_dot :
-	-rm $(DOT_FILES)
+	-rm $(DOT_FILES) $(DOT_PNG_FILES)
 
 #==================
 # xml

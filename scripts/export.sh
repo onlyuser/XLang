@@ -28,9 +28,6 @@ if [ $# -ne 5 ]; then
     exit 1
 fi
 
-TEMP_FILE=`mktemp`
-trap "rm $TEMP_FILE" EXIT
-
 EXEC=$1
 INPUT_MODE=$2
 INPUT_FILE=$3
@@ -53,14 +50,14 @@ case $OUTPUT_FILE_TYPE in
 esac
 
 EMIT_SH=`dirname $0`/"emit.sh"
-$EMIT_SH $EXEC $EXEC_FLAGS $INPUT_MODE $INPUT_FILE $TEMP_FILE
+$EMIT_SH $EXEC $EXEC_FLAGS $INPUT_MODE $INPUT_FILE $OUTPUT_FILE_STEM
 
 if [ $EXEC_FLAGS == "--dot" ]; then
     DOT_TOOL="dot"
     DOT_FLAGS="-T$OUTPUT_FILE_TYPE"
-    $DOT_TOOL $DOT_FLAGS -o $OUTPUT_FILE $TEMP_FILE
+    $DOT_TOOL $DOT_FLAGS -o $OUTPUT_FILE $OUTPUT_FILE_STEM
 elif [ $EXEC_FLAGS == "--xml" ]; then
-    cp $TEMP_FILE $OUTPUT_FILE # TEMP_FILE already trapped on exit!
+    mv $OUTPUT_FILE_STEM $OUTPUT_FILE
 fi
 
 echo "success!"
