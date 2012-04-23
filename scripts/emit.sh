@@ -41,7 +41,7 @@ fi
 
 case $INPUT_MODE in
     "file")
-        $EXEC $EXEC_FLAGS --file $INPUT_FILE > $OUTPUT_FILE
+        $EXEC $EXEC_FLAGS --in-file $INPUT_FILE > $OUTPUT_FILE
         ;;
     "stdin")
         cat $INPUT_FILE | $EXEC $EXEC_FLAGS > $OUTPUT_FILE

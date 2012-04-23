@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#=======================
+# environment variables
+#=======================
+
+# EXTERN_INCLUDE_PATH
+# EXTERN_LIB_PATH
+
 #==================
 # compile flags
 #==================
@@ -28,10 +35,6 @@ BUILD_PATH = build
 BIN_PATH = bin
 BINARY = $(BIN_PATH)/libcommon.a
 INSTALL_BINARY = $(PARENT_LIB_PATH)/libcommon.a
-
-EXTERN_DEPENDS = $(PARENT_PATH)/extern-depends
-EXTERN_INCLUDE_PATH = $(EXTERN_DEPENDS)/include
-EXTERN_LIB_PATH = $(EXTERN_DEPENDS)/lib
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))

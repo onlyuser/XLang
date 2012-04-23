@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#=======================
+# environment variables
+#=======================
+
+# EXTERN_INCLUDE_PATH
+# EXTERN_LIB_PATH
+
 #==================
 # compile flags
 #==================
@@ -31,10 +38,6 @@ COMMON = $(PARENT_PATH)/lib-common
 COMMON_INCLUDE_PATH = $(COMMON)/include
 COMMON_SRC_PATH = $(COMMON)/src
 COMMON_BUILD_PATH = $(COMMON)/build
-
-EXTERN_DEPENDS = $(PARENT_PATH)/extern-depends
-EXTERN_INCLUDE_PATH = $(EXTERN_DEPENDS)/include
-EXTERN_LIB_PATH = $(EXTERN_DEPENDS)/lib
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))

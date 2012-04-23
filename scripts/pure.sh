@@ -53,7 +53,7 @@ PURE_TOOL="valgrind"
 PURE_FLAGS="--leak-check=full"
 case $INPUT_MODE in
     "file")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --file $INPUT_FILE 2> $TEMP_FILE
+        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --in-file $INPUT_FILE 2> $TEMP_FILE
         ;;
     "stdin")
         cat $INPUT_FILE | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
