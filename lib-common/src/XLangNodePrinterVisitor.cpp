@@ -47,7 +47,8 @@ void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node
 
 void NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 {
-    std::cout << _node->name();
+	// TODO: fix-me!
+    //std::cout << dynamic_cast<Node*>(_node)->name();
 }
 
 }

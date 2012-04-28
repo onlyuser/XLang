@@ -61,7 +61,7 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
             break;
         case node::NodeIdentIFace::INNER:
             {
-                std::cout << '(' << dynamic_cast<const node::InnerNodeIFace*>(_node)->name() << ' ';
+                std::cout << '(' << _node->name() << ' ';
                 size_t i;
                 for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size()-1; i++)
                 {
@@ -92,39 +92,40 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, size_t depth)
     switch(_node->type())
     {
         case node::NodeIdentIFace::INT:
-            std::cout << "<leaf id=" << id << " type=\"int\" value=";
+            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::FLOAT:
-            std::cout << "<leaf id=" << id << " type=\"float\" value=";
+            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::STRING:
-            std::cout << "<leaf id=" << id << " type=\"string\" value=";
+            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
             std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::CHAR:
-            std::cout << "<leaf id=" << id << " type=\"char\" value=";
+            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
             std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::IDENT:
-            std::cout << "<leaf id=" << id << " type=\"ident\" value=";
+            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
             std::cout << '\"' << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value() << '\"';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::INNER:
             {
-                std::cout << "<inner id=" << id << " name=\"" << dynamic_cast<const node::InnerNodeIFace*>(_node)->name()
-                		<< "\">" << std::endl;
+                std::cout << "<inner id=" << id << " type=\"" << _node->name() << "\">" << std::endl;
+                depth++;
                 for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
                 {
-                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i), depth+1);
+                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i), depth);
                     std::cout << std::endl;
                 }
+                depth--;
                 std::cout << std::string(depth, '\t') << "</inner>";
             }
             break;
@@ -160,7 +161,7 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
             std::cout << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value();
             break;
         case node::NodeIdentIFace::INNER:
-            std::cout << dynamic_cast<const node::InnerNodeIFace*>(_node)->name();
+            std::cout << _node->name();
             break;
     }
     std::cout << "\"," << std::endl <<
@@ -256,7 +257,7 @@ void exNode
             sprintf(word, "%s", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(p)->value()->c_str());
             break;
         case typeOpr:
-            temp = dynamic_cast<const node::InnerNodeIFace*>(p)->name();
+            temp = p->name();
             s = const_cast<char*>(temp.c_str());
             break;
         default:

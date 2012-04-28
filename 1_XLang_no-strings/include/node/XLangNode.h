@@ -43,6 +43,7 @@ public:
     {
         return m_sym_id;
     }
+    std::string name() const;
     YYLTYPE loc() const
     {
         return m_loc;
@@ -95,11 +96,14 @@ public:
             m_child_vec.push_back(_node);
         }
     }
-    std::string name() const;
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
     }
+    void push_back(NodeIdentIFace* node)
+	{
+    	m_child_vec.push_back(node);
+	}
     size_t size() const
     {
         return m_child_vec.size();

@@ -23,7 +23,7 @@ extern std::string sym_name(uint32_t sym_id);
 
 namespace node {
 
-std::string InnerNode::name() const
+std::string Node::name() const
 {
     return sym_name(sym_id());
 }

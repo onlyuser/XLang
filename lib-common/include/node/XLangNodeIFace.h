@@ -30,6 +30,7 @@ struct NodeIdentIFace
     virtual ~NodeIdentIFace() { }
     virtual type_e type() const = 0;
     virtual uint32_t sym_id() const = 0;
+    virtual std::string name() const = 0;
     bool is_same_type(const NodeIdentIFace* _node) const
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
@@ -72,7 +73,6 @@ struct LeafNodeIFace
 struct InnerNodeIFace
 {
     virtual ~InnerNodeIFace() { }
-    virtual std::string name() const = 0;
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
 };

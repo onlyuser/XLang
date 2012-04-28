@@ -30,7 +30,6 @@ namespace mvc {
 
 struct MVCModel
 {
-	static node::NodeIdentIFace* make_ast(Allocator &alloc, std::string filename);
     template<class T>
     static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
@@ -38,7 +37,8 @@ struct MVCModel
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
                 >(sym_id, loc, value);
     }
-    static node::NodeIdentIFace* make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
+    static node::InnerNode* make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
+	static node::NodeIdentIFace* make_ast(ParserContextIFace* pc, std::string filename);
 };
 
 }

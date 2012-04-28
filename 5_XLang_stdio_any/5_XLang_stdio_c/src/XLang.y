@@ -83,6 +83,10 @@ std::string sym_name(uint32_t sym_id)
     }
     return _sym_name[sym_id - ID_BASE - 1];
 }
+uint32_t sym_name_r(std::string name)
+{
+    return 0;
+}
 ParserContext* &parse_context()
 {
     static ParserContext* pc = NULL;
@@ -685,7 +689,10 @@ bool do_work(args_t &args)
     node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
     {
-        ast = mvc::MVCModel::make_ast(alloc, args.in_xml);
+        parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+                reinterpret_cast<ParserContext*>(x)->~ParserContext();
+                }) ParserContext(alloc);
+        ast = mvc::MVCModel::make_ast(parse_context(), args.in_xml);
         if(NULL == ast)
         {
             std::cout << "import fail!" << std::endl;

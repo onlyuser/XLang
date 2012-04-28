@@ -66,23 +66,34 @@ std::stringstream &errors()
 }
 std::string sym_name(uint32_t sym_id)
 {
-    static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
-        "ID_INT",
-        "ID_FLOAT",
-        "ID_STRING",
-        "ID_CHAR",
-        "ID_IDENT"
-        };
     switch(sym_id)
     {
-    case '+': return "+";
-    case '-': return "-";
-    case '*': return "*";
-    case '/': return "/";
-    case '=': return "=";
-    case ',': return ",";
+        case '+': return "+";
+        case '-': return "-";
+        case '*': return "*";
+        case '/': return "/";
+        case '=': return "=";
+        case ',': return ",";
     }
+    static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
+        "int",
+        "float",
+        "ident"
+        };
     return _sym_name[sym_id - ID_BASE - 1];
+}
+uint32_t sym_name_r(std::string name)
+{
+    if(name == "+")     return '+';
+    if(name == "-")     return '-';
+    if(name == "*")     return '*';
+    if(name == "/")     return '/';
+    if(name == "=")     return '=';
+    if(name == ",")     return ',';
+    if(name == "int")   return ID_INT;
+    if(name == "float") return ID_FLOAT;
+    if(name == "ident") return ID_IDENT;
+    return 0;
 }
 
 %}
@@ -272,10 +283,11 @@ bool parse_args(int argc, char** argv, args_t &args)
 bool do_work(args_t &args)
 {
     Allocator alloc(__FILE__);
+    ParserContext parser_context(alloc, "");
     node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
     {
-        ast = mvc::MVCModel::make_ast(alloc, args.in_xml);
+        ast = mvc::MVCModel::make_ast(&parser_context, args.in_xml);
         if(NULL == ast)
         {
             std::cout << "import fail!" << std::endl;
