@@ -144,13 +144,29 @@ clean_binary : clean_objects clean_parent_libs
 
 .PHONY : test
 test : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_test
 clean_test :
-	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+
+#==================
+# import
+#==================
+
+.PHONY : import
+import : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
+
+.PHONY : clean_import
+clean_import :
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
 
@@ -246,5 +262,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_test clean_pure clean_dot clean_lint clean_doc
+clean : clean_binary clean_test clean_import clean_pure clean_dot clean_xml clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)

@@ -40,6 +40,9 @@ if [ ! -f $INPUT_FILE ]; then
 fi
 
 case $INPUT_MODE in
+    "xml")
+        $EXEC $EXEC_FLAGS --in-xml $INPUT_FILE > $OUTPUT_FILE
+        ;;
     "file")
         $EXEC $EXEC_FLAGS --in-file $INPUT_FILE > $OUTPUT_FILE
         ;;

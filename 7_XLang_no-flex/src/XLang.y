@@ -279,8 +279,8 @@ void display_usage(bool verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << std::endl
                 << "Input control:" << std::endl
-                << "  -i, --in-xml=FILE" << std::endl
-                << "  -f, --in-file=FILE" << std::endl
+                << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
+                << "  -f, --in-file=FILE (regular parse)" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
                 << "  -l, --lisp" << std::endl
@@ -369,6 +369,7 @@ bool do_work(args_t &args)
     node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
     {
+        // TODO: fix-me! -- NULL file causes segfault, need separate context class
         parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
                 reinterpret_cast<ParserContext*>(x)->~ParserContext();
                 }) ParserContext(alloc, NULL);

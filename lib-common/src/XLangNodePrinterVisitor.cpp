@@ -47,7 +47,7 @@ void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node
 
 void NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 {
-	// TODO: fix-me!
+	// TODO: fix-me! -- shouldn't need to do this cast
     //std::cout << dynamic_cast<Node*>(_node)->name();
 }
 

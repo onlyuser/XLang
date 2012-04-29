@@ -33,17 +33,6 @@ TEST_SH = $(SCRIPT_PATH)/test.sh
 PURE_SH = $(SCRIPT_PATH)/pure.sh
 EXPORT_SH = $(SCRIPT_PATH)/export.sh
 
-#==================
-# all
-#==================
-
-.DEFAULT_GOAL : all
-all : test
-
-#==================
-# test
-#==================
-
 ifneq ($(strip $(BASIC_SUITE)),)
     TEST_PATH = basic_suite
     TEST_FILE_STEMS = \
@@ -62,15 +51,21 @@ ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
     TEST_FILE_STEMS = \
             5_strings
 endif
+
+#==================
+# all
+#==================
+
+.DEFAULT_GOAL : all
+all : test
+
+#==================
+# test
+#==================
+
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
-PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
-PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
-PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
-DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
-DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
-XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) --lisp $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
@@ -84,9 +79,32 @@ clean_test :
 	-rm $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 
 #==================
+# import
+#==================
+
+INPUT_MODE = xml
+IMPORT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.import, $(TEST_FILE_STEMS))
+IMPORT_PASS_FILES = $(patsubst %, %.pass, $(IMPORT_FILES))
+IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
+
+$(BUILD_PATH)/%.test.import.pass : $(BINARY) $(TEST_PATH)/%.test
+	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.test.import.gold $(TEST_PATH)/$*.test.import.gold \
+			$(BUILD_PATH)/$*.test.import
+
+.PHONY : import
+import : $(IMPORT_PASS_FILES)
+
+.PHONY : clean_import
+clean_import :
+	-rm $(IMPORT_PASS_FILES) $(IMPORT_FAIL_FILES)
+
+#==================
 # pure
 #==================
 
+PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
+PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
+PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 GOLD_KEYWORD = "All heap blocks were freed -- no leaks are possible"
 
 $(BUILD_PATH)/%.test.pure.pass : $(BINARY) $(TEST_PATH)/%.test
@@ -104,6 +122,9 @@ clean_pure :
 # dot
 #==================
 
+DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
+DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
+
 $(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
 			png \
@@ -119,6 +140,8 @@ clean_dot :
 #==================
 # xml
 #==================
+
+XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.test.xml : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
@@ -137,4 +160,4 @@ clean_xml :
 #==================
 
 .PHONY : clean
-clean : clean_test clean_pure clean_dot clean_xml
+clean : clean_test clean_import clean_pure clean_dot clean_xml
