@@ -79,8 +79,8 @@ $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 .PHONY : test
 test : $(TEST_PASS_FILES)
 
-.PHONY : clean_tests
-clean_tests :
+.PHONY : clean_test
+clean_test :
 	-rm $(TEST_PASS_FILES) $(TEST_FAIL_FILES)
 
 #==================
@@ -137,4 +137,4 @@ clean_xml :
 #==================
 
 .PHONY : clean
-clean : clean_tests clean_pure clean_dot clean_xml
+clean : clean_test clean_pure clean_dot clean_xml

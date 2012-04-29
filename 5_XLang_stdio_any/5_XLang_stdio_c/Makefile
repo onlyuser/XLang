@@ -148,8 +148,8 @@ test : $(BINARY)
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			BASIC_SUITE=1
 
-.PHONY : clean_tests
-clean_tests :
+.PHONY : clean_test
+clean_test :
 	cd $(TEST_PATH); $(MAKE) -f Makefile clean \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
@@ -246,5 +246,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_tests clean_pure clean_dot clean_lint clean_doc
+clean : clean_binary clean_test clean_pure clean_dot clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
