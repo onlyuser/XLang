@@ -53,7 +53,6 @@ if [ ! -f $GOLD_FILE ]; then
 fi
 
 EMIT_SH=`dirname $0`/"emit.sh"
-EXEC_FLAGS="--lisp"
 $EMIT_SH $EXEC $EXEC_FLAGS $INPUT_MODE $INPUT_FILE $TEMP_FILE_0
 
 diff $TEMP_FILE_0 $GOLD_FILE | tee $TEMP_FILE_1
