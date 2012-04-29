@@ -19,11 +19,11 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC={xlang}> <INPUT_MODE={file|stdin|arg}> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "Usage: `basename $0` <EXEC={xlang}> <EXEC_FLAGS> <INPUT_MODE={file|stdin|arg}> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
 }
 
-if [ $# -ne 5 ]; then
-    echo "fail! -- expect 5 arguments! ==> $@"
+if [ $# -ne 6 ]; then
+    echo "fail! -- expect 6 arguments! ==> $@"
     show_help
     exit 1
 fi
@@ -34,10 +34,11 @@ TEMP_FILE_1=`mktemp`
 trap "rm $TEMP_FILE_1" EXIT
 
 EXEC=$1
-INPUT_MODE=$2
-INPUT_FILE=$3
-GOLD_FILE=$4
-OUTPUT_FILE_STEM=$5
+EXEC_FLAGS=$2
+INPUT_MODE=$3
+INPUT_FILE=$4
+GOLD_FILE=$5
+OUTPUT_FILE_STEM=$6
 PASS_FILE=${OUTPUT_FILE_STEM}.pass
 FAIL_FILE=${OUTPUT_FILE_STEM}.fail
 

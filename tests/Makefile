@@ -73,7 +73,7 @@ DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
 XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
+	-$(TEST_SH) $(BINARY) --lisp $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
 			$(BUILD_PATH)/$*.test
 
 .PHONY : test

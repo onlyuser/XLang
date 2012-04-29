@@ -51,15 +51,16 @@ fi
 
 PURE_TOOL="valgrind"
 PURE_FLAGS="--leak-check=full"
+EXEC_FLAGS="--lisp"
 case $INPUT_MODE in
     "file")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --in-file $INPUT_FILE 2> $TEMP_FILE
+        $PURE_TOOL $PURE_FLAGS $EXEC $EXEC_FLAGS --in-file $INPUT_FILE 2> $TEMP_FILE
         ;;
     "stdin")
-        cat $INPUT_FILE | $PURE_TOOL $PURE_FLAGS $EXEC --lisp 2> $TEMP_FILE
+        cat $INPUT_FILE | $PURE_TOOL $PURE_FLAGS $EXEC $EXEC_FLAGS 2> $TEMP_FILE
         ;;
     "arg")
-        $PURE_TOOL $PURE_FLAGS $EXEC --lisp --expr `cat $INPUT_FILE` 2> $TEMP_FILE
+        $PURE_TOOL $PURE_FLAGS $EXEC $EXEC_FLAGS --expr `cat $INPUT_FILE` 2> $TEMP_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"
