@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC> <EXEC_FLAGS> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE>"
+    echo "Usage: `basename $0` <EXEC={xlang}> <EXEC_FLAGS> <INPUT_MODE={file|stin|arg}> <INPUT_FILE> <OUTPUT_FILE>"
 }
 
 if [ $# -ne 5 ]; then

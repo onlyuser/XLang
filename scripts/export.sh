@@ -19,7 +19,8 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC> <INPUT_MODE> <INPUT_FILE> <OUTPUT_FILE_TYPE> <OUTPUT_FILE_STEM>"
+    echo -e "Usage: `basename $0` <EXEC={xlang}> <INPUT_MODE={file|stin|arg}> <INPUT_FILE> \c"
+    echo "<OUTPUT_FILE_TYPE={bmp|jpg|gif|png|lisp|xml}> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 5 ]; then
