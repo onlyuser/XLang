@@ -607,6 +607,7 @@ void display_usage(bool verbose)
     if(verbose)
     {
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
+                << std::endl
                 << "Input control:" << std::endl
                 << "  -i, --in-xml=FILE" << std::endl
                 << std::endl
@@ -685,6 +686,11 @@ bool parse_args(int argc, char** argv, args_t &args)
 
 bool do_work(args_t &args)
 {
+    if(args.mode == args_t::MODE_HELP)
+    {
+        display_usage(true);
+        return true;
+    }
     Allocator alloc(__FILE__);
     node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
@@ -729,7 +735,6 @@ bool do_work(args_t &args)
         case args_t::MODE_XML:   mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: mvc::MVCView::print_graph(ast); break;
         case args_t::MODE_DOT:   mvc::MVCView::print_dot(ast); break;
-        case args_t::MODE_HELP:  display_usage(true); break;
         default:
             break;
     }
