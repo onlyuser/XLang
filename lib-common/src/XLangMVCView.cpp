@@ -83,7 +83,7 @@ static std::string ptr_to_string(const void* x)
     return s;
 }
 
-void MVCView::print_xml(const node::NodeIdentIFace* _node, size_t depth)
+void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid, size_t depth)
 {
     if(NULL == _node)
         return;
@@ -92,37 +92,54 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, size_t depth)
     switch(_node->type())
     {
         case node::NodeIdentIFace::INT:
-            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
+        case node::NodeIdentIFace::FLOAT:
+        case node::NodeIdentIFace::STRING:
+        case node::NodeIdentIFace::CHAR:
+        case node::NodeIdentIFace::IDENT:
+            std::cout << "<leaf ";
+            break;
+        case node::NodeIdentIFace::INNER:
+            std::cout << "<inner ";
+            break;
+    }
+    if(include_node_uid)
+        std::cout << "id=" << id << " ";
+    std::cout << "type=\"" << _node->name() << "\" ";
+    switch(_node->type())
+    {
+        case node::NodeIdentIFace::INT:
+            std::cout << "value=";
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::FLOAT:
-            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
+            std::cout << "value=";
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::STRING:
-            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
+            std::cout << "value=";
             std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::CHAR:
-            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
+            std::cout << "value=";
             std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::IDENT:
-            std::cout << "<leaf id=" << id << " type=\"" << _node->name() << "\" value=";
+            std::cout << "value=";
             std::cout << '\"' << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value() << '\"';
             std::cout << "/>";
             break;
         case node::NodeIdentIFace::INNER:
             {
-                std::cout << "<inner id=" << id << " type=\"" << _node->name() << "\">" << std::endl;
+                std::cout << ">" << std::endl;
                 depth++;
                 for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
                 {
-                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i), depth);
+                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i),
+                			include_node_uid, depth);
                     std::cout << std::endl;
                 }
                 depth--;
