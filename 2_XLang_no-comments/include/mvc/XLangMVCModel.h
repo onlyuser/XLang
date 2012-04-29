@@ -21,7 +21,7 @@
 #include "XLangAlloc.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "node/XLangNode.h" // node::LeafNode
-#include "XLangParserContextIFace.h" // ParserContextIFace
+#include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -31,14 +31,14 @@ namespace mvc {
 struct MVCModel
 {
     template<class T>
-    static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, T value)
+    static node::NodeIdentIFace* make_leaf(TreeContext* pc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
         return new (pc->alloc(), __FILE__, __LINE__) node::LeafNode<
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
                 >(sym_id, loc, value);
     }
-    static node::InnerNode* make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
-	static node::NodeIdentIFace* make_ast(ParserContextIFace* pc, std::string filename);
+    static node::InnerNode* make_inner(TreeContext* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
+	static node::NodeIdentIFace* make_ast(TreeContext* pc, std::string filename);
 };
 
 }

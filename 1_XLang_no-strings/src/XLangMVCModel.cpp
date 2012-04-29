@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
-#include "XLangParserContextIFace.h" // ParserContextIFace
+#include "XLangTreeContext.h" // TreeContext
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangType.h" // uint32_t
 #include <stdarg.h> // va_list
@@ -33,7 +33,7 @@ extern uint32_t sym_name_r(std::string name);
 namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_leaf<std::string>(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, std::string value)
+node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* pc, uint32_t sym_id, YYLTYPE &loc, std::string value)
 {
 	node::NodeIdentIFace* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
@@ -43,7 +43,7 @@ node::NodeIdentIFace* MVCModel::make_leaf<std::string>(ParserContextIFace* pc, u
 	return node;
 }
 
-node::InnerNode* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
+node::InnerNode* MVCModel::make_inner(TreeContext* pc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
@@ -54,7 +54,7 @@ node::InnerNode* MVCModel::make_inner(ParserContextIFace* pc, uint32_t sym_id, Y
     return node;
 }
 
-static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, std::string type, std::string value)
+static node::NodeIdentIFace* make_leaf(TreeContext* pc, std::string type, std::string value)
 {
 	static YYLTYPE dummy_loc;
 	memset(&dummy_loc, 0, sizeof(dummy_loc));
@@ -76,7 +76,7 @@ static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, std::string type,
 	return NULL;
 }
 
-static node::NodeIdentIFace* visit(ParserContextIFace* pc, ticpp::Node* node)
+static node::NodeIdentIFace* visit(TreeContext* pc, ticpp::Node* node)
 {
 	static YYLTYPE dummy_loc;
 	memset(&dummy_loc, 0, sizeof(dummy_loc));
@@ -128,7 +128,7 @@ static node::NodeIdentIFace* visit(ParserContextIFace* pc, ticpp::Node* node)
 	}
 }
 
-node::NodeIdentIFace* MVCModel::make_ast(ParserContextIFace* pc, std::string filename)
+node::NodeIdentIFace* MVCModel::make_ast(TreeContext* pc, std::string filename)
 {
 	ticpp::Document doc(filename.c_str());
 	doc.LoadFile();
