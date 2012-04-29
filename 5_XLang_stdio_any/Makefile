@@ -30,6 +30,12 @@ test :
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
 
+.PHONY : import
+import :
+	@for i in $(SUBPATHS); do \
+	echo "make $@ in $$i..."; \
+	(cd $$i; $(MAKE) $@); done
+
 .PHONY : pure
 pure :
 	@for i in $(SUBPATHS); do \

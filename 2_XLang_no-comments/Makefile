@@ -167,6 +167,22 @@ clean_test :
 			BASIC_SUITE=1
 
 #==================
+# import
+#==================
+
+.PHONY : import
+import : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			BASIC_SUITE=1
+
+.PHONY : clean_import
+clean_import :
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+
+#==================
 # pure
 #==================
 

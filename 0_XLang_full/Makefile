@@ -179,6 +179,34 @@ clean_test :
 			ADVANCED_SUITE_STRINGS=1
 
 #==================
+# import
+#==================
+
+.PHONY : import
+import : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			ADVANCED_SUITE_STRINGS=1
+
+.PHONY : clean_import
+clean_import :
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
+
+#==================
 # pure
 #==================
 
