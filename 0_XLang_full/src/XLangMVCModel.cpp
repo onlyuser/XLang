@@ -60,13 +60,25 @@ static node::NodeIdentIFace* make_leaf(ParserContextIFace* pc, std::string type,
 	memset(&dummy_loc, 0, sizeof(dummy_loc));
 	if(type == "int")
 		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc,
-				static_cast<long>(atoi(value.c_str())));
+				static_cast<node::LeafTypeTraits<node::NodeIdentIFace::INT>::type>(
+						atoi(value.c_str())
+						));
 	if(type == "float")
 		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc,
-				static_cast<float32_t>(atof(value.c_str())));
+				static_cast<node::LeafTypeTraits<node::NodeIdentIFace::FLOAT>::type>(
+						atof(value.c_str())
+						));
+	if(type == "string")
+		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc,
+				static_cast<node::LeafTypeTraits<node::NodeIdentIFace::STRING>::type>(value));
+	if(type == "char")
+		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc,
+				static_cast<node::LeafTypeTraits<node::NodeIdentIFace::CHAR>::type>(value[0]));
 	if(type == "ident")
 		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc,
-				pc->alloc_unique_string(value));
+				static_cast<node::LeafTypeTraits<node::NodeIdentIFace::IDENT>::type>(
+						pc->alloc_unique_string(value)
+						));
 	return NULL;
 }
 
@@ -111,7 +123,7 @@ static node::NodeIdentIFace* visit(ParserContextIFace* pc, ticpp::Node* node)
 		value = attrib_map["value"];
 	}
 	if(node->NoChildren())
-		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), dummy_loc, value);
+		return make_leaf(pc, type, value);
 	else
 	{
 		node::InnerNode* dest_node = mvc::MVCModel::make_inner(pc, sym_name_r(type), dummy_loc, 0);

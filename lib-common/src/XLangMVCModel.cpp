@@ -106,7 +106,7 @@ static node::NodeIdentIFace* visit(ParserContextIFace* pc, ticpp::Node* node)
 		value = attrib_map["value"];
 	}
 	if(node->NoChildren())
-		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), value);
+		return make_leaf(pc, type, value);
 	else
 	{
 		node::InnerNode* dest_node = mvc::MVCModel::make_inner(pc, sym_name_r(type), 0);

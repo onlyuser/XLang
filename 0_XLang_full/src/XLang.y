@@ -78,21 +78,25 @@ std::string sym_name(uint32_t sym_id)
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "int",
         "float",
+        "char",
+        "string",
         "ident"
         };
     return _sym_name[sym_id - ID_BASE - 1];
 }
 uint32_t sym_name_r(std::string name)
 {
-    if(name == "+")     return '+';
-    if(name == "-")     return '-';
-    if(name == "*")     return '*';
-    if(name == "/")     return '/';
-    if(name == "=")     return '=';
-    if(name == ",")     return ',';
-    if(name == "int")   return ID_INT;
-    if(name == "float") return ID_FLOAT;
-    if(name == "ident") return ID_IDENT;
+    if(name == "+")      return '+';
+    if(name == "-")      return '-';
+    if(name == "*")      return '*';
+    if(name == "/")      return '/';
+    if(name == "=")      return '=';
+    if(name == ",")      return ',';
+    if(name == "int")    return ID_INT;
+    if(name == "float")  return ID_FLOAT;
+    if(name == "char")   return ID_CHAR;
+    if(name == "string") return ID_STRING;
+    if(name == "ident")  return ID_IDENT;
     return 0;
 }
 
