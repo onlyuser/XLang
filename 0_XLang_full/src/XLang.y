@@ -266,16 +266,8 @@ bool parse_args(int argc, char** argv, args_t &args)
     return true;
 }
 
-bool do_work(args_t &args)
+bool do_import(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
 {
-    if(args.mode == args_t::MODE_HELP)
-    {
-        display_usage(true);
-        return true;
-    }
-    Allocator alloc(__FILE__);
-    ParserContext parser_context(alloc, "");
-    node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
     {
         ast = mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
@@ -283,7 +275,7 @@ bool do_work(args_t &args)
                 }) TreeContext(alloc), args.in_xml);
         if(NULL == ast)
         {
-            std::cout << "import fail!" << std::endl;
+            std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
         }
     }
@@ -296,6 +288,11 @@ bool do_work(args_t &args)
             return false;
         }
     }
+    return true;
+}
+
+void do_export(args_t &args, node::NodeIdentIFace* ast)
+{
     switch(args.mode)
     {
         case args_t::MODE_LISP:
@@ -320,6 +317,20 @@ bool do_work(args_t &args)
         default:
             break;
     }
+}
+
+bool do_work(args_t &args)
+{
+    if(args.mode == args_t::MODE_HELP)
+    {
+        display_usage(true);
+        return true;
+    }
+    Allocator alloc(__FILE__);
+    node::NodeIdentIFace* ast = NULL;
+    if(!do_import(args, alloc, ast))
+        return false;
+    do_export(args, ast);
     if(args.dump_memory)
         alloc.dump(std::string(1, '\t'));
     return true;
