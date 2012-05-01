@@ -30,14 +30,14 @@ namespace mvc {
 struct MVCModel
 {
     template<class T>
-    static node::NodeIdentIFace* make_leaf(TreeContextIFace* tc, uint32_t sym_id, T value)
+    static node::NodeIdentIFace* make_leaf(TreeContext* tc, uint32_t sym_id, T value)
     {
         return new (tc->alloc(), __FILE__, __LINE__) node::LeafNode<
                 static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
                 >(sym_id, value);
     }
-    static node::InnerNode* make_inner(TreeContextIFace* tc, uint32_t sym_id, size_t size, ...);
-	static node::NodeIdentIFace* make_ast(TreeContextIFace* tc, std::string filename);
+    static node::InnerNode* make_inner(TreeContext* tc, uint32_t sym_id, size_t size, ...);
+	static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 
 }

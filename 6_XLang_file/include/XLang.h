@@ -42,11 +42,11 @@ class ParserContext
 public:
     ParserContext(Allocator &alloc, FILE* file)
         : m_tree_context(alloc), m_scanner_context(file) {}
-    TreeContext<> &tree_context() { return m_tree_context; }
+    TreeContext &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
 
 private:
-    TreeContext<> m_tree_context;
+    TreeContext m_tree_context;
     ScannerContext m_scanner_context;
 };
 

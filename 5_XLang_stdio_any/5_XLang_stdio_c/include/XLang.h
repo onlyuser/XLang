@@ -36,7 +36,7 @@ void _XLANG_error(const char* s);
 
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
-TreeContext<>* &tree_context();
+TreeContext* &tree_context();
 
 node::NodeIdentIFace* make_ast(Allocator &alloc);
 

@@ -25,6 +25,7 @@
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
+#include "XLangTreeContext.h" // TreeContext
 #include "node/XLangNodePrinterVisitor.h" // node::NodePrinterVisitor
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // fread
@@ -357,8 +358,8 @@ bool do_work(args_t &args)
     if(args.in_xml != "")
     {
         ast = mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<TreeContext<>*>(x)->~TreeContext();
-                }) TreeContext<>(alloc), args.in_xml);
+                reinterpret_cast<TreeContext*>(x)->~TreeContext();
+                }) TreeContext(alloc), args.in_xml);
         if(NULL == ast)
         {
             std::cout << "import fail!" << std::endl;

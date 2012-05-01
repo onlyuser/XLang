@@ -34,7 +34,7 @@ extern uint32_t sym_name_r(std::string name);
 namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContextIFace* tc, uint32_t sym_id, std::string value)
+node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t sym_id, std::string value)
 {
 	return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
@@ -43,7 +43,7 @@ node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContextIFace* tc, uin
 					>(sym_id, value);
 }
 
-node::InnerNode* MVCModel::make_inner(TreeContextIFace* tc, uint32_t sym_id, size_t size, ...)
+node::InnerNode* MVCModel::make_inner(TreeContext* tc, uint32_t sym_id, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
@@ -54,7 +54,7 @@ node::InnerNode* MVCModel::make_inner(TreeContextIFace* tc, uint32_t sym_id, siz
     return node;
 }
 
-static node::NodeIdentIFace* make_leaf(TreeContextIFace* tc, std::string type, std::string value)
+static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::string value)
 {
 	if(type == "int")
 		return mvc::MVCModel::make_leaf(tc, sym_name_r(type),
@@ -67,7 +67,7 @@ static node::NodeIdentIFace* make_leaf(TreeContextIFace* tc, std::string type, s
 	return NULL;
 }
 
-static node::NodeIdentIFace* visit(TreeContextIFace* tc, ticpp::Node* node)
+static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
 {
 	if(dynamic_cast<ticpp::Document*>(node))
 	{
@@ -117,7 +117,7 @@ static node::NodeIdentIFace* visit(TreeContextIFace* tc, ticpp::Node* node)
 	}
 }
 
-node::NodeIdentIFace* MVCModel::make_ast(TreeContextIFace* tc, std::string filename)
+node::NodeIdentIFace* MVCModel::make_ast(TreeContext* tc, std::string filename)
 {
 	ticpp::Document doc(filename.c_str());
 	doc.LoadFile();

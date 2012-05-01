@@ -25,6 +25,7 @@
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
+#include "XLangTreeContext.h" // TreeContext
 #include "node/XLangNodePrinterVisitor.h" // node::NodePrinterVisitor
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
@@ -78,8 +79,8 @@ std::string sym_name(uint32_t sym_id)
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "int",
         "float",
-        "char",
         "string",
+        "char",
         "ident"
         };
     return _sym_name[sym_id - ID_BASE - 1];
@@ -94,8 +95,8 @@ uint32_t sym_name_r(std::string name)
     if(name == ",")      return ',';
     if(name == "int")    return ID_INT;
     if(name == "float")  return ID_FLOAT;
-    if(name == "char")   return ID_CHAR;
     if(name == "string") return ID_STRING;
+    if(name == "char")   return ID_CHAR;
     if(name == "ident")  return ID_IDENT;
     return 0;
 }
@@ -133,7 +134,7 @@ uint32_t sym_name_r(std::string name)
 %%
 
 root:
-      program { pc->tree_context().root().inner_value = $1; }
+      program { pc->tree_context().root() = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -176,7 +177,7 @@ node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)
     _XLANG_set_extra(&parser_context, scanner);
     int error = _XLANG_parse(&parser_context, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? parser_context.tree_context().root().inner_value : NULL;
+    return ((0 == error) && errors().str().empty()) ? parser_context.tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)
@@ -278,8 +279,8 @@ bool do_work(args_t &args)
     if(args.in_xml != "")
     {
         ast = mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<TreeContext<>*>(x)->~TreeContext();
-                }) TreeContext<>(alloc), args.in_xml);
+                reinterpret_cast<TreeContext*>(x)->~TreeContext();
+                }) TreeContext(alloc), args.in_xml);
         if(NULL == ast)
         {
             std::cout << "import fail!" << std::endl;

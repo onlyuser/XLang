@@ -16,17 +16,16 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "XLangTreeContext.h" // TreeContext
-#include "XLangAlloc.h" // Allocator
 #include <string> // std::string
 
-std::string* TreeContextBase::alloc_string(std::string s)
+std::string* TreeContext::alloc_string(std::string s)
 {
     return new (m_alloc, __FILE__, __LINE__, [](void *x) {
             reinterpret_cast<std::string*>(x)->~basic_string();
             }) std::string(s);
 }
 
-const std::string* TreeContextBase::alloc_unique_string(std::string name)
+const std::string* TreeContext::alloc_unique_string(std::string name)
 {
 	string_set_t::iterator p = m_string_set.find(&name);
     if(p == m_string_set.end())

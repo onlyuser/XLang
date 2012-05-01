@@ -23,28 +23,20 @@
 #include <string> // std::string
 #include <set> // std::set
 
-class TreeContextIFace
+class TreeContext
 {
 public:
-	virtual ~TreeContextIFace() { }
-    virtual Allocator &alloc() = 0;
-    virtual std::string* alloc_string(std::string s) = 0;
-    virtual const std::string* alloc_unique_string(std::string name) = 0;
-};
-
-class TreeContextBase : public TreeContextIFace
-{
-public:
-	TreeContextBase(Allocator &alloc)
-        : m_alloc(alloc)
-	{
-	}
+	TreeContext(Allocator &alloc)
+        : m_alloc(alloc), m_root(NULL)
+	{ }
     Allocator &alloc() { return m_alloc; }
+	node::NodeIdentIFace* &root() { return m_root; }
     const std::string* alloc_unique_string(std::string name);
     std::string* alloc_string(std::string s);
 
 private:
     Allocator &m_alloc;
+	node::NodeIdentIFace* m_root; // parse result (AST root)
 
     struct str_ptr_compare_t
     {
@@ -55,21 +47,6 @@ private:
     };
     typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
     string_set_t m_string_set;
-};
-
-template<class T = node::NodeIdentIFace*>
-class TreeContext : public TreeContextBase
-{
-public:
-	TreeContext(Allocator &alloc)
-        : TreeContextBase(alloc)
-	{
-		memset(&m_root, 0, sizeof(m_root));
-	}
-    T &root() { return m_root; }
-
-private:
-    T m_root; // parse result (AST root)
 };
 
 #endif

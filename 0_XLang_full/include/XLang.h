@@ -70,11 +70,11 @@ class ParserContext
 public:
     ParserContext(Allocator &alloc, const char* buf)
         : m_tree_context(alloc), m_scanner_context(buf) {}
-    TreeContext<YYSTYPE> &tree_context() { return m_tree_context; }
+    TreeContext &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
 
 private:
-    TreeContext<YYSTYPE> m_tree_context;
+    TreeContext m_tree_context;
     ScannerContext m_scanner_context;
 };
 #define YY_EXTRA_TYPE ParserContext*
