@@ -15,32 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_MVC_MODEL_H_
-#define XLANG_MVC_MODEL_H_
-
-#include "XLangAlloc.h"
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNode.h" // node::LeafNode
 #include "XLangTreeContext.h" // TreeContext
-#include "XLangType.h" // uint32_t
-#include "XLang.tab.h" // YYLTYPE
+#include "XLangAlloc.h" // Allocator
 #include <string> // std::string
 
-namespace mvc {
-
-struct MVCModel
+std::string* TreeContextBase::alloc_string(std::string s)
 {
-    template<class T>
-    static node::NodeIdentIFace* make_leaf(TreeContextIFace* tc, uint32_t sym_id, YYLTYPE &loc, T value)
-    {
-        return new (tc->alloc(), __FILE__, __LINE__) node::LeafNode<
-                static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
-                >(sym_id, loc, value);
-    }
-    static node::InnerNode* make_inner(TreeContextIFace* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
-	static node::NodeIdentIFace* make_ast(TreeContextIFace* tc, std::string filename);
-};
-
+    return new (m_alloc, __FILE__, __LINE__, [](void *x) {
+            reinterpret_cast<std::string*>(x)->~basic_string();
+            }) std::string(s);
 }
 
-#endif
+const std::string* TreeContextBase::alloc_unique_string(std::string name)
+{
+	string_set_t::iterator p = m_string_set.find(&name);
+    if(p == m_string_set.end())
+    {
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
+                reinterpret_cast<std::string*>(x)->~basic_string();
+                }) std::string(name));
+        p = m_string_set.find(&name);
+    }
+    return *p;
+}

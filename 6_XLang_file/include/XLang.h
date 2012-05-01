@@ -37,30 +37,17 @@ struct ScannerContext
 };
 
 // context type to hold shared data between bison and flex
-class ParserContext : public TreeContext
+class ParserContext
 {
 public:
     ParserContext(Allocator &alloc, FILE* file)
-        : m_alloc(alloc), m_scanner_context(file), m_root(NULL) {}
-    Allocator &alloc() { return m_alloc; }
+        : m_tree_context(alloc), m_scanner_context(file) {}
+    TreeContext<> &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
-    node::NodeIdentIFace* &root() { return m_root; }
-    const std::string* alloc_unique_string(std::string name);
 
 private:
-    Allocator &m_alloc;
+    TreeContext<> m_tree_context;
     ScannerContext m_scanner_context;
-    node::NodeIdentIFace* m_root; // parse result (AST root)
-
-    struct str_ptr_compare_t
-    {
-        bool operator()(const std::string* s1, const std::string* s2)
-        {
-            return *s1 < *s2;
-        }
-    };
-    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
-    string_set_t m_string_set;
 };
 
 // forward declaration of lexer/parser functions

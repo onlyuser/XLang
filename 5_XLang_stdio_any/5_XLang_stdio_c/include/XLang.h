@@ -26,31 +26,6 @@
 #include <set> // std::set
 #include <sstream> // std::stringstream
 
-// context type to hold shared data between bison and flex
-class ParserContext : public TreeContext
-{
-public:
-    ParserContext(Allocator &alloc)
-        : m_alloc(alloc), m_root(NULL) {}
-    Allocator &alloc() { return m_alloc; }
-    node::NodeIdentIFace* &root() { return m_root; }
-    const std::string* alloc_unique_string(std::string name);
-
-private:
-    Allocator &m_alloc;
-    node::NodeIdentIFace* m_root; // parse result (AST root)
-
-    struct str_ptr_compare_t
-    {
-        bool operator()(const std::string* s1, const std::string* s2)
-        {
-            return *s1 < *s2;
-        }
-    };
-    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
-    string_set_t m_string_set;
-};
-
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
 //
@@ -61,7 +36,7 @@ void _XLANG_error(const char* s);
 
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
-ParserContext* &parse_context();
+TreeContext<>* &tree_context();
 
 node::NodeIdentIFace* make_ast(Allocator &alloc);
 

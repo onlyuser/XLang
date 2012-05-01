@@ -19,13 +19,57 @@
 #define XLANG_TREE_CONTEXT_H_
 
 #include "XLangAlloc.h" // Allocator
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include <string> // std::string
+#include <set> // std::set
 
-struct TreeContext
+class TreeContextIFace
 {
-    virtual ~TreeContext() { }
+public:
+	virtual ~TreeContextIFace() { }
     virtual Allocator &alloc() = 0;
-    virtual const std::string *alloc_unique_string(std::string name) = 0;
+    virtual std::string* alloc_string(std::string s) = 0;
+    virtual const std::string* alloc_unique_string(std::string name) = 0;
+};
+
+class TreeContextBase : public TreeContextIFace
+{
+public:
+	TreeContextBase(Allocator &alloc)
+        : m_alloc(alloc)
+	{
+	}
+    Allocator &alloc() { return m_alloc; }
+    const std::string* alloc_unique_string(std::string name);
+    std::string* alloc_string(std::string s);
+
+private:
+    Allocator &m_alloc;
+
+    struct str_ptr_compare_t
+    {
+        bool operator()(const std::string* s1, const std::string* s2)
+        {
+            return *s1 < *s2;
+        }
+    };
+    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
+    string_set_t m_string_set;
+};
+
+template<class T = node::NodeIdentIFace*>
+class TreeContext : public TreeContextBase
+{
+public:
+	TreeContext(Allocator &alloc)
+        : TreeContextBase(alloc)
+	{
+		memset(&m_root, 0, sizeof(m_root));
+	}
+    T &root() { return m_root; }
+
+private:
+    T m_root; // parse result (AST root)
 };
 
 #endif

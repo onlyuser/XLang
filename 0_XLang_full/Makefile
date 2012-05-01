@@ -106,9 +106,10 @@ clean_lex :
 
 COMMON_CPP_STEMS = \
         XLangAlloc \
+        XLangMVCView \
         XLangNode \
         XLangNodePrinterVisitor \
-        XLangMVCView #\
+        XLangTreeContext #\
         XLangMVCModel
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))

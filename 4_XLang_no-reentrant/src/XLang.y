@@ -36,8 +36,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(parse_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) mvc::MVCModel::make_inner(parse_context(), ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parse_context()->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parse_context()->tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -119,7 +119,7 @@ ParserContext* &parse_context()
 %%
 
 root:
-      program { parse_context()->root() = $1; }
+      program { parse_context()->tree_context().root() = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -151,19 +151,6 @@ ScannerContext::ScannerContext(const char* buf)
 {
 }
 
-const std::string* ParserContext::alloc_unique_string(std::string name)
-{
-    string_set_t::iterator p = m_string_set.find(&name);
-    if(p == m_string_set.end())
-    {
-        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
-                reinterpret_cast<std::string*>(x)->~basic_string();
-                }) std::string(name));
-        p = m_string_set.find(&name);
-    }
-    return *p;
-}
-
 node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)
 {
     parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
@@ -171,7 +158,7 @@ node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)
             }) ParserContext(alloc, s);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
-    return ((0 == error) && errors().str().empty()) ? parse_context()->root() : NULL;
+    return ((0 == error) && errors().str().empty()) ? parse_context()->tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)
@@ -271,10 +258,9 @@ bool do_work(args_t &args)
     node::NodeIdentIFace* ast = NULL;
     if(args.in_xml != "")
     {
-        parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<ParserContext*>(x)->~ParserContext();
-                }) ParserContext(alloc, "");
-        ast = mvc::MVCModel::make_ast(parse_context(), args.in_xml);
+        ast = mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
+                reinterpret_cast<TreeContext<>*>(x)->~TreeContext();
+                }) TreeContext<>(alloc), args.in_xml);
         if(NULL == ast)
         {
             std::cout << "import fail!" << std::endl;

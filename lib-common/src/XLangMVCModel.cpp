@@ -34,54 +34,54 @@ extern uint32_t sym_name_r(std::string name);
 namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* pc, uint32_t sym_id, std::string value)
+node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContextIFace* tc, uint32_t sym_id, std::string value)
 {
-	return new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
+	return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
 			}) node::LeafNode<
 					static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<std::string>::value)
 					>(sym_id, value);
 }
 
-node::InnerNode* MVCModel::make_inner(TreeContext* pc, uint32_t sym_id, size_t size, ...)
+node::InnerNode* MVCModel::make_inner(TreeContextIFace* tc, uint32_t sym_id, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
-    node::InnerNode* node = new (pc->alloc(), __FILE__, __LINE__, [](void* x) {
+    node::InnerNode* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
 			}) node::InnerNode(sym_id, size, ap);
     va_end(ap);
     return node;
 }
 
-static node::NodeIdentIFace* make_leaf(TreeContext* pc, std::string type, std::string value)
+static node::NodeIdentIFace* make_leaf(TreeContextIFace* tc, std::string type, std::string value)
 {
 	if(type == "int")
-		return mvc::MVCModel::make_leaf(pc, sym_name_r(type),
+		return mvc::MVCModel::make_leaf(tc, sym_name_r(type),
 				static_cast<long>(atoi(value.c_str())));
 	if(type == "float")
-		return mvc::MVCModel::make_leaf(pc, sym_name_r(type),
+		return mvc::MVCModel::make_leaf(tc, sym_name_r(type),
 				static_cast<float32_t>(atof(value.c_str())));
 	if(type == "ident")
-		return mvc::MVCModel::make_leaf(pc, sym_name_r(type), pc->alloc_unique_string(value));
+		return mvc::MVCModel::make_leaf(tc, sym_name_r(type), tc->alloc_unique_string(value));
 	return NULL;
 }
 
-static node::NodeIdentIFace* visit(TreeContext* pc, ticpp::Node* node)
+static node::NodeIdentIFace* visit(TreeContextIFace* tc, ticpp::Node* node)
 {
 	if(dynamic_cast<ticpp::Document*>(node))
 	{
 		uint32_t sym_id = 0;
-		node::InnerNode* dest_node = mvc::MVCModel::make_inner(pc, sym_id, 0);
+		node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_id, 0);
 		if(!node->NoChildren())
 		{
 			ticpp::Iterator<ticpp::Node> child;
 			for(child = child.begin(node); child != child.end(); child++)
-				dest_node->push_back(visit(pc, child.Get()));
+				dest_node->push_back(visit(tc, child.Get()));
 			if(dest_node->size() == 1)
 			{
 				node::NodeIdentIFace* dest_child = (*dest_node)[0];
-				pc->alloc()._free(dest_node);
+				tc->alloc()._free(dest_node);
 				return dest_child;
 			}
 		}
@@ -106,22 +106,22 @@ static node::NodeIdentIFace* visit(TreeContext* pc, ticpp::Node* node)
 		value = attrib_map["value"];
 	}
 	if(node->NoChildren())
-		return make_leaf(pc, type, value);
+		return make_leaf(tc, type, value);
 	else
 	{
-		node::InnerNode* dest_node = mvc::MVCModel::make_inner(pc, sym_name_r(type), 0);
+		node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_name_r(type), 0);
 		ticpp::Iterator<ticpp::Node> child;
 		for(child = child.begin(node); child != child.end(); child++)
-			dest_node->push_back(visit(pc, child.Get()));
+			dest_node->push_back(visit(tc, child.Get()));
 		return dest_node;
 	}
 }
 
-node::NodeIdentIFace* MVCModel::make_ast(TreeContext* pc, std::string filename)
+node::NodeIdentIFace* MVCModel::make_ast(TreeContextIFace* tc, std::string filename)
 {
 	ticpp::Document doc(filename.c_str());
 	doc.LoadFile();
-	return visit(pc, &doc);
+	return visit(tc, &doc);
 }
 
 }

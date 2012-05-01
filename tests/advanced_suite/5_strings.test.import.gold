@@ -1,0 +1,5 @@
+<inner type="+" >
+	<leaf type="int" value=1/>
+	<leaf type="char" value="qwe"/>
+	<leaf type="string" value='x'/>
+</inner>

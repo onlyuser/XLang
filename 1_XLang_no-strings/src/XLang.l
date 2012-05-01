@@ -77,7 +77,7 @@ ignored [ \t\n]+
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
-                yylval->ident_value = yyget_extra(yyscanner)->alloc_unique_string(yytext);
+                yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 

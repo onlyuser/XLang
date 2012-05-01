@@ -63,30 +63,17 @@ struct ScannerContext
 };
 
 // context type to hold shared data between bison and flex
-class ParserContext : public TreeContext
+class ParserContext
 {
 public:
-    ParserContext(Allocator &alloc, const char* s)
-        : m_alloc(alloc), m_scanner_context(s), m_root() {}
-    Allocator &alloc() { return m_alloc; }
+    ParserContext(Allocator &alloc, const char* buf)
+        : m_tree_context(alloc), m_scanner_context(buf) {}
+    TreeContext<YYSTYPE> &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
-    YYSTYPE &root() { return m_root; }
-    const std::string* alloc_unique_string(std::string name);
 
 private:
-    Allocator &m_alloc;
+    TreeContext<YYSTYPE> m_tree_context;
     ScannerContext m_scanner_context;
-    YYSTYPE m_root; // parse result (AST root)
-
-    struct str_ptr_compare_t
-    {
-        bool operator()(const std::string* s1, const std::string* s2)
-        {
-            return *s1 < *s2;
-        }
-    };
-    typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
-    string_set_t m_string_set;
 };
 #define YY_EXTRA_TYPE ParserContext*
 
