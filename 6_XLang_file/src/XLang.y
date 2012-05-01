@@ -36,8 +36,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parse_context()->tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parse_context()->tree_context(), ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parser_context()->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parser_context()->tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -82,7 +82,7 @@ uint32_t sym_name_r(std::string name)
     if(name == "ident") return ID_IDENT;
     return 0;
 }
-ParserContext* &parse_context()
+ParserContext* &parser_context()
 {
     static ParserContext* pc = NULL;
     return pc;
@@ -119,7 +119,7 @@ ParserContext* &parse_context()
 %%
 
 root:
-      program { parse_context()->tree_context().root() = $1; }
+      program { parser_context()->tree_context().root() = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -156,12 +156,12 @@ ScannerContext::ScannerContext(FILE* file)
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+    parser_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<ParserContext*>(x)->~ParserContext();
             }) ParserContext(alloc, file);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
-    return ((0 == error) && errors().str().empty()) ? parse_context()->tree_context().root() : NULL;
+    return ((0 == error) && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)

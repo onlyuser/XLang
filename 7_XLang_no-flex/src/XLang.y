@@ -41,8 +41,8 @@
 
 #define SIZE_BUF_SMALL 160
 
-#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parse_context()->tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parse_context()->tree_context(), ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parser_context()->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parser_context()->tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -87,7 +87,7 @@ uint32_t sym_name_r(std::string name)
     if(name == "ident") return ID_IDENT;
     return 0;
 }
-ParserContext* &parse_context()
+ParserContext* &parser_context()
 {
     static ParserContext* pc = NULL;
     return pc;
@@ -95,7 +95,7 @@ ParserContext* &parse_context()
 
 // When in the lexer you have to access parm through the extra data.
 //
-#define PARM parse_context()->scanner_context()
+#define PARM parser_context()->scanner_context()
 
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
@@ -141,7 +141,7 @@ int _XLANG_lex()
             YY_REWIND(1);
             yytext[PARM.m_pos - start_pos] = '\0';
         }
-        _XLANG_lval.ident_value = parse_context()->tree_context().alloc_unique_string(yytext);
+        _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if(isdigit(*cur_ptr))
@@ -214,7 +214,7 @@ int _XLANG_lex()
 %%
 
 root:
-      program { parse_context()->tree_context().root() = $1; }
+      program { parser_context()->tree_context().root() = $1; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
@@ -251,11 +251,11 @@ ScannerContext::ScannerContext(FILE* file)
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
 {
-    parse_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
+    parser_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<ParserContext*>(x)->~ParserContext();
             }) ParserContext(alloc, file);
     int error = _XLANG_parse(); // parser entry point
-    return ((0 == error) && errors().str().empty()) ? parse_context()->tree_context().root() : NULL;
+    return ((0 == error) && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)

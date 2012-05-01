@@ -32,10 +32,6 @@
 //
 #define PARM yyget_extra(yyscanner)->scanner_context()
 
-#ifndef MIN
-    #define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 //

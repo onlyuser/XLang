@@ -59,7 +59,7 @@ void _XLANG_error(const char* s);
 
 std::stringstream &errors();
 std::string sym_name(uint32_t sym_id);
-ParserContext* &parse_context();
+ParserContext* &parser_context();
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file);
 

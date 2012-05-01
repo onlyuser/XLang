@@ -29,7 +29,7 @@
 
 // When in the lexer you have to access parm through the extra data.
 //
-#define PARM parse_context()->scanner_context()
+#define PARM parser_context()->scanner_context()
 
 // We want to read from a the buffer in parm so we have to redefine the
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
@@ -62,7 +62,7 @@ ignored [ \t\n]+
 %%
 
 {ident}     {
-                _XLANG_lval.ident_value = parse_context()->tree_context().alloc_unique_string(yytext);
+                _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
