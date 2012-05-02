@@ -27,7 +27,7 @@ struct NodeIdentIFace
 {
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
 
-    virtual ~NodeIdentIFace() { }
+    virtual ~NodeIdentIFace() {}
     virtual type_e type() const = 0;
     virtual uint32_t sym_id() const = 0;
     virtual std::string name() const = 0;
@@ -66,13 +66,13 @@ struct LeafTypeTraitsR<const std::string*> { enum { value = NodeIdentIFace::IDEN
 template<NodeIdentIFace::type_e type>
 struct LeafNodeIFace
 {
-    virtual ~LeafNodeIFace() { }
+    virtual ~LeafNodeIFace() {}
     virtual typename LeafTypeTraits<type>::type value() const = 0;
 };
 
 struct InnerNodeIFace
 {
-    virtual ~InnerNodeIFace() { }
+    virtual ~InnerNodeIFace() {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
 };

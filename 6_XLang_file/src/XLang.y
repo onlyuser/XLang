@@ -30,7 +30,7 @@
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
-#include <string.h> // memset
+#include <string> // memset
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
@@ -212,7 +212,7 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "flxgdmh?";
+    static const char *optString = "i:f:lxgdmh?";
     static const struct option longOpts[] = {
                 { "in-xml",  required_argument, NULL, 'i' },
                 { "in-file", required_argument, NULL, 'f' },

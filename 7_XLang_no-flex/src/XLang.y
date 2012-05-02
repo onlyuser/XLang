@@ -306,7 +306,7 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "flxgdmh?";
+    static const char *optString = "i:f:lxgdmh?";
     static const struct option longOpts[] = {
                 { "in-xml",  required_argument, NULL, 'i' },
                 { "in-file", required_argument, NULL, 'f' },

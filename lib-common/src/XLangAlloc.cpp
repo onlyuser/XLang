@@ -31,8 +31,8 @@ MemChunk::~MemChunk()
 {
     if(m_ptr)
     {
-    	if(m_dtor)
-    		m_dtor(m_ptr);
+        if(m_dtor)
+            m_dtor(m_ptr);
         free(m_ptr);
     }
 }
@@ -52,7 +52,7 @@ Allocator::~Allocator()
 }
 
 void* Allocator::_malloc(size_t size_bytes, std::string filename, size_t line_number,
-		MemChunk::dtor_type dtor)
+        MemChunk::dtor_type dtor)
 {
     MemChunk* chunk = new MemChunk(size_bytes, filename, line_number, dtor);
     m_size_bytes += size_bytes;
@@ -91,7 +91,7 @@ void Allocator::dump(std::string indent) const
 }
 
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number,
-		MemChunk::dtor_type dtor)
+        MemChunk::dtor_type dtor)
 {
     return alloc._malloc(size_bytes, filename, line_number, dtor);
 }

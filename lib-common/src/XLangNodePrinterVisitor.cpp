@@ -47,7 +47,7 @@ void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node
 
 void NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 {
-	// TODO: fix-me! -- should cast to "NodeIdentIFace" in order to use "::name()", but can't
+    // TODO: fix-me! -- should cast to "NodeIdentIFace" in order to use "::name()", but can't
     //std::cout << dynamic_cast<Node*>(_node)->name();
 }
 

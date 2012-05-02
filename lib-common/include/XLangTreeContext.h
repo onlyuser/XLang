@@ -26,17 +26,17 @@
 class TreeContext
 {
 public:
-	TreeContext(Allocator &alloc)
+    TreeContext(Allocator &alloc)
         : m_alloc(alloc), m_root(NULL)
-	{ }
+    {}
     Allocator &alloc() { return m_alloc; }
-	node::NodeIdentIFace* &root() { return m_root; }
+    node::NodeIdentIFace* &root() { return m_root; }
     const std::string* alloc_unique_string(std::string name);
     std::string* alloc_string(std::string s);
 
 private:
     Allocator &m_alloc;
-	node::NodeIdentIFace* m_root; // parse result (AST root)
+    node::NodeIdentIFace* m_root; // parse result (AST root)
 
     struct str_ptr_compare_t
     {

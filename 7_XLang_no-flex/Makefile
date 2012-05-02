@@ -110,7 +110,7 @@ clean_objects : clean_yacc
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) #$(LEX_STEMS)
+CPP_STEMS = $(YACC_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 

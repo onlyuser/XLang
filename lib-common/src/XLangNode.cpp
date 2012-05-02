@@ -35,7 +35,7 @@ void InnerNode::accept(NodeVisitorIFace* visitor) const
     size_t i;
     for(i = 0; i < size(); i++)
     {
-    	NodeIdentIFace* child = operator[](i);
+        NodeIdentIFace* child = operator[](i);
         switch(child->type())
         {
         case NodeIdentIFace::INT:

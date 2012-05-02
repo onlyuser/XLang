@@ -32,7 +32,7 @@ class Node : public NodeIdentIFace, public VisitableNodeIFace
 public:
     Node(NodeIdentIFace::type_e _type, uint32_t _sym_id)
         : m_type(_type), m_sym_id(_sym_id)
-    { }
+    {}
     NodeIdentIFace::type_e type() const
     {
         return m_type;
@@ -54,7 +54,7 @@ class LeafNode : virtual public Node, public LeafNodeIFace<_type>
 public:
     LeafNode(uint32_t _sym_id, typename LeafTypeTraits<_type>::type _value)
         : Node(_type, _sym_id), m_value(_value)
-    { }
+    {}
     typename LeafTypeTraits<_type>::type value() const
     {
         return m_value;
@@ -93,9 +93,9 @@ public:
         return m_child_vec[index];
     }
     void push_back(NodeIdentIFace* node)
-	{
-    	m_child_vec.push_back(node);
-	}
+    {
+        m_child_vec.push_back(node);
+    }
     size_t size() const
     {
         return m_child_vec.size();

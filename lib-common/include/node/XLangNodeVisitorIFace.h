@@ -24,7 +24,7 @@ namespace node {
 
 struct NodeVisitorIFace
 {
-    virtual ~NodeVisitorIFace() { }
+    virtual ~NodeVisitorIFace() {}
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node) = 0;
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node) = 0;
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node) = 0;
@@ -35,7 +35,7 @@ struct NodeVisitorIFace
 
 struct VisitableNodeIFace
 {
-    virtual ~VisitableNodeIFace() { }
+    virtual ~VisitableNodeIFace() {}
     virtual void accept(NodeVisitorIFace* visitor) const = 0;
 };
 

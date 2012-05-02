@@ -38,7 +38,7 @@ struct MVCModel
                 >(sym_id, loc, value);
     }
     static node::InnerNode* make_inner(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
-	static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
+    static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 
 }

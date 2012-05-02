@@ -27,7 +27,7 @@ std::string* TreeContext::alloc_string(std::string s)
 
 const std::string* TreeContext::alloc_unique_string(std::string name)
 {
-	string_set_t::iterator p = m_string_set.find(&name);
+    string_set_t::iterator p = m_string_set.find(&name);
     if(p == m_string_set.end())
     {
         m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {

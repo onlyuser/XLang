@@ -64,7 +64,7 @@ private:
 
 // NOTE: doesn't work for arrays
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number,
-		MemChunk::dtor_type dtor);
+        MemChunk::dtor_type dtor);
 void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number);
 
 #endif

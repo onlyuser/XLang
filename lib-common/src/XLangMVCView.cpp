@@ -18,6 +18,7 @@
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangType.h" // uint32_t
+#include <string.h> // strlen
 #include <string> // std::string
 #include <iostream> // std::cout
 #include <sstream> // std::stringstream
@@ -28,7 +29,7 @@
 /* calc3d.c: Generation of the graph of the syntax tree */
 
 #include <stdio.h> // printf
-#include <string.h> // strcpy
+#include <string> // strcpy
 
 //#include "calc3.h"
 //#include "calc3.tab.h"
@@ -138,8 +139,8 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
                 depth++;
                 for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
                 {
-                	print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i),
-                			include_node_uid, depth);
+                    print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i),
+                            include_node_uid, depth);
                     std::cout << std::endl;
                 }
                 depth--;
@@ -148,7 +149,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
             break;
     }
     if(depth == 0)
-    	std::cout << std::endl;
+        std::cout << std::endl;
 }
 
 void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
@@ -156,10 +157,10 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
     if(NULL == _node)
         return;
     if(root)
-    	std::cout << "digraph g {" << std::endl;
+        std::cout << "digraph g {" << std::endl;
     std::string id = ptr_to_string(_node);
     std::cout << "\t" << id << " [" << std::endl <<
-    		"\t\tlabel=\"";
+            "\t\tlabel=\"";
     switch(_node->type())
     {
         case node::NodeIdentIFace::INT:
@@ -182,18 +183,18 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
             break;
     }
     std::cout << "\"," << std::endl <<
-    		"\t\tshape=\"ellipse\"" << std::endl <<
-    		"\t];" << std::endl;
+            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t];" << std::endl;
     if(_node->type() == node::NodeIdentIFace::INNER)
-		for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
-		{
-			const node::NodeIdentIFace* child =
-					dynamic_cast<const node::InnerNodeIFace*>(_node)->operator [](i);
-			std::cout << '\t' << id << "->" << ptr_to_string(child) << ";" << std::endl;
-			print_dot(child, false);
-		}
+        for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
+        {
+            const node::NodeIdentIFace* child =
+                    dynamic_cast<const node::InnerNodeIFace*>(_node)->operator [](i);
+            std::cout << '\t' << id << "->" << ptr_to_string(child) << ";" << std::endl;
+            print_dot(child, false);
+        }
     if(root)
-    	std::cout << "}" << std::endl;
+        std::cout << "}" << std::endl;
 }
 
 typedef const node::NodeIdentIFace nodeType;
@@ -258,7 +259,7 @@ void exNode
     int cs;             /* start column of children */
     char word[20];      /* extended node text */
 
-    if (!p) return;
+    if(!p) return;
 
     strcpy (word, "???"); /* should never appear */
     s = word;
@@ -288,7 +289,7 @@ void exNode
     *cm = c + w / 2;
 
     /* node is leaf */
-    if (p->type() != typeOpr ||
+    if(p->type() != typeOpr ||
             dynamic_cast<const node::InnerNodeIFace*>(p)->size() == 0) {
         graphDrawBox (s, cbar, l);
         return;
@@ -296,13 +297,13 @@ void exNode
 
     /* node has children */
     cs = c;
-    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
+    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
         exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         cs = che;
     }
 
     /* total node width */
-    if (w < che - c) {
+    if(w < che - c) {
         cbar += (che - c - w) / 2;
         *ce = che;
         *cm = (c + che) / 2;
@@ -313,7 +314,7 @@ void exNode
 
     /* draw arrows (not optimal: children are drawn a second time) */
     cs = c;
-    for (k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
+    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
         exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         graphDrawArrow (*cm, l+h, chm, l+h+eps-1);
         cs = che;
@@ -331,20 +332,20 @@ int graphNumber = 0;
 void graphTest (int l, int c)
 {   int ok;
     ok = 1;
-    if (l < 0) ok = 0;
-    if (l >= lmax) ok = 0;
-    if (c < 0) ok = 0;
-    if (c >= cmax) ok = 0;
-    if (ok) return;
-    printf ("\n+++error: l=%d, c=%d not in drawing rectangle 0, 0 ... %d, %d", 
+    if(l < 0) ok = 0;
+    if(l >= lmax) ok = 0;
+    if(c < 0) ok = 0;
+    if(c >= cmax) ok = 0;
+    if(ok) return;
+    printf ("\n+++error: l=%d, c=%d not in drawing rectangle 0, 0 ... %d, %d",
         l, c, lmax, cmax);
     //exit (1);
 }
 
 void graphInit (void) {
     int i, j;
-    for (i = 0; i < lmax; i++) {
-        for (j = 0; j < cmax; j++) {
+    for(i = 0; i < lmax; i++) {
+        for(j = 0; j < cmax; j++) {
             graph[i][j] = ' ';
         }
     }
@@ -352,15 +353,15 @@ void graphInit (void) {
 
 void graphFinish() {
     int i, j;
-    for (i = 0; i < lmax; i++) {
-        for (j = cmax-1; j > 0 && graph[i][j] == ' '; j--);
+    for(i = 0; i < lmax; i++) {
+        for(j = cmax-1; j > 0 && graph[i][j] == ' '; j--);
         graph[i][cmax-1] = 0;
-        if (j < cmax-1) graph[i][j+1] = 0;
-        if (graph[i][j] == ' ') graph[i][j] = 0;
+        if(j < cmax-1) graph[i][j+1] = 0;
+        if(graph[i][j] == ' ') graph[i][j] = 0;
     }
-    for (i = lmax-1; i > 0 && graph[i][0] == 0; i--);
+    for(i = lmax-1; i > 0 && graph[i][0] == 0; i--);
     printf ("\n\nGraph %d:\n", graphNumber++);
-    for (j = 0; j <= i; j++) printf ("\n%s", graph[j]);
+    for(j = 0; j <= i; j++) printf ("\n%s", graph[j]);
     printf("\n");
 }
 
@@ -372,7 +373,7 @@ void graphBox (char *s, int *w, int *h) {
 void graphDrawBox (char *s, int c, int l) {
     size_t i;
     graphTest (l, c+strlen(s)-1+del);
-    for (i = 0; i < strlen (s); i++) {
+    for(i = 0; i < strlen (s); i++) {
         graph[l][c+i+del] = s[i];
     }
 }
@@ -382,9 +383,9 @@ void graphDrawArrow (int c1, int l1, int c2, int l2) {
     graphTest (l1, c1);
     graphTest (l2, c2);
     m = (l1 + l2) / 2;
-    while (l1 != m) { graph[l1][c1] = '|'; if (l1 < l2) l1++; else l1--; }
-    while (c1 != c2) { graph[l1][c1] = '-'; if (c1 < c2) c1++; else c1--; }
-    while (l1 != l2) { graph[l1][c1] = '|'; if (l1 < l2) l1++; else l1--; }
+    while(l1 != m) { graph[l1][c1] = '|'; if(l1 < l2) l1++; else l1--; }
+    while(c1 != c2) { graph[l1][c1] = '-'; if(c1 < c2) c1++; else c1--; }
+    while(l1 != l2) { graph[l1][c1] = '|'; if(l1 < l2) l1++; else l1--; }
     graph[l1][c1] = '|';
 }
 
