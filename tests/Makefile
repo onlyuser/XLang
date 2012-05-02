@@ -34,22 +34,22 @@ PURE_SH = $(SCRIPT_PATH)/pure.sh
 EXPORT_SH = $(SCRIPT_PATH)/export.sh
 
 ifneq ($(strip $(BASIC_SUITE)),)
-    TEST_PATH = basic_suite
-    TEST_FILE_STEMS = \
-            0_simple \
-            1_op_prec \
-            2_grouping \
-            3_identifier
+	TEST_PATH = basic_suite
+	TEST_FILE_STEMS = \
+			0_simple \
+			1_op_prec \
+			2_grouping \
+			3_identifier
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
-    TEST_PATH = advanced_suite
-    TEST_FILE_STEMS = \
-            4_comments
+	TEST_PATH = advanced_suite
+	TEST_FILE_STEMS = \
+			4_comments
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
-    TEST_PATH = advanced_suite
-    TEST_FILE_STEMS = \
-            5_strings
+	TEST_PATH = advanced_suite
+	TEST_FILE_STEMS = \
+			5_strings
 endif
 
 #==================
