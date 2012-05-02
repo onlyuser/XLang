@@ -1,7 +1,7 @@
 <inner type="+" >
-    <leaf type="int" value=1/>
-    <inner type="*" >
-        <leaf type="int" value=2/>
-        <leaf type="int" value=3/>
-    </inner>
+	<leaf type="int" value=1/>
+	<inner type="*" >
+		<leaf type="int" value=2/>
+		<leaf type="int" value=3/>
+	</inner>
 </inner>
