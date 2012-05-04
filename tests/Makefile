@@ -29,9 +29,6 @@
 
 PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
-TEST_SH = $(SCRIPT_PATH)/test.sh
-PURE_SH = $(SCRIPT_PATH)/pure.sh
-EXPORT_SH = $(SCRIPT_PATH)/export.sh
 
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
@@ -66,6 +63,7 @@ all : test
 TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
+TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) --lisp $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
@@ -86,6 +84,7 @@ INPUT_MODE = xml
 IMPORT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.import, $(TEST_FILE_STEMS))
 IMPORT_PASS_FILES = $(patsubst %, %.pass, $(IMPORT_FILES))
 IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
+TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/%.test.import.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.test.import.gold $(TEST_PATH)/$*.test.import.gold \
@@ -106,6 +105,7 @@ PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.test.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 GOLD_KEYWORD = "All heap blocks were freed -- no leaks are possible"
+PURE_SH = $(SCRIPT_PATH)/pure.sh
 
 $(BUILD_PATH)/%.test.pure.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(GOLD_KEYWORD) \
@@ -124,6 +124,7 @@ clean_pure :
 
 DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.test.dot, $(TEST_FILE_STEMS))
 DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
+EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
 $(BUILD_PATH)/%.test.dot.png : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
@@ -142,6 +143,7 @@ clean_dot :
 #==================
 
 XML_FILES = $(patsubst %, $(BUILD_PATH)/%.test.xml, $(TEST_FILE_STEMS))
+EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
 $(BUILD_PATH)/%.test.xml : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \

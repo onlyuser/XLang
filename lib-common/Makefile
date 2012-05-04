@@ -42,13 +42,18 @@ INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 LIB_PATHS = $(LIB_PATH) $(EXTERN_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-EXTERN_LIB_STEMS = ticppd
-EXTERN_LIBS = $(patsubst %, $(EXTERN_LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+ifdef EXTERN_LIB_PATH
+    EXTERN_LIB_STEMS = ticppd
+    EXTERN_LIBS = $(patsubst %, $(EXTERN_LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+endif
 LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
 #DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+ifdef EXTERN_INCLUDE_PATH
+	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH
+endif
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
@@ -86,7 +91,7 @@ CPP_STEMS = \
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(EXTERN_LIBS) $(OBJECTS)
+$(BINARY) : $(OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(AR) -cvq $@ $^
 	mkdir -p $(PARENT_LIB_PATH)
@@ -103,7 +108,6 @@ clean_binary : clean_objects
 
 LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
 LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
-
 LINT_SH = $(SCRIPT_PATH)/lint.sh
 
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp

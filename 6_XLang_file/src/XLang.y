@@ -30,7 +30,6 @@
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
-#include <string> // memset
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
