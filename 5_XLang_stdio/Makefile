@@ -44,8 +44,10 @@ INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(EXTERN_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-EXTERN_LIB_STEMS = ticppd
-EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+ifdef EXTERN_LIB_PATH
+    EXTERN_LIB_STEMS = ticppd
+    EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+endif
 PARENT_LIB_STEMS = common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
@@ -54,6 +56,9 @@ LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 CXX = g++
 #DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+ifdef EXTERN_INCLUDE_PATH
+	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH
+endif
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
@@ -225,7 +230,6 @@ clean_xml :
 
 LINT_PASS_FILES = $(patsubst %, %.pass, $(LINT_FILES))
 LINT_FAIL_FILES = $(patsubst %, %.fail, $(LINT_FILES))
-
 LINT_SH = $(SCRIPT_PATH)/lint.sh
 
 $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
