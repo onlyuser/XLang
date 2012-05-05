@@ -18,6 +18,9 @@
 LIB_PATH = lib
 
 SUBPATHS = \
+	0_XLang_full \
+	1_XLang_no-strings \
+	2_XLang_no-comments \
 	3_XLang_no-locations \
 	4_XLang_no-reentrant \
 	5_XLang_stdio \
