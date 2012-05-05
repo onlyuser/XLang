@@ -43,8 +43,8 @@ LIB_PATHS = $(LIB_PATH) $(EXTERN_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
 ifdef EXTERN_LIB_PATH
-    EXTERN_LIB_STEMS = ticppd
-    EXTERN_LIBS = $(patsubst %, $(EXTERN_LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+	EXTERN_LIB_STEMS = ticppd
+	EXTERN_LIBS = $(patsubst %, $(EXTERN_LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 endif
 LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 

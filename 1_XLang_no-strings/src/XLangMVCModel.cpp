@@ -24,13 +24,13 @@
 #include <string> // std::string
 
 #ifdef EXTERN_INCLUDE_PATH
-	#define TIXML_USE_TICPP
+    #define TIXML_USE_TICPP
 #endif
 #ifdef TIXML_USE_TICPP
     #include <ticpp/ticpp.h>
 
-	// prototype
-	extern uint32_t sym_name_r(std::string name);
+    // prototype
+    extern uint32_t sym_name_r(std::string name);
 #endif
 
 namespace mvc {

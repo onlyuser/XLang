@@ -45,8 +45,8 @@ LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(EXTERN_LIB_PATH)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
 ifdef EXTERN_LIB_PATH
-    EXTERN_LIB_STEMS = ticppd
-    EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
+	EXTERN_LIB_STEMS = ticppd
+	EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 endif
 PARENT_LIB_STEMS = common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))

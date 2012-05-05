@@ -24,13 +24,13 @@
 #include <map> // std::map
 
 #ifdef EXTERN_INCLUDE_PATH
-	#define TIXML_USE_TICPP
+    #define TIXML_USE_TICPP
 #endif
 #ifdef TIXML_USE_TICPP
     #include <ticpp/ticpp.h>
 
-	// prototype
-	extern uint32_t sym_name_r(std::string name);
+    // prototype
+    extern uint32_t sym_name_r(std::string name);
 #endif
 
 namespace mvc {
@@ -124,11 +124,11 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
 node::NodeIdentIFace* MVCModel::make_ast(TreeContext* tc, std::string filename)
 {
 #ifdef TIXML_USE_TICPP
-	ticpp::Document doc(filename.c_str());
-	doc.LoadFile();
-	return visit(tc, &doc);
+    ticpp::Document doc(filename.c_str());
+    doc.LoadFile();
+    return visit(tc, &doc);
 #else
-	return NULL;
+    return NULL;
 #endif
 }
 
