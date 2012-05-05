@@ -1,4 +1,4 @@
-Variations of a Flex-Bison parser
+Variations of a Lex-Yacc parser
 based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 
 Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
@@ -6,7 +6,7 @@ Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 About:
 
     This is a parser "framework" inspired by Tom Niemann's excellent "Compact Guide
-    to Lex/Yacc". 7 variations of Flex/Bison parser are presented, varying in
+    to Lex/Yacc". 7 variations of Lex-Yacc parser are presented, varying in
     feature richness.
 
     The first variation (0_XLang_full), is a full-featured parser. With each
@@ -24,9 +24,9 @@ About:
     reason one cannot cannot have both "comments" and "file input" enabled, or both
     "reentrant" and "hand-rolled lexer" enabled.
 
-    The code is organized in a way that anyone unfamiliar with Flex/Bison can
-    quickly isolate a variation that is most relevent, and most readily customizable
-    to his/her specific requirements.
+    The code is organized in a way that anyone unfamiliar with Lex-Yacc can quickly
+    isolate a variation that is most relevent, and most readily customizable to
+    his/her specific requirements.
 
 Variation vs Feature Table:
 
@@ -79,7 +79,7 @@ Feature Detail:
 
     locations: Tell the parser to provide a location variable "$@" for each BNF
                production. This option demonstrates the standard way to track syntax
-               error line/column number using Flex/Bison.
+               error line/column number using Lex-Yacc.
 
     comments: Tell the lexer to conditionally enable/disable certain lexer rules for
               stateful scanning. This option demonstrates the standard way to ignore
