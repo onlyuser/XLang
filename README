@@ -9,9 +9,9 @@ About:
     to Lex/Yacc". 7 variations of Flex/Bison parser are presented, varying in
     feature richness.
 
-    The first variation, "0_XLang_full", is a full-featured parser. With each
+    The first variation (0_XLang_full), is a full-featured parser. With each
     successive variation, non-critical features are stripped until there is nothing
-    left but a flex-less parser, "7_XLang_no-flex".
+    left but a flex-less parser, the last variation (7_XLang_no-flex).
 
     feature <--                                                         --> feature
     rich                                                                    poor
@@ -129,19 +129,30 @@ FAQ:
        I recommend hacking the "stdio" example to your liking, but any of the other
        variations is suitable as a base for beginners.
 
-    4. What licenses or restrictions apply if I decide to use XLang ?
+    4. What licenses apply when using XLang ?
        GPL3.
 
     5. Why did you write XLang ?
        I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
        excellent tutorial.
 
-    6. Why allocators ?
+    6. How does this "framework" differ from that found in Tom Niemann's excellent
+       tutorial ?
+       a) XLang uses C++, with unions used only where necessary.
+       b) XLang has its own memory management system based on allocators.
+       c) XLang offers different flavors of Lex-Yacc whereas Tom's tutorial only
+          offers one "stdio" parser.
+
+    7. Why allocators ?
        I've incorporated a simple memory allocator in this project because I wanted
        to keep my AST node classes as clean as possible, without destructors that
        delete child nodes. But the way the allocator was written really doesn't
        improve the program's memory usage patterns. With some effort, I suppose one
        could upgrade that into a real allocator with true memory pooling.
+
+    8. Why did you use C++0x ?
+       Lambda functions are the only C++0x feature used here, and only because it
+       solves the problem elengantly.
 
 References:
 
