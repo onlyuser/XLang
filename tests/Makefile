@@ -87,8 +87,8 @@ IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/%.test.import.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.test.import.gold $(TEST_PATH)/$*.test.import.gold \
-			$(BUILD_PATH)/$*.test.import
+	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.test.import.test-gold \
+			$(TEST_PATH)/$*.test.import.test-gold $(BUILD_PATH)/$*.test.import
 
 .PHONY : import
 import : $(IMPORT_PASS_FILES)
