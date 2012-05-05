@@ -103,15 +103,17 @@ Requirements:
 
 Make targets:
 
-    all, test, pure, dot, lint, doc, clean.
+    all, test, pure, dot, lint, doc, xml, import, clean.
 
-    all:   make binaries
-    test:  all + run tests
-    pure:  test + use valgrind to check for memory leaks
-    dot:   test + generate .png graph for tests
-    lint:  use cppcheck to run static analysis on .cpp files
-    doc:   use doxygen to generate documentation
-    clean: remove all target-generated files
+    all:    make binaries
+    test:   all + run tests
+    pure:   test + use valgrind to check for memory leaks
+    dot:    test + generate .png graph for tests
+    lint:   use cppcheck to perform static analysis on .cpp files
+    doc:    use doxygen to generate documentation
+    xml:    test + generate .xml for tests
+    import: test + use ticpp to serialize-to/deserialize-from xml
+    clean:  remove all target-generated files
 
 FAQ:
 
@@ -128,8 +130,7 @@ FAQ:
        variations is suitable as a base for beginners.
 
     4. What licenses or restrictions apply if I decide to use XLang ?
-       GPL3, but I would be glad to hear from you if XLang is useful for your
-       project.
+       GPL3.
 
     5. Why did you write XLang ?
        I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
