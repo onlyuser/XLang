@@ -1,11 +1,11 @@
 <inner type="-" >
-	<leaf type="int" value=1/>
-	<inner type="*" >
-		<inner type="negate" >
-			<leaf type="int" value=2/>
-		</inner>
-		<inner type="negate" >
-			<leaf type="int" value=3/>
-		</inner>
-	</inner>
+    <leaf type="int" value=1/>
+    <inner type="*" >
+        <inner type="negate" >
+            <leaf type="int" value=2/>
+        </inner>
+        <inner type="negate" >
+            <leaf type="int" value=3/>
+        </inner>
+    </inner>
 </inner>

@@ -170,6 +170,19 @@ int _XLANG_lex()
         _XLANG_lval.int_value = atoi(yytext);
         return ID_INT;
     }
+    else if(*cur_ptr == ' ' || *cur_ptr == '\t' || *cur_ptr == '\n')
+    {
+        do
+        {
+            cur_ptr = &yytext[PARM.m_pos - start_pos];
+            YY_INPUT(cur_ptr, bytes_read, 1);
+        } while(bytes_read != 0 && (*cur_ptr == ' ' || *cur_ptr == '\t' || *cur_ptr == '\n'));
+        if(bytes_read != 0)
+        {
+            YY_REWIND(1);
+            return _XLANG_lex();
+        }
+    }
     else
         switch(*cur_ptr)
         {

@@ -89,7 +89,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
     if(NULL == _node)
         return;
     std::string id = ptr_to_string(_node);
-    std::cout << std::string(depth, '\t');
+    std::cout << std::string(depth*4, ' ');
     switch(_node->type())
     {
         case node::NodeIdentIFace::INT:
@@ -144,7 +144,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
                     std::cout << std::endl;
                 }
                 depth--;
-                std::cout << std::string(depth, '\t') << "</inner>";
+                std::cout << std::string(depth*4, ' ') << "</inner>";
             }
             break;
     }
