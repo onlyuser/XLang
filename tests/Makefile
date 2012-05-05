@@ -36,7 +36,8 @@ ifneq ($(strip $(BASIC_SUITE)),)
 			0_simple \
 			1_op_prec \
 			2_grouping \
-			3_identifier
+			3_identifier \
+			4_negate
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
 	TEST_PATH = advanced_suite

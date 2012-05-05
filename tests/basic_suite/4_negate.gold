@@ -1,0 +1,1 @@
+(- 1 (* (negate 2) (negate 3)))

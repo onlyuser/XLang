@@ -60,12 +60,13 @@ std::string sym_name(uint32_t sym_id)
 {
     switch(sym_id)
     {
-        case '+': return "+";
-        case '-': return "-";
-        case '*': return "*";
-        case '/': return "/";
-        case '=': return "=";
-        case ',': return ",";
+        case UMINUS: return "negate";
+        case '+':    return "+";
+        case '-':    return "-";
+        case '*':    return "*";
+        case '/':    return "/";
+        case '=':    return "=";
+        case ',':    return ",";
     }
     static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
         "int",
@@ -76,15 +77,16 @@ std::string sym_name(uint32_t sym_id)
 }
 uint32_t sym_name_r(std::string name)
 {
-    if(name == "+")     return '+';
-    if(name == "-")     return '-';
-    if(name == "*")     return '*';
-    if(name == "/")     return '/';
-    if(name == "=")     return '=';
-    if(name == ",")     return ',';
-    if(name == "int")   return ID_INT;
-    if(name == "float") return ID_FLOAT;
-    if(name == "ident") return ID_IDENT;
+    if(name == "negate") return UMINUS;
+    if(name == "+")      return '+';
+    if(name == "-")      return '-';
+    if(name == "*")      return '*';
+    if(name == "/")      return '/';
+    if(name == "=")      return '=';
+    if(name == ",")      return ',';
+    if(name == "int")    return ID_INT;
+    if(name == "float")  return ID_FLOAT;
+    if(name == "ident")  return ID_IDENT;
     return 0;
 }
 
@@ -110,6 +112,7 @@ uint32_t sym_name_r(std::string name)
 
 %left '+' '-'
 %left '*' '/'
+%nonassoc UMINUS
 
 %nonassoc ID_COUNT
 
@@ -131,14 +134,15 @@ statement:
     ;
 
 expression:
-      ID_INT                    { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT                  { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-    | ID_IDENT                  { $$ = MAKE_LEAF(ID_IDENT, $1); }
-    | expression '+' expression { $$ = MAKE_INNER('+', 2, $1, $3); }
-    | expression '-' expression { $$ = MAKE_INNER('-', 2, $1, $3); }
-    | expression '*' expression { $$ = MAKE_INNER('*', 2, $1, $3); }
-    | expression '/' expression { $$ = MAKE_INNER('/', 2, $1, $3); }
-    | '(' expression ')'        { $$ = $2; }
+      ID_INT                      { $$ = MAKE_LEAF(ID_INT, $1); }
+    | ID_FLOAT                    { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    | ID_IDENT                    { $$ = MAKE_LEAF(ID_IDENT, $1); }
+    | '-' expression %prec UMINUS { $$ = MAKE_INNER(UMINUS, 1, $2); }
+    | expression '+' expression   { $$ = MAKE_INNER('+', 2, $1, $3); }
+    | expression '-' expression   { $$ = MAKE_INNER('-', 2, $1, $3); }
+    | expression '*' expression   { $$ = MAKE_INNER('*', 2, $1, $3); }
+    | expression '/' expression   { $$ = MAKE_INNER('/', 2, $1, $3); }
+    | '(' expression ')'          { $$ = $2; }
     ;
 
 %%
