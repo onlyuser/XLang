@@ -42,12 +42,12 @@ endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
 	TEST_PATH = advanced_suite
 	TEST_FILE_STEMS = \
-			4_comments
+			0_comments
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_PATH = advanced_suite
 	TEST_FILE_STEMS = \
-			5_strings
+			1_strings
 endif
 OUT_PREFIX = $(TEST_PATH)
 
