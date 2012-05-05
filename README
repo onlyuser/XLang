@@ -123,7 +123,7 @@ FAQ:
        XLang is not unified parser front-end that will properly construct ASTs for
        every language under the sun.
 
-    3. How should one use XLang ?
+    3. How should I use XLang ?
        I recommend hacking the "stdio" example to your liking, but any of the other
        variations is suitable as a base for beginners.
 
