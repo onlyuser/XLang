@@ -363,7 +363,7 @@ bool parse_args(int argc, char** argv, args_t &args)
     return true;
 }
 
-bool do_import(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
+bool import_ast(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
 {
     if(args.in_xml != "")
     {
@@ -395,7 +395,7 @@ bool do_import(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
     return true;
 }
 
-void do_export(args_t &args, node::NodeIdentIFace* ast)
+void export_ast(args_t &args, node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
@@ -432,9 +432,9 @@ bool do_work(args_t &args)
     }
     Allocator alloc(__FILE__);
     node::NodeIdentIFace* ast = NULL;
-    if(!do_import(args, alloc, ast))
+    if(!import_ast(args, alloc, ast))
         return false;
-    do_export(args, ast);
+    export_ast(args, ast);
     if(args.dump_memory)
         alloc.dump(std::string(1, '\t'));
     return true;
