@@ -49,6 +49,7 @@ ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_FILE_STEMS = \
 			5_strings
 endif
+OUT_PREFIX = $(TEST_PATH)
 
 #==================
 # all
@@ -61,14 +62,14 @@ all : test
 # test
 #==================
 
-TEST_FILES = $(patsubst %, $(BUILD_PATH)/%.test, $(TEST_FILE_STEMS))
+TEST_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.test, $(TEST_FILE_STEMS))
 TEST_PASS_FILES = $(patsubst %, %.pass, $(TEST_FILES))
 TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
-$(BUILD_PATH)/%.test.pass : $(BINARY) $(TEST_PATH)/%.test
+$(BUILD_PATH)/$(OUT_PREFIX).%.test.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) --lisp $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
-			$(BUILD_PATH)/$*.test
+			$(BUILD_PATH)/$(OUT_PREFIX).$*.test
 
 .PHONY : test
 test : $(TEST_PASS_FILES)
@@ -82,14 +83,14 @@ clean_test :
 #==================
 
 INPUT_MODE = xml
-IMPORT_FILES = $(patsubst %, $(BUILD_PATH)/%.import, $(TEST_FILE_STEMS))
+IMPORT_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.import, $(TEST_FILE_STEMS))
 IMPORT_PASS_FILES = $(patsubst %, %.pass, $(IMPORT_FILES))
 IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
-$(BUILD_PATH)/%.import.pass : $(BINARY) $(TEST_PATH)/%.test
+$(BUILD_PATH)/$(OUT_PREFIX).%.import.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.import.test-gold \
-			$(TEST_PATH)/$*.import.test-gold $(BUILD_PATH)/$*.import
+			$(TEST_PATH)/$*.import.test-gold $(BUILD_PATH)/$(OUT_PREFIX).$*.import
 
 .PHONY : import
 import : $(IMPORT_PASS_FILES)
@@ -102,15 +103,15 @@ clean_import :
 # pure
 #==================
 
-PURE_FILES = $(patsubst %, $(BUILD_PATH)/%.pure, $(TEST_FILE_STEMS))
+PURE_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.pure, $(TEST_FILE_STEMS))
 PURE_PASS_FILES = $(patsubst %, %.pass, $(PURE_FILES))
 PURE_FAIL_FILES = $(patsubst %, %.fail, $(PURE_FILES))
 GOLD_KEYWORD = "All heap blocks were freed -- no leaks are possible"
 PURE_SH = $(SCRIPT_PATH)/pure.sh
 
-$(BUILD_PATH)/%.pure.pass : $(BINARY) $(TEST_PATH)/%.test
+$(BUILD_PATH)/$(OUT_PREFIX).%.pure.pass : $(BINARY) $(TEST_PATH)/%.test
 	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(GOLD_KEYWORD) \
-			$(BUILD_PATH)/$*.pure
+			$(BUILD_PATH)/$(OUT_PREFIX).$*.pure
 
 .PHONY : pure
 pure : $(PURE_PASS_FILES)
@@ -123,14 +124,14 @@ clean_pure :
 # dot
 #==================
 
-DOT_FILES = $(patsubst %, $(BUILD_PATH)/%.dot, $(TEST_FILE_STEMS))
+DOT_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.dot, $(TEST_FILE_STEMS))
 DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
 EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
-$(BUILD_PATH)/%.dot.png : $(BINARY) $(TEST_PATH)/%.test
+$(BUILD_PATH)/$(OUT_PREFIX).%.dot.png : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
 			png \
-			$(BUILD_PATH)/$*.dot
+			$(BUILD_PATH)/$(OUT_PREFIX).$*.dot
 
 .PHONY : dot
 dot : $(DOT_PNG_FILES)
@@ -143,13 +144,13 @@ clean_dot :
 # xml
 #==================
 
-XML_FILES = $(patsubst %, $(BUILD_PATH)/%.xml, $(TEST_FILE_STEMS))
+XML_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.xml, $(TEST_FILE_STEMS))
 EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
-$(BUILD_PATH)/%.xml : $(BINARY) $(TEST_PATH)/%.test
+$(BUILD_PATH)/$(OUT_PREFIX).%.xml : $(BINARY) $(TEST_PATH)/%.test
 	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
 			xml \
-			$(BUILD_PATH)/$*
+			$(BUILD_PATH)/$(OUT_PREFIX).$*
 
 .PHONY : xml
 xml : $(XML_FILES)
