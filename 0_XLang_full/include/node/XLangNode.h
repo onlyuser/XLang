@@ -56,7 +56,7 @@ protected:
 };
 
 template<NodeIdentIFace::type_e _type>
-class LeafNode : virtual public Node, public LeafNodeIFace<_type>
+class LeafNode : public Node, public LeafNodeIFace<_type>
 {
 public:
     LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafTypeTraits<_type>::type _value)
@@ -76,7 +76,7 @@ private:
     typename LeafTypeTraits<_type>::type m_value;
 };
 
-class InnerNode : virtual public Node, public InnerNodeIFace
+class InnerNode : public Node, public InnerNodeIFace
 {
 public:
     InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
