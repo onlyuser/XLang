@@ -19,13 +19,13 @@
 #include <iostream> // std::cout
 
 // prototype
-extern std::string sym_name(uint32_t sym_id);
+extern std::string id_to_name(uint32_t sym_id);
 
 namespace node {
 
 std::string Node::name() const
 {
-    return sym_name(sym_id());
+    return id_to_name(sym_id());
 }
 void InnerNode::accept(NodeVisitorIFace* visitor) const
 {
@@ -38,24 +38,24 @@ void InnerNode::accept(NodeVisitorIFace* visitor) const
         NodeIdentIFace* child = operator[](i);
         switch(child->type())
         {
-        case NodeIdentIFace::INT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child));
-            break;
-        case NodeIdentIFace::FLOAT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child));
-            break;
-        case NodeIdentIFace::STRING:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child));
-            break;
-        case NodeIdentIFace::CHAR:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child));
-            break;
-        case NodeIdentIFace::IDENT:
-            visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child));
-            break;
-        case NodeIdentIFace::INNER:
-            dynamic_cast<const node::VisitableNodeIFace*>(child)->accept(visitor);
-            break;
+			case NodeIdentIFace::INT:
+				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child));
+				break;
+			case NodeIdentIFace::FLOAT:
+				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child));
+				break;
+			case NodeIdentIFace::STRING:
+				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child));
+				break;
+			case NodeIdentIFace::CHAR:
+				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child));
+				break;
+			case NodeIdentIFace::IDENT:
+				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child));
+				break;
+			case NodeIdentIFace::INNER:
+				dynamic_cast<const node::VisitableNodeIFace*>(child)->accept(visitor);
+				break;
         }
         if(i < size()-1)
             std::cout << ' ';

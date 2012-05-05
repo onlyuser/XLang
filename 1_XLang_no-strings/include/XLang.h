@@ -67,7 +67,8 @@ class ParserContext
 {
 public:
     ParserContext(Allocator &alloc, const char* buf)
-        : m_tree_context(alloc), m_scanner_context(buf) {}
+        : m_tree_context(alloc), m_scanner_context(buf)
+    {}
     TreeContext &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
 
@@ -89,7 +90,7 @@ void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char*
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
-std::string sym_name(uint32_t sym_id);
+std::string id_to_name(uint32_t sym_id);
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, char* s);
 

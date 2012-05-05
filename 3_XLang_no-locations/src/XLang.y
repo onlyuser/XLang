@@ -56,7 +56,7 @@ std::stringstream &errors()
     static std::stringstream _errors;
     return _errors;
 }
-std::string sym_name(uint32_t sym_id)
+std::string id_to_name(uint32_t sym_id)
 {
     switch(sym_id)
     {
@@ -68,14 +68,14 @@ std::string sym_name(uint32_t sym_id)
         case '=':    return "=";
         case ',':    return ",";
     }
-    static const char* _sym_name[ID_COUNT - ID_BASE - 1] = {
+    static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
         "int",
         "float",
         "ident"
         };
-    return _sym_name[sym_id - ID_BASE - 1];
+    return _id_to_name[sym_id - ID_BASE - 1];
 }
-uint32_t sym_name_r(std::string name)
+uint32_t name_to_id(std::string name)
 {
     if(name == "negate") return UMINUS;
     if(name == "+")      return '+';
@@ -149,8 +149,7 @@ expression:
 
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf))
-{
-}
+{}
 
 node::NodeIdentIFace* make_ast(Allocator &alloc, const char* s)
 {
@@ -202,7 +201,8 @@ struct args_t
     bool dump_memory;
 
     args_t()
-        : mode(MODE_NONE), dump_memory(false) {}
+        : mode(MODE_NONE), dump_memory(false)
+    {}
 };
 
 bool parse_args(int argc, char** argv, args_t &args)

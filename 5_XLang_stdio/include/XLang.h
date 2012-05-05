@@ -35,7 +35,7 @@ int _XLANG_parse();
 void _XLANG_error(const char* s);
 
 std::stringstream &errors();
-std::string sym_name(uint32_t sym_id);
+std::string id_to_name(uint32_t sym_id);
 TreeContext* &tree_context();
 
 node::NodeIdentIFace* make_ast(Allocator &alloc);

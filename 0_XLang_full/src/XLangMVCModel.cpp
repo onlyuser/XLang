@@ -30,7 +30,7 @@
     #include <ticpp/ticpp.h>
 
     // prototype
-    extern uint32_t sym_name_r(std::string name);
+    extern uint32_t name_to_id(std::string name);
 #endif
 
 namespace mvc {
@@ -63,23 +63,23 @@ static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::s
     static YYLTYPE dummy_loc;
     memset(&dummy_loc, 0, sizeof(dummy_loc));
     if(type == "int")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), dummy_loc,
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
                 static_cast<node::LeafTypeTraits<node::NodeIdentIFace::INT>::type>(
                         atoi(value.c_str())
                         ));
     if(type == "float")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), dummy_loc,
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
                 static_cast<node::LeafTypeTraits<node::NodeIdentIFace::FLOAT>::type>(
                         atof(value.c_str())
                         ));
     if(type == "string")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), dummy_loc,
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
                 static_cast<node::LeafTypeTraits<node::NodeIdentIFace::STRING>::type>(value));
     if(type == "char")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), dummy_loc,
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
                 static_cast<node::LeafTypeTraits<node::NodeIdentIFace::CHAR>::type>(value[0]));
     if(type == "ident")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), dummy_loc,
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
                 static_cast<node::LeafTypeTraits<node::NodeIdentIFace::IDENT>::type>(
                         tc->alloc_unique_string(value)
                         ));
@@ -130,7 +130,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         return make_leaf(tc, type, value);
     else
     {
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_name_r(type), dummy_loc, 0);
+        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, name_to_id(type), dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->push_back(visit(tc, child.Get()));

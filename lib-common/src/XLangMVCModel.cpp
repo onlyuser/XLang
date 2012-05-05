@@ -30,7 +30,7 @@
     #include <ticpp/ticpp.h>
 
     // prototype
-    extern uint32_t sym_name_r(std::string name);
+    extern uint32_t name_to_id(std::string name);
 #endif
 
 namespace mvc {
@@ -60,13 +60,13 @@ node::InnerNode* MVCModel::make_inner(TreeContext* tc, uint32_t sym_id, size_t s
 static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::string value)
 {
     if(type == "int")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type),
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type),
                 static_cast<long>(atoi(value.c_str())));
     if(type == "float")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type),
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type),
                 static_cast<float32_t>(atof(value.c_str())));
     if(type == "ident")
-        return mvc::MVCModel::make_leaf(tc, sym_name_r(type), tc->alloc_unique_string(value));
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), tc->alloc_unique_string(value));
     return NULL;
 }
 
@@ -112,7 +112,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         return make_leaf(tc, type, value);
     else
     {
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_name_r(type), 0);
+        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, name_to_id(type), 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->push_back(visit(tc, child.Get()));
