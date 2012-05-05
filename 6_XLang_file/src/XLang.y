@@ -277,6 +277,7 @@ bool do_import(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
             return false;
         }
         ast = make_ast(alloc, file);
+        fclose(file);
         if(NULL == ast)
         {
             std::cout << errors().str().c_str() << std::endl;
