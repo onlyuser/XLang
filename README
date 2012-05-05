@@ -113,6 +113,35 @@ Make targets:
     doc:   use doxygen to generate documentation
     clean: remove all target-generated files
 
+FAQ:
+
+    1. What is XLang ?
+       XLang is a starting point for people looking to construct their own language
+       using Lex-Yacc.
+
+    2. What isn't XLang ?
+       XLang is not unified parser front-end that will properly construct ASTs for
+       every language under the sun.
+
+    3. How should one use XLang ?
+       I recommend hacking the "stdio" example to your liking, but any of the other
+       variations is suitable as a base for beginners.
+
+    4. What licenses or restrictions apply if I decide to use XLang ?
+       GPL3, but I would be glad to hear from you if XLang is useful for your
+       project.
+
+    5. Why did you write XLang ?
+       I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
+       excellent tutorial.
+
+    6. Why allocators ?
+       I've incorporated a simple memory allocator in this project because I wanted
+       to keep my AST node classes as clean as possible, without destructors that
+       delete child nodes. But the way the allocator was written really doesn't
+       improve the program's memory usage patterns. With some effort, I suppose one
+       could upgrade that into a real allocator with true memory pooling.
+
 References:
 
     "Flex your lexical analysis muscles"
