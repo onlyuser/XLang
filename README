@@ -120,14 +120,15 @@ FAQ:
     1. What is XLang ?
 
        XLang is a starting point for people looking to construct their own language
-       using Lex-Yacc.
+       using Lex-Yacc. XLang is thoroughly tested and comes with its own test suite.
 
     2. What isn't XLang ?
 
-       XLang is not unified parser front-end that will properly construct ASTs for
-       every language under the sun.
+       XLang isn't a unified parser front-end for every language under the sun. It
+       makes some assumptions about the target language, meaning, literal values
+       must be C/C++ like. Otherwise, it places no restrictions on the grammar.
 
-    3. How should I use XLang ?
+    3. How should one use XLang ?
 
        I recommend hacking the "stdio" example to your liking, but any of the other
        variations is suitable as a base for beginners.
@@ -136,7 +137,20 @@ FAQ:
 
        GPL3.
 
-    5. Why did you write XLang ?
+    5. What's the motivation behind writing XLang ?
+
+       Lex-Yacc isn't hard, and it will get the job done, but it doesn't do it right
+       out of the box. It needs other infrastructure to get most sizeable projects
+       going.
+
+       I built XLang to answer my own need for a parser SDK that takes care of the
+       tedious tree building business so I could focus on the fun stuff -- AST
+       visitation.
+
+       But isn't that what Yacc production rules are all about ? No. In order to
+       visit the AST a second time, with Yacc only, one would have to re-parse the
+       input, and that's wasteful. XLang builds an AST for you so you can visit it
+       with multiple visitations.
 
        I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
        excellent tutorial.
@@ -149,7 +163,7 @@ FAQ:
           offers just one "stdio" parser.
        d) XLang's ASTs are "flattened", meaning lists are interpreted as lists
           instead of deep-recursing binary trees. This tree organization lends
-          itself better to visitation (less likely to stack-overflow). 
+          itself better to AST visitation (less likely to stack-overflow). 
 
           (1+2+3)        (1+2+3)
           non-flattened: flattened:
@@ -168,9 +182,9 @@ FAQ:
        improve the program's memory usage patterns. With some effort, I suppose one
        could upgrade that into a real allocator with true memory pooling.
 
-    8. Why C++0x ?
+    8. Why c++0x ?
 
-       Lambda functions are the only C++0x feature used here, and only because it
+       Lambda functions are the only c++0x feature used here, and only because it
        solves the problem elengantly.
 
 References:
