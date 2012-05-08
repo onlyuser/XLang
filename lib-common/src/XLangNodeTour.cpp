@@ -59,7 +59,7 @@ static int get_next_asc(ccrContParam, const InnerNodeIFace* _node)
 	int i;
 	ccrEndContext(foo);
 	ccrBegin(foo);
-	for (foo->i = 0; foo->i < static_cast<int>(_node->size()); foo->i++)
+	for(foo->i = 0; foo->i < static_cast<int>(_node->size()); foo->i++)
 		ccrReturn(foo->i);
 	ccrFinish(-1);
 }
@@ -97,6 +97,15 @@ int NodeTour::visit(const InnerNodeIFace* _node)
 #else
 	return -1;
 #endif
+}
+
+void NodeTour::flush(const InnerNodeIFace* _node)
+{
+	int index;
+	do
+	{
+		index = visit(_node);
+	} while(index != -1);
 }
 
 }

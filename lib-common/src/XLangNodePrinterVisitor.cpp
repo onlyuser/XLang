@@ -29,7 +29,7 @@ int NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 		index = NodeTour::visit(_node);
 		if(index != -1)
 			std::cout << ' ';
-	} while (index != -1);
+	} while(index != -1);
 	std::cout << ')';
 	return index;
 }

@@ -31,6 +31,7 @@ struct NodeTour
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     virtual int visit(const node::InnerNodeIFace* _node);
+    virtual void flush(const node::InnerNodeIFace* _node);
 };
 
 }
