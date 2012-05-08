@@ -27,7 +27,7 @@
     #define TIXML_USE_TICPP
 #endif
 #ifdef TIXML_USE_TICPP
-    #include <ticpp/ticpp.h>
+    #include "ticpp/ticpp.h"
 
     // prototype
     extern uint32_t name_to_id(std::string name);

@@ -20,35 +20,18 @@
 
 namespace node {
 
-void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::INT>* _node)
+int NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 {
-    std::cout << _node->value();
-}
-
-void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::FLOAT>* _node)
-{
-    std::cout << _node->value();
-}
-
-void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::STRING>* _node)
-{
-    std::cout << '\"' << _node->value() << '\"';
-}
-
-void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::CHAR>* _node)
-{
-    std::cout << '\'' << _node->value() << '\'';
-}
-
-void NodePrinterVisitor::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node)
-{
-    std::cout << *_node->value();
-}
-
-void NodePrinterVisitor::visit(const InnerNodeIFace* _node)
-{
-    // TODO: fix-me! -- should cast to "NodeIdentIFace" in order to use "::name()", but can't
-    //std::cout << dynamic_cast<Node*>(_node)->name();
+	std::cout << '(' << _node->name() << ' ';
+	int index;
+	do
+	{
+		index = NodeTour::visit(_node);
+		if(index != -1)
+			std::cout << ' ';
+	} while (index != -1);
+	std::cout << ')';
+	return index;
 }
 
 }

@@ -49,7 +49,7 @@ endif
 LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
-#DEBUG = -g
+DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
 	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH
@@ -87,6 +87,7 @@ CPP_STEMS = \
 		XLangMVCView \
 		XLangNode \
 		XLangNodePrinterVisitor \
+		XLangNodeTour \
 		XLangTreeContext
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))

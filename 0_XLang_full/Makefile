@@ -114,6 +114,7 @@ COMMON_CPP_STEMS = \
 		XLangMVCView \
 		XLangNode \
 		XLangNodePrinterVisitor \
+		XLangNodeTour \
 		XLangTreeContext #\
 		XLangMVCModel
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))

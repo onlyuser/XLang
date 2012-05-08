@@ -294,13 +294,13 @@ void export_ast(args_t &args, node::NodeIdentIFace* ast)
     {
         case args_t::MODE_LISP:
             {
-                #if 1 // use mvc-pattern pretty-printer
+                #if 0 // use mvc-pattern pretty-printer
                     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
                 #else // use visitor-pattern pretty-printer
-                    node::NodePrinterVisitor visitor;
                     if(ast->type() == node::NodeIdentIFace::INNER)
                     {
-                        dynamic_cast<const node::InnerNode*>(ast)->accept(&visitor);
+                        node::NodePrinterVisitor visitor;
+                        visitor.visit(dynamic_cast<const node::InnerNode*>(ast));
                         std::cout << std::endl;
                     }
                     else

@@ -19,18 +19,13 @@
 #define XLANG_NODE_PRINTER_VISITOR_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNodeVisitorIFace.h" // node::NodeVisitorIFace
+#include "node/XLangNodeTour.h" // node::NodeTour
 
 namespace node {
 
-struct NodePrinterVisitor : public NodeVisitorIFace
+struct NodePrinterVisitor : public NodeTour
 {
-    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
-    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
-    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
-    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
-    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-    void visit(const node::InnerNodeIFace* _node);
+    int visit(const node::InnerNodeIFace* _node);
 };
 
 }

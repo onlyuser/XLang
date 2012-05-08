@@ -27,40 +27,5 @@ std::string Node::name() const
 {
     return id_to_name(sym_id());
 }
-void InnerNode::accept(NodeVisitorIFace* visitor) const
-{
-    std::cout << '(';
-    visitor->visit(this);
-    std::cout << ' ';
-    size_t i;
-    for(i = 0; i < size(); i++)
-    {
-        NodeIdentIFace* child = operator[](i);
-        switch(child->type())
-        {
-			case NodeIdentIFace::INT:
-				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child));
-				break;
-			case NodeIdentIFace::FLOAT:
-				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child));
-				break;
-			case NodeIdentIFace::STRING:
-				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child));
-				break;
-			case NodeIdentIFace::CHAR:
-				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child));
-				break;
-			case NodeIdentIFace::IDENT:
-				visitor->visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child));
-				break;
-			case NodeIdentIFace::INNER:
-				dynamic_cast<const node::VisitableNodeIFace*>(child)->accept(visitor);
-				break;
-        }
-        if(i < size()-1)
-            std::cout << ' ';
-    }
-    std::cout << ')';
-}
 
 }

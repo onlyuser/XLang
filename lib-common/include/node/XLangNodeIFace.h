@@ -70,11 +70,12 @@ struct LeafNodeIFace
     virtual typename LeafTypeTraits<type>::type value() const = 0;
 };
 
-struct InnerNodeIFace
+struct InnerNodeIFace : virtual public NodeIdentIFace
 {
     virtual ~InnerNodeIFace() {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
+    virtual void* &getVisitState() = 0;
 };
 
 }

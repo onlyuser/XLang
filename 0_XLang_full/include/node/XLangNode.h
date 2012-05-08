@@ -19,7 +19,7 @@
 #define XLANG_NODE_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNodeVisitorIFace.h" // node::VisitableNodeIFace
+#include "node/XLangNodeTour.h" // node::VisitableNodeIFace
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -28,13 +28,12 @@
 
 namespace node {
 
-class Node : public NodeIdentIFace, public VisitableNodeIFace
+class Node : virtual public NodeIdentIFace
 {
 public:
     Node(NodeIdentIFace::type_e _type, uint32_t _sym_id, YYLTYPE &_loc)
         : m_type(_type), m_sym_id(_sym_id), m_loc(_loc)
-    {
-    }
+    {}
     NodeIdentIFace::type_e type() const
     {
         return m_type;
@@ -67,10 +66,6 @@ public:
     {
         return m_value;
     }
-    void accept(NodeVisitorIFace* visitor) const
-    {
-        visitor->visit(this);
-    }
 
 private:
     typename LeafTypeTraits<_type>::type m_value;
@@ -80,7 +75,7 @@ class InnerNode : public Node, public InnerNodeIFace
 {
 public:
     InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
-        : Node(NodeIdentIFace::INNER, _sym_id, loc)
+        : Node(NodeIdentIFace::INNER, _sym_id, loc), m_visit_state(NULL)
     {
         for(size_t i = 0; i<_size; i++)
         {
@@ -108,10 +103,14 @@ public:
     {
         return m_child_vec.size();
     }
-    void accept(NodeVisitorIFace* visitor) const;
+    void* &getVisitState()
+    {
+    	return m_visit_state;
+    }
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
+    void* m_visit_state;
 };
 
 }
