@@ -20,18 +20,18 @@
 
 namespace node {
 
-int NodePrinterVisitor::visit(const InnerNodeIFace* _node)
+bool NodePrinterVisitor::visit(const InnerNodeIFace* _node)
 {
 	std::cout << '(' << _node->name() << ' ';
-	int index;
+	bool more;
 	do
 	{
-		index = NodeTour::visit(_node);
-		if(index != -1)
+		more = NodeTour::visit(_node);
+		if(more)
 			std::cout << ' ';
-	} while(index != -1);
+	} while(more);
 	std::cout << ')';
-	return index;
+	return more;
 }
 
 }

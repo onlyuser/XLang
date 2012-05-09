@@ -19,9 +19,9 @@
 #include <iostream> // std::cout
 
 #ifdef EXTERN_INCLUDE_PATH
-    #define HAVE_COROUTINE
+    #define USE_COROUTINE
 #endif
-#ifdef HAVE_COROUTINE
+#ifdef USE_COROUTINE
 	#include "coroutine/coroutine_cpp.h"
 #endif
 
@@ -52,7 +52,7 @@ void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node)
     std::cout << *_node->value();
 }
 
-#ifdef HAVE_COROUTINE
+#ifdef USE_COROUTINE
 static int get_next_asc(ccrContParam, const InnerNodeIFace* _node)
 {
 	ccrBeginContext;
@@ -65,12 +65,12 @@ static int get_next_asc(ccrContParam, const InnerNodeIFace* _node)
 }
 #endif
 
-int NodeTour::visit(const InnerNodeIFace* _node)
+bool NodeTour::visit(const InnerNodeIFace* _node)
 {
-#ifdef HAVE_COROUTINE
+#ifdef USE_COROUTINE
 	int index = get_next_asc(&const_cast<InnerNodeIFace*>(_node)->getVisitState(), _node);
 	if(index == -1)
-		return -1;
+		return false;
 	NodeIdentIFace* child = _node->operator[](index);
 	switch(child->type())
 	{
@@ -93,19 +93,17 @@ int NodeTour::visit(const InnerNodeIFace* _node)
 			visit(dynamic_cast<const node::InnerNodeIFace*>(child));
 			break;
 	}
-	return index;
+	if(index == _node->size()-1)
+		return false;
+	return true;
 #else
-	return -1;
+	return false;
 #endif
 }
 
 void NodeTour::flush(const InnerNodeIFace* _node)
 {
-	int index;
-	do
-	{
-		index = visit(_node);
-	} while(index != -1);
+	while(visit(_node));
 }
 
 }

@@ -25,7 +25,7 @@ namespace node {
 
 struct NodePrinterVisitor : public NodeTour
 {
-    int visit(const node::InnerNodeIFace* _node);
+	bool visit(const node::InnerNodeIFace* _node);
 };
 
 }
