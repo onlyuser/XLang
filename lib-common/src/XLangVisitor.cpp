@@ -17,6 +17,7 @@
 
 #include "visitor/XLangVisitor.h" // visitor::LispPrinter
 #include <iostream> // std::cout
+#include <sstream> // std::stringstream
 
 namespace visitor {
 
@@ -31,7 +32,88 @@ bool LispPrinter::visit(const node::InnerNodeIFace* _node)
 			std::cout << ' ';
 	} while(more);
 	std::cout << ')';
-	return more;
+	return false;
+}
+
+static std::string ptr_to_string(const void* x)
+{
+    std::stringstream ss;
+    ss << '_' << x;
+    std::string s = ss.str();
+    return s;
+}
+
+static bool include_node_uid;
+static size_t depth;
+
+void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
+{
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<leaf ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    std::cout << _node->value();
+    std::cout << "/>";
+}
+
+void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
+{
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<leaf ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+}
+
+void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
+{
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<leaf ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+}
+
+void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
+{
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<leaf ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+}
+
+void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
+{
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<leaf ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+}
+
+bool XMLPrinter::visit(const node::InnerNodeIFace* _node)
+{
+    if(NULL == _node)
+        return false;
+    std::cout << std::string(depth*4, ' ');
+    std::cout << "<inner ";
+    if(include_node_uid)
+        std::cout << "id=" << ptr_to_string(_node) << " ";
+    std::cout << "type=\"" << _node->name() << "\">" << std::endl;
+	depth++;
+	bool more;
+	do
+	{
+		more = DefaultTour::visit(_node);
+		std::cout << std::endl;
+	} while(more);
+	depth--;
+	std::cout << std::string(depth*4, ' ') << "</inner>";
+    if(depth == 0)
+        std::cout << std::endl;
+    return false;
 }
 
 }
