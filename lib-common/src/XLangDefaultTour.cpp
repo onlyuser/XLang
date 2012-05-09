@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "visitor/XLangNodeTour.h" // visitor::NodeTour
+#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 #include <iostream> // std::cout
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -27,27 +27,27 @@
 
 namespace visitor {
 
-void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
+void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
+void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
+void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << '\"' << _node->value() << '\"';
 }
 
-void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
+void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
     std::cout << '\'' << _node->value() << '\'';
 }
 
-void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
+void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
     std::cout << *_node->value();
 }
@@ -65,10 +65,10 @@ static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
 }
 #endif
 
-bool NodeTour::visit(const node::InnerNodeIFace* _node)
+bool DefaultTour::visit(const node::InnerNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
-	int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->getVisitState(), _node);
+	int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
 	if(index == -1)
 		return false;
 	visit_any(_node->operator[](index));
@@ -80,12 +80,12 @@ bool NodeTour::visit(const node::InnerNodeIFace* _node)
 #endif
 }
 
-void NodeTour::flush(const node::InnerNodeIFace* _node)
+void DefaultTour::flush(const node::InnerNodeIFace* _node)
 {
 	while(visit(_node));
 }
 
-void NodeTour::visit_any(const node::NodeIdentIFace* _node)
+void DefaultTour::visit_any(const node::NodeIdentIFace* _node)
 {
 	switch(_node->type())
 	{

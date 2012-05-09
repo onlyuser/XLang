@@ -15,17 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_PRINTER_VISITOR_H_
-#define XLANG_NODE_PRINTER_VISITOR_H_
+#ifndef XLANG_DEFAULT_TOUR_H_
+#define XLANG_DEFAULT_TOUR_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangNodeTour.h" // visitor::NodeTour
 
 namespace visitor {
 
-struct NodePrinterVisitor : public NodeTour
+struct DefaultTour
 {
-	bool visit(const node::InnerNodeIFace* _node);
+    virtual ~DefaultTour() {}
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    virtual bool visit(const node::InnerNodeIFace* _node);
+    virtual void flush(const node::InnerNodeIFace* _node);
+    virtual void visit_any(const node::NodeIdentIFace* _node);
 };
 
 }

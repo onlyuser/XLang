@@ -19,7 +19,7 @@
 #define XLANG_NODE_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangNodeVisitableIFace.h" // visitor::visit_state_t
+#include "visitor/XLangVisitableIFace.h" // visitor::visit_state_t
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -103,7 +103,7 @@ public:
     {
         return m_child_vec.size();
     }
-    visitor::visit_state_t &getVisitState()
+    visitor::visit_state_t &visit_state()
     {
     	return m_visit_state;
     }

@@ -26,7 +26,7 @@
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
-#include "visitor/XLangNodePrinterVisitor.h" // visitor::NodePrinterVisitor
+#include "visitor/XLangVisitor.h" // visitor::LispPrinter
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
@@ -706,7 +706,7 @@ void export_ast(args_t &args, const node::NodeIdentIFace* ast)
                 #if 0 // use mvc-pattern pretty-printer
                     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
                 #else // use visitor-pattern pretty-printer
-                    visitor::NodePrinterVisitor visitor;
+                    visitor::LispPrinter visitor;
                     visitor.visit_any(ast);
                     std::cout << std::endl;
                 #endif

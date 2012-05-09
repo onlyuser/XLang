@@ -15,19 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_NODE_VISITABLE_IFACE_H_
-#define XLANG_NODE_VISITABLE_IFACE_H_
+#include "visitor/XLangVisitor.h" // visitor::LispPrinter
+#include <iostream> // std::cout
 
 namespace visitor {
 
-typedef void* visit_state_t;
-
-struct NodeVisitableIFace
+bool LispPrinter::visit(const node::InnerNodeIFace* _node)
 {
-	virtual ~NodeVisitableIFace() {}
-    virtual visit_state_t &getVisitState() = 0;
-};
-
+	std::cout << '(' << _node->name() << ' ';
+	bool more;
+	do
+	{
+		more = DefaultTour::visit(_node);
+		if(more)
+			std::cout << ' ';
+	} while(more);
+	std::cout << ')';
+	return more;
 }
 
-#endif
+}
