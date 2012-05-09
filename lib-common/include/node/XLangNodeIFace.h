@@ -18,7 +18,7 @@
 #ifndef XLANG_NODE_IFACE_H_
 #define XLANG_NODE_IFACE_H_
 
-#include "visitor/XLangNodeVisitableIFace.h" // visitor::visit_state_t
+#include "visitor/XLangNodeVisitableIFace.h" // visitor::NodeVisitableIFace
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
@@ -71,12 +71,11 @@ struct LeafNodeIFace : virtual public NodeIdentIFace
     virtual typename LeafTypeTraits<T>::type value() const = 0;
 };
 
-struct InnerNodeIFace : virtual public NodeIdentIFace
+struct InnerNodeIFace : virtual public NodeIdentIFace, public visitor::NodeVisitableIFace
 {
     virtual ~InnerNodeIFace() {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
-    virtual visitor::visit_state_t &getVisitState() = 0;
 };
 
 }
