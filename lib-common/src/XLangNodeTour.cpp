@@ -71,29 +71,8 @@ bool NodeTour::visit(const InnerNodeIFace* _node)
 	int index = get_next_asc(&const_cast<InnerNodeIFace*>(_node)->getVisitState(), _node);
 	if(index == -1)
 		return false;
-	NodeIdentIFace* child = _node->operator[](index);
-	switch(child->type())
-	{
-		case NodeIdentIFace::INT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(child));
-			break;
-		case NodeIdentIFace::FLOAT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(child));
-			break;
-		case NodeIdentIFace::STRING:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(child));
-			break;
-		case NodeIdentIFace::CHAR:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(child));
-			break;
-		case NodeIdentIFace::IDENT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(child));
-			break;
-		case NodeIdentIFace::INNER:
-			visit(dynamic_cast<const node::InnerNodeIFace*>(child));
-			break;
-	}
-	if(index == _node->size()-1)
+	visit_any(_node->operator[](index));
+	if(index == static_cast<int>(_node->size())-1)
 		return false;
 	return true;
 #else
@@ -104,6 +83,34 @@ bool NodeTour::visit(const InnerNodeIFace* _node)
 void NodeTour::flush(const InnerNodeIFace* _node)
 {
 	while(visit(_node));
+}
+
+void NodeTour::visit_any(const NodeIdentIFace* _node)
+{
+	switch(_node->type())
+	{
+		case NodeIdentIFace::INT:
+			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node));
+			break;
+		case NodeIdentIFace::FLOAT:
+			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node));
+			break;
+		case NodeIdentIFace::STRING:
+			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node));
+			break;
+		case NodeIdentIFace::CHAR:
+			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node));
+			break;
+		case NodeIdentIFace::IDENT:
+			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node));
+			break;
+		case NodeIdentIFace::INNER:
+			visit(dynamic_cast<const node::InnerNodeIFace*>(_node));
+			break;
+		default:
+			std::cout << "unknown node type" << std::endl;
+			break;
+	}
 }
 
 }

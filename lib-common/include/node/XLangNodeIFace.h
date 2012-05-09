@@ -63,11 +63,11 @@ struct LeafTypeTraitsR<char> { enum { value = NodeIdentIFace::CHAR}; };
 template<>
 struct LeafTypeTraitsR<const std::string*> { enum { value = NodeIdentIFace::IDENT}; };
 
-template<NodeIdentIFace::type_e type>
-struct LeafNodeIFace
+template<NodeIdentIFace::type_e T>
+struct LeafNodeIFace : virtual public NodeIdentIFace
 {
     virtual ~LeafNodeIFace() {}
-    virtual typename LeafTypeTraits<type>::type value() const = 0;
+    virtual typename LeafTypeTraits<T>::type value() const = 0;
 };
 
 struct InnerNodeIFace : virtual public NodeIdentIFace

@@ -706,14 +706,9 @@ void export_ast(args_t &args, node::NodeIdentIFace* ast)
                 #if 0 // use mvc-pattern pretty-printer
                     mvc::MVCView::print_lisp(ast); std::cout << std::endl;
                 #else // use visitor-pattern pretty-printer
-                    if(ast->type() == node::NodeIdentIFace::INNER)
-                    {
-                        node::NodePrinterVisitor visitor;
-                        visitor.visit(dynamic_cast<const node::InnerNode*>(ast));
-                        std::cout << std::endl;
-                    }
-                    else
-                        std::cout << "visitor can only print inner-node" << std::endl;
+                    node::NodePrinterVisitor visitor;
+                    visitor.visit_any(ast);
+                    std::cout << std::endl;
                 #endif
             }
             break;
