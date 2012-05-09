@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "node/XLangNodeTour.h" // node::NodeTour
+#include "visitor/XLangNodeTour.h" // visitor::NodeTour
 #include <iostream> // std::cout
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -25,35 +25,35 @@
 	#include "coroutine/coroutine_cpp.h"
 #endif
 
-namespace node {
+namespace visitor {
 
-void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::INT>* _node)
+void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::FLOAT>* _node)
+void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
     std::cout << _node->value();
 }
 
-void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::STRING>* _node)
+void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << '\"' << _node->value() << '\"';
 }
 
-void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::CHAR>* _node)
+void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
     std::cout << '\'' << _node->value() << '\'';
 }
 
-void NodeTour::visit(const LeafNodeIFace<NodeIdentIFace::IDENT>* _node)
+void NodeTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
     std::cout << *_node->value();
 }
 
 #ifdef USE_COROUTINE
-static int get_next_asc(ccrContParam, const InnerNodeIFace* _node)
+static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
 {
 	ccrBeginContext;
 	int i;
@@ -65,10 +65,10 @@ static int get_next_asc(ccrContParam, const InnerNodeIFace* _node)
 }
 #endif
 
-bool NodeTour::visit(const InnerNodeIFace* _node)
+bool NodeTour::visit(const node::InnerNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
-	int index = get_next_asc(&const_cast<InnerNodeIFace*>(_node)->getVisitState(), _node);
+	int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->getVisitState(), _node);
 	if(index == -1)
 		return false;
 	visit_any(_node->operator[](index));
@@ -80,31 +80,31 @@ bool NodeTour::visit(const InnerNodeIFace* _node)
 #endif
 }
 
-void NodeTour::flush(const InnerNodeIFace* _node)
+void NodeTour::flush(const node::InnerNodeIFace* _node)
 {
 	while(visit(_node));
 }
 
-void NodeTour::visit_any(const NodeIdentIFace* _node)
+void NodeTour::visit_any(const node::NodeIdentIFace* _node)
 {
 	switch(_node->type())
 	{
-		case NodeIdentIFace::INT:
+		case node::NodeIdentIFace::INT:
 			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node));
 			break;
-		case NodeIdentIFace::FLOAT:
+		case node::NodeIdentIFace::FLOAT:
 			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node));
 			break;
-		case NodeIdentIFace::STRING:
+		case node::NodeIdentIFace::STRING:
 			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node));
 			break;
-		case NodeIdentIFace::CHAR:
+		case node::NodeIdentIFace::CHAR:
 			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node));
 			break;
-		case NodeIdentIFace::IDENT:
+		case node::NodeIdentIFace::IDENT:
 			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node));
 			break;
-		case NodeIdentIFace::INNER:
+		case node::NodeIdentIFace::INNER:
 			visit(dynamic_cast<const node::InnerNodeIFace*>(_node));
 			break;
 		default:

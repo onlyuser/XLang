@@ -15,23 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "visitor/XLangNodePrinterVisitor.h" // visitor::NodePrinterVisitor
-#include <iostream> // std::cout
+#ifndef XLANG_NODE_VISITABLE_IFACE_H_
+#define XLANG_NODE_VISITABLE_IFACE_H_
 
 namespace visitor {
 
-bool NodePrinterVisitor::visit(const node::InnerNodeIFace* _node)
+typedef void* visit_state_t;
+
+struct NodeVisitableIFace
 {
-	std::cout << '(' << _node->name() << ' ';
-	bool more;
-	do
-	{
-		more = NodeTour::visit(_node);
-		if(more)
-			std::cout << ' ';
-	} while(more);
-	std::cout << ')';
-	return more;
-}
+	virtual ~NodeVisitableIFace() {}
+    virtual visit_state_t &getVisitState() = 0;
+};
 
 }
+
+#endif

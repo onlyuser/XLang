@@ -19,7 +19,7 @@
 #define XLANG_NODE_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNodeTour.h" // node::VisitableNodeIFace
+#include "visitor/XLangNodeVisitableIFace.h" // visitor::visit_state_t
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <vector> // std::vector
@@ -96,14 +96,14 @@ public:
     {
         return m_child_vec.size();
     }
-    void* &getVisitState()
+    visitor::visit_state_t &getVisitState()
     {
     	return m_visit_state;
     }
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
-    void* m_visit_state;
+    visitor::visit_state_t m_visit_state;
 };
 
 }

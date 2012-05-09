@@ -18,6 +18,7 @@
 #ifndef XLANG_NODE_IFACE_H_
 #define XLANG_NODE_IFACE_H_
 
+#include "visitor/XLangNodeVisitableIFace.h" // visitor::visit_state_t
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
@@ -75,7 +76,7 @@ struct InnerNodeIFace : virtual public NodeIdentIFace
     virtual ~InnerNodeIFace() {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
-    virtual void* &getVisitState() = 0;
+    virtual visitor::visit_state_t &getVisitState() = 0;
 };
 
 }

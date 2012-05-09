@@ -15,23 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "visitor/XLangNodePrinterVisitor.h" // visitor::NodePrinterVisitor
-#include <iostream> // std::cout
+#ifndef XLANG_NODE_TOUR_H_
+#define XLANG_NODE_TOUR_H_
+
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 
 namespace visitor {
 
-bool NodePrinterVisitor::visit(const node::InnerNodeIFace* _node)
+struct NodeTour
 {
-	std::cout << '(' << _node->name() << ' ';
-	bool more;
-	do
-	{
-		more = NodeTour::visit(_node);
-		if(more)
-			std::cout << ' ';
-	} while(more);
-	std::cout << ')';
-	return more;
-}
+    virtual ~NodeTour() {}
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    virtual bool visit(const node::InnerNodeIFace* _node);
+    virtual void flush(const node::InnerNodeIFace* _node);
+    virtual void visit_any(const node::NodeIdentIFace* _node);
+};
 
 }
+
+#endif
