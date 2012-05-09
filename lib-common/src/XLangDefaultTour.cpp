@@ -22,7 +22,7 @@
     #define USE_COROUTINE
 #endif
 #ifdef USE_COROUTINE
-	#include "coroutine/coroutine_cpp.h"
+    #include "coroutine/coroutine_cpp.h"
 #endif
 
 namespace visitor {
@@ -55,62 +55,62 @@ void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* 
 #ifdef USE_COROUTINE
 static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
 {
-	ccrBeginContext;
-	int i;
-	ccrEndContext(foo);
-	ccrBegin(foo);
-	for(foo->i = 0; foo->i < static_cast<int>(_node->size()); foo->i++)
-		ccrReturn(foo->i);
-	ccrFinish(-1);
+    ccrBeginContext;
+    int i;
+    ccrEndContext(foo);
+    ccrBegin(foo);
+    for(foo->i = 0; foo->i < static_cast<int>(_node->size()); foo->i++)
+        ccrReturn(foo->i);
+    ccrFinish(-1);
 }
 #endif
 
 bool DefaultTour::visit(const node::InnerNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
-	int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
-	if(index == -1)
-		return false;
-	visit_any(_node->operator[](index));
-	if(index == static_cast<int>(_node->size())-1)
-		return false;
-	return true;
+    int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
+    if(index == -1)
+        return false;
+    visit_any(_node->operator[](index));
+    if(index == static_cast<int>(_node->size())-1)
+        return false;
+    return true;
 #else
-	return false;
+    return false;
 #endif
 }
 
 void DefaultTour::flush(const node::InnerNodeIFace* _node)
 {
-	while(visit(_node));
+    while(visit(_node));
 }
 
 void DefaultTour::visit_any(const node::NodeIdentIFace* _node)
 {
-	switch(_node->type())
-	{
-		case node::NodeIdentIFace::INT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node));
-			break;
-		case node::NodeIdentIFace::FLOAT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node));
-			break;
-		case node::NodeIdentIFace::STRING:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node));
-			break;
-		case node::NodeIdentIFace::CHAR:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node));
-			break;
-		case node::NodeIdentIFace::IDENT:
-			visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node));
-			break;
-		case node::NodeIdentIFace::INNER:
-			visit(dynamic_cast<const node::InnerNodeIFace*>(_node));
-			break;
-		default:
-			std::cout << "unknown node type" << std::endl;
-			break;
-	}
+    switch(_node->type())
+    {
+        case node::NodeIdentIFace::INT:
+            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node));
+            break;
+        case node::NodeIdentIFace::FLOAT:
+            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node));
+            break;
+        case node::NodeIdentIFace::STRING:
+            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node));
+            break;
+        case node::NodeIdentIFace::CHAR:
+            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node));
+            break;
+        case node::NodeIdentIFace::IDENT:
+            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node));
+            break;
+        case node::NodeIdentIFace::INNER:
+            visit(dynamic_cast<const node::InnerNodeIFace*>(_node));
+            break;
+        default:
+            std::cout << "unknown node type" << std::endl;
+            break;
+    }
 }
 
 }

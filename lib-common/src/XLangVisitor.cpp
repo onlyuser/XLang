@@ -23,16 +23,16 @@ namespace visitor {
 
 bool LispPrinter::visit(const node::InnerNodeIFace* _node)
 {
-	std::cout << '(' << _node->name() << ' ';
-	bool more;
-	do
-	{
-		more = DefaultTour::visit(_node);
-		if(more)
-			std::cout << ' ';
-	} while(more);
-	std::cout << ')';
-	return false;
+    std::cout << '(' << _node->name() << ' ';
+    bool more;
+    do
+    {
+        more = DefaultTour::visit(_node);
+        if(more)
+            std::cout << ' ';
+    } while(more);
+    std::cout << ')';
+    return false;
 }
 
 static std::string ptr_to_string(const void* x)
@@ -102,15 +102,15 @@ bool XMLPrinter::visit(const node::InnerNodeIFace* _node)
     if(include_node_uid)
         std::cout << "id=" << ptr_to_string(_node) << " ";
     std::cout << "type=\"" << _node->name() << "\">" << std::endl;
-	depth++;
-	bool more;
-	do
-	{
-		more = DefaultTour::visit(_node);
-		std::cout << std::endl;
-	} while(more);
-	depth--;
-	std::cout << std::string(depth*4, ' ') << "</inner>";
+    depth++;
+    bool more;
+    do
+    {
+        more = DefaultTour::visit(_node);
+        std::cout << std::endl;
+    } while(more);
+    depth--;
+    std::cout << std::string(depth*4, ' ') << "</inner>";
     if(depth == 0)
         std::cout << std::endl;
     return false;

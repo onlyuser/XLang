@@ -24,7 +24,7 @@ typedef void* visit_state_t;
 
 struct VisitableIFace
 {
-	virtual ~VisitableIFace() {}
+    virtual ~VisitableIFace() {}
     virtual visit_state_t &visit_state() = 0;
 };
 

@@ -8,6 +8,6 @@
 
 #undef ccrBegin
 #define ccrBegin(x) if(!x) {x= reinterpret_cast<ccrContextTag *>(*ccrParam=malloc(sizeof(*x))); x->ccrLine=0;}\
-                    if (x) switch(x->ccrLine) { case 0:;
+                    if(x) switch(x->ccrLine) { case 0:;
 
 #endif

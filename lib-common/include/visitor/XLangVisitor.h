@@ -25,7 +25,7 @@ namespace visitor {
 
 struct LispPrinter : public DefaultTour
 {
-	bool visit(const node::InnerNodeIFace* _node);
+    bool visit(const node::InnerNodeIFace* _node);
 };
 
 struct XMLPrinter : public DefaultTour
@@ -35,7 +35,7 @@ struct XMLPrinter : public DefaultTour
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-	bool visit(const node::InnerNodeIFace* _node);
+    bool visit(const node::InnerNodeIFace* _node);
 };
 
 }

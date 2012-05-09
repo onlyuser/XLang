@@ -12,7 +12,7 @@
  *    static int i;
  * 
  *    scrBegin;
- *    for (i=0; i<10; i++) {
+ *    for(i=0; i<10; i++) {
  *       scrReturn(i);
  *    }
  *    scrFinish(-1);
@@ -25,7 +25,7 @@
  *    ccrEndContext(foo);
  *
  *    ccrBegin(foo);
- *    for (foo->i=0; foo->i<10; foo->i++) {
+ *    for(foo->i=0; foo->i<10; foo->i++) {
  *       ccrReturn(foo->i);
  *    }
  *    ccrFinish(-1);
@@ -65,7 +65,7 @@
  *    do {
  *       i = ascending();
  *       printf("got number %d\n", i);
- *    } while (i != -1);
+ *    } while(i != -1);
  * }
  * 
  * The caller of a re-entrant coroutine must provide a context
@@ -75,7 +75,7 @@
  *    ccrContext z = 0;
  *    do {
  *       printf("got number %d\n", ascending (&z));
- *    } while (z);
+ *    } while(z);
  * }
  * 
  * Note that the context variable is set back to zero when the
@@ -140,12 +140,12 @@
         do {\
             scrLine=__LINE__;\
             return (z); case __LINE__:;\
-        } while (0)
+        } while(0)
 #define scrReturnV       \
         do {\
             scrLine=__LINE__;\
             return; case __LINE__:;\
-        } while (0)
+        } while(0)
 
 /*
  * `ccr' macros for re-entrant coroutines.
@@ -157,7 +157,7 @@
 #define ccrEndContext(x) } *x = *ccrParam
 
 #define ccrBegin(x)      if(!x) {x= *ccrParam=malloc(sizeof(*x)); x->ccrLine=0;}\
-                         if (x) switch(x->ccrLine) { case 0:;
+                         if(x) switch(x->ccrLine) { case 0:;
 #define ccrFinish(z)     } free(*ccrParam); *ccrParam=0; return (z)
 #define ccrFinishV       } free(*ccrParam); *ccrParam=0; return
 
@@ -165,17 +165,17 @@
         do {\
             ((struct ccrContextTag *)*ccrParam)->ccrLine=__LINE__;\
             return (z); case __LINE__:;\
-        } while (0)
+        } while(0)
 #define ccrReturnV       \
         do {\
             ((struct ccrContextTag *)*ccrParam)->ccrLine=__LINE__;\
             return; case __LINE__:;\
-        } while (0)
+        } while(0)
 
 #define ccrStop(z)       do{ free(*ccrParam); *ccrParam=0; return (z); }while(0)
 #define ccrStopV         do{ free(*ccrParam); *ccrParam=0; return; }while(0)
 
 #define ccrContext       void *
-#define ccrAbort(ctx)    do { free (ctx); ctx = 0; } while (0)
+#define ccrAbort(ctx)    do { free (ctx); ctx = 0; } while(0)
 
 #endif /* COROUTINE_H */

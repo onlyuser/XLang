@@ -98,7 +98,7 @@ public:
     }
     visitor::visit_state_t &visit_state()
     {
-    	return m_visit_state;
+        return m_visit_state;
     }
 
 private:
