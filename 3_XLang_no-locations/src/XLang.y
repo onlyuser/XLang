@@ -281,12 +281,12 @@ void export_ast(args_t &args, const node::NodeIdentIFace* ast)
         case args_t::MODE_LISP:
             {
                 #if 0 // use mvc-pattern pretty-printer
-                    mvc::MVCView::print_lisp(ast); std::cout << std::endl;
+                    mvc::MVCView::print_lisp(ast);
                 #else // use visitor-pattern pretty-printer
                     visitor::LispPrinter visitor;
                     visitor.visit_any(ast);
-                    std::cout << std::endl;
                 #endif
+                std::cout << std::endl;
             }
             break;
         case args_t::MODE_XML:   mvc::MVCView::print_xml(ast); break;
