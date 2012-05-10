@@ -63,6 +63,10 @@ static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
         ccrReturn(foo->i);
     ccrFinish(-1);
 }
+static void stop_asc(ccrContParam)
+{
+	ccrStopV;
+}
 #endif
 
 bool DefaultTour::visit(const node::InnerNodeIFace* _node)
@@ -74,13 +78,19 @@ bool DefaultTour::visit(const node::InnerNodeIFace* _node)
     visit_any(_node->operator[](index));
     if(index == static_cast<int>(_node->size())-1)
     {
-    	// call one last time to free context
-    	get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
+    	abort_tour(_node);
         return false;
     }
     return true;
 #else
     return false;
+#endif
+}
+
+void DefaultTour::abort_tour(const node::InnerNodeIFace* _node)
+{
+#ifdef USE_COROUTINE
+    stop_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state());
 #endif
 }
 
