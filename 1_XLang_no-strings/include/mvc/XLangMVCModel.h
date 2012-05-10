@@ -34,7 +34,7 @@ struct MVCModel
     static node::NodeIdentIFace* make_leaf(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
         return new (tc->alloc(), __FILE__, __LINE__) node::LeafNode<
-                static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<T>::value)
+                static_cast<node::NodeIdentIFace::type_id_t>(node::LeafTraitsTypeID<T>::type_id)
                 >(sym_id, loc, value);
     }
     static node::InnerNode* make_inner(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);

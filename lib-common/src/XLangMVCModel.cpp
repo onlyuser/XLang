@@ -41,7 +41,7 @@ node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t
     return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
             }) node::LeafNode<
-                    static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<std::string>::value)
+                    static_cast<node::NodeIdentIFace::type_id_t>(node::LeafTraitsTypeID<std::string>::type_id)
                     >(sym_id, value);
 }
 

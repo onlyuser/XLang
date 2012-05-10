@@ -26,49 +26,49 @@ namespace node {
 
 struct NodeIdentIFace
 {
-    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_e;
+    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_id_t;
 
     virtual ~NodeIdentIFace() {}
-    virtual type_e type() const = 0;
+    virtual type_id_t type_id() const = 0;
     virtual uint32_t sym_id() const = 0;
     virtual std::string name() const = 0;
     bool is_same_type(const NodeIdentIFace* _node) const
     {
-        return type() == _node->type() && sym_id() == _node->sym_id();
+        return type_id() == _node->type_id() && sym_id() == _node->sym_id();
     }
 };
 
-template<NodeIdentIFace::type_e>
-struct LeafTypeTraits;
+template<NodeIdentIFace::type_id_t>
+struct LeafTraitsType;
 template<>
-struct LeafTypeTraits<NodeIdentIFace::INT> { typedef long type; };
+struct LeafTraitsType<NodeIdentIFace::INT> { typedef long type; };
 template<>
-struct LeafTypeTraits<NodeIdentIFace::FLOAT> { typedef float32_t type; };
+struct LeafTraitsType<NodeIdentIFace::FLOAT> { typedef float32_t type; };
 template<>
-struct LeafTypeTraits<NodeIdentIFace::STRING> { typedef std::string type; };
+struct LeafTraitsType<NodeIdentIFace::STRING> { typedef std::string type; };
 template<>
-struct LeafTypeTraits<NodeIdentIFace::CHAR> { typedef char type; };
+struct LeafTraitsType<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
-struct LeafTypeTraits<NodeIdentIFace::IDENT> { typedef const std::string* type; };
+struct LeafTraitsType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
 
 template<class T>
-struct LeafTypeTraitsR;
+struct LeafTraitsTypeID;
 template<>
-struct LeafTypeTraitsR<long> { enum { value = NodeIdentIFace::INT}; };
+struct LeafTraitsTypeID<long> { enum { type_id = NodeIdentIFace::INT}; };
 template<>
-struct LeafTypeTraitsR<float32_t> { enum { value = NodeIdentIFace::FLOAT}; };
+struct LeafTraitsTypeID<float32_t> { enum { type_id = NodeIdentIFace::FLOAT}; };
 template<>
-struct LeafTypeTraitsR<std::string> { enum { value = NodeIdentIFace::STRING}; };
+struct LeafTraitsTypeID<std::string> { enum { type_id = NodeIdentIFace::STRING}; };
 template<>
-struct LeafTypeTraitsR<char> { enum { value = NodeIdentIFace::CHAR}; };
+struct LeafTraitsTypeID<char> { enum { type_id = NodeIdentIFace::CHAR}; };
 template<>
-struct LeafTypeTraitsR<const std::string*> { enum { value = NodeIdentIFace::IDENT}; };
+struct LeafTraitsTypeID<const std::string*> { enum { type_id = NodeIdentIFace::IDENT}; };
 
-template<NodeIdentIFace::type_e T>
+template<NodeIdentIFace::type_id_t T>
 struct LeafNodeIFace : virtual public NodeIdentIFace
 {
     virtual ~LeafNodeIFace() {}
-    virtual typename LeafTypeTraits<T>::type value() const = 0;
+    virtual typename LeafTraitsType<T>::type value() const = 0;
 };
 
 struct InnerNodeIFace : virtual public NodeIdentIFace, public visitor::VisitableIFace

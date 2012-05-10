@@ -43,7 +43,7 @@ void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
     if(NULL == _node)
         return;
-    switch(_node->type())
+    switch(_node->type_id())
     {
         case node::NodeIdentIFace::INT:
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
@@ -90,7 +90,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
         return;
     std::string id = ptr_to_string(_node);
     std::cout << std::string(depth*4, ' ');
-    switch(_node->type())
+    switch(_node->type_id())
     {
         case node::NodeIdentIFace::INT:
         case node::NodeIdentIFace::FLOAT:
@@ -106,7 +106,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid
     if(include_node_uid)
         std::cout << "id=" << id << " ";
     std::cout << "type=\"" << _node->name() << "\" ";
-    switch(_node->type())
+    switch(_node->type_id())
     {
         case node::NodeIdentIFace::INT:
             std::cout << "value=";
@@ -161,7 +161,7 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
     std::string id = ptr_to_string(_node);
     std::cout << "\t" << id << " [" << std::endl <<
             "\t\tlabel=\"";
-    switch(_node->type())
+    switch(_node->type_id())
     {
         case node::NodeIdentIFace::INT:
             std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
@@ -185,7 +185,7 @@ void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
     std::cout << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
-    if(_node->type() == node::NodeIdentIFace::INNER)
+    if(_node->type_id() == node::NodeIdentIFace::INNER)
         for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
         {
             const node::NodeIdentIFace* child =
@@ -264,7 +264,7 @@ void exNode
     strcpy (word, "???"); /* should never appear */
     s = word;
     std::string temp;
-    switch(p->type()) {
+    switch(p->type_id()) {
         case node::NodeIdentIFace::INT:
             sprintf(word, "%ld", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(p)->value());
             break;
@@ -289,7 +289,7 @@ void exNode
     *cm = c + w / 2;
 
     /* node is leaf */
-    if(p->type() != typeOpr ||
+    if(p->type_id() != typeOpr ||
             dynamic_cast<const node::InnerNodeIFace*>(p)->size() == 0) {
         graphDrawBox (s, cbar, l);
         return;

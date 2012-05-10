@@ -30,12 +30,12 @@ namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_e _type, uint32_t _sym_id)
-        : m_type(_type), m_sym_id(_sym_id)
+    Node(NodeIdentIFace::type_id_t _type_id, uint32_t _sym_id)
+        : m_type_id(_type_id), m_sym_id(_sym_id)
     {}
-    NodeIdentIFace::type_e type() const
+    NodeIdentIFace::type_id_t type_id() const
     {
-        return m_type;
+        return m_type_id;
     }
     uint32_t sym_id() const
     {
@@ -44,24 +44,24 @@ public:
     std::string name() const;
 
 protected:
-    NodeIdentIFace::type_e m_type;
+    NodeIdentIFace::type_id_t m_type_id;
     uint32_t m_sym_id;
 };
 
-template<NodeIdentIFace::type_e _type>
+template<NodeIdentIFace::type_id_t _type>
 class LeafNode : public Node, public LeafNodeIFace<_type>
 {
 public:
-    LeafNode(uint32_t _sym_id, typename LeafTypeTraits<_type>::type _value)
+    LeafNode(uint32_t _sym_id, typename LeafTraitsType<_type>::type _value)
         : Node(_type, _sym_id), m_value(_value)
     {}
-    typename LeafTypeTraits<_type>::type value() const
+    typename LeafTraitsType<_type>::type value() const
     {
         return m_value;
     }
 
 private:
-    typename LeafTypeTraits<_type>::type m_value;
+    typename LeafTraitsType<_type>::type m_value;
 };
 
 class InnerNode : public Node, public InnerNodeIFace

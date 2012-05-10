@@ -41,7 +41,7 @@ node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t
     node::NodeIdentIFace* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
             }) node::LeafNode<
-                    static_cast<node::NodeIdentIFace::type_e>(node::LeafTypeTraitsR<std::string>::value)
+                    static_cast<node::NodeIdentIFace::type_id_t>(node::LeafTraitsTypeID<std::string>::type_id)
                     >(sym_id, loc, value);
     return node;
 }
@@ -64,17 +64,17 @@ static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::s
     memset(&dummy_loc, 0, sizeof(dummy_loc));
     if(type == "int")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTypeTraits<node::NodeIdentIFace::INT>::type>(
+                static_cast<node::LeafTraitsType<node::NodeIdentIFace::INT>::type>(
                         atoi(value.c_str())
                         ));
     if(type == "float")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTypeTraits<node::NodeIdentIFace::FLOAT>::type>(
+                static_cast<node::LeafTraitsType<node::NodeIdentIFace::FLOAT>::type>(
                         atof(value.c_str())
                         ));
     if(type == "ident")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTypeTraits<node::NodeIdentIFace::IDENT>::type>(
+                static_cast<node::LeafTraitsType<node::NodeIdentIFace::IDENT>::type>(
                         tc->alloc_unique_string(value)
                         ));
     return NULL;

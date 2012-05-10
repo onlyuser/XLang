@@ -87,7 +87,7 @@ void DefaultTour::flush(const node::InnerNodeIFace* _node)
 
 void DefaultTour::visit_any(const node::NodeIdentIFace* _node)
 {
-    switch(_node->type())
+    switch(_node->type_id())
     {
         case node::NodeIdentIFace::INT:
             visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node));
