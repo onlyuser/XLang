@@ -73,7 +73,11 @@ bool DefaultTour::visit(const node::InnerNodeIFace* _node)
         return false;
     visit_any(_node->operator[](index));
     if(index == static_cast<int>(_node->size())-1)
+    {
+    	// call one last time to free context
+    	get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
         return false;
+    }
     return true;
 #else
     return false;
