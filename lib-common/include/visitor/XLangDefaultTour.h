@@ -33,7 +33,7 @@ struct DefaultTour
     virtual bool visit(const node::InnerNodeIFace* _node);
     virtual void abort(const node::InnerNodeIFace* _node);
     virtual void flush(const node::InnerNodeIFace* _node);
-    virtual void visit_any(const node::NodeIdentIFace* _node);
+    virtual void dispatch_visit(const node::NodeIdentIFace* _node);
 };
 
 }

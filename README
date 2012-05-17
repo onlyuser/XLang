@@ -1,7 +1,7 @@
 Variations of a Lex-Yacc parser
 based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 
-Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
@@ -113,7 +113,7 @@ Make targets:
     doc:    use doxygen to generate documentation
     xml:    test + generate .xml for tests
     import: test + use ticpp to serialize-to/deserialize-from xml
-    clean:  remove all target-generated files
+    clean:  remove all intermediate files
 
 FAQ:
 

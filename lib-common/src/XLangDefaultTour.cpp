@@ -66,7 +66,7 @@ static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
 
 static void stop_asc(ccrContParam)
 {
-	ccrStopV;
+    ccrStopV;
 }
 #endif
 
@@ -76,10 +76,10 @@ bool DefaultTour::visit(const node::InnerNodeIFace* _node)
     int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
     if(index == -1)
         return false;
-    visit_any(_node->operator[](index));
+    dispatch_visit(_node->operator[](index));
     if(index == static_cast<int>(_node->size())-1)
     {
-    	abort(_node);
+        abort(_node);
         return false;
     }
     return true;
@@ -100,7 +100,7 @@ void DefaultTour::flush(const node::InnerNodeIFace* _node)
     while(visit(_node));
 }
 
-void DefaultTour::visit_any(const node::NodeIdentIFace* _node)
+void DefaultTour::dispatch_visit(const node::NodeIdentIFace* _node)
 {
     switch(_node->type_id())
     {

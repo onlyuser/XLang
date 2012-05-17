@@ -287,7 +287,7 @@ void export_ast(args_t &args, const node::NodeIdentIFace* ast)
                     mvc::MVCView::print_lisp(ast);
                 #else // use visitor-pattern pretty-printer
                     visitor::LispPrinter visitor;
-                    visitor.visit_any(ast);
+                    visitor.dispatch_visit(ast);
                 #endif
                 std::cout << std::endl;
             }
