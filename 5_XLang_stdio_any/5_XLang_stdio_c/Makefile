@@ -35,7 +35,7 @@ BUILD_PATH = build
 BIN_PATH = bin
 BINARY = $(BIN_PATH)/XLang.exe
 
-COMMON = $(PARENT_PATH)/lib-common
+COMMON = $(PARENT_PATH)/libxlang
 COMMON_INCLUDE_PATH = $(COMMON)/include
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
@@ -48,7 +48,7 @@ ifdef EXTERN_LIB_PATH
 	EXTERN_LIB_STEMS = ticppd
 	EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 endif
-PARENT_LIB_STEMS = common
+PARENT_LIB_STEMS = xlang
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))

@@ -32,7 +32,7 @@ all :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE)); done
-	cd lib-common; $(MAKE)
+	cd libxlang; $(MAKE)
 
 .PHONY : test
 test :
@@ -69,19 +69,19 @@ lint :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-common; $(MAKE) $@
+	cd libxlang; $(MAKE) $@
 
 .PHONY : doc
 doc :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-common; $(MAKE) $@
+	cd libxlang; $(MAKE) $@
 
 .PHONY : clean
 clean :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-common; $(MAKE) $@
+	cd libxlang; $(MAKE) $@
 	-rmdir $(LIB_PATH)
