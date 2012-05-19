@@ -30,8 +30,8 @@ About:
 
 Variation vs Feature Table:
 
-                 more                                                       less
-                 critical <--                                           --> critical
+                 more                                                      less
+                 critical <--                                          --> critical
 +--------------+-------------+--------+-----------+-----------+----------+---------+
 | variation    | lexer       | input  | reentrant | locations | comments | strings |
 +--------------+-------------+--------+-----------+-----------+----------+---------+
