@@ -18,7 +18,8 @@
 #ifndef XLANG_NODE_IFACE_H_
 #define XLANG_NODE_IFACE_H_
 
-#include "visitor/XLangVisitableIFace.h" // visitor::VisitableIFace
+#include "visitor/XLangVisitable.h" // visitor::Visitable
+#include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
@@ -26,52 +27,52 @@ namespace node {
 
 struct NodeIdentIFace
 {
-    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_id_t;
+    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_t;
 
     virtual ~NodeIdentIFace() {}
-    virtual type_id_t type_id() const = 0;
+    virtual type_t type() const = 0;
     virtual uint32_t sym_id() const = 0;
     virtual std::string name() const = 0;
     bool is_same_type(const NodeIdentIFace* _node) const
     {
-        return type_id() == _node->type_id() && sym_id() == _node->sym_id();
+        return type() == _node->type() && sym_id() == _node->sym_id();
     }
 };
 
-template<NodeIdentIFace::type_id_t>
-struct LeafTraitsType;
+template<NodeIdentIFace::type_t>
+struct LeafInternalType;
 template<>
-struct LeafTraitsType<NodeIdentIFace::INT> { typedef long type; };
+struct LeafInternalType<NodeIdentIFace::INT> { typedef long type; };
 template<>
-struct LeafTraitsType<NodeIdentIFace::FLOAT> { typedef float32_t type; };
+struct LeafInternalType<NodeIdentIFace::FLOAT> { typedef float32_t type; };
 template<>
-struct LeafTraitsType<NodeIdentIFace::STRING> { typedef std::string type; };
+struct LeafInternalType<NodeIdentIFace::STRING> { typedef std::string type; };
 template<>
-struct LeafTraitsType<NodeIdentIFace::CHAR> { typedef char type; };
+struct LeafInternalType<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
-struct LeafTraitsType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
+struct LeafInternalType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
 
 template<class T>
-struct LeafTraitsTypeID;
+struct LeafType;
 template<>
-struct LeafTraitsTypeID<long> { enum { type_id = NodeIdentIFace::INT}; };
+struct LeafType<long> { enum { type = NodeIdentIFace::INT}; };
 template<>
-struct LeafTraitsTypeID<float32_t> { enum { type_id = NodeIdentIFace::FLOAT}; };
+struct LeafType<float32_t> { enum { type = NodeIdentIFace::FLOAT}; };
 template<>
-struct LeafTraitsTypeID<std::string> { enum { type_id = NodeIdentIFace::STRING}; };
+struct LeafType<std::string> { enum { type = NodeIdentIFace::STRING}; };
 template<>
-struct LeafTraitsTypeID<char> { enum { type_id = NodeIdentIFace::CHAR}; };
+struct LeafType<char> { enum { type = NodeIdentIFace::CHAR}; };
 template<>
-struct LeafTraitsTypeID<const std::string*> { enum { type_id = NodeIdentIFace::IDENT}; };
+struct LeafType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
 
-template<NodeIdentIFace::type_id_t T>
+template<NodeIdentIFace::type_t T>
 struct LeafNodeIFace : virtual public NodeIdentIFace
 {
     virtual ~LeafNodeIFace() {}
-    virtual typename LeafTraitsType<T>::type value() const = 0;
+    virtual typename LeafInternalType<T>::type value() const = 0;
 };
 
-struct InnerNodeIFace : virtual public NodeIdentIFace, public visitor::VisitableIFace
+struct InnerNodeIFace : virtual public NodeIdentIFace, virtual public visitor::VisitStateIFace
 {
     virtual ~InnerNodeIFace() {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;

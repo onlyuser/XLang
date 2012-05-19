@@ -19,7 +19,8 @@
 #define XLANG_NODE_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangVisitableIFace.h" // visitor::visit_state_t
+#include "visitor/XLangVisitable.h" // visitor::Visitable
+#include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <vector> // std::vector
@@ -30,12 +31,12 @@ namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_id_t _type_id, uint32_t _sym_id)
-        : m_type_id(_type_id), m_sym_id(_sym_id)
+    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id)
+        : m_type(_type), m_sym_id(_sym_id)
     {}
-    NodeIdentIFace::type_id_t type_id() const
+    NodeIdentIFace::type_t type() const
     {
-        return m_type_id;
+        return m_type;
     }
     uint32_t sym_id() const
     {
@@ -44,31 +45,35 @@ public:
     std::string name() const;
 
 protected:
-    NodeIdentIFace::type_id_t m_type_id;
+    NodeIdentIFace::type_t m_type;
     uint32_t m_sym_id;
 };
 
-template<NodeIdentIFace::type_id_t _type>
-class LeafNode : public Node, public LeafNodeIFace<_type>
+template<NodeIdentIFace::type_t _type>
+class LeafNode
+	: public Node, public LeafNodeIFace<_type>, public visitor::Visitable<LeafNode<_type> >
 {
 public:
-    LeafNode(uint32_t _sym_id, typename LeafTraitsType<_type>::type _value)
-        : Node(_type, _sym_id), m_value(_value)
+    LeafNode(uint32_t _sym_id, typename LeafInternalType<_type>::type _value)
+        : Node(_type, _sym_id), visitor::Visitable<LeafNode<_type> >(this), m_value(_value)
     {}
-    typename LeafTraitsType<_type>::type value() const
+    typename LeafInternalType<_type>::type value() const
     {
         return m_value;
     }
 
 private:
-    typename LeafTraitsType<_type>::type m_value;
+    typename LeafInternalType<_type>::type m_value;
 };
 
-class InnerNode : public Node, public InnerNodeIFace
+class InnerNode
+	: public Node, public InnerNodeIFace, public visitor::Visitable<InnerNode>,
+	  virtual public visitor::VisitStateIFace
 {
 public:
     InnerNode(uint32_t _sym_id, size_t _size, va_list ap)
-        : Node(NodeIdentIFace::INNER, _sym_id), m_visit_state(NULL)
+        : Node(NodeIdentIFace::INNER, _sym_id), visitor::Visitable<InnerNode>(this),
+          m_visit_state(NULL)
     {
         for(size_t i = 0; i<_size; i++)
         {
@@ -88,7 +93,7 @@ public:
     {
         return m_child_vec[index];
     }
-    void push_back(NodeIdentIFace* node)
+    void add_child(NodeIdentIFace* node)
     {
         m_child_vec.push_back(node);
     }
@@ -96,14 +101,14 @@ public:
     {
         return m_child_vec.size();
     }
-    visitor::visit_state_t &visit_state()
+    visitor::VisitStateIFace::state_t &visit_state()
     {
         return m_visit_state;
     }
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
-    visitor::visit_state_t m_visit_state;
+    visitor::VisitStateIFace::state_t m_visit_state;
 };
 
 }

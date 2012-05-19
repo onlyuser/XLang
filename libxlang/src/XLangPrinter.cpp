@@ -15,24 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "visitor/XLangVisitor.h" // visitor::LispPrinter
+#include "visitor/XLangPrinter.h" // visitor::LispPrinter
 #include <iostream> // std::cout
 #include <sstream> // std::stringstream
 
 namespace visitor {
 
-bool LispPrinter::visit(const node::InnerNodeIFace* _node)
+void LispPrinter::visit(const node::InnerNodeIFace* _node)
 {
     std::cout << '(' << _node->name() << ' ';
     bool more;
     do
     {
-        more = DefaultTour::visit(_node);
+        more = visit_next_child(_node);
         if(more)
             std::cout << ' ';
     } while(more);
     std::cout << ')';
-    return false;
 }
 
 static std::string ptr_to_string(const void* x)
@@ -93,10 +92,10 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _
     std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
 }
 
-bool XMLPrinter::visit(const node::InnerNodeIFace* _node)
+void XMLPrinter::visit(const node::InnerNodeIFace* _node)
 {
     if(NULL == _node)
-        return false;
+        return;
     std::cout << std::string(depth*4, ' ');
     std::cout << "<inner ";
     if(include_node_uid)
@@ -106,14 +105,13 @@ bool XMLPrinter::visit(const node::InnerNodeIFace* _node)
     bool more;
     do
     {
-        more = DefaultTour::visit(_node);
+        more = visit_next_child(_node);
         std::cout << std::endl;
     } while(more);
     depth--;
     std::cout << std::string(depth*4, ' ') << "</inner>";
     if(depth == 0)
         std::cout << std::endl;
-    return false;
 }
 
 }

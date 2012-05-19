@@ -41,7 +41,7 @@ node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t
     node::NodeIdentIFace* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
             }) node::LeafNode<
-                    static_cast<node::NodeIdentIFace::type_id_t>(node::LeafTraitsTypeID<std::string>::type_id)
+                    static_cast<node::NodeIdentIFace::type_t>(node::LeafType<std::string>::type)
                     >(sym_id, loc, value);
     return node;
 }
@@ -64,17 +64,17 @@ static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::s
     memset(&dummy_loc, 0, sizeof(dummy_loc));
     if(type == "int")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTraitsType<node::NodeIdentIFace::INT>::type>(
+                static_cast<node::LeafInternalType<node::NodeIdentIFace::INT>::type>(
                         atoi(value.c_str())
                         ));
     if(type == "float")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTraitsType<node::NodeIdentIFace::FLOAT>::type>(
+                static_cast<node::LeafInternalType<node::NodeIdentIFace::FLOAT>::type>(
                         atof(value.c_str())
                         ));
     if(type == "ident")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafTraitsType<node::NodeIdentIFace::IDENT>::type>(
+                static_cast<node::LeafInternalType<node::NodeIdentIFace::IDENT>::type>(
                         tc->alloc_unique_string(value)
                         ));
     return NULL;
@@ -92,7 +92,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         {
             ticpp::Iterator<ticpp::Node> child;
             for(child = child.begin(node); child != child.end(); child++)
-                dest_node->push_back(visit(tc, child.Get()));
+                dest_node->add_child(visit(tc, child.Get()));
             if(dest_node->size() == 1)
             {
                 node::NodeIdentIFace* dest_child = (*dest_node)[0];
@@ -127,7 +127,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, name_to_id(type), dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
-            dest_node->push_back(visit(tc, child.Get()));
+            dest_node->add_child(visit(tc, child.Get()));
         return dest_node;
     }
 }

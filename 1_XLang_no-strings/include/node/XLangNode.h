@@ -19,7 +19,8 @@
 #define XLANG_NODE_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangVisitableIFace.h" // visitor::visit_state_t
+#include "visitor/XLangVisitable.h" // visitor::Visitable
+#include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -31,12 +32,12 @@ namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_id_t _type_id, uint32_t _sym_id, YYLTYPE &_loc)
-        : m_type_id(_type_id), m_sym_id(_sym_id), m_loc(_loc)
+    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id, YYLTYPE &_loc)
+        : m_type(_type), m_sym_id(_sym_id), m_loc(_loc)
     {}
-    NodeIdentIFace::type_id_t type_id() const
+    NodeIdentIFace::type_t type() const
     {
-        return m_type_id;
+        return m_type;
     }
     uint32_t sym_id() const
     {
@@ -49,33 +50,37 @@ public:
     }
 
 protected:
-    NodeIdentIFace::type_id_t m_type_id;
+    NodeIdentIFace::type_t m_type;
     uint32_t m_sym_id;
     YYLTYPE m_loc;
 };
 
-template<NodeIdentIFace::type_id_t _type>
-class LeafNode : public Node, public LeafNodeIFace<_type>
+template<NodeIdentIFace::type_t _type>
+class LeafNode
+	: public Node, public LeafNodeIFace<_type>, public visitor::Visitable<LeafNode<_type> >
 {
 public:
-    LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafTraitsType<_type>::type _value)
-        : Node(_type, _sym_id, loc), m_value(_value)
+    LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafInternalType<_type>::type _value)
+        : Node(_type, _sym_id, loc), visitor::Visitable<LeafNode<_type> >(this), m_value(_value)
     {
     }
-    typename LeafTraitsType<_type>::type value() const
+    typename LeafInternalType<_type>::type value() const
     {
         return m_value;
     }
 
 private:
-    typename LeafTraitsType<_type>::type m_value;
+    typename LeafInternalType<_type>::type m_value;
 };
 
-class InnerNode : public Node, public InnerNodeIFace
+class InnerNode
+	: public Node, public InnerNodeIFace, public visitor::Visitable<InnerNode>,
+	  virtual public visitor::VisitStateIFace
 {
 public:
     InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
-        : Node(NodeIdentIFace::INNER, _sym_id, loc), m_visit_state(NULL)
+        : Node(NodeIdentIFace::INNER, _sym_id, loc), visitor::Visitable<InnerNode>(this),
+          m_visit_state(NULL)
     {
         for(size_t i = 0; i<_size; i++)
         {
@@ -95,7 +100,7 @@ public:
     {
         return m_child_vec[index];
     }
-    void push_back(NodeIdentIFace* node)
+    void add_child(NodeIdentIFace* node)
     {
         m_child_vec.push_back(node);
     }
@@ -103,14 +108,14 @@ public:
     {
         return m_child_vec.size();
     }
-    visitor::visit_state_t &visit_state()
+    visitor::VisitStateIFace::state_t &visit_state()
     {
         return m_visit_state;
     }
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
-    visitor::visit_state_t m_visit_state;
+    visitor::VisitStateIFace::state_t m_visit_state;
 };
 
 }

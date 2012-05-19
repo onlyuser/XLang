@@ -15,17 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_VISITOR_H_
-#define XLANG_VISITOR_H_
+#ifndef XLANG_VISIT_STATE_IFACE_H_
+#define XLANG_VISIT_STATE_IFACE_H_
 
 namespace visitor {
 
-template<class T>
-struct Visitor
+class VisitStateIFace
 {
-    virtual ~Visitor()
+public:
+    typedef void* state_t;
+
+    virtual ~VisitStateIFace()
     {}
-    virtual void visit_any(T* unknown) = 0;
+    virtual state_t &visit_state() = 0;
 };
 
 }

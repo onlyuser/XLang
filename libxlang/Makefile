@@ -86,7 +86,7 @@ CPP_STEMS = \
 		XLangMVCModel \
 		XLangMVCView \
 		XLangNode \
-		XLangVisitor \
+		XLangPrinter \
 		XLangDefaultTour \
 		XLangTreeContext
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))

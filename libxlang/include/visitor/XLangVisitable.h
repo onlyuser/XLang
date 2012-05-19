@@ -15,17 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_VISITABLE_IFACE_H_
-#define XLANG_VISITABLE_IFACE_H_
+#ifndef XLANG_VISITABLE_H_
+#define XLANG_VISITABLE_H_
+
+#include "visitor/XLangVisitor.h" // visitor::Visitor
 
 namespace visitor {
 
-typedef void* visit_state_t;
-
-struct VisitableIFace
+template<class T>
+class Visitable
 {
-    virtual ~VisitableIFace() {}
-    virtual visit_state_t &visit_state() = 0;
+public:
+    Visitable(T* instance) : m_instance(*instance)
+    {}
+    virtual ~Visitable()
+    {}
+    virtual void accept(Visitor<T>* v)
+    {
+        v->visit_any(&m_instance);
+    }
+
+private:
+    T &m_instance;
 };
 
 }

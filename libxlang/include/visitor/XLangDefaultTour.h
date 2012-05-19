@@ -19,10 +19,11 @@
 #define XLANG_DEFAULT_TOUR_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "visitor/XLangVisitor.h" // visitor::Visitor
 
 namespace visitor {
 
-struct DefaultTour
+struct DefaultTour : public Visitor<const node::NodeIdentIFace>
 {
     virtual ~DefaultTour() {}
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
@@ -30,10 +31,10 @@ struct DefaultTour
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-    virtual bool visit(const node::InnerNodeIFace* _node);
-    virtual void abort(const node::InnerNodeIFace* _node);
-    virtual void flush(const node::InnerNodeIFace* _node);
-    virtual void dispatch_visit(const node::NodeIdentIFace* _node);
+    virtual bool visit_next_child(const node::InnerNodeIFace* _node);
+    virtual void abort_visit_next_child(const node::InnerNodeIFace* _node);
+    virtual void visit(const node::InnerNodeIFace* _node);
+    virtual void visit_any(const node::NodeIdentIFace* unknown);
 };
 
 }

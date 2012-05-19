@@ -113,7 +113,7 @@ COMMON_CPP_STEMS = \
 		XLangAlloc \
 		XLangMVCView \
 		XLangNode \
-		XLangVisitor \
+		XLangPrinter \
 		XLangDefaultTour \
 		XLangTreeContext #\
 		XLangMVCModel

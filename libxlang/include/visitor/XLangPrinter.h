@@ -15,17 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_VISITOR_H_
-#define XLANG_VISITOR_H_
+#ifndef XLANG_PRINTER_H_
+#define XLANG_PRINTER_H_
+
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 
 namespace visitor {
 
-template<class T>
-struct Visitor
+struct LispPrinter : public DefaultTour
 {
-    virtual ~Visitor()
-    {}
-    virtual void visit_any(T* unknown) = 0;
+    void visit(const node::InnerNodeIFace* _node);
+};
+
+struct XMLPrinter : public DefaultTour
+{
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    void visit(const node::InnerNodeIFace* _node);
 };
 
 }
