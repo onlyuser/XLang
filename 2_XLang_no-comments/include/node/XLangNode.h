@@ -57,7 +57,7 @@ protected:
 
 template<NodeIdentIFace::type_t _type>
 class LeafNode
-	: public Node, public LeafNodeIFace<_type>, public visitor::Visitable<LeafNode<_type> >
+    : public Node, public LeafNodeIFace<_type>, public visitor::Visitable<LeafNode<_type> >
 {
 public:
     LeafNode(uint32_t _sym_id, YYLTYPE &loc, typename LeafInternalType<_type>::type _value)
@@ -74,8 +74,8 @@ private:
 };
 
 class InnerNode
-	: public Node, public InnerNodeIFace, public visitor::Visitable<InnerNode>,
-	  virtual public visitor::VisitStateIFace
+    : public Node, public InnerNodeIFace, public visitor::Visitable<InnerNode>,
+      virtual public visitor::VisitStateIFace
 {
 public:
     InnerNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)

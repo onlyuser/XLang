@@ -79,7 +79,7 @@ bool DefaultTour::visit_next_child(const node::InnerNodeIFace* _node)
     visit_any(_node->operator[](index));
     if(index == static_cast<int>(_node->size())-1)
     {
-    	abort_visit_next_child(_node);
+        abort_visit_next_child(_node);
         return false;
     }
     return true;
@@ -97,7 +97,7 @@ void DefaultTour::abort_visit_next_child(const node::InnerNodeIFace* _node)
 
 void DefaultTour::visit(const node::InnerNodeIFace* _node)
 {
-	while(visit_next_child(_node));
+    while(visit_next_child(_node));
 }
 
 void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
