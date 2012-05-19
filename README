@@ -5,28 +5,28 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
-    This is a parser "framework" inspired by Tom Niemann's excellent "Compact Guide
-    to Lex/Yacc". 7 variations of Lex-Yacc parser are presented, varying in
-    feature richness.
+    This is a parser "framework" inspired by Tom Niemann's excellent "Compact
+    Guide to Lex/Yacc". 7 variations of Lex-Yacc parser are presented, varying
+    in feature richness.
 
     The first variation (0_XLang_full), is a full-featured parser. With each
-    successive variation, non-critical features are stripped until there is nothing
-    left but a flex-less parser, the last variation (7_XLang_no-flex).
+    successive variation, non-critical features are stripped until there is
+    nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
     feature <--                                                         --> feature
     rich                                                                    poor
 
     full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
-    The order is chosen based on "usefulness" -- for instance, it is arguably more
-    useful to have a reentrant parser than to have a non-reentrant parser, so the
-    reentrant feature is enabled on the "feature rich" end. There's really no good
-    reason one cannot cannot have both "comments" and "file input" enabled, or both
-    "reentrant" and "hand-rolled lexer" enabled.
+    The order is chosen based on "usefulness" -- for instance, it is arguably
+    more useful to have a reentrant parser than to have a non-reentrant parser,
+    so the reentrant feature is enabled on the "feature rich" end. There's
+    really no good reason one cannot cannot have both "comments" and "file
+    input" enabled, or both "reentrant" and "hand-rolled lexer" enabled.
 
-    The code is organized in a way that anyone unfamiliar with Lex-Yacc can quickly
-    isolate a variation that is most relevent, and most readily customizable to
-    his/her specific requirements.
+    The code is organized in a way that anyone unfamiliar with Lex-Yacc can
+    quickly isolate a variation that is most relevent, and most readily
+    customizable to his/her specific requirements.
 
 Variation vs Feature Table:
 
@@ -45,9 +45,9 @@ Variation vs Feature Table:
 | no-flex      | hand-rolled | file   | no        | no        | no       | no      |
 +--------------+-------------+--------+-----------+-----------+----------+---------+
 
-    HINT: The "stdio" variation is easiest to implement -- The flex lexer accepts
-          standard stream input by default. It takes extra effort to hack flex into
-          using "buffer input" or "file input".
+    HINT: The "stdio" variation is easiest to implement -- The flex lexer
+          accepts standard stream input by default. It takes extra effort to
+          hack flex into using "buffer input" or "file input".
 
 Feature Detail:
 
@@ -59,42 +59,43 @@ Feature Detail:
 
         hand-rolled: Use a custom lexer.
                      This option is preferred when speed is critical -- Flex is
-                     slow. This option is also preferred when unicode support is
-                     needed -- Flex has no unicode support as of the time of this
-                     writing.
+                     slow. This option is also preferred when unicode support
+                     is needed -- Flex has no unicode support as of the time of
+                     this writing.
 
     input:
 
         buffer: Use in-memory buffer as input.
-                This option is preferred when speed is critical -- Standard streams
-                are slow. This option is also preferred when the input string
-                already resides in memory and does not require passing through a
-                standard stream in order to be used.
+                This option is preferred when speed is critical -- Standard
+                streams are slow. This option is also preferred when the input
+                string already resides in memory and does not require passing
+                through a standard stream in order to be used.
 
         stdio: Use standard input.
                This is the default behavior.
 
     reentrant: Tell the parser not to use global variables.
-               This option is required to make the parser multi-thread compliant.
+               This option is required to make the parser multi-thread
+               compliant.
 
     locations: Tell the parser to provide a location variable "$@" for each BNF
-               production. This option demonstrates the standard way to track syntax
-               error line/column number using Lex-Yacc.
+               production. This option demonstrates the standard way to track
+               syntax error line/column number using Lex-Yacc.
 
-    comments: Tell the lexer to conditionally enable/disable certain lexer rules for
-              stateful scanning. This option demonstrates the standard way to ignore
-              line/block comments.
+    comments: Tell the lexer to conditionally enable/disable certain lexer
+              rules for stateful scanning. This option demonstrates the
+              standard way to ignore line/block comments.
 
-    strings: Tell the lexer to conditionally enable/disable certain lexer rules for
-             stateful scanning. This option demonstrates *one* of the many ways to
-             handle strings, characters, and escaped characters.
+    strings: Tell the lexer to conditionally enable/disable certain lexer rules
+             for stateful scanning. This option demonstrates *one* of the many
+             ways to handle strings, characters, and escaped characters.
 
 Requirements:
 
     Unix tools and 3rd party components (accessible from $PATH):
 
-        gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck, doxygen,
-        graphviz, ticpp
+        gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck,
+        doxygen, graphviz, ticpp
 
     Environment variables:
 
@@ -119,19 +120,21 @@ FAQ:
 
     1. What is XLang ?
 
-       XLang is a starting point for people looking to construct their own language
-       using Lex-Yacc. XLang is thoroughly tested and comes with its own test suite.
+       XLang is a starting point for people looking to construct their own
+       language using Lex-Yacc. XLang is thoroughly tested and comes with its
+       own test suite.
 
     2. What isn't XLang ?
 
-       XLang isn't a unified parser front-end for every language under the sun. It
-       makes some assumptions about the target language, meaning, literal values
-       must be C/C++ like. Otherwise, it places no restrictions on the grammar.
+       XLang isn't a unified parser front-end for every language under the sun.
+       It makes some assumptions about the target language, meaning, literal
+       values must be C/C++ like. Otherwise, it places no restrictions on the
+       grammar.
 
     3. How should one use XLang ?
 
-       I recommend hacking the "stdio" example to your liking, but any of the other
-       variations is suitable as a base for beginners.
+       I recommend hacking the "stdio" example to your liking, but any of the
+       other variations is suitable as a base for beginners.
 
     4. What licenses apply when using XLang ?
 
@@ -139,18 +142,18 @@ FAQ:
 
     5. What's the motivation behind writing XLang ?
 
-       Lex-Yacc isn't hard, and it will get the job done, but it doesn't do it right
-       out of the box. It needs other infrastructure to get most sizeable projects
-       going.
+       Lex-Yacc isn't hard, and it will get the job done, but it doesn't do it
+       right out of the box. It needs other infrastructure to get most sizeable
+       projects going.
 
-       I built XLang to answer my own need for a parser SDK that takes care of the
-       tedious tree building business so I could focus on the fun stuff -- AST
-       visitation.
+       I built XLang to answer my own need for a parser SDK that takes care of
+       the tedious tree building business so I could focus on the fun stuff --
+       AST visitation.
 
-       But isn't that what Yacc production rules are all about ? No. In order to
-       visit the AST a second time, with Yacc only, one would have to re-parse the
-       input, and that's wasteful. XLang builds an AST for you so you can visit it
-       with multiple visitations.
+       But isn't that what Yacc production rules are all about ? No. In order
+       to visit the AST a second time, with Yacc only, one would have to re-
+       parse the input, and that's wasteful. XLang builds an AST for you so you
+       can visit it with multiple visitations.
 
        I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
        excellent tutorial.
@@ -159,11 +162,11 @@ FAQ:
 
        a) XLang uses C++, with unions used only where necessary.
        b) XLang has its own memory management system based on allocators.
-       c) XLang offers different flavors of Lex-Yacc whereas Tom's tutorial offers
-          just one "stdio" parser.
+       c) XLang offers different flavors of Lex-Yacc whereas Tom's tutorial
+          offers just one "stdio" parser.
        d) XLang's ASTs are "flattened", meaning lists are interpreted as lists
           instead of deep-recursing binary trees. This tree organization lends
-          itself better to AST visitation (less likely to stack-overflow). 
+          itself better to AST visitation (less likely to stack-overflow).
 
           (1+2+3)        (1+2+3)
           non-flattened: flattened:
@@ -176,35 +179,39 @@ FAQ:
 
     7. Why allocators ?
 
-       I've incorporated a simple memory allocator in this project because I wanted
-       to keep my AST node classes as clean as possible, without destructors that
-       delete child nodes. But the way the allocator was written really doesn't
-       improve the program's memory usage patterns. With some effort, I suppose one
-       could upgrade that into a real allocator with true memory pooling.
+       I've incorporated a simple memory allocator in this project because I
+       wanted to keep my AST node classes as clean as possible, without
+       destructors that delete child nodes. But the way the allocator was
+       written really doesn't improve the program's memory usage patterns. With
+       some effort, I suppose one could upgrade that into a real allocator with
+       true memory pooling.
 
     8. Why c++0x ?
 
-       Lambda functions are the only c++0x feature used here, and only because it
-       solves the problem elengantly.
+       Lambda functions are the only c++0x feature used here, and only because
+       it solves the problem elengantly.
 
 References:
 
     "Flex your lexical analysis muscles"
-    http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/
-    http://www.developer.com/net/cplus/article.php/3636641
+    http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm
+    http://www.developer.com/net/cplus/article.php/3636641/Flex-Your-Lexical-Analysis-Muscles.htm
 
     "Classic Parsing with Flex-Bison"
-    http://www.codeguru.com/csharp/.net/net_general/patterns/article.php/c12805
-    http://www.developer.com/net/cplus/article.php/3642516
+    http://www.codeguru.com/csharp/.net/net_general/patterns/article.php/c12805/Classic-Parsing-with-Flex-and-Bison.htm
+    http://www.developer.com/net/cplus/article.php/3642516/Classic-Parsing-with-Flex-and-Bison.htm
 
     "Tom Niemann Flex-Bison AST examples"
     http://epaperpress.com/lexandyacc/
 
     "UsualCoding.eu Reentrant Flex-Bison example"
-    http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-
-    Flex/Bison
+    http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison
     (code example needs "void yyerror(){}" inserted in declaration section of
     parser.y)
+    (page seems down as of May 19, 2012)
+
+    "Make a reentrant parser with Flex and Bison"
+    http://www.lemoda.net/c/reentrant-parser/index.html
 
     "Better error handling using Flex and Bison"
     http://www.ibm.com/developerworks/library/l-flexbison.html
@@ -219,8 +226,7 @@ Additional Reading:
 
     http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
     http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
-    http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/
-    softDevGuide_6.html
+    http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 Keywords:
 
