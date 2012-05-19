@@ -39,7 +39,7 @@ struct SynthAttrib
         std::string* string_value; // string value
         char char_value; // char value
         const std::string* ident_value; // symbol table index
-        node::NodeIdentIFace* inner_value; // node pointer
+        xlang::node::NodeIdentIFace* inner_value; // node pointer
     };
 };
 #define YYSTYPE SynthAttrib
@@ -68,14 +68,14 @@ struct ScannerContext
 class ParserContext
 {
 public:
-    ParserContext(Allocator &alloc, const char* buf)
+    ParserContext(xlang::Allocator &alloc, const char* buf)
         : m_tree_context(alloc), m_scanner_context(buf)
     {}
-    TreeContext &tree_context() { return m_tree_context; }
+    xlang::TreeContext &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
 
 private:
-    TreeContext m_tree_context;
+    xlang::TreeContext m_tree_context;
     ScannerContext m_scanner_context;
 };
 #define YY_EXTRA_TYPE ParserContext*
@@ -94,6 +94,6 @@ void _XLANG_error(const char* s);
 std::stringstream &errors();
 std::string id_to_name(uint32_t sym_id);
 
-node::NodeIdentIFace* make_ast(Allocator &alloc, char* s);
+xlang::node::NodeIdentIFace* make_ast(xlang::Allocator &alloc, char* s);
 
 #endif

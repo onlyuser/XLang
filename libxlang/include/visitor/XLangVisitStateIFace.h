@@ -18,7 +18,7 @@
 #ifndef XLANG_VISIT_STATE_IFACE_H_
 #define XLANG_VISIT_STATE_IFACE_H_
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 class VisitStateIFace
 {
@@ -30,6 +30,6 @@ public:
     virtual state_t &visit_state() = 0;
 };
 
-}
+} }
 
 #endif

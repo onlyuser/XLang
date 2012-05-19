@@ -18,7 +18,7 @@
 #ifndef XLANG_VISITOR_H_
 #define XLANG_VISITOR_H_
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 template<class T>
 struct Visitor
@@ -28,6 +28,6 @@ struct Visitor
     virtual void visit_any(T* unknown) = 0;
 };
 
-}
+} }
 
 #endif

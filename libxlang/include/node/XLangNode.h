@@ -26,7 +26,7 @@
 #include <vector> // std::vector
 #include <stdarg.h> // va_list
 
-namespace node {
+namespace xlang { namespace node {
 
 class Node : virtual public NodeIdentIFace
 {
@@ -111,6 +111,6 @@ private:
     visitor::VisitStateIFace::state_t m_visit_state;
 };
 
-}
+} }
 
 #endif

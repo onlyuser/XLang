@@ -23,7 +23,7 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
-namespace node {
+namespace xlang { namespace node {
 
 struct NodeIdentIFace
 {
@@ -79,6 +79,6 @@ struct InnerNodeIFace : virtual public NodeIdentIFace, virtual public visitor::V
     virtual size_t size() const = 0;
 };
 
-}
+} }
 
 #endif

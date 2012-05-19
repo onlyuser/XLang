@@ -20,7 +20,7 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 
-namespace mvc {
+namespace xlang { namespace mvc {
 
 struct MVCView
 {
@@ -31,6 +31,6 @@ struct MVCView
     static void print_graph(const node::NodeIdentIFace* p);
 };
 
-}
+} }
 
 #endif

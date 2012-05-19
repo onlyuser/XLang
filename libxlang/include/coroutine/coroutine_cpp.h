@@ -1,5 +1,5 @@
-#ifndef COROUTINE_CPP_H
-#define COROUTINE_CPP_H
+#ifndef COROUTINE_CPP_H_
+#define COROUTINE_CPP_H_
 
 #include "coroutine/coroutine.h"
 

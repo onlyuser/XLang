@@ -26,7 +26,7 @@
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
 
-namespace mvc {
+namespace xlang { namespace mvc {
 
 struct MVCModel
 {
@@ -41,6 +41,6 @@ struct MVCModel
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 
-}
+} }
 
 #endif

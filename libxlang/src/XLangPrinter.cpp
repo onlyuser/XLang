@@ -19,7 +19,7 @@
 #include <iostream> // std::cout
 #include <sstream> // std::stringstream
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 void LispPrinter::visit(const node::InnerNodeIFace* _node)
 {
@@ -114,4 +114,4 @@ void XMLPrinter::visit(const node::InnerNodeIFace* _node)
         std::cout << std::endl;
 }
 
-}
+} }

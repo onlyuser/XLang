@@ -36,8 +36,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) mvc::MVCModel::make_leaf(&parser_context()->tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) mvc::MVCModel::make_inner(&parser_context()->tree_context(), ##__VA_ARGS__)
+#define MAKE_LEAF(sym_id, ...) xlang::mvc::MVCModel::make_leaf(&parser_context()->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_INNER(...) xlang::mvc::MVCModel::make_inner(&parser_context()->tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -100,7 +100,7 @@ ParserContext* &parser_context()
     long int_value; // int value
     float32_t float_value; // float value
     const std::string* ident_value; // symbol table index
-    node::NodeIdentIFace* inner_value; // node pointer
+    xlang::node::NodeIdentIFace* inner_value; // node pointer
 }
 
 // show detailed parse errors
@@ -158,7 +158,7 @@ ScannerContext::ScannerContext(FILE* file)
     rewind(file);
 }
 
-node::NodeIdentIFace* make_ast(Allocator &alloc, FILE* file)
+xlang::node::NodeIdentIFace* make_ast(xlang::Allocator &alloc, FILE* file)
 {
     parser_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<ParserContext*>(x)->~ParserContext();
@@ -256,13 +256,13 @@ bool parse_args(int argc, char** argv, args_t &args)
     return true;
 }
 
-bool import_ast(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
+bool import_ast(args_t &args, xlang::Allocator &alloc, xlang::node::NodeIdentIFace* &ast)
 {
     if(args.in_xml != "")
     {
-        ast = mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<TreeContext*>(x)->~TreeContext();
-                }) TreeContext(alloc), args.in_xml);
+        ast = xlang::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
+                reinterpret_cast<xlang::TreeContext*>(x)->~TreeContext();
+                }) xlang::TreeContext(alloc), args.in_xml);
         if(NULL == ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
@@ -288,7 +288,7 @@ bool import_ast(args_t &args, Allocator &alloc, node::NodeIdentIFace* &ast)
     return true;
 }
 
-void export_ast(args_t &args, const node::NodeIdentIFace* ast)
+void export_ast(args_t &args, const xlang::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
@@ -297,15 +297,15 @@ void export_ast(args_t &args, const node::NodeIdentIFace* ast)
                 #if 0 // use mvc-pattern pretty-printer
                     mvc::MVCView::print_lisp(ast);
                 #else // use visitor-pattern pretty-printer
-                    visitor::LispPrinter v;
+                    xlang::visitor::LispPrinter v;
                     v.visit_any(ast);
                 #endif
                 std::cout << std::endl;
             }
             break;
-        case args_t::MODE_XML:   mvc::MVCView::print_xml(ast); break;
-        case args_t::MODE_GRAPH: mvc::MVCView::print_graph(ast); break;
-        case args_t::MODE_DOT:   mvc::MVCView::print_dot(ast); break;
+        case args_t::MODE_XML:   xlang::mvc::MVCView::print_xml(ast); break;
+        case args_t::MODE_GRAPH: xlang::mvc::MVCView::print_graph(ast); break;
+        case args_t::MODE_DOT:   xlang::mvc::MVCView::print_dot(ast); break;
         default:
             break;
     }
@@ -318,8 +318,8 @@ bool do_work(args_t &args)
         display_usage(true);
         return true;
     }
-    Allocator alloc(__FILE__);
-    node::NodeIdentIFace* ast = NULL;
+    xlang::Allocator alloc(__FILE__);
+    xlang::node::NodeIdentIFace* ast = NULL;
     if(!import_ast(args, alloc, ast))
         return false;
     export_ast(args, ast);

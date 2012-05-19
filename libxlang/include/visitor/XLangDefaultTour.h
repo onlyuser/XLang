@@ -21,7 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitor.h" // visitor::Visitor
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 struct DefaultTour : public Visitor<const node::NodeIdentIFace>
 {
@@ -32,11 +32,11 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     virtual bool visit_next_child(const node::InnerNodeIFace* _node);
-    virtual void abort_visit_next_child(const node::InnerNodeIFace* _node);
+    virtual void abort_visitation(const node::InnerNodeIFace* _node);
     virtual void visit(const node::InnerNodeIFace* _node);
     virtual void visit_any(const node::NodeIdentIFace* unknown);
 };
 
-}
+} }
 
 #endif

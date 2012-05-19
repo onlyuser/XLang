@@ -25,7 +25,7 @@
     #include "coroutine/coroutine_cpp.h"
 #endif
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
@@ -79,7 +79,7 @@ bool DefaultTour::visit_next_child(const node::InnerNodeIFace* _node)
     visit_any(_node->operator[](index));
     if(index == static_cast<int>(_node->size())-1)
     {
-        abort_visit_next_child(_node);
+        abort_visitation(_node);
         return false;
     }
     return true;
@@ -88,7 +88,7 @@ bool DefaultTour::visit_next_child(const node::InnerNodeIFace* _node)
 #endif
 }
 
-void DefaultTour::abort_visit_next_child(const node::InnerNodeIFace* _node)
+void DefaultTour::abort_visitation(const node::InnerNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
     stop_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state());
@@ -128,4 +128,4 @@ void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
     }
 }
 
-}
+} }

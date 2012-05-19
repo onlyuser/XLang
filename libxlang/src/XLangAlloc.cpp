@@ -21,6 +21,8 @@
 #include <stdlib.h> // malloc
 #include <stddef.h> // size_t
 
+namespace xlang {
+
 MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_type dtor)
     : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number), m_dtor(dtor)
 {
@@ -90,13 +92,15 @@ void Allocator::dump(std::string indent) const
     std::cout << "};" << std::endl;
 }
 
-void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number,
-        MemChunk::dtor_type dtor)
+}
+
+void* operator new(size_t size_bytes, xlang::Allocator &alloc, std::string filename, size_t line_number,
+		xlang::MemChunk::dtor_type dtor)
 {
     return alloc._malloc(size_bytes, filename, line_number, dtor);
 }
 
-void* operator new(size_t size_bytes, Allocator &alloc, std::string filename, size_t line_number)
+void* operator new(size_t size_bytes, xlang::Allocator &alloc, std::string filename, size_t line_number)
 {
     return alloc._malloc(size_bytes, filename, line_number, NULL);
 }

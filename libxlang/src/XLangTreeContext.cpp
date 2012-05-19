@@ -18,6 +18,8 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
 
+namespace xlang {
+
 std::string* TreeContext::alloc_string(std::string s)
 {
     return new (m_alloc, __FILE__, __LINE__, [](void *x) {
@@ -36,4 +38,6 @@ const std::string* TreeContext::alloc_unique_string(std::string name)
         p = m_string_set.find(&name);
     }
     return *p;
+}
+
 }

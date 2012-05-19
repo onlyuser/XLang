@@ -20,7 +20,7 @@
 
 #include "visitor/XLangVisitor.h" // visitor::Visitor
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 template<class T>
 class Visitable
@@ -39,6 +39,6 @@ private:
     T &m_instance;
 };
 
-}
+} }
 
 #endif

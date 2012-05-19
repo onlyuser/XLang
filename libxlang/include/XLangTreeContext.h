@@ -23,6 +23,8 @@
 #include <string> // std::string
 #include <set> // std::set
 
+namespace xlang {
+
 class TreeContext
 {
 public:
@@ -48,5 +50,7 @@ private:
     typedef std::set<std::string*, str_ptr_compare_t> string_set_t;
     string_set_t m_string_set;
 };
+
+}
 
 #endif

@@ -37,7 +37,7 @@
 #define typeId node::NodeIdentIFace::IDENT
 #define typeOpr node::NodeIdentIFace::INNER
 
-namespace mvc {
+namespace xlang { namespace mvc {
 
 void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
@@ -389,4 +389,4 @@ void graphDrawArrow (int c1, int l1, int c2, int l2) {
     graph[l1][c1] = '|';
 }
 
-}
+} }

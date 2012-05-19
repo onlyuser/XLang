@@ -21,11 +21,11 @@
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
 
-namespace node {
+namespace xlang { namespace node {
 
 std::string Node::name() const
 {
     return id_to_name(sym_id());
 }
 
-}
+} }

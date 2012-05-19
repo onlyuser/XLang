@@ -21,7 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 
-namespace visitor {
+namespace xlang { namespace visitor {
 
 struct LispPrinter : public DefaultTour
 {
@@ -38,6 +38,6 @@ struct XMLPrinter : public DefaultTour
     void visit(const node::InnerNodeIFace* _node);
 };
 
-}
+} }
 
 #endif
