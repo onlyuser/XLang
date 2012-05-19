@@ -21,11 +21,12 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitor.h" // visitor::Visitor
 
-namespace xlang { namespace visitor {
+namespace xl { namespace visitor {
 
 struct DefaultTour : public Visitor<const node::NodeIdentIFace>
 {
-    virtual ~DefaultTour() {}
+    virtual ~DefaultTour()
+    {}
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
     virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);

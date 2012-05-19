@@ -23,7 +23,7 @@
 #include <string> // std::string
 #include <set> // std::set
 
-namespace xlang {
+namespace xl {
 
 class TreeContext
 {

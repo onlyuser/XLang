@@ -39,14 +39,14 @@ struct ScannerContext
 class ParserContext
 {
 public:
-    ParserContext(xlang::Allocator &alloc, const char* buf)
+    ParserContext(xl::Allocator &alloc, const char* buf)
         : m_tree_context(alloc), m_scanner_context(buf)
     {}
-    xlang::TreeContext &tree_context() { return m_tree_context; }
+    xl::TreeContext &tree_context() { return m_tree_context; }
     ScannerContext &scanner_context() { return m_scanner_context; }
 
 private:
-    xlang::TreeContext m_tree_context;
+    xl::TreeContext m_tree_context;
     ScannerContext m_scanner_context;
 };
 
@@ -62,6 +62,6 @@ std::stringstream &errors();
 std::string id_to_name(uint32_t sym_id);
 ParserContext* &parser_context();
 
-xlang::node::NodeIdentIFace* make_ast(xlang::Allocator &alloc, char* s);
+xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, char* s);
 
 #endif

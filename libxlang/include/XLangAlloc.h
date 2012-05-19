@@ -23,7 +23,7 @@
 #include <stddef.h> // size_t
 #include <list> // std::list
 
-namespace xlang {
+namespace xl {
 
 class MemChunk
 {
@@ -67,8 +67,8 @@ private:
 }
 
 // NOTE: doesn't work for arrays
-void* operator new(size_t size_bytes, xlang::Allocator &alloc, std::string filename, size_t line_number,
-		xlang::MemChunk::dtor_type dtor);
-void* operator new(size_t size_bytes, xlang::Allocator &alloc, std::string filename, size_t line_number);
+void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number,
+        xl::MemChunk::dtor_type dtor);
+void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number);
 
 #endif

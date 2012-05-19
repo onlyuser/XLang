@@ -20,7 +20,7 @@
 
 #include "visitor/XLangVisitor.h" // visitor::Visitor
 
-namespace xlang { namespace visitor {
+namespace xl { namespace visitor {
 
 template<class T>
 class Visitable

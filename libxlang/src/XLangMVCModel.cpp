@@ -33,7 +33,7 @@
     extern uint32_t name_to_id(std::string name);
 #endif
 
-namespace xlang { namespace mvc {
+namespace xl { namespace mvc {
 
 template<>
 node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t sym_id, std::string value)

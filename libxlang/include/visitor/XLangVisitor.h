@@ -18,7 +18,7 @@
 #ifndef XLANG_VISITOR_H_
 #define XLANG_VISITOR_H_
 
-namespace xlang { namespace visitor {
+namespace xl { namespace visitor {
 
 template<class T>
 struct Visitor

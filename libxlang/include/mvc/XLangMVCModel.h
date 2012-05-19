@@ -25,7 +25,7 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
-namespace xlang { namespace mvc {
+namespace xl { namespace mvc {
 
 struct MVCModel
 {

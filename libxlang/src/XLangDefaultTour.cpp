@@ -25,7 +25,7 @@
     #include "coroutine/coroutine_cpp.h"
 #endif
 
-namespace xlang { namespace visitor {
+namespace xl { namespace visitor {
 
 void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {

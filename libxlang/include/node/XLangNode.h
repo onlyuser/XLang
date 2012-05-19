@@ -26,7 +26,7 @@
 #include <vector> // std::vector
 #include <stdarg.h> // va_list
 
-namespace xlang { namespace node {
+namespace xl { namespace node {
 
 class Node : virtual public NodeIdentIFace
 {

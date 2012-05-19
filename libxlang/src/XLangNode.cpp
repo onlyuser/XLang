@@ -21,7 +21,7 @@
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
 
-namespace xlang { namespace node {
+namespace xl { namespace node {
 
 std::string Node::name() const
 {

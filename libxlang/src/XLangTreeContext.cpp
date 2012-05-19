@@ -18,7 +18,7 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
 
-namespace xlang {
+namespace xl {
 
 std::string* TreeContext::alloc_string(std::string s)
 {

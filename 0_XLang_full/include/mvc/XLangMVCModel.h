@@ -26,7 +26,7 @@
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
 
-namespace xlang { namespace mvc {
+namespace xl { namespace mvc {
 
 struct MVCModel
 {

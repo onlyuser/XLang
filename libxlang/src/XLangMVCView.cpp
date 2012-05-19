@@ -37,7 +37,7 @@
 #define typeId node::NodeIdentIFace::IDENT
 #define typeOpr node::NodeIdentIFace::INNER
 
-namespace xlang { namespace mvc {
+namespace xl { namespace mvc {
 
 void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {

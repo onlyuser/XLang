@@ -206,7 +206,7 @@ References:
 
     "UsualCoding.eu Reentrant Flex-Bison example"
     http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison
-    (code example needs "void yyerror(){}" inserted in declaration section of
+    (code example needs "void yyerror() {}" inserted in declaration section of
     parser.y)
     (page seems down as of May 19, 2012)
 

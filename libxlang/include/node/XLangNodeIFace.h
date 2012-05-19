@@ -23,13 +23,14 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
-namespace xlang { namespace node {
+namespace xl { namespace node {
 
 struct NodeIdentIFace
 {
     typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_t;
 
-    virtual ~NodeIdentIFace() {}
+    virtual ~NodeIdentIFace()
+    {}
     virtual type_t type() const = 0;
     virtual uint32_t sym_id() const = 0;
     virtual std::string name() const = 0;
@@ -68,13 +69,15 @@ struct LeafType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
 template<NodeIdentIFace::type_t T>
 struct LeafNodeIFace : virtual public NodeIdentIFace
 {
-    virtual ~LeafNodeIFace() {}
+    virtual ~LeafNodeIFace()
+    {}
     virtual typename LeafInternalType<T>::type value() const = 0;
 };
 
 struct InnerNodeIFace : virtual public NodeIdentIFace, virtual public visitor::VisitStateIFace
 {
-    virtual ~InnerNodeIFace() {}
+    virtual ~InnerNodeIFace()
+    {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
 };

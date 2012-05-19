@@ -20,7 +20,7 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 
-namespace xlang { namespace mvc {
+namespace xl { namespace mvc {
 
 struct MVCView
 {

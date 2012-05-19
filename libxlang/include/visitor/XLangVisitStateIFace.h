@@ -18,7 +18,7 @@
 #ifndef XLANG_VISIT_STATE_IFACE_H_
 #define XLANG_VISIT_STATE_IFACE_H_
 
-namespace xlang { namespace visitor {
+namespace xl { namespace visitor {
 
 class VisitStateIFace
 {
