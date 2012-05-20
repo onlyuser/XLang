@@ -51,6 +51,22 @@ private:
     bool include_node_uid;
 };
 
+struct DotPrinter : public DefaultTour
+{
+public:
+    DotPrinter() : depth(0)
+    {}
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    void visit(const node::InnerNodeIFace* _node);
+
+private:
+    size_t depth;
+};
+
 } }
 
 #endif

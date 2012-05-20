@@ -62,47 +62,8 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node)
 
 void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
 {
-    if(NULL == _node)
-        return;
-    if(root)
-        std::cout << "digraph g {" << std::endl;
-    std::string id = ptr_to_string(_node);
-    std::cout << "\t" << id << " [" << std::endl <<
-            "\t\tlabel=\"";
-    switch(_node->type())
-    {
-        case node::NodeIdentIFace::INT:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::FLOAT:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::STRING:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::CHAR:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::IDENT:
-            std::cout << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::INNER:
-            std::cout << _node->name();
-            break;
-    }
-    std::cout << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
-            "\t];" << std::endl;
-    if(_node->type() == node::NodeIdentIFace::INNER)
-        for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
-        {
-            const node::NodeIdentIFace* child =
-                    dynamic_cast<const node::InnerNodeIFace*>(_node)->operator [](i);
-            std::cout << '\t' << id << "->" << ptr_to_string(child) << ";" << std::endl;
-            print_dot(child, false);
-        }
-    if(root)
-        std::cout << "}" << std::endl;
+    visitor::DotPrinter v;
+    v.visit_any(_node);
 }
 
 typedef const node::NodeIdentIFace nodeType;
