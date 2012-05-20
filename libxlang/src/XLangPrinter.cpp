@@ -27,9 +27,6 @@ static std::string ptr_to_string(const void* x)
     return s;
 }
 
-static bool include_node_uid;
-static size_t depth;
-
 namespace xl { namespace visitor {
 
 void LispPrinter::visit(const node::InnerNodeIFace* _node)

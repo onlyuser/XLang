@@ -23,19 +23,32 @@
 
 namespace xl { namespace visitor {
 
-struct LispPrinter : public DefaultTour
+class LispPrinter : public DefaultTour
 {
+public:
+    LispPrinter() : depth(0)
+    {}
     void visit(const node::InnerNodeIFace* _node);
+
+private:
+    size_t depth;
 };
 
 struct XMLPrinter : public DefaultTour
 {
+public:
+    XMLPrinter() : depth(0), include_node_uid(false)
+    {}
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     void visit(const node::InnerNodeIFace* _node);
+
+private:
+    size_t depth;
+    bool include_node_uid;
 };
 
 } }
