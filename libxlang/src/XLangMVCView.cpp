@@ -17,6 +17,7 @@
 
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "visitor/XLangPrinter.h" // visitor::LispPrinter
 #include "XLangType.h" // uint32_t
 #include <string.h> // strlen
 #include <string> // std::string
@@ -37,45 +38,6 @@
 #define typeId node::NodeIdentIFace::IDENT
 #define typeOpr node::NodeIdentIFace::INNER
 
-namespace xl { namespace mvc {
-
-void MVCView::print_lisp(const node::NodeIdentIFace* _node)
-{
-    if(NULL == _node)
-        return;
-    switch(_node->type())
-    {
-        case node::NodeIdentIFace::INT:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::FLOAT:
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::STRING:
-            std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
-            break;
-        case node::NodeIdentIFace::CHAR:
-            std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
-            break;
-        case node::NodeIdentIFace::IDENT:
-            std::cout << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value();
-            break;
-        case node::NodeIdentIFace::INNER:
-            {
-                std::cout << '(' << _node->name() << ' ';
-                size_t i;
-                for(i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size()-1; i++)
-                {
-                    print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i));
-                    std::cout << ' ';
-                }
-                print_lisp(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i));
-                std::cout << ')';
-            }
-            break;
-    }
-}
-
 static std::string ptr_to_string(const void* x)
 {
     std::stringstream ss;
@@ -84,72 +46,18 @@ static std::string ptr_to_string(const void* x)
     return s;
 }
 
-void MVCView::print_xml(const node::NodeIdentIFace* _node, bool include_node_uid, size_t depth)
+namespace xl { namespace mvc {
+
+void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
-    if(NULL == _node)
-        return;
-    std::string id = ptr_to_string(_node);
-    std::cout << std::string(depth*4, ' ');
-    switch(_node->type())
-    {
-        case node::NodeIdentIFace::INT:
-        case node::NodeIdentIFace::FLOAT:
-        case node::NodeIdentIFace::STRING:
-        case node::NodeIdentIFace::CHAR:
-        case node::NodeIdentIFace::IDENT:
-            std::cout << "<leaf ";
-            break;
-        case node::NodeIdentIFace::INNER:
-            std::cout << "<inner ";
-            break;
-    }
-    if(include_node_uid)
-        std::cout << "id=" << id << " ";
-    std::cout << "type=\"" << _node->name() << "\" ";
-    switch(_node->type())
-    {
-        case node::NodeIdentIFace::INT:
-            std::cout << "value=";
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(_node)->value();
-            std::cout << "/>";
-            break;
-        case node::NodeIdentIFace::FLOAT:
-            std::cout << "value=";
-            std::cout << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(_node)->value();
-            std::cout << "/>";
-            break;
-        case node::NodeIdentIFace::STRING:
-            std::cout << "value=";
-            std::cout << '\"' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(_node)->value() << '\"';
-            std::cout << "/>";
-            break;
-        case node::NodeIdentIFace::CHAR:
-            std::cout << "value=";
-            std::cout << '\'' << dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(_node)->value() << '\'';
-            std::cout << "/>";
-            break;
-        case node::NodeIdentIFace::IDENT:
-            std::cout << "value=";
-            std::cout << '\"' << *dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(_node)->value() << '\"';
-            std::cout << "/>";
-            break;
-        case node::NodeIdentIFace::INNER:
-            {
-                std::cout << ">" << std::endl;
-                depth++;
-                for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
-                {
-                    print_xml(dynamic_cast<const node::InnerNodeIFace*>(_node)->operator[](i),
-                            include_node_uid, depth);
-                    std::cout << std::endl;
-                }
-                depth--;
-                std::cout << std::string(depth*4, ' ') << "</inner>";
-            }
-            break;
-    }
-    if(depth == 0)
-        std::cout << std::endl;
+	visitor::LispPrinter v;
+	v.visit_any(_node);
+}
+
+void MVCView::print_xml(const node::NodeIdentIFace* _node)
+{
+	visitor::XMLPrinter v;
+	v.visit_any(_node);
 }
 
 void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)

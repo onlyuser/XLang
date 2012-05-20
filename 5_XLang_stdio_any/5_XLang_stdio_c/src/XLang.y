@@ -26,7 +26,6 @@
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
-#include "visitor/XLangPrinter.h" // visitor::LispPrinter
 #include "XLangType.h" // uint32_t
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
@@ -701,17 +700,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
-        case args_t::MODE_LISP:
-            {
-                #if 0 // use mvc-pattern pretty-printer
-                    mvc::MVCView::print_lisp(ast);
-                #else // use visitor-pattern pretty-printer
-                    xl::visitor::LispPrinter v;
-                    v.visit_any(ast);
-                #endif
-                std::cout << std::endl;
-            }
-            break;
+        case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
         case args_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
         case args_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;

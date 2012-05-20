@@ -19,6 +19,17 @@
 #include <iostream> // std::cout
 #include <sstream> // std::stringstream
 
+static std::string ptr_to_string(const void* x)
+{
+    std::stringstream ss;
+    ss << '_' << x;
+    std::string s = ss.str();
+    return s;
+}
+
+static bool include_node_uid;
+static size_t depth;
+
 namespace xl { namespace visitor {
 
 void LispPrinter::visit(const node::InnerNodeIFace* _node)
@@ -33,17 +44,6 @@ void LispPrinter::visit(const node::InnerNodeIFace* _node)
     } while(more);
     std::cout << ')';
 }
-
-static std::string ptr_to_string(const void* x)
-{
-    std::stringstream ss;
-    ss << '_' << x;
-    std::string s = ss.str();
-    return s;
-}
-
-static bool include_node_uid;
-static size_t depth;
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
