@@ -35,6 +35,7 @@ namespace xl { namespace visitor {
 void LispPrinter::visit(const node::InnerNodeIFace* _node)
 {
     std::cout << '(' << _node->name() << ' ';
+    depth++;
     bool more;
     do
     {
@@ -42,7 +43,10 @@ void LispPrinter::visit(const node::InnerNodeIFace* _node)
         if(more)
             std::cout << ' ';
     } while(more);
+    depth--;
     std::cout << ')';
+    if(depth == 0)
+        std::cout << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
