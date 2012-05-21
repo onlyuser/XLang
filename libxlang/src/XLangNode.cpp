@@ -35,6 +35,7 @@ std::string Node::name() const
 {
     return id_to_name(sym_id());
 }
+
 std::string Node::uid() const
 {
     return ptr_to_string(this);

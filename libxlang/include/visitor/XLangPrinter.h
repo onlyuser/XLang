@@ -26,12 +26,9 @@ namespace xl { namespace visitor {
 class LispPrinter : public DefaultTour
 {
 public:
-    LispPrinter() : depth(0)
+    LispPrinter()
     {}
     void visit(const node::InnerNodeIFace* _node);
-
-private:
-    size_t depth;
 };
 
 struct XMLPrinter : public DefaultTour
