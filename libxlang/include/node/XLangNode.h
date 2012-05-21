@@ -32,7 +32,7 @@ class Node : virtual public NodeIdentIFace
 {
 public:
     Node(NodeIdentIFace::type_t _type, uint32_t _sym_id)
-        : m_type(_type), m_sym_id(_sym_id)
+        : m_type(_type), m_sym_id(_sym_id), m_parent(NULL)
     {}
     NodeIdentIFace::type_t type() const
     {
@@ -43,10 +43,24 @@ public:
         return m_sym_id;
     }
     std::string name() const;
+    void set_parent(NodeIdentIFace* parent)
+    {
+        m_parent = parent;
+    }
+    NodeIdentIFace* parent() const
+    {
+        return m_parent;
+    }
+    bool is_root() const
+    {
+        return m_parent == NULL;
+    }
+    std::string uid() const;
 
 protected:
     NodeIdentIFace::type_t m_type;
     uint32_t m_sym_id;
+    NodeIdentIFace* m_parent;
 };
 
 template<NodeIdentIFace::type_t _type>
@@ -77,16 +91,20 @@ public:
     {
         for(size_t i = 0; i<_size; i++)
         {
-            NodeIdentIFace* _node = va_arg(ap, NodeIdentIFace*);
-            if(is_same_type(_node))
+            NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
+            if(is_same_type(child))
             {
-                InnerNode* inner_node = dynamic_cast<InnerNode*>(_node);
+                InnerNode* inner_node = dynamic_cast<InnerNode*>(child);
                 m_child_vec.insert(m_child_vec.end(),
                         inner_node->m_child_vec.begin(),
                         inner_node->m_child_vec.end());
+                std::vector<NodeIdentIFace*>::iterator p;
+                for(p = inner_node->m_child_vec.begin(); p != inner_node->m_child_vec.end(); ++p)
+                    (*p)->set_parent(this);
                 continue;
             }
-            m_child_vec.push_back(_node);
+            m_child_vec.push_back(child);
+            child->set_parent(this);
         }
     }
     NodeIdentIFace* operator[](uint32_t index) const

@@ -38,6 +38,10 @@ struct NodeIdentIFace
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
     }
+    virtual void set_parent(NodeIdentIFace* parent) = 0;
+    virtual NodeIdentIFace* parent() const = 0;
+    virtual bool is_root() const = 0;
+    virtual std::string uid() const = 0;
 };
 
 template<NodeIdentIFace::type_t>

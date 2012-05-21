@@ -17,15 +17,6 @@
 
 #include "visitor/XLangPrinter.h" // visitor::LispPrinter
 #include <iostream> // std::cout
-#include <sstream> // std::stringstream
-
-static std::string ptr_to_string(const void* x)
-{
-    std::stringstream ss;
-    ss << '_' << x;
-    std::string s = ss.str();
-    return s;
-}
 
 namespace xl { namespace visitor {
 
@@ -42,7 +33,7 @@ void LispPrinter::visit(const node::InnerNodeIFace* _node)
     } while(more);
     depth--;
     std::cout << ')';
-    if(depth == 0)
+    if(_node->is_root())
         std::cout << std::endl;
 }
 
@@ -51,8 +42,8 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _no
     std::cout << std::string(depth*4, ' ');
     std::cout << "<leaf ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+        std::cout << "id=" << _node->uid() << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
@@ -60,8 +51,8 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _
     std::cout << std::string(depth*4, ' ');
     std::cout << "<leaf ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+        std::cout << "id=" << _node->uid() << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
@@ -69,8 +60,8 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* 
     std::cout << std::string(depth*4, ' ');
     std::cout << "<leaf ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+        std::cout << "id=" << _node->uid() << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
@@ -78,8 +69,8 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _n
     std::cout << std::string(depth*4, ' ');
     std::cout << "<leaf ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>";
+        std::cout << "id=" << _node->uid() << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
@@ -87,98 +78,80 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _
     std::cout << std::string(depth*4, ' ');
     std::cout << "<leaf ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << *_node->value() << "/>";
+        std::cout << "id=" << _node->uid() << " ";
+    std::cout << "type=\"" << _node->name() << "\" value=" << *_node->value() << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::InnerNodeIFace* _node)
 {
-    if(NULL == _node)
-        return;
     std::cout << std::string(depth*4, ' ');
     std::cout << "<inner ";
     if(include_node_uid)
-        std::cout << "id=" << ptr_to_string(_node) << " ";
+        std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\">" << std::endl;
     depth++;
-    bool more;
-    do
-    {
-        more = visit_next_child(_node);
-        std::cout << std::endl;
-    } while(more);
+    DefaultTour::visit(_node);
     depth--;
-    std::cout << std::string(depth*4, ' ') << "</inner>";
-    if(depth == 0)
-        std::cout << std::endl;
+    std::cout << std::string(depth*4, ' ') << "</inner>" << std::endl;
 }
 
 void DotPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
+    std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
 
 void DotPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
+    std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
 
 void DotPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
+    std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
 
 void DotPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
+    std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
 
 void DotPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << *_node->value() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
+    std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
 
 void DotPrinter::visit(const node::InnerNodeIFace* _node)
 {
-    if(NULL == _node)
-        return;
-    std::cout << std::string(depth*4, ' ');
-    if(depth == 0)
+    if(_node->is_root())
         std::cout << "digraph g {" << std::endl;
-    std::string id = ptr_to_string(dynamic_cast<const node::NodeIdentIFace*>(_node));
-    std::cout << "\t" << id << " [" << std::endl <<
+    std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->name() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
-    depth++;
-    for(size_t i = 0; i < dynamic_cast<const node::InnerNodeIFace*>(_node)->size(); i++)
-    {
-        const node::NodeIdentIFace* child = _node->operator [](i);
-        std::cout << '\t' << id << "->" << ptr_to_string(child) << ";" << std::endl;
-        visit_any(child);
-    }
-    depth--;
-    if(depth == 0)
+    DefaultTour::visit(_node);
+    if(!_node->is_root())
+        std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
+    if(_node->is_root())
         std::cout << "}" << std::endl;
 }
 

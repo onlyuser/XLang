@@ -16,16 +16,28 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "node/XLangNode.h" // node::NodeIdentIFace
-#include <iostream> // std::cout
+#include <sstream> // std::stringstream
 
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
+
+static std::string ptr_to_string(const void* x)
+{
+    std::stringstream ss;
+    ss << '_' << x;
+    std::string s = ss.str();
+    return s;
+}
 
 namespace xl { namespace node {
 
 std::string Node::name() const
 {
     return id_to_name(sym_id());
+}
+std::string Node::uid() const
+{
+    return ptr_to_string(this);
 }
 
 } }

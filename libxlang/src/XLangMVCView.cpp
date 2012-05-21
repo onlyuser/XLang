@@ -38,14 +38,6 @@
 #define typeId node::NodeIdentIFace::IDENT
 #define typeOpr node::NodeIdentIFace::INNER
 
-static std::string ptr_to_string(const void* x)
-{
-    std::stringstream ss;
-    ss << '_' << x;
-    std::string s = ss.str();
-    return s;
-}
-
 namespace xl { namespace mvc {
 
 void MVCView::print_lisp(const node::NodeIdentIFace* _node)
