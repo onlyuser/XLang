@@ -98,10 +98,10 @@ xl::TreeContext* &tree_context()
 //
 %union
 {
-    long int_value; // int value
-    float32_t float_value; // float value
-    const std::string* ident_value; // symbol table index
-    xl::node::NodeIdentIFace* inner_value; // node pointer
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type   int_value;   // int value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type float_value; // float value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type ident_value; // symbol table index
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type inner_value; // node pointer
 }
 
 // show detailed parse errors

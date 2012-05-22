@@ -56,6 +56,8 @@ template<>
 struct LeafInternalType<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
 struct LeafInternalType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
+template<>
+struct LeafInternalType<NodeIdentIFace::INNER> { typedef NodeIdentIFace* type; };
 
 template<class T>
 struct LeafType;
@@ -69,6 +71,8 @@ template<>
 struct LeafType<char> { enum { type = NodeIdentIFace::CHAR}; };
 template<>
 struct LeafType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
+template<>
+struct LeafType<NodeIdentIFace*> { enum { type = NodeIdentIFace::INNER}; };
 
 template<NodeIdentIFace::type_t T>
 struct LeafNodeIFace : virtual public NodeIdentIFace
