@@ -128,12 +128,14 @@ clean_lint :
 
 DOC_PATH = $(PARENT_PATH)/doc
 DOC_CONFIG_FILE = XLang.config
+DOC_CONFIG_PATCH_FILE = $(DOC_CONFIG_FILE).patch
 DOC_TOOL = doxygen
 
 .PHONY : doc
 doc :
 	mkdir -p $(BUILD_PATH)
-	-ln -s ../$(DOC_PATH)/$(DOC_CONFIG_FILE) $(BUILD_PATH)/$(DOC_CONFIG_FILE)
+	doxygen -g $(BUILD_PATH)/$(DOC_CONFIG_FILE)
+	patch $(BUILD_PATH)/$(DOC_CONFIG_FILE) < $(DOC_PATH)/$(DOC_CONFIG_PATCH_FILE)
 	cd $(BUILD_PATH); $(DOC_TOOL) $(DOC_CONFIG_FILE)
 
 .PHONY : clean_doc
