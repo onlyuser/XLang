@@ -16,7 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 SUBPATHS = \
-	5_XLang_stdio_c
+	5_XLang_stdio_c \
+	5_XLang_stdio_proto
 
 .DEFAULT_GOAL : all
 all :
