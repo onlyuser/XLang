@@ -34,12 +34,12 @@ struct SynthAttrib
 {
     union
     {
-        xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type    int_value;   // int value
-        xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value; // float value
-        std::string* string_value; // string value
-        xl::node::LeafInternalType<xl::node::NodeIdentIFace::CHAR>::type   char_value;  // char value
-        xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value; // symbol table index
-        xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type  inner_value; // node pointer
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type     int_value;    // int value
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type   float_value;  // float value
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
+        xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type   inner_value;  // node pointer
     };
 };
 #define YYSTYPE SynthAttrib
