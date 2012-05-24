@@ -17,7 +17,7 @@
 
 SUBPATHS = \
 	5_XLang_stdio_c \
-	5_XLang_stdio_proto
+	5_XLang_stdio_bring-up
 
 .DEFAULT_GOAL : all
 all :
