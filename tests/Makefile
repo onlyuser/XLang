@@ -49,12 +49,10 @@ ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_FILE_STEMS = \
 			1_strings
 endif
-ifneq ($(strip $(BRINGUP_SUITE)),)
-	TEST_PATH = bring-up_suite
+ifneq ($(strip $(C_SUITE)),)
+	TEST_PATH = c_suite
 	TEST_FILE_STEMS = \
-			0_fqn \
-			1_namespace \
-			2_static_param
+			0_hello_world
 endif
 OUT_PREFIX = $(TEST_PATH)
 

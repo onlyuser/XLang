@@ -16,8 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 SUBPATHS = \
-	5_XLang_stdio_c \
-	5_XLang_stdio_bring-up
+	5_XLang_stdio_c
 
 .DEFAULT_GOAL : all
 all :
