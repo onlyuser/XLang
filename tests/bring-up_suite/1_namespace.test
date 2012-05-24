@@ -1,0 +1,11 @@
+namespace a {
+
+x
+
+namespace b { namespace c {
+
+y
+
+} }
+
+}

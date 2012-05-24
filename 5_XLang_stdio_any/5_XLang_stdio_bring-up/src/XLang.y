@@ -112,13 +112,12 @@ xl::TreeContext* &tree_context()
 %token<int_value> ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<inner_value> program literal fqn statement expression
+%type<inner_value> program statement expression literal fqn
 
 %left '+' '-'
 %left '*' '/'
-%nonassoc UMINUS
-
 %token NAME_DELIM
+%nonassoc UMINUS
 
 %nonassoc ID_COUNT
 
@@ -131,17 +130,7 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = MAKE_INNER(',', 2, $1, $3); }
-    ;
-
-literal:
-      ID_INT   { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-    ;
-
-fqn:
-      ID_IDENT           { $$ = MAKE_LEAF(ID_IDENT, $1); }
-    | fqn NAME_DELIM fqn { $$ = MAKE_INNER(NAME_DELIM, 2, $1, $3); }
+    | statement ';' program { $$ = MAKE_INNER(';', 2, $1, $3); }
     ;
 
 statement:
@@ -158,6 +147,16 @@ expression:
     | expression '*' expression   { $$ = MAKE_INNER('*', 2, $1, $3); }
     | expression '/' expression   { $$ = MAKE_INNER('/', 2, $1, $3); }
     | '(' expression ')'          { $$ = $2; }
+    ;
+
+literal:
+      ID_INT   { $$ = MAKE_LEAF(ID_INT, $1); }
+    | ID_FLOAT { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    ;
+
+fqn:
+      ID_IDENT           { $$ = MAKE_LEAF(ID_IDENT, $1); }
+    | fqn NAME_DELIM fqn { $$ = MAKE_INNER(NAME_DELIM, 2, $1, $3); }
     ;
 
 %%

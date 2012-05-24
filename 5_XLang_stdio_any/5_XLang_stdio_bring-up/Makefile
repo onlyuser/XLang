@@ -152,13 +152,13 @@ clean_binary : clean_objects clean_parent_libs
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			BASIC_SUITE=1
+			BRINGUP_SUITE=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			BRINGUP_SUITE=1
 
 #==================
 # import
@@ -216,13 +216,13 @@ clean_dot :
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			BASIC_SUITE=1
+			BRINGUP_SUITE=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			BRINGUP_SUITE=1
 
 #==================
 # lint
