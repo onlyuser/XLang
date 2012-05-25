@@ -100,9 +100,9 @@ ignored [ \t\n]+
 [\"] { begin_token(yyscanner, yyleng); BEGIN STATE_STRING; }
 <STATE_STRING>[^\"]* {
                 begin_token(yyscanner, yyleng);
-                yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(yytext);
-                char* buf = new char[yylval->string_value->length()+1];
-                strcpy(buf, yylval->string_value->c_str());
+                std::string s = yytext;
+                char* buf = new char[s.length()+1];
+                strcpy(buf, s.c_str());
                 int n = 0;
                 bool escape_next_char = false;
                 for(int i = 0; '\0' != buf[i]; i++)
@@ -121,7 +121,7 @@ ignored [ \t\n]+
                     buf[n++] = buf[i];
                 }
                 buf[n] = '\0';
-                *yylval->string_value = buf;
+                yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(buf);
                 delete []buf;
                 return ID_STRING;
             }
