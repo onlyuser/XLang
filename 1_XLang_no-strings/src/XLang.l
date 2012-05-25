@@ -109,7 +109,7 @@ ignored [ \t\n]+
             }
 <STATE_COMMENT_LINE>. {}
 <STATE_COMMENT_LINE>"\n" {
-            BEGIN INITIAL;
+                BEGIN INITIAL;
             }
 
 .           {

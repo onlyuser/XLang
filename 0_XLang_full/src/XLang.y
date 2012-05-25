@@ -233,13 +233,13 @@ bool parse_args(int argc, char** argv, args_t &args)
     static const struct option longOpts[] = {
                 { "in-xml", required_argument, NULL, 'i' },
                 { "expr",   required_argument, NULL, 'e' },
-                { "lisp",   no_argument, NULL, 'l' },
-                { "xml",    no_argument, NULL, 'x' },
-                { "graph",  no_argument, NULL, 'g' },
-                { "dot",    no_argument, NULL, 'd' },
-                { "memory", no_argument, NULL, 'm' },
-                { "help",   no_argument, NULL, 'h' },
-                { NULL,     no_argument, NULL, 0 }
+                { "lisp",   no_argument,       NULL, 'l' },
+                { "xml",    no_argument,       NULL, 'x' },
+                { "graph",  no_argument,       NULL, 'g' },
+                { "dot",    no_argument,       NULL, 'd' },
+                { "memory", no_argument,       NULL, 'm' },
+                { "help",   no_argument,       NULL, 'h' },
+                { NULL,     no_argument,       NULL, 0 }
             };
     opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     while(opt != -1)

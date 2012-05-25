@@ -115,8 +115,8 @@ ignored [ \t\n]+
                     else
                         if('\\' == buf[i])
                         {
-                         escape_next_char = true;
-                         continue;
+                            escape_next_char = true;
+                            continue;
                         }
                     buf[n++] = buf[i];
                 }
@@ -155,7 +155,7 @@ ignored [ \t\n]+
             }
 <STATE_COMMENT_LINE>. {}
 <STATE_COMMENT_LINE>"\n" {
-            BEGIN INITIAL;
+                BEGIN INITIAL;
             }
 
 .           {
