@@ -54,6 +54,11 @@ ifneq ($(strip $(C_SUITE)),)
 	TEST_FILE_STEMS = \
 			0_hello_world
 endif
+ifneq ($(strip $(YACC_SUITE)),)
+	TEST_PATH = yacc_suite
+	TEST_FILE_STEMS = \
+			0_ebnf
+endif
 OUT_PREFIX = $(TEST_PATH)
 
 #==================

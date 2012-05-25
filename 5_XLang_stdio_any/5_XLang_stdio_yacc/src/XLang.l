@@ -1,0 +1,70 @@
+/* Variations of a Flex-Bison parser
+ * -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+ * Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+%option outfile="lex.XLang.c"
+%option prefix="_XLANG_"
+
+%{
+
+#include "XLang.h" // node::NodeIdentIFace
+#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include <stdlib.h> // atoi
+
+%}
+
+%option noyywrap
+%option nounput
+
+digit   [0-9]
+alpha   [a-zA-Z]
+id      {alpha}|[_]
+ident   {id}+({digit}|{id})*
+_int    {digit}+
+_float  {digit}*[.]{digit}+
+unnamed [,()+\-*/=]
+ignored [ \t\n]+
+
+%%
+
+{ident}     {
+                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_IDENT;
+            }
+
+{_int}      {
+                _XLANG_lval.int_value = atoi(yytext);
+                return ID_INT;
+            }
+
+{_float}    {
+                _XLANG_lval.float_value = atof(yytext);
+                return ID_FLOAT;
+            }
+
+{unnamed}   {
+                return *yytext;
+            }
+
+{ignored} ; // ignore whitespace
+
+.           {
+                _XLANG_error("unknown character");
+                YY_FLUSH_BUFFER;
+            }
+
+%%

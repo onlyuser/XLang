@@ -1,0 +1,26 @@
+root:
+      program
+    | error
+    ;
+
+program:
+      statement
+    | statement ',' program
+    ;
+
+statement:
+      expression
+    | ID_IDENT '=' expression
+    ;
+
+expression:
+      ID_INT
+    | ID_FLOAT
+    | ID_IDENT
+    | '-' expression %prec UMINUS
+    | expression '+' expression
+    | expression '-' expression
+    | expression '*' expression
+    | expression '/' expression
+    | '(' expression ')'
+    ;
