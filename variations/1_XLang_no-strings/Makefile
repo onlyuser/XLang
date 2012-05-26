@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 SRC_PATH = src

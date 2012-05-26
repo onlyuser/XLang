@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 SRC_PATH = src
@@ -166,12 +166,24 @@ test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
 
 #==================
 # import
@@ -182,12 +194,24 @@ import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
 
 #==================
 # pure
@@ -198,12 +222,24 @@ pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
 
 #==================
 # dot
@@ -214,12 +250,24 @@ dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
 
 #==================
 # xml
@@ -230,12 +278,24 @@ xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_COMMENTS=1
+	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			ADVANCED_SUITE_STRINGS=1
 
 #==================
 # lint (common)

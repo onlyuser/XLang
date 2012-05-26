@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 PARENT_LIB_PATH = $(PARENT_PATH)/lib
@@ -53,6 +53,7 @@ PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
+CXX = g++
 #DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
@@ -150,14 +151,14 @@ clean_binary : clean_objects clean_parent_libs
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			BASIC_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			YACC_SUITE=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 #==================
 # import
@@ -167,13 +168,13 @@ clean_test :
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 #==================
 # pure
@@ -182,14 +183,14 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			BASIC_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			YACC_SUITE=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 #==================
 # dot
@@ -198,14 +199,14 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			BASIC_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			YACC_SUITE=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 #==================
 # xml
@@ -214,14 +215,14 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			BASIC_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			YACC_SUITE=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			YACC_SUITE=1
 
 #==================
 # lint

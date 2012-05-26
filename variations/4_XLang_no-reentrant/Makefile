@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 PARENT_LIB_PATH = $(PARENT_PATH)/lib
@@ -100,6 +100,22 @@ clean_yacc :
 	-rm $(YACC_GEN)
 
 #==================
+# lex-gen
+#==================
+
+LEX_STEMS = lex.XLang
+LEX_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(LEX_STEMS))
+.SECONDARY : $(LEX_GEN)
+
+$(SRC_PATH)/lex.%.cpp : $(SRC_PATH)/%.l $(YACC_GEN)
+	flex $<
+	mv lex.$*.c $(SRC_PATH)/lex.$*.cpp
+
+.PHONY : clean_lex
+clean_lex :
+	-rm $(LEX_GEN)
+
+#==================
 # objects
 #==================
 
@@ -108,14 +124,14 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY : clean_objects
-clean_objects : clean_yacc
+clean_objects : clean_yacc clean_lex
 	-rm $(OBJECTS)
 
 #==================
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS)
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
@@ -134,7 +150,7 @@ clean_binary : clean_objects clean_parent_libs
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_test
@@ -166,7 +182,7 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_pure
@@ -182,7 +198,7 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_dot
@@ -198,7 +214,7 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_xml

@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 PARENT_LIB_PATH = $(PARENT_PATH)/lib
@@ -150,7 +150,7 @@ clean_binary : clean_objects clean_parent_libs
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
 			BASIC_SUITE=1
 
 .PHONY : clean_test
@@ -182,7 +182,7 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
 			BASIC_SUITE=1
 
 .PHONY : clean_pure
@@ -198,7 +198,7 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
 			BASIC_SUITE=1
 
 .PHONY : clean_dot
@@ -214,7 +214,7 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
 			BASIC_SUITE=1
 
 .PHONY : clean_xml

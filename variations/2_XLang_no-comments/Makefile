@@ -26,10 +26,9 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
-PARENT_LIB_PATH = $(PARENT_PATH)/lib
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
@@ -37,6 +36,8 @@ BINARY = $(BIN_PATH)/XLang.exe
 
 COMMON = $(PARENT_PATH)/libxlang
 COMMON_INCLUDE_PATH = $(COMMON)/include
+COMMON_SRC_PATH = $(COMMON)/src
+COMMON_BUILD_PATH = $(BUILD_PATH)/libxlang
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
@@ -48,12 +49,11 @@ ifdef EXTERN_LIB_PATH
 	EXTERN_LIB_STEMS = ticppd
 	EXTERN_LIBS = $(patsubst %, $(LIB_PATH)/lib%.a, $(EXTERN_LIB_STEMS))
 endif
-PARENT_LIB_STEMS = xlang
+PARENT_LIB_STEMS = #common
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
-CXX = g++
 #DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
@@ -70,17 +70,6 @@ TEST_PATH = $(PARENT_PATH)/tests
 
 .DEFAULT_GOAL : all
 all : $(BINARY)
-
-#==================
-# libs
-#==================
-
-$(PARENT_LIBS) :
-	cd $(COMMON); $(MAKE) -f Makefile
-
-.PHONY : clean_parent_libs
-clean_parent_libs :
-	cd $(COMMON); $(MAKE) -f Makefile clean
 
 #==================
 # yacc-gen
@@ -117,6 +106,30 @@ clean_lex :
 	-rm $(LEX_GEN)
 
 #==================
+# objects (common)
+#==================
+
+COMMON_CPP_STEMS = \
+		XLangAlloc \
+		XLangMVCView \
+		XLangNode \
+		XLangPrinter \
+		XLangDefaultTour \
+		XLangTreeContext #\
+		XLangMVCModel
+COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
+COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
+
+$(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
+	mkdir -p $(COMMON_BUILD_PATH)
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
+
+.PHONY : clean_common_objects
+clean_common_objects :
+	-rm $(COMMON_OBJECTS)
+	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
+
+#==================
 # objects
 #==================
 
@@ -125,23 +138,23 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY : clean_objects
-clean_objects : clean_yacc clean_lex
+clean_objects : clean_common_objects clean_yacc clean_lex
 	-rm $(OBJECTS)
 
 #==================
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(OBJECTS) $(PARENT_LIBS)
+$(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY : clean_binary
-clean_binary : clean_objects clean_parent_libs
+clean_binary : clean_objects
 	-rm $(BINARY)
 
 #==================
@@ -151,7 +164,7 @@ clean_binary : clean_objects clean_parent_libs
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_test
@@ -183,7 +196,7 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_pure
@@ -199,7 +212,7 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_dot
@@ -215,7 +228,7 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
 			BASIC_SUITE=1
 
 .PHONY : clean_xml
@@ -223,6 +236,24 @@ clean_xml :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			BASIC_SUITE=1
+
+#==================
+# lint (common)
+#==================
+
+COMMON_LINT_PASS_FILES = $(patsubst %, %.pass, $(COMMON_LINT_FILES))
+COMMON_LINT_FAIL_FILES = $(patsubst %, %.fail, $(COMMON_LINT_FILES))
+
+$(COMMON_BUILD_PATH)/%.lint.pass : $(COMMON_SRC_PATH)/%.cpp
+	mkdir -p $(COMMON_BUILD_PATH)
+	-$(LINT_SH) $(LINT_TOOL) $< $(COMMON_BUILD_PATH)/$*.lint $(LINTFLAGS)
+
+.PHONY : common_lint
+common_lint : $(COMMON_LINT_PASS_FILES)
+
+.PHONY : clean_common_lint
+clean_common_lint :
+	-rm $(COMMON_LINT_PASS_FILES) $(COMMON_LINT_FAIL_FILES)
 
 #==================
 # lint
@@ -237,10 +268,10 @@ $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	-$(LINT_SH) $< $(BUILD_PATH)/$*.lint $(INCLUDE_PATH_FLAGS)
 
 .PHONY : lint
-lint : $(LINT_PASS_FILES)
+lint : $(LINT_PASS_FILES) common_lint
 
 .PHONY : clean_lint
-clean_lint :
+clean_lint : clean_common_lint
 	-rm $(LINT_PASS_FILES) $(LINT_FAIL_FILES)
 
 #==================

@@ -150,14 +150,14 @@ clean_binary : clean_objects clean_parent_libs
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 #==================
 # import
@@ -167,13 +167,13 @@ clean_test :
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 #==================
 # pure
@@ -182,14 +182,14 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 #==================
 # dot
@@ -198,14 +198,14 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 #==================
 # xml
@@ -214,14 +214,14 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="arg" \
+			BASIC_SUITE=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE=1
+			BASIC_SUITE=1
 
 #==================
 # lint
