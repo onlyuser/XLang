@@ -20,11 +20,10 @@ LIB_PATH = lib
 SUBPATHS = variations
 
 .DEFAULT_GOAL : all
-all :
+all : _lib
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE)); done
-	cd libxlang; $(MAKE)
 
 .PHONY : test
 test :
@@ -70,10 +69,17 @@ doc :
 	(cd $$i; $(MAKE) $@); done
 	cd libxlang; $(MAKE) $@
 
+.PHONY : _lib
+_lib :
+	cd libxlang; $(MAKE)
+
+.PHONY : clean_lib
+clean_lib :
+	cd libxlang; $(MAKE) clean
+	-rmdir $(LIB_PATH)
+
 .PHONY : clean
-clean :
+clean : clean_lib
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd libxlang; $(MAKE) $@
-	-rmdir $(LIB_PATH)
