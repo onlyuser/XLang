@@ -101,7 +101,7 @@ ignored [ \t\n]+
 <STATE_STRING>[^\"]* {
                 begin_token(yyscanner, yyleng);
                 std::string s = yytext;
-                char* buf = new char[s.length()+1];
+                char* buf = new char[s.length()+1]; // can't use allocator for arrays
                 strcpy(buf, s.c_str());
                 int n = 0;
                 bool escape_next_char = false;
