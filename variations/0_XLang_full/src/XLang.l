@@ -53,12 +53,13 @@
 
 void begin_token(yyscan_t yyscanner, size_t length);
 char escape_char(char c);
+std::string escape_string(std::string s);
 
 %}
 
-%option noyywrap
-%option nounput
+%option noyywrap nounput noyy_top_state
 %option reentrant bison-bridge bison-locations
+%option stack
 %x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
 
 digit   [0-9]
@@ -97,66 +98,44 @@ ignored [ \t\n]+
 
 {ignored} ; // ignore whitespace
 
-[\"] { begin_token(yyscanner, yyleng); BEGIN STATE_STRING; }
+[\"]        {
+                begin_token(yyscanner, yyleng);
+                yy_push_state(STATE_STRING, yyscanner);
+            }
 <STATE_STRING>[^\"]* {
                 begin_token(yyscanner, yyleng);
-                std::string s = yytext;
-                char* buf = new char[s.length()+1]; // can't use allocator for arrays
-                strcpy(buf, s.c_str());
-                int n = 0;
-                bool escape_next_char = false;
-                for(int i = 0; '\0' != buf[i]; i++)
-                {
-                    if(escape_next_char)
-                    {
-                        escape_next_char = false;
-                        buf[i] = escape_char(buf[i]);
-                    }
-                    else
-                        if('\\' == buf[i])
-                        {
-                            escape_next_char = true;
-                            continue;
-                        }
-                    buf[n++] = buf[i];
-                }
-                buf[n] = '\0';
-                yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(buf);
-                delete []buf;
+                yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(
+                        escape_string(yytext)
+                        );
                 return ID_STRING;
             }
-<STATE_STRING>[\"] { begin_token(yyscanner, yyleng); BEGIN INITIAL; }
+<STATE_STRING>[\"] {
+                begin_token(yyscanner, yyleng);
+                yy_pop_state(yyscanner);
+            }
 
-[\'] { begin_token(yyscanner, yyleng); BEGIN STATE_CHAR; }
+[\']        {
+                begin_token(yyscanner, yyleng);
+                yy_push_state(STATE_CHAR, yyscanner);
+            }
 <STATE_CHAR>[^\']* {
                 begin_token(yyscanner, yyleng);
-                if('\\' == *yytext)
-                {
-                    yytext++;
-                    *yytext = escape_char(*yytext);
-                }
-                if('\0' != *(yytext + 1))
-                    _XLANG_error("bad escape character");
-                yylval->char_value = *yytext;
+                std::string s = escape_string(yytext);
+                yylval->char_value = s[0];
                 return ID_CHAR;
             }
-<STATE_CHAR>[\'] { begin_token(yyscanner, yyleng); BEGIN INITIAL; }
-
-"/*"        {
-                BEGIN STATE_COMMENT_BLOCK;
-            }
-<STATE_COMMENT_BLOCK>. {}
-<STATE_COMMENT_BLOCK>"*/" {
-                BEGIN INITIAL;
+<STATE_CHAR>[\'] {
+                begin_token(yyscanner, yyleng);
+                yy_pop_state(yyscanner);
             }
 
-"//"        {
-                BEGIN STATE_COMMENT_LINE;
-            }
-<STATE_COMMENT_LINE>. {}
-<STATE_COMMENT_LINE>"\n" {
-                BEGIN INITIAL;
-            }
+"/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
+<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
+<STATE_COMMENT_BLOCK>.    ; // ignore comment
+
+"//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
+<STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
+<STATE_COMMENT_LINE>.    ; // ignore comment
 
 .           {
                 begin_token(yyscanner, yyleng);
@@ -179,14 +158,42 @@ void begin_token(yyscan_t yyscanner, size_t length)
         PARM.m_prev_column--;
 }
 
+std::string escape_string(std::string s)
+{
+    std::string s2;
+    char* buf = new char[s.length()+1]; // can't use allocator for arrays
+    strcpy(buf, s.c_str());
+    int n = 0;
+    bool escape_next_char = false;
+    for(int i = 0; '\0' != buf[i]; i++)
+    {
+        if(escape_next_char)
+        {
+            escape_next_char = false;
+            buf[i] = escape_char(buf[i]);
+        }
+        else
+            if('\\' == buf[i])
+            {
+                escape_next_char = true;
+                continue;
+            }
+        buf[n++] = buf[i];
+    }
+    buf[n] = '\0';
+    s2 = buf;
+    delete []buf;
+    return s2;
+}
+
 char escape_char(char c)
 {
     switch(c)
     {
-    case 'r': return '\r';
-    case 'n': return '\n';
-    case 't': return '\t';
-    case '0': return '\0';
+        case 'r': return '\r';
+        case 'n': return '\n';
+        case 't': return '\t';
+        case '0': return '\0';
     }
     return c;
 }

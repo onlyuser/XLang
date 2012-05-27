@@ -47,8 +47,7 @@
 
 %}
 
-%option noyywrap
-%option nounput
+%option noyywrap nounput
 %option reentrant bison-bridge
 
 digit   [0-9]

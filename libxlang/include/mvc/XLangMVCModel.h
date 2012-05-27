@@ -34,7 +34,7 @@ struct MVCModel
     {
         return new (tc->alloc(), __FILE__, __LINE__) node::LeafNode<
                 static_cast<node::NodeIdentIFace::type_t>(node::LeafType<T>::type)
-                >(sym_id, value);
+                >(sym_id, value); // default case assumes no non-trivial dtor
     }
     static node::InnerNode* make_inner(TreeContext* tc, uint32_t sym_id, size_t size, ...);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);

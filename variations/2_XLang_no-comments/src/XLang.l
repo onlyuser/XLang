@@ -55,8 +55,7 @@ void begin_token(yyscan_t yyscanner, size_t length);
 
 %}
 
-%option noyywrap
-%option nounput
+%option noyywrap nounput
 %option reentrant bison-bridge bison-locations
 
 digit   [0-9]

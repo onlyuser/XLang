@@ -27,8 +27,9 @@
 
 %}
 
-%option noyywrap
-%option nounput
+%option noyywrap nounput
+%option stack
+%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_DEFINITION_CODE STATE_RULES STATE_CODE
 
 digit   [0-9]
 alpha   [a-zA-Z]
@@ -41,26 +42,52 @@ ignored [ \t\n]+
 
 %%
 
-{ident}     {
+<*>{ignored} ; // ignore whitespace
+
+"%{"        {
+                yy_push_state(STATE_DEFINITION_CODE);
+            }
+<STATE_DEFINITION_CODE>"%}" {
+                yy_pop_state();
+            }
+<STATE_DEFINITION_CODE>. ;
+
+"%%"        {
+                BEGIN STATE_RULES;
+            }
+<STATE_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
-
-{_int}      {
+<STATE_RULES>{_int} {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
-
-{_float}    {
+<STATE_RULES>{_float} {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
-
-{unnamed}   {
+<STATE_RULES>{unnamed} {
                 return *yytext;
             }
+<STATE_RULES>"%%" {
+                BEGIN STATE_CODE;
+            }
+<STATE_RULES>. {
+                _XLANG_error("unknown character");
+                YY_FLUSH_BUFFER;
+                BEGIN INITIAL;
+            }
 
-{ignored} ; // ignore whitespace
+<STATE_CODE>. ;
+
+<*>"/*"                   { yy_push_state(STATE_COMMENT_BLOCK); }
+<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
+<STATE_COMMENT_BLOCK>.    ; // ignore comment
+
+<*>"//"                  { yy_push_state(STATE_COMMENT_LINE); }
+<STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
+<STATE_COMMENT_LINE>.    ; // ignore comment
 
 .           {
                 _XLANG_error("unknown character");
