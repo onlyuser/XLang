@@ -92,6 +92,8 @@ public:
         for(size_t i = 0; i<_size; i++)
         {
             NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
+            if(!child)
+                continue;
             if(is_same_type(child))
             {
                 InnerNode* inner_node = dynamic_cast<InnerNode*>(child);

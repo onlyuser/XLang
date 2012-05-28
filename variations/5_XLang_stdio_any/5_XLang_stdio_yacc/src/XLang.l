@@ -27,22 +27,20 @@
 
 %}
 
-%option noyywrap nounput
+%option noyywrap nounput noyy_top_state
 %option stack
 %x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_DEFINITION_CODE STATE_RULES STATE_CODE
 
-digit   [0-9]
-alpha   [a-zA-Z]
-id      {alpha}|[_]
-ident   {id}+({digit}|{id})*
-_int    {digit}+
-_float  {digit}*[.]{digit}+
-unnamed [,()+\-*/=]
-ignored [ \t\n]+
+digit      [0-9]
+alpha      [a-zA-Z]
+id         {alpha}|[_]
+ident      {id}+({digit}|{id})*
+_int       {digit}+
+_float     {digit}*[.]{digit}+
+unnamed    [:|()+*?;]
+whitespace [ \t\n]+
 
 %%
-
-<*>{ignored} ; // ignore whitespace
 
 "%{"        {
                 yy_push_state(STATE_DEFINITION_CODE);
@@ -73,8 +71,11 @@ ignored [ \t\n]+
 <STATE_RULES>"%%" {
                 BEGIN STATE_CODE;
             }
+<STATE_RULES>{whitespace} ;
 <STATE_RULES>. {
-                _XLANG_error("unknown character");
+                char buf[20];
+                sprintf(buf, "unknown character: \"%s\"\n", yytext);
+                _XLANG_error(buf);
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;
             }
@@ -83,15 +84,12 @@ ignored [ \t\n]+
 
 <*>"/*"                   { yy_push_state(STATE_COMMENT_BLOCK); }
 <STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
-<STATE_COMMENT_BLOCK>.    ; // ignore comment
+<STATE_COMMENT_BLOCK>.    ;
 
 <*>"//"                  { yy_push_state(STATE_COMMENT_LINE); }
 <STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
-<STATE_COMMENT_LINE>.    ; // ignore comment
+<STATE_COMMENT_LINE>.    ;
 
-.           {
-                _XLANG_error("unknown character");
-                YY_FLUSH_BUFFER;
-            }
+. ;
 
 %%

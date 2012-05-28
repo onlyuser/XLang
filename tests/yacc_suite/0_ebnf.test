@@ -10,7 +10,20 @@
 
 %%
 
-4+4
+list:
+      item;
+/*
+list:
+      item
+    | list (plus list)+
+    ;
+
+item:
+      ID_INT
+    | ID_FLOAT
+    | ID_IDENT
+    ;
+*/
 
 %%
 

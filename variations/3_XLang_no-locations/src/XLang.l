@@ -50,14 +50,14 @@
 %option noyywrap nounput
 %option reentrant bison-bridge
 
-digit   [0-9]
-alpha   [a-zA-Z]
-id      {alpha}|[_]
-ident   {id}+({digit}|{id})*
-_int    {digit}+
-_float  {digit}*[.]{digit}+
-unnamed [,()+\-*/=]
-ignored [ \t\n]+
+digit      [0-9]
+alpha      [a-zA-Z]
+id         {alpha}|[_]
+ident      {id}+({digit}|{id})*
+_int       {digit}+
+_float     {digit}*[.]{digit}+
+unnamed    [,()+\-*/=]
+whitespace [ \t\n]+
 
 %%
 
@@ -80,7 +80,7 @@ ignored [ \t\n]+
                 return *yytext;
             }
 
-{ignored} ; // ignore whitespace
+{whitespace} ;
 
 .           {
                 _XLANG_error("unknown character");

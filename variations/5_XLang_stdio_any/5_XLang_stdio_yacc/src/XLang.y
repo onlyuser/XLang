@@ -54,13 +54,15 @@ std::string id_to_name(uint32_t sym_id)
 {
     switch(sym_id)
     {
-        case ID_UMINUS: return "uminus";
-        case '+':       return "+";
-        case '-':       return "-";
-        case '*':       return "*";
-        case '/':       return "/";
-        case '=':       return "=";
-        case ',':       return ",";
+        case ID_RULES:      return "id_rules";
+        case ID_RULE:       return "id_rule";
+        case ID_ITEMS:      return "id_items";
+        case ID_ITEM_GROUP: return "id_item_group";
+        case ':': return ":";
+        case '|': return "|";
+        case '+': return "+";
+        case '*': return "*";
+        case '?': return "?";
     }
     static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
         "int",
@@ -71,16 +73,18 @@ std::string id_to_name(uint32_t sym_id)
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "uminus") return ID_UMINUS;
-    if(name == "+")      return '+';
-    if(name == "-")      return '-';
-    if(name == "*")      return '*';
-    if(name == "/")      return '/';
-    if(name == "=")      return '=';
-    if(name == ",")      return ',';
-    if(name == "int")    return ID_INT;
-    if(name == "float")  return ID_FLOAT;
-    if(name == "ident")  return ID_IDENT;
+    if(name == "id_rules")      return ID_RULES;
+    if(name == "id_rule")       return ID_RULE;
+    if(name == "id_items")      return ID_ITEMS;
+    if(name == "id_item_group") return ID_ITEM_GROUP;
+    if(name == ":")             return ':';
+    if(name == "|")             return '|';
+    if(name == "+")             return '+';
+    if(name == "*")             return '*';
+    if(name == "?")             return '?';
+    if(name == "int")           return ID_INT;
+    if(name == "float")         return ID_FLOAT;
+    if(name == "ident")         return ID_IDENT;
     return 0;
 }
 xl::TreeContext* &tree_context()
@@ -110,41 +114,49 @@ xl::TreeContext* &tree_context()
 %token<int_value> ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<inner_value> program statement expression
+%type<inner_value> rules rule alternatives items item
 
-%left '+' '-'
-%left '*' '/'
-%nonassoc ID_UMINUS
+%nonassoc ID_RULES ID_RULE ID_ITEMS ID_ITEM_GROUP
+%nonassoc ':'
+%nonassoc '|'
+%nonassoc '+' '*' '?' ';'
 
 %nonassoc ID_COUNT
 
 %%
 
 root:
-      program { tree_context()->root() = $1; YYACCEPT; }
+      rules { tree_context()->root() = $1; YYACCEPT; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
-program:
-      statement             { $$ = $1; }
-    | statement ',' program { $$ = MAKE_INNER(',', 2, $1, $3); }
+rules:
+      /* empty */ { $$ = NULL; }
+    | rules rule  { $$ = (!$1) ? $2 : MAKE_INNER(ID_RULES, 2, $1, $2); }
     ;
 
-statement:
-      expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_INNER('=', 2, MAKE_LEAF(ID_IDENT, $1), $3); }
+rule:
+    ID_IDENT ':' alternatives ';' { $$ = MAKE_INNER(ID_RULE, 2, MAKE_LEAF(ID_IDENT, $1), $3); }
     ;
 
-expression:
-      ID_INT                         { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT                       { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_LEAF(ID_IDENT, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_INNER(ID_UMINUS, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_INNER('+', 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_INNER('-', 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_INNER('*', 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_INNER('/', 2, $1, $3); }
-    | '(' expression ')'             { $$ = $2; }
+alternatives:
+      items                  { $$ = $1; }
+    | alternatives '|' items { $$ = MAKE_INNER('|', 2, $1, $3); }
+    ;
+
+items:
+      item       { $$ = $1; }
+    | items item { $$ = MAKE_INNER(ID_ITEMS, 2, $1, $2); }
+    ;
+
+item:
+      ID_INT               { $$ = MAKE_LEAF(ID_INT, $1); }
+    | ID_FLOAT             { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    | ID_IDENT             { $$ = MAKE_LEAF(ID_IDENT, $1); }
+    | item '+'             { $$ = MAKE_INNER('+', 1, $1); }
+    | item '*'             { $$ = MAKE_INNER('*', 1, $1); }
+    | item '?'             { $$ = MAKE_INNER('?', 1, $1); }
+    | '(' alternatives ')' { $$ = MAKE_INNER(ID_ITEM_GROUP, 1, $2); }
     ;
 
 %%
@@ -250,7 +262,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
         ast = xl::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
                 reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
                 }) xl::TreeContext(alloc), args.in_xml);
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
@@ -259,7 +271,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     else
     {
         ast = make_ast(alloc);
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << errors().str().c_str() << std::endl;
             return false;

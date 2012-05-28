@@ -60,14 +60,14 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option stack
 %x STATE_COMMENT_BLOCK STATE_COMMENT_LINE
 
-digit   [0-9]
-alpha   [a-zA-Z]
-id      {alpha}|[_]
-ident   {id}+({digit}|{id})*
-_int    {digit}+
-_float  {digit}*[.]{digit}+
-unnamed [,()+\-*/=]
-ignored [ \t\n]+
+digit      [0-9]
+alpha      [a-zA-Z]
+id         {alpha}|[_]
+ident      {id}+({digit}|{id})*
+_int       {digit}+
+_float     {digit}*[.]{digit}+
+unnamed    [,()+\-*/=]
+whitespace [ \t\n]+
 
 %%
 
@@ -94,15 +94,15 @@ ignored [ \t\n]+
                 return *yytext;
             }
 
-{ignored} ; // ignore whitespace
+{whitespace} ;
 
 "/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
 <STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_BLOCK>.    ; // ignore comment
+<STATE_COMMENT_BLOCK>.    ;
 
 "//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
 <STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_LINE>.    ; // ignore comment
+<STATE_COMMENT_LINE>.    ;
 
 .           {
                 begin_token(yyscanner, yyleng);

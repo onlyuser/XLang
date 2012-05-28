@@ -42,7 +42,7 @@
 // report error
 void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
 {
-    if(NULL != loc)
+    if(loc)
     {
         std::stringstream ss;
         ss << std::string(loc->first_column-1, '-') <<
@@ -136,7 +136,7 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = MAKE_INNER(',', @$, 2, $1, $3); }
+    | program ',' statement { $$ = MAKE_INNER(',', @$, 2, $1, $3); }
     ;
 
 statement:
@@ -268,7 +268,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
         ast = xl::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
                 reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
                 }) xl::TreeContext(alloc), args.in_xml);
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
@@ -277,7 +277,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     else
     {
         ast = make_ast(alloc, args.expr.c_str());
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << errors().str().c_str() << std::endl;
             return false;

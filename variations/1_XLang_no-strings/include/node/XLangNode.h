@@ -54,7 +54,7 @@ public:
     }
     bool is_root() const
     {
-        return m_parent == NULL;
+        return !m_parent;
     }
     std::string uid() const;
     YYLTYPE loc() const

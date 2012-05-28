@@ -236,7 +236,7 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | statement ',' program { $$ = MAKE_INNER(',', 2, $1, $3); }
+    | program ',' statement { $$ = MAKE_INNER(',', 2, $1, $3); }
     ;
 
 statement:
@@ -370,7 +370,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
         ast = xl::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
                 reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
                 }) xl::TreeContext(alloc), args.in_xml);
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
@@ -379,14 +379,14 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     else
     {
         FILE* file = fopen(args.in_file.c_str(), "rb");
-        if(NULL == file)
+        if(!file)
         {
             std::cout << "cannot open file" << std::endl;
             return false;
         }
         ast = make_ast(alloc, file);
         fclose(file);
-        if(NULL == ast)
+        if(!ast)
         {
             std::cout << errors().str().c_str() << std::endl;
             return false;
