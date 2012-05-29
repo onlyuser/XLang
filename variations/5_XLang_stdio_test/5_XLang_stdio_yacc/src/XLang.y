@@ -67,6 +67,8 @@ std::string id_to_name(uint32_t sym_id)
     static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
         "int",
         "float",
+        "string",
+        "char",
         "ident"
         };
     return _id_to_name[sym_id - ID_BASE - 1];
@@ -84,6 +86,8 @@ uint32_t name_to_id(std::string name)
     if(name == "?")             return '?';
     if(name == "int")           return ID_INT;
     if(name == "float")         return ID_FLOAT;
+    if(name == "string")        return ID_STRING;
+    if(name == "char")          return ID_CHAR;
     if(name == "ident")         return ID_IDENT;
     return 0;
 }
@@ -100,10 +104,12 @@ xl::TreeContext* &tree_context()
 //
 %union
 {
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type   int_value;   // int value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type float_value; // float value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type ident_value; // symbol table index
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type inner_value; // node pointer
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type     int_value;    // int value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type   float_value;  // float value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
+    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type   inner_value;  // node pointer
 }
 
 // show detailed parse errors
@@ -113,6 +119,8 @@ xl::TreeContext* &tree_context()
 
 %token<int_value> ID_INT
 %token<float_value> ID_FLOAT
+%token<string_value> ID_STRING
+%token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
 %type<inner_value> rules rule alternatives items item
 
@@ -152,6 +160,8 @@ items:
 item:
       ID_INT               { $$ = MAKE_LEAF(ID_INT, $1); }
     | ID_FLOAT             { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    | ID_STRING            { $$ = MAKE_LEAF(ID_STRING, $1); }
+    | ID_CHAR              { $$ = MAKE_LEAF(ID_CHAR, $1); }
     | ID_IDENT             { $$ = MAKE_LEAF(ID_IDENT, $1); }
     | item '+'             { $$ = MAKE_INNER('+', 1, $1); }
     | item '*'             { $$ = MAKE_INNER('*', 1, $1); }

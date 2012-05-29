@@ -10,26 +10,6 @@
 
 %%
 
-list:
-      item;
-/*
-list:
-      item
-    | list (plus list)+
-    ;
-
-item:
-      ID_INT
-    | ID_FLOAT
-    | ID_IDENT
-    ;
-*/
-
-%%
-
-5+5
-
-/*
 root:
       program
     | error
@@ -56,4 +36,10 @@ expression:
     | expression '/' expression
     | '(' expression ')'
     ;
+
+%%
+
+5+5
+
+/*
 */

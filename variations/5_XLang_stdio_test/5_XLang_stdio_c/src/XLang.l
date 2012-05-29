@@ -29,14 +29,14 @@
 
 %option noyywrap nounput
 
+whitespace [ \t\n]+
+literal    [,()+\-*/=]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
-unnamed    [,()+\-*/=]
-whitespace [ \t\n]+
 
 D  [0-9]
 L  [a-zA-Z_]
@@ -46,6 +46,10 @@ FS (f|F|l|L)
 IS (u|U|l|L)*
 
 %%
+
+{whitespace} ;
+
+{literal}   { return *yytext; }
 
 {ident}     {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
@@ -154,12 +158,6 @@ L?\"(\\.|[^\\"])*\"    { return(STRING_LITERAL); }
 "^"         { return('^'); }
 "|"         { return('|'); }
 "?"         { return('?'); }
-
-{unnamed}   {
-                return *yytext;
-            }
-
-{whitespace} ;
 
 .           {
                 _XLANG_error("unknown character");

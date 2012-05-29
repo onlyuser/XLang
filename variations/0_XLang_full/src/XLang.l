@@ -52,8 +52,8 @@
     } while(0)
 
 void begin_token(yyscan_t yyscanner, size_t length);
-char escape_char(char c);
 std::string escape_string(std::string s);
+char escape_char(char c);
 
 %}
 
@@ -62,16 +62,31 @@ std::string escape_string(std::string s);
 %option stack
 %x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
 
+whitespace [ \t\n]+
+literal    [,()+\-*/=]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
-unnamed    [,()+\-*/=]
-whitespace [ \t\n]+
 
 %%
+
+{whitespace} ;
+
+{literal}   {
+                begin_token(yyscanner, yyleng);
+                return *yytext;
+            }
+
+"/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
+<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
+<STATE_COMMENT_BLOCK>.    ;
+
+"//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
+<STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
+<STATE_COMMENT_LINE>.    ;
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
@@ -90,13 +105,6 @@ whitespace [ \t\n]+
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
-
-{unnamed}   {
-                begin_token(yyscanner, yyleng);
-                return *yytext;
-            }
-
-{whitespace} ;
 
 [\"]        {
                 begin_token(yyscanner, yyleng);
@@ -128,14 +136,6 @@ whitespace [ \t\n]+
                 begin_token(yyscanner, yyleng);
                 yy_pop_state(yyscanner);
             }
-
-"/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
-<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_BLOCK>.    ;
-
-"//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
-<STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_LINE>.    ;
 
 .           {
                 begin_token(yyscanner, yyleng);

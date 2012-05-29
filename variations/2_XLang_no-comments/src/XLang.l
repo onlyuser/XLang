@@ -58,16 +58,23 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option noyywrap nounput
 %option reentrant bison-bridge bison-locations
 
+whitespace [ \t\n]+
+literal    [,()+\-*/=]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
-unnamed    [,()+\-*/=]
-whitespace [ \t\n]+
 
 %%
+
+{whitespace} ;
+
+{literal}   {
+                begin_token(yyscanner, yyleng);
+                return *yytext;
+            }
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
@@ -86,13 +93,6 @@ whitespace [ \t\n]+
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
-
-{unnamed}   {
-                begin_token(yyscanner, yyleng);
-                return *yytext;
-            }
-
-{whitespace} ;
 
 .           {
                 begin_token(yyscanner, yyleng);

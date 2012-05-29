@@ -49,16 +49,20 @@
 
 %option noyywrap nounput
 
+whitespace [ \t\n]+
+literal    [,()+\-*/=]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
-unnamed    [,()+\-*/=]
-whitespace [ \t\n]+
 
 %%
+
+{whitespace} ;
+
+{literal}   { return *yytext; }
 
 {ident}     {
                 _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
@@ -74,12 +78,6 @@ whitespace [ \t\n]+
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
-
-{unnamed}   {
-                return *yytext;
-            }
-
-{whitespace} ;
 
 .           {
                 _XLANG_error("unknown character");

@@ -25,34 +25,41 @@
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include <stdlib.h> // atoi
 
+std::string escape_string(std::string s);
+char escape_char(char c);
+
 %}
 
 %option noyywrap nounput noyy_top_state
 %option stack
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_DEFINITION_CODE STATE_RULES STATE_CODE
+%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_DEFINITION_CODE STATE_RULES STATE_CODE STATE_STRING STATE_CHAR
 
+whitespace [ \t\n]+
+literal    [:|()+*?;]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
-unnamed    [:|()+*?;]
-whitespace [ \t\n]+
 
 %%
 
-"%{"        {
-                yy_push_state(STATE_DEFINITION_CODE);
-            }
-<STATE_DEFINITION_CODE>"%}" {
-                yy_pop_state();
-            }
-<STATE_DEFINITION_CODE>. ;
+<*>"/*"                   { yy_push_state(STATE_COMMENT_BLOCK); }
+<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
+<STATE_COMMENT_BLOCK>.    ;
 
-"%%"        {
-                BEGIN STATE_RULES;
-            }
+<*>"//"                  { yy_push_state(STATE_COMMENT_LINE); }
+<STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
+<STATE_COMMENT_LINE>.    ;
+
+<*>{whitespace} ;
+
+"%{"                        { yy_push_state(STATE_DEFINITION_CODE); }
+<STATE_DEFINITION_CODE>"%}" { yy_pop_state(); }
+<STATE_DEFINITION_CODE>.    ;
+
+"%%"        { BEGIN STATE_RULES; }
 <STATE_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
@@ -65,16 +72,26 @@ whitespace [ \t\n]+
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
-<STATE_RULES>{unnamed} {
-                return *yytext;
+<STATE_RULES>{literal} { return *yytext; }
+<STATE_RULES>[\"] { yy_push_state(STATE_STRING); }
+<STATE_STRING>[^\"]* {
+                _XLANG_lval.string_value = tree_context()->alloc_string(
+                        escape_string(yytext)
+                        );
+                return ID_STRING;
             }
-<STATE_RULES>"%%" {
-                BEGIN STATE_CODE;
+<STATE_STRING>[\"] { yy_pop_state(); }
+<STATE_RULES>[\'] { yy_push_state(STATE_CHAR); }
+<STATE_CHAR>[^\']* {
+                std::string s = escape_string(yytext);
+                _XLANG_lval.char_value = s[0];
+                return ID_CHAR;
             }
-<STATE_RULES>{whitespace} ;
+<STATE_CHAR>[\'] { yy_pop_state(); }
+<STATE_RULES>"%%" { BEGIN STATE_CODE; }
 <STATE_RULES>. {
                 char buf[20];
-                sprintf(buf, "unknown character: \"%s\"\n", yytext);
+                sprintf(buf, "unknown character: \'%c\'\n", *yytext);
                 _XLANG_error(buf);
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;
@@ -82,14 +99,46 @@ whitespace [ \t\n]+
 
 <STATE_CODE>. ;
 
-<*>"/*"                   { yy_push_state(STATE_COMMENT_BLOCK); }
-<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
-<STATE_COMMENT_BLOCK>.    ;
-
-<*>"//"                  { yy_push_state(STATE_COMMENT_LINE); }
-<STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
-<STATE_COMMENT_LINE>.    ;
-
 . ;
 
 %%
+
+std::string escape_string(std::string s)
+{
+    std::string s2;
+    char* buf = new char[s.length()+1]; // can't use allocator for arrays
+    strcpy(buf, s.c_str());
+    int n = 0;
+    bool escape_next_char = false;
+    for(int i = 0; '\0' != buf[i]; i++)
+    {
+        if(escape_next_char)
+        {
+            escape_next_char = false;
+            buf[i] = escape_char(buf[i]);
+        }
+        else
+            if('\\' == buf[i])
+            {
+                escape_next_char = true;
+                continue;
+            }
+        buf[n++] = buf[i];
+    }
+    buf[n] = '\0';
+    s2 = buf;
+    delete []buf;
+    return s2;
+}
+
+char escape_char(char c)
+{
+    switch(c)
+    {
+        case 'r': return '\r';
+        case 'n': return '\n';
+        case 't': return '\t';
+        case '0': return '\0';
+    }
+    return c;
+}

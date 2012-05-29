@@ -185,15 +185,14 @@ int _XLANG_lex()
     else
         switch(*cur_ptr)
         {
-        case ',':
-        case '(': case ')':
-        case '+': case '-':
-        case '*': case '/':
-        case '=':
-        case '\n':
-            return *cur_ptr;
-        default:
-            _XLANG_error("unknown character");
+            case ',':
+            case '(': case ')':
+            case '+': case '-':
+            case '*': case '/':
+            case '=':
+                return *cur_ptr;
+            default:
+                _XLANG_error("unknown character");
         }
     return -1;
 }
