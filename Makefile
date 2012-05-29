@@ -16,11 +16,19 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 LIB_PATH = lib
-
-SUBPATHS = variations
+CHILD_PATH = variations
+SUBPATHS = \
+	$(CHILD_PATH)/0_XLang_full \
+	$(CHILD_PATH)/1_XLang_no-strings \
+	$(CHILD_PATH)/2_XLang_no-comments \
+	$(CHILD_PATH)/3_XLang_no-locations \
+	$(CHILD_PATH)/4_XLang_no-reentrant \
+	$(CHILD_PATH)/5_XLang_stdio \
+	$(CHILD_PATH)/6_XLang_file \
+	$(CHILD_PATH)/7_XLang_no-flex
 
 .DEFAULT_GOAL : all
-all : _lib
+all :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE)); done
@@ -60,26 +68,19 @@ lint :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd libxlang; $(MAKE) $@
+	cd lib-xlang; $(MAKE) $@
 
 .PHONY : doc
 doc :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd libxlang; $(MAKE) $@
-
-.PHONY : _lib
-_lib :
-	cd libxlang; $(MAKE)
-
-.PHONY : clean_lib
-clean_lib :
-	cd libxlang; $(MAKE) clean
-	-rmdir $(LIB_PATH)
+	cd lib-xlang; $(MAKE) $@
 
 .PHONY : clean
-clean : clean_lib
+clean :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
+	cd lib-xlang; $(MAKE) clean
+	-rmdir $(LIB_PATH)
