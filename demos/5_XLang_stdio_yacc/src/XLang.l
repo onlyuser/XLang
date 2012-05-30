@@ -33,7 +33,7 @@ char escape_char(char c);
 %option noyywrap nounput noyy_top_state
 %option stack
 %x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
-%s STATE_DEFINITION_CODE STATE_RULES STATE_CODE
+%s STATE_DEFINITION_CODE STATE_RULES STATE_CODE STATE_RULES_CODE
 
 whitespace [ \t\n]+
 literal    [:|()+*?;]
@@ -46,6 +46,8 @@ _float     {digit}*[.]{digit}+
 
 %%
 
+{whitespace} ;
+
 "/*"                      { yy_push_state(STATE_COMMENT_BLOCK); }
 <STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
 <STATE_COMMENT_BLOCK>.    ;
@@ -54,12 +56,14 @@ _float     {digit}*[.]{digit}+
 <STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
 <STATE_COMMENT_LINE>.    ;
 
-{whitespace} ;
-
 "%{"                        { yy_push_state(STATE_DEFINITION_CODE); }
 <STATE_DEFINITION_CODE>"%}" { yy_pop_state(); }
 <STATE_DEFINITION_CODE>.    ;
 "%%"                        { BEGIN STATE_RULES; }
+<STATE_RULES>[\{]           { yy_push_state(STATE_RULES_CODE); }
+<STATE_RULES_CODE>[\{]      { yy_push_state(STATE_RULES_CODE); }
+<STATE_RULES_CODE>[\}]      { yy_pop_state(); }
+<STATE_RULES_CODE>.         ;
 <STATE_RULES>"%%"           { BEGIN STATE_CODE; }
 <STATE_CODE>.               ;
 
@@ -77,7 +81,7 @@ _float     {digit}*[.]{digit}+
             }
 <STATE_RULES>{literal} { return *yytext; }
 
-<STATE_RULES>[\"] { yy_push_state(STATE_STRING); }
+[\"]        { yy_push_state(STATE_STRING); }
 <STATE_STRING>[^\"]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         escape_string(yytext)
@@ -86,7 +90,7 @@ _float     {digit}*[.]{digit}+
             }
 <STATE_STRING>[\"] { yy_pop_state(); }
 
-<STATE_RULES>[\'] { yy_push_state(STATE_CHAR); }
+[\']        { yy_push_state(STATE_CHAR); }
 <STATE_CHAR>[^\']* {
                 std::string s = escape_string(yytext);
                 _XLANG_lval.char_value = s[0];
@@ -102,7 +106,7 @@ _float     {digit}*[.]{digit}+
                 BEGIN INITIAL;
             }
 
-. ;
+.           ;
 
 %%
 

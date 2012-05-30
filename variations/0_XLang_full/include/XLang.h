@@ -39,7 +39,7 @@ struct SynthAttrib
         xl::node::TermInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
         xl::node::TermInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
         xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
-        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type   symbol_value;  // node pointer
+        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type  symbol_value; // node pointer
     };
 };
 #define YYSTYPE SynthAttrib
