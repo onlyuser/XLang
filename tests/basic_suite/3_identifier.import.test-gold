@@ -1,5 +1,5 @@
-<inner type="+" >
+<inner type="+">
     <leaf type="int" value=1/>
-    <leaf type="ident" value="qwe"/>
+    <leaf type="ident" value=qwe/>
     <leaf type="float" value=3.14/>
 </inner>

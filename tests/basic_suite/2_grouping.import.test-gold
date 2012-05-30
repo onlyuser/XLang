@@ -1,5 +1,5 @@
-<inner type="*" >
-    <inner type="+" >
+<inner type="*">
+    <inner type="+">
         <leaf type="int" value=1/>
         <leaf type="int" value=2/>
     </inner>

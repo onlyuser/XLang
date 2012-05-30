@@ -153,7 +153,7 @@ statement:
 expression:
       ID_INT                         { $$ = MAKE_LEAF(ID_INT, @$, $1); }
     | ID_FLOAT                       { $$ = MAKE_LEAF(ID_FLOAT, @$, $1); }
-    | ID_STRING                      { $$ = MAKE_LEAF(ID_STRING, @$, *$1); }
+    | ID_STRING                      { $$ = MAKE_LEAF(ID_STRING, @$, *$1); } // NOTE: asterisk..
     | ID_CHAR                        { $$ = MAKE_LEAF(ID_CHAR, @$, $1); }
     | ID_IDENT                       { $$ = MAKE_LEAF(ID_IDENT, @$, $1); }
     | '-' expression %prec ID_UMINUS { $$ = MAKE_INNER(ID_UMINUS, @$, 1, $2); }

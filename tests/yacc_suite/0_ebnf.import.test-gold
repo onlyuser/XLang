@@ -1,0 +1,70 @@
+<inner type="grammar">
+    <inner type=":">
+        <leaf type="ident" value=root/>
+        <inner type="|">
+            <leaf type="ident" value=program/>
+            <leaf type="ident" value=error/>
+        </inner>
+    </inner>
+    <inner type=":">
+        <leaf type="ident" value=program/>
+        <inner type="|">
+            <leaf type="ident" value=statement/>
+            <inner type="alt">
+                <leaf type="ident" value=statement/>
+                <leaf type="char" value=','/>
+                <leaf type="ident" value=program/>
+            </inner>
+        </inner>
+    </inner>
+    <inner type=":">
+        <leaf type="ident" value=statement/>
+        <inner type="|">
+            <leaf type="ident" value=expression/>
+            <inner type="alt">
+                <leaf type="ident" value=ID_IDENT/>
+                <leaf type="char" value='='/>
+                <leaf type="ident" value=expression/>
+            </inner>
+        </inner>
+    </inner>
+    <inner type=":">
+        <leaf type="ident" value=expression/>
+        <inner type="|">
+            <leaf type="ident" value=ID_INT/>
+            <leaf type="ident" value=ID_FLOAT/>
+            <leaf type="ident" value=ID_IDENT/>
+            <inner type="alt">
+                <leaf type="char" value='-'/>
+                <leaf type="ident" value=expression/>
+                <leaf type="ident" value=%prec/>
+                <leaf type="ident" value=UMINUS/>
+            </inner>
+            <inner type="alt">
+                <leaf type="ident" value=expression/>
+                <leaf type="char" value='+'/>
+                <leaf type="ident" value=expression/>
+            </inner>
+            <inner type="alt">
+                <leaf type="ident" value=expression/>
+                <leaf type="char" value='-'/>
+                <leaf type="ident" value=expression/>
+            </inner>
+            <inner type="alt">
+                <leaf type="ident" value=expression/>
+                <leaf type="char" value='*'/>
+                <leaf type="ident" value=expression/>
+            </inner>
+            <inner type="alt">
+                <leaf type="ident" value=expression/>
+                <leaf type="char" value='/'/>
+                <leaf type="ident" value=expression/>
+            </inner>
+            <inner type="alt">
+                <leaf type="char" value='('/>
+                <leaf type="ident" value=expression/>
+                <leaf type="char" value=')'/>
+            </inner>
+        </inner>
+    </inner>
+</inner>

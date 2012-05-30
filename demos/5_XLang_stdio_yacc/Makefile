@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ../../..
+PARENT_PATH = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 PARENT_LIB_PATH = $(PARENT_PATH)/lib
@@ -54,7 +54,7 @@ LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
-#DEBUG = -g
+DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
 	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH

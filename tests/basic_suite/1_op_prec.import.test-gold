@@ -1,6 +1,6 @@
-<inner type="+" >
+<inner type="+">
     <leaf type="int" value=1/>
-    <inner type="*" >
+    <inner type="*">
         <leaf type="int" value=2/>
         <leaf type="int" value=3/>
     </inner>

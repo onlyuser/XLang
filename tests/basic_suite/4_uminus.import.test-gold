@@ -1,10 +1,10 @@
-<inner type="-" >
+<inner type="-">
     <leaf type="int" value=1/>
-    <inner type="*" >
-        <inner type="uminus" >
+    <inner type="*">
+        <inner type="uminus">
             <leaf type="int" value=2/>
         </inner>
-        <inner type="uminus" >
+        <inner type="uminus">
             <leaf type="int" value=3/>
         </inner>
     </inner>

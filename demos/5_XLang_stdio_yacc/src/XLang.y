@@ -54,15 +54,14 @@ std::string id_to_name(uint32_t sym_id)
 {
     switch(sym_id)
     {
-        case ID_RULES:      return "id_rules";
-        case ID_RULE:       return "id_rule";
-        case ID_ITEMS:      return "id_items";
-        case ID_ITEM_GROUP: return "id_item_group";
-        case ':': return ":";
-        case '|': return "|";
-        case '+': return "+";
-        case '*': return "*";
-        case '?': return "?";
+        case ID_GRAMMAR: return "grammar";
+        case ':':        return ":";
+        case ID_ALT:     return "alt";
+        case '(':        return "(";
+        case '|':        return "|";
+        case '+':        return "+";
+        case '*':        return "*";
+        case '?':        return "?";
     }
     static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
         "int",
@@ -75,20 +74,19 @@ std::string id_to_name(uint32_t sym_id)
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "id_rules")      return ID_RULES;
-    if(name == "id_rule")       return ID_RULE;
-    if(name == "id_items")      return ID_ITEMS;
-    if(name == "id_item_group") return ID_ITEM_GROUP;
-    if(name == ":")             return ':';
-    if(name == "|")             return '|';
-    if(name == "+")             return '+';
-    if(name == "*")             return '*';
-    if(name == "?")             return '?';
-    if(name == "int")           return ID_INT;
-    if(name == "float")         return ID_FLOAT;
-    if(name == "string")        return ID_STRING;
-    if(name == "char")          return ID_CHAR;
-    if(name == "ident")         return ID_IDENT;
+    if(name == "grammar") return ID_GRAMMAR;
+    if(name == ":")       return ':';
+    if(name == "alt")     return ID_ALT;
+    if(name == "(")       return '(';
+    if(name == "|")       return '|';
+    if(name == "+")       return '+';
+    if(name == "*")       return '*';
+    if(name == "?")       return '?';
+    if(name == "int")     return ID_INT;
+    if(name == "float")   return ID_FLOAT;
+    if(name == "string")  return ID_STRING;
+    if(name == "char")    return ID_CHAR;
+    if(name == "ident")   return ID_IDENT;
     return 0;
 }
 xl::TreeContext* &tree_context()
@@ -122,51 +120,51 @@ xl::TreeContext* &tree_context()
 %token<string_value> ID_STRING
 %token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
-%type<inner_value> rules rule alternatives items item
+%type<inner_value> grammar rule rule_rhs alt leaf
 
-%nonassoc ID_RULES ID_RULE ID_ITEMS ID_ITEM_GROUP
+%nonassoc ID_GRAMMAR ID_ALT
 %nonassoc ':'
-%nonassoc '|'
-%nonassoc '+' '*' '?' ';'
+%nonassoc '|' '(' ';'
+%nonassoc '+' '*' '?'
 
 %nonassoc ID_COUNT
 
 %%
 
 root:
-      rules { tree_context()->root() = $1; YYACCEPT; }
+      grammar { tree_context()->root() = $1; YYACCEPT; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
-rules:
-      /* empty */ { $$ = NULL; }
-    | rules rule  { $$ = (!$1) ? $2 : MAKE_INNER(ID_RULES, 2, $1, $2); }
+grammar:
+      /* empty */  { $$ = NULL; }
+    | grammar rule { $$ = (!$1) ? $2 : MAKE_INNER(ID_GRAMMAR, 2, $1, $2); }
     ;
 
 rule:
-    ID_IDENT ':' alternatives ';' { $$ = MAKE_INNER(ID_RULE, 2, MAKE_LEAF(ID_IDENT, $1), $3); }
+    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_INNER(':', 2, MAKE_LEAF(ID_IDENT, $1), $3); }
     ;
 
-alternatives:
-      items                  { $$ = $1; }
-    | alternatives '|' items { $$ = MAKE_INNER('|', 2, $1, $3); }
+rule_rhs:
+      alt              { $$ = $1; }
+    | rule_rhs '|' alt { $$ = MAKE_INNER('|', 2, $1, $3); }
     ;
 
-items:
-      item       { $$ = $1; }
-    | items item { $$ = MAKE_INNER(ID_ITEMS, 2, $1, $2); }
+alt:
+      leaf     { $$ = $1; }
+    | alt leaf { $$ = MAKE_INNER(ID_ALT, 2, $1, $2); }
     ;
 
-item:
-      ID_INT               { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT             { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-    | ID_STRING            { $$ = MAKE_LEAF(ID_STRING, $1); }
-    | ID_CHAR              { $$ = MAKE_LEAF(ID_CHAR, $1); }
-    | ID_IDENT             { $$ = MAKE_LEAF(ID_IDENT, $1); }
-    | item '+'             { $$ = MAKE_INNER('+', 1, $1); }
-    | item '*'             { $$ = MAKE_INNER('*', 1, $1); }
-    | item '?'             { $$ = MAKE_INNER('?', 1, $1); }
-    | '(' alternatives ')' { $$ = MAKE_INNER(ID_ITEM_GROUP, 1, $2); }
+leaf:
+      ID_INT           { $$ = MAKE_LEAF(ID_INT, $1); }
+    | ID_FLOAT         { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    | ID_STRING        { $$ = MAKE_LEAF(ID_STRING, *$1); } // NOTE: asterisk..
+    | ID_CHAR          { $$ = MAKE_LEAF(ID_CHAR, $1); }
+    | ID_IDENT         { $$ = MAKE_LEAF(ID_IDENT, $1); }
+    | leaf '+'         { $$ = MAKE_INNER('+', 1, $1); }
+    | leaf '*'         { $$ = MAKE_INNER('*', 1, $1); }
+    | leaf '?'         { $$ = MAKE_INNER('?', 1, $1); }
+    | '(' rule_rhs ')' { $$ = MAKE_INNER('(', 1, $2); }
     ;
 
 %%

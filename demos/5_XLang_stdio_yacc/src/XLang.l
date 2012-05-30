@@ -39,7 +39,7 @@ literal    [:|()+*?;]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
-ident      {id}+({digit}|{id})*
+ident      [%]?{id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
 

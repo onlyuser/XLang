@@ -41,7 +41,9 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _no
     std::cout << "<leaf ";
     if(include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    DefaultTour::visit(_node);
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
@@ -50,7 +52,9 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _
     std::cout << "<leaf ";
     if(include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    DefaultTour::visit(_node);
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
@@ -59,7 +63,9 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* 
     std::cout << "<leaf ";
     if(include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    DefaultTour::visit(_node);
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
@@ -68,7 +74,9 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _n
     std::cout << "<leaf ";
     if(include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << _node->value() << "/>" << std::endl;
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    DefaultTour::visit(_node);
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
@@ -77,7 +85,9 @@ void XMLPrinter::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _
     std::cout << "<leaf ";
     if(include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
-    std::cout << "type=\"" << _node->name() << "\" value=" << *_node->value() << "/>" << std::endl;
+    std::cout << "type=\"" << _node->name() << "\" value=";
+    DefaultTour::visit(_node);
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::InnerNodeIFace* _node)

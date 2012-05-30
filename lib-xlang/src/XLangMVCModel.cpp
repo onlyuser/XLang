@@ -65,6 +65,10 @@ static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::s
     if(type == "float")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type),
                 static_cast<float32_t>(atof(value.c_str())));
+    if(type == "char")
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), value[0]);
+    if(type == "string")
+        return mvc::MVCModel::make_leaf(tc, name_to_id(type), value);
     if(type == "ident")
         return mvc::MVCModel::make_leaf(tc, name_to_id(type), tc->alloc_unique_string(value));
     return NULL;
