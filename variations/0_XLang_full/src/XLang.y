@@ -36,8 +36,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) xl::mvc::MVCModel::make_leaf(&pc->tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) xl::mvc::MVCModel::make_inner(&pc->tree_context(), ##__VA_ARGS__)
+#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(&pc->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(&pc->tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
@@ -125,7 +125,7 @@ uint32_t name_to_id(std::string name)
 %token<string_value> ID_STRING
 %token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
-%type<inner_value> program statement expression
+%type<symbol_value> program statement expression
 
 %left '+' '-'
 %left '*' '/'
@@ -142,25 +142,25 @@ root:
 
 program:
       statement             { $$ = $1; }
-    | program ',' statement { $$ = MAKE_INNER(',', @$, 2, $1, $3); }
+    | program ',' statement { $$ = MAKE_SYMBOL(',', @$, 2, $1, $3); }
     ;
 
 statement:
       expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_INNER('=', @$, 2, MAKE_LEAF(ID_IDENT, @$, $1), $3); }
+    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', @$, 2, MAKE_TERM(ID_IDENT, @$, $1), $3); }
     ;
 
 expression:
-      ID_INT                         { $$ = MAKE_LEAF(ID_INT, @$, $1); }
-    | ID_FLOAT                       { $$ = MAKE_LEAF(ID_FLOAT, @$, $1); }
-    | ID_STRING                      { $$ = MAKE_LEAF(ID_STRING, @$, *$1); } // NOTE: asterisk..
-    | ID_CHAR                        { $$ = MAKE_LEAF(ID_CHAR, @$, $1); }
-    | ID_IDENT                       { $$ = MAKE_LEAF(ID_IDENT, @$, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_INNER(ID_UMINUS, @$, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_INNER('+', @$, 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_INNER('-', @$, 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_INNER('*', @$, 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_INNER('/', @$, 2, $1, $3); }
+      ID_INT                         { $$ = MAKE_TERM(ID_INT, @$, $1); }
+    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, @$, $1); }
+    | ID_STRING                      { $$ = MAKE_TERM(ID_STRING, @$, *$1); } // NOTE: asterisk..
+    | ID_CHAR                        { $$ = MAKE_TERM(ID_CHAR, @$, $1); }
+    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, @$, $1); }
+    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, @$, 1, $2); }
+    | expression '+' expression      { $$ = MAKE_SYMBOL('+', @$, 2, $1, $3); }
+    | expression '-' expression      { $$ = MAKE_SYMBOL('-', @$, 2, $1, $3); }
+    | expression '*' expression      { $$ = MAKE_SYMBOL('*', @$, 2, $1, $3); }
+    | expression '/' expression      { $$ = MAKE_SYMBOL('/', @$, 2, $1, $3); }
     | '(' expression ')'             { $$ = $2; }
     ;
 

@@ -1,11 +1,11 @@
-<inner type="-">
-    <leaf type="int" value=1/>
-    <inner type="*">
-        <inner type="uminus">
-            <leaf type="int" value=2/>
-        </inner>
-        <inner type="uminus">
-            <leaf type="int" value=3/>
-        </inner>
-    </inner>
-</inner>
+<symbol type="-">
+    <term type="int" value=1/>
+    <symbol type="*">
+        <symbol type="uminus">
+            <term type="int" value=2/>
+        </symbol>
+        <symbol type="uminus">
+            <term type="int" value=3/>
+        </symbol>
+    </symbol>
+</symbol>

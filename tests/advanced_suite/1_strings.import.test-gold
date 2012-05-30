@@ -1,5 +1,5 @@
-<inner type="+">
-    <leaf type="int" value=1/>
-    <leaf type="string" value="qwe"/>
-    <leaf type="char" value='x'/>
-</inner>
+<symbol type="+">
+    <term type="int" value=1/>
+    <term type="string" value="qwe"/>
+    <term type="char" value='x'/>
+</symbol>

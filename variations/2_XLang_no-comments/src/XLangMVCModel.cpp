@@ -36,45 +36,45 @@
 namespace xl { namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, std::string value)
+node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, std::string value)
 {
     node::NodeIdentIFace* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) node::LeafNode<
-                    static_cast<node::NodeIdentIFace::type_t>(node::LeafType<std::string>::type)
+            }) node::TermNode<
+                    static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
                     >(sym_id, loc, value);
     return node;
 }
 
-node::InnerNode* MVCModel::make_inner(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
-    node::InnerNode* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+    node::SymbolNode* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) node::InnerNode(sym_id, loc, size, ap);
+            }) node::SymbolNode(sym_id, loc, size, ap);
     va_end(ap);
     return node;
 }
 
 #ifdef TIXML_USE_TICPP
-static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::string value)
+static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::string value)
 {
     static YYLTYPE dummy_loc;
     memset(&dummy_loc, 0, sizeof(dummy_loc));
     if(type == "int")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafInternalType<node::NodeIdentIFace::INT>::type>(
+        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+                static_cast<node::TermInternalType<node::NodeIdentIFace::INT>::type>(
                         atoi(value.c_str())
                         ));
     if(type == "float")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafInternalType<node::NodeIdentIFace::FLOAT>::type>(
+        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+                static_cast<node::TermInternalType<node::NodeIdentIFace::FLOAT>::type>(
                         atof(value.c_str())
                         ));
     if(type == "ident")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), dummy_loc,
-                static_cast<node::LeafInternalType<node::NodeIdentIFace::IDENT>::type>(
+        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+                static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(
                         tc->alloc_unique_string(value)
                         ));
     return NULL;
@@ -87,7 +87,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
     if(dynamic_cast<ticpp::Document*>(node))
     {
         uint32_t sym_id = 0;
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_id, dummy_loc, 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, sym_id, dummy_loc, 0);
         if(!node->NoChildren())
         {
             ticpp::Iterator<ticpp::Node> child;
@@ -121,10 +121,10 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         value = attrib_map["value"];
     }
     if(node->NoChildren())
-        return make_leaf(tc, type, value);
+        return make_term(tc, type, value);
     else
     {
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, name_to_id(type), dummy_loc, 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(type), dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->add_child(visit(tc, child.Get()));

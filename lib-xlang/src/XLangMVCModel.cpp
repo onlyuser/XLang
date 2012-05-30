@@ -36,41 +36,41 @@
 namespace xl { namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_leaf<std::string>(TreeContext* tc, uint32_t sym_id, std::string value)
+node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, std::string value)
 {
     return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) node::LeafNode<
-                    static_cast<node::NodeIdentIFace::type_t>(node::LeafType<std::string>::type)
+            }) node::TermNode<
+                    static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
                     >(sym_id, value);
 }
 
-node::InnerNode* MVCModel::make_inner(TreeContext* tc, uint32_t sym_id, size_t size, ...)
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
-    node::InnerNode* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+    node::SymbolNode* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) node::InnerNode(sym_id, size, ap);
+            }) node::SymbolNode(sym_id, size, ap);
     va_end(ap);
     return node;
 }
 
 #ifdef TIXML_USE_TICPP
-static node::NodeIdentIFace* make_leaf(TreeContext* tc, std::string type, std::string value)
+static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::string value)
 {
     if(type == "int")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type),
+        return mvc::MVCModel::make_term(tc, name_to_id(type),
                 static_cast<long>(atoi(value.c_str())));
     if(type == "float")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type),
+        return mvc::MVCModel::make_term(tc, name_to_id(type),
                 static_cast<float32_t>(atof(value.c_str())));
     if(type == "char")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), value[0]);
+        return mvc::MVCModel::make_term(tc, name_to_id(type), value[0]);
     if(type == "string")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), value);
+        return mvc::MVCModel::make_term(tc, name_to_id(type), value);
     if(type == "ident")
-        return mvc::MVCModel::make_leaf(tc, name_to_id(type), tc->alloc_unique_string(value));
+        return mvc::MVCModel::make_term(tc, name_to_id(type), tc->alloc_unique_string(value));
     return NULL;
 }
 
@@ -79,7 +79,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
     if(dynamic_cast<ticpp::Document*>(node))
     {
         uint32_t sym_id = 0;
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, sym_id, 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, sym_id, 0);
         if(!node->NoChildren())
         {
             ticpp::Iterator<ticpp::Node> child;
@@ -113,10 +113,10 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         value = attrib_map["value"];
     }
     if(node->NoChildren())
-        return make_leaf(tc, type, value);
+        return make_term(tc, type, value);
     else
     {
-        node::InnerNode* dest_node = mvc::MVCModel::make_inner(tc, name_to_id(type), 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(type), 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->add_child(visit(tc, child.Get()));

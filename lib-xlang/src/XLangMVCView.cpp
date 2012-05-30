@@ -36,7 +36,7 @@
 //#include "calc3.tab.h"
 
 #define typeId node::NodeIdentIFace::IDENT
-#define typeOpr node::NodeIdentIFace::INNER
+#define typeOpr node::NodeIdentIFace::SYMBOL
 
 namespace xl { namespace mvc {
 
@@ -90,11 +90,11 @@ int ex (nodeType *p) {
     return 0;
 }
 
-/*c----cm---ce---->                       drawing of leaf-nodes
- l leaf-info
+/*c----cm---ce---->                       drawing of term-nodes
+ l term-info
  */
 
-/*c---------------cm--------------ce----> drawing of non-leaf-nodes
+/*c---------------cm--------------ce----> drawing of non-term-nodes
  l            node-info
  *                |
  *    -------------     ...----
@@ -127,13 +127,13 @@ void exNode
     std::string temp;
     switch(p->type()) {
         case node::NodeIdentIFace::INT:
-            sprintf(word, "%ld", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(p)->value());
+            sprintf(word, "%ld", dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::INT>*>(p)->value());
             break;
         case node::NodeIdentIFace::FLOAT:
-            sprintf(word, "%f", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(p)->value());
+            sprintf(word, "%f", dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>*>(p)->value());
             break;
         case typeId:
-            sprintf(word, "%s", dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(p)->value()->c_str());
+            sprintf(word, "%s", dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*>(p)->value()->c_str());
             break;
         case typeOpr:
             temp = p->name();
@@ -149,17 +149,17 @@ void exNode
     *ce = c + w;
     *cm = c + w / 2;
 
-    /* node is leaf */
+    /* node is term */
     if(p->type() != typeOpr ||
-            dynamic_cast<const node::InnerNodeIFace*>(p)->size() == 0) {
+            dynamic_cast<const node::SymbolNodeIFace*>(p)->size() == 0) {
         graphDrawBox (s, cbar, l);
         return;
     }
 
     /* node has children */
     cs = c;
-    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
+    for(k = 0; k < dynamic_cast<const node::SymbolNodeIFace*>(p)->size(); k++) {
+        exNode (dynamic_cast<const node::SymbolNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         cs = che;
     }
 
@@ -175,8 +175,8 @@ void exNode
 
     /* draw arrows (not optimal: children are drawn a second time) */
     cs = c;
-    for(k = 0; k < dynamic_cast<const node::InnerNodeIFace*>(p)->size(); k++) {
-        exNode (dynamic_cast<const node::InnerNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
+    for(k = 0; k < dynamic_cast<const node::SymbolNodeIFace*>(p)->size(); k++) {
+        exNode (dynamic_cast<const node::SymbolNodeIFace*>(p)->operator[](k), cs, l+h+eps, &che, &chm);
         graphDrawArrow (*cm, l+h, chm, l+h+eps-1);
         cs = che;
     }

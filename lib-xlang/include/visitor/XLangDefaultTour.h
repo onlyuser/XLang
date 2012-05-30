@@ -27,14 +27,14 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
 {
     virtual ~DefaultTour()
     {}
-    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node);
-    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
-    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node);
-    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node);
-    virtual void visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-    virtual bool visit_next_child(const node::InnerNodeIFace* _node);
-    virtual void abort_visitation(const node::InnerNodeIFace* _node);
-    virtual void visit(const node::InnerNodeIFace* _node);
+    virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
+    virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
+    virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
+    virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    virtual bool visit_next_child(const node::SymbolNodeIFace* _node);
+    virtual void abort_visitation(const node::SymbolNodeIFace* _node);
+    virtual void visit(const node::SymbolNodeIFace* _node);
     virtual void visit_any(const node::NodeIdentIFace* unknown);
 };
 

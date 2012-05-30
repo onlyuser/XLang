@@ -20,7 +20,7 @@
 
 #include "XLangAlloc.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "node/XLangNode.h" // node::LeafNode
+#include "node/XLangNode.h" // node::TermNode
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
@@ -31,13 +31,13 @@ namespace xl { namespace mvc {
 struct MVCModel
 {
     template<class T>
-    static node::NodeIdentIFace* make_leaf(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, T value)
+    static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, T value)
     {
-        return new (tc->alloc(), __FILE__, __LINE__) node::LeafNode<
-                static_cast<node::NodeIdentIFace::type_t>(node::LeafType<T>::type)
+        return new (tc->alloc(), __FILE__, __LINE__) node::TermNode<
+                static_cast<node::NodeIdentIFace::type_t>(node::TermType<T>::type)
                 >(sym_id, loc, value); // default case assumes no non-trivial dtor
     }
-    static node::InnerNode* make_inner(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 

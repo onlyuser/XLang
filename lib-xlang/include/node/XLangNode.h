@@ -64,29 +64,29 @@ protected:
 };
 
 template<NodeIdentIFace::type_t _type>
-class LeafNode
-    : public Node, public LeafNodeIFace<_type>, public visitor::Visitable<LeafNode<_type> >
+class TermNode
+    : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type> >
 {
 public:
-    LeafNode(uint32_t _sym_id, typename LeafInternalType<_type>::type _value)
-        : Node(_type, _sym_id), visitor::Visitable<LeafNode<_type> >(this), m_value(_value)
+    TermNode(uint32_t _sym_id, typename TermInternalType<_type>::type _value)
+        : Node(_type, _sym_id), visitor::Visitable<TermNode<_type> >(this), m_value(_value)
     {}
-    typename LeafInternalType<_type>::type value() const
+    typename TermInternalType<_type>::type value() const
     {
         return m_value;
     }
 
 private:
-    typename LeafInternalType<_type>::type m_value;
+    typename TermInternalType<_type>::type m_value;
 };
 
-class InnerNode
-    : public Node, public InnerNodeIFace, public visitor::Visitable<InnerNode>,
+class SymbolNode
+    : public Node, public SymbolNodeIFace, public visitor::Visitable<SymbolNode>,
       virtual public visitor::VisitStateIFace
 {
 public:
-    InnerNode(uint32_t _sym_id, size_t _size, va_list ap)
-        : Node(NodeIdentIFace::INNER, _sym_id), visitor::Visitable<InnerNode>(this),
+    SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
+        : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
           m_visit_state(NULL)
     {
         for(size_t i = 0; i<_size; i++)
@@ -96,12 +96,12 @@ public:
                 continue;
             if(is_same_type(child))
             {
-                InnerNode* inner_node = dynamic_cast<InnerNode*>(child);
+                SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
                 m_child_vec.insert(m_child_vec.end(),
-                        inner_node->m_child_vec.begin(),
-                        inner_node->m_child_vec.end());
+                        symbol_node->m_child_vec.begin(),
+                        symbol_node->m_child_vec.end());
                 std::vector<NodeIdentIFace*>::iterator p;
-                for(p = inner_node->m_child_vec.begin(); p != inner_node->m_child_vec.end(); ++p)
+                for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
                     (*p)->set_parent(this);
                 continue;
             }

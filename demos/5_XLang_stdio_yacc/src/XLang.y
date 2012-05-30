@@ -35,8 +35,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) xl::mvc::MVCModel::make_leaf(tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) xl::mvc::MVCModel::make_inner(tree_context(), ##__VA_ARGS__)
+#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -102,12 +102,12 @@ xl::TreeContext* &tree_context()
 //
 %union
 {
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type     int_value;    // int value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type   float_value;  // float value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type   inner_value;  // node pointer
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type     int_value;    // int value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type   float_value;  // float value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type   symbol_value;  // node pointer
 }
 
 // show detailed parse errors
@@ -120,7 +120,7 @@ xl::TreeContext* &tree_context()
 %token<string_value> ID_STRING
 %token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
-%type<inner_value> grammar rule rule_rhs alt leaf
+%type<symbol_value> grammar rule rule_rhs alt term
 
 %nonassoc ID_GRAMMAR ID_ALT
 %nonassoc ':'
@@ -138,33 +138,33 @@ root:
 
 grammar:
       /* empty */  { $$ = NULL; }
-    | grammar rule { $$ = (!$1) ? $2 : MAKE_INNER(ID_GRAMMAR, 2, $1, $2); }
+    | grammar rule { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $2); }
     ;
 
 rule:
-    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_INNER(':', 2, MAKE_LEAF(ID_IDENT, $1), $3); }
+    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(':', 2, MAKE_TERM(ID_IDENT, $1), $3); }
     ;
 
 rule_rhs:
       alt              { $$ = $1; }
-    | rule_rhs '|' alt { $$ = MAKE_INNER('|', 2, $1, $3); }
+    | rule_rhs '|' alt { $$ = MAKE_SYMBOL('|', 2, $1, $3); }
     ;
 
 alt:
-      leaf     { $$ = $1; }
-    | alt leaf { $$ = MAKE_INNER(ID_ALT, 2, $1, $2); }
+      term     { $$ = $1; }
+    | alt term { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
-leaf:
-      ID_INT           { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT         { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-    | ID_STRING        { $$ = MAKE_LEAF(ID_STRING, *$1); } // NOTE: asterisk..
-    | ID_CHAR          { $$ = MAKE_LEAF(ID_CHAR, $1); }
-    | ID_IDENT         { $$ = MAKE_LEAF(ID_IDENT, $1); }
-    | leaf '+'         { $$ = MAKE_INNER('+', 1, $1); }
-    | leaf '*'         { $$ = MAKE_INNER('*', 1, $1); }
-    | leaf '?'         { $$ = MAKE_INNER('?', 1, $1); }
-    | '(' rule_rhs ')' { $$ = MAKE_INNER('(', 1, $2); }
+term:
+      ID_INT           { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT         { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_STRING        { $$ = MAKE_TERM(ID_STRING, *$1); } // NOTE: asterisk..
+    | ID_CHAR          { $$ = MAKE_TERM(ID_CHAR, $1); }
+    | ID_IDENT         { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | term '+'         { $$ = MAKE_SYMBOL('+', 1, $1); }
+    | term '*'         { $$ = MAKE_SYMBOL('*', 1, $1); }
+    | term '?'         { $$ = MAKE_SYMBOL('?', 1, $1); }
+    | '(' rule_rhs ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
     ;
 
 %%

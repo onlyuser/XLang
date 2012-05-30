@@ -1,4 +1,4 @@
-<inner type="+">
-    <leaf type="int" value=1/>
-    <leaf type="int" value=2/>
-</inner>
+<symbol type="+">
+    <term type="int" value=1/>
+    <term type="int" value=2/>
+</symbol>

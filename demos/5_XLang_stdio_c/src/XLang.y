@@ -35,8 +35,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_LEAF(sym_id, ...) xl::mvc::MVCModel::make_leaf(tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_INNER(...) xl::mvc::MVCModel::make_inner(tree_context(), ##__VA_ARGS__)
+#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
 
 // report error
 void _XLANG_error(const char* s)
@@ -99,10 +99,10 @@ xl::TreeContext* &tree_context()
 //
 %union
 {
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INT>::type   int_value;   // int value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::FLOAT>::type float_value; // float value
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::IDENT>::type ident_value; // symbol table index
-    xl::node::LeafInternalType<xl::node::NodeIdentIFace::INNER>::type inner_value; // node pointer
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type   int_value;   // int value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type float_value; // float value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type ident_value; // symbol table index
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 }
 
 // show detailed parse errors
@@ -110,7 +110,7 @@ xl::TreeContext* &tree_context()
 
 %nonassoc ID_BASE
 
-%type<inner_value> primary_expression postfix_expression unary_expression unary_operator
+%type<symbol_value> primary_expression postfix_expression unary_expression unary_operator
         multiplicative_expression additive_expression shift_expression relational_expression
         equality_expression and_expression exclusive_or_expression inclusive_or_expression
         logical_and_expression logical_or_expression conditional_expression assignment_expression
@@ -148,22 +148,22 @@ xl::TreeContext* &tree_context()
 //
 //program:
 //      statement             { $$ = $1; }
-//    | statement ',' program { $$ = MAKE_INNER(',', 2, $1, $3); }
+//    | statement ',' program { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
 //    ;
 //
 //statement:
 //      expression                { $$ = $1; }
-//    | IDENTIFIER '=' expression { $$ = MAKE_INNER('=', 2, MAKE_LEAF(IDENTIFIER, $1), $3); }
+//    | IDENTIFIER '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(IDENTIFIER, $1), $3); }
 //    ;
 //
 //expression:
-//      ID_INT                    { $$ = MAKE_LEAF(ID_INT, $1); }
-//    | ID_FLOAT                  { $$ = MAKE_LEAF(ID_FLOAT, $1); }
-//    | IDENTIFIER                { $$ = MAKE_LEAF(IDENTIFIER, $1); }
-//    | expression '+' expression { $$ = MAKE_INNER('+', 2, $1, $3); }
-//    | expression '-' expression { $$ = MAKE_INNER('-', 2, $1, $3); }
-//    | expression '*' expression { $$ = MAKE_INNER('*', 2, $1, $3); }
-//    | expression '/' expression { $$ = MAKE_INNER('/', 2, $1, $3); }
+//      ID_INT                    { $$ = MAKE_TERM(ID_INT, $1); }
+//    | ID_FLOAT                  { $$ = MAKE_TERM(ID_FLOAT, $1); }
+//    | IDENTIFIER                { $$ = MAKE_TERM(IDENTIFIER, $1); }
+//    | expression '+' expression { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+//    | expression '-' expression { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+//    | expression '*' expression { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+//    | expression '/' expression { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
 //    | '(' expression ')'        { $$ = $2; }
 //    ;
 ///////////////////////////////////////////////////////////////////////////////
@@ -174,9 +174,9 @@ root
     ;
 
 primary_expression
-    : IDENTIFIER         { $$ = MAKE_LEAF(IDENTIFIER, $1); }
-    | ID_INT             { $$ = MAKE_LEAF(ID_INT, $1); }
-    | ID_FLOAT           { $$ = MAKE_LEAF(ID_FLOAT, $1); }
+    : IDENTIFIER         { $$ = MAKE_TERM(IDENTIFIER, $1); }
+    | ID_INT             { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT           { $$ = MAKE_TERM(ID_FLOAT, $1); }
     //| STRING_LITERAL
     | '(' expression ')' { $$ = $2; }
     ;

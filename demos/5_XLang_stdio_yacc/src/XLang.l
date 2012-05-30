@@ -32,7 +32,8 @@ char escape_char(char c);
 
 %option noyywrap nounput noyy_top_state
 %option stack
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_DEFINITION_CODE STATE_RULES STATE_CODE STATE_STRING STATE_CHAR
+%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
+%s STATE_DEFINITION_CODE STATE_RULES STATE_CODE
 
 whitespace [ \t\n]+
 literal    [:|()+*?;]
@@ -45,21 +46,23 @@ _float     {digit}*[.]{digit}+
 
 %%
 
-<*>"/*"                   { yy_push_state(STATE_COMMENT_BLOCK); }
+"/*"                      { yy_push_state(STATE_COMMENT_BLOCK); }
 <STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
 <STATE_COMMENT_BLOCK>.    ;
 
-<*>"//"                  { yy_push_state(STATE_COMMENT_LINE); }
+"//"                     { yy_push_state(STATE_COMMENT_LINE); }
 <STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
 <STATE_COMMENT_LINE>.    ;
 
-<*>{whitespace} ;
+{whitespace} ;
 
 "%{"                        { yy_push_state(STATE_DEFINITION_CODE); }
 <STATE_DEFINITION_CODE>"%}" { yy_pop_state(); }
 <STATE_DEFINITION_CODE>.    ;
+"%%"                        { BEGIN STATE_RULES; }
+<STATE_RULES>"%%"           { BEGIN STATE_CODE; }
+<STATE_CODE>.               ;
 
-"%%"        { BEGIN STATE_RULES; }
 <STATE_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
@@ -73,6 +76,7 @@ _float     {digit}*[.]{digit}+
                 return ID_FLOAT;
             }
 <STATE_RULES>{literal} { return *yytext; }
+
 <STATE_RULES>[\"] { yy_push_state(STATE_STRING); }
 <STATE_STRING>[^\"]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
@@ -81,6 +85,7 @@ _float     {digit}*[.]{digit}+
                 return ID_STRING;
             }
 <STATE_STRING>[\"] { yy_pop_state(); }
+
 <STATE_RULES>[\'] { yy_push_state(STATE_CHAR); }
 <STATE_CHAR>[^\']* {
                 std::string s = escape_string(yytext);
@@ -88,7 +93,7 @@ _float     {digit}*[.]{digit}+
                 return ID_CHAR;
             }
 <STATE_CHAR>[\'] { yy_pop_state(); }
-<STATE_RULES>"%%" { BEGIN STATE_CODE; }
+
 <STATE_RULES>. {
                 char buf[20];
                 sprintf(buf, "unknown character: \'%c\'\n", *yytext);
@@ -96,8 +101,6 @@ _float     {digit}*[.]{digit}+
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;
             }
-
-<STATE_CODE>. ;
 
 . ;
 

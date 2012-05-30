@@ -27,33 +27,33 @@
 
 namespace xl { namespace visitor {
 
-void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::INT>* _node)
+void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
     std::cout << _node->value();
 }
 
-void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
+void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
     std::cout << _node->value();
 }
 
-void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::STRING>* _node)
+void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << '\"' << _node->value() << '\"';
 }
 
-void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>* _node)
+void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
     std::cout << '\'' << _node->value() << '\'';
 }
 
-void DefaultTour::visit(const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>* _node)
+void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
     std::cout << *_node->value();
 }
 
 #ifdef USE_COROUTINE
-static int get_next_asc(ccrContParam, const node::InnerNodeIFace* _node)
+static int get_next_asc(ccrContParam, const node::SymbolNodeIFace* _node)
 {
     ccrBeginContext;
     int i;
@@ -70,10 +70,10 @@ static void stop_asc(ccrContParam)
 }
 #endif
 
-bool DefaultTour::visit_next_child(const node::InnerNodeIFace* _node)
+bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
-    int index = get_next_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state(), _node);
+    int index = get_next_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state(), _node);
     if(index == -1)
         return false;
     visit_any(_node->operator[](index));
@@ -88,14 +88,14 @@ bool DefaultTour::visit_next_child(const node::InnerNodeIFace* _node)
 #endif
 }
 
-void DefaultTour::abort_visitation(const node::InnerNodeIFace* _node)
+void DefaultTour::abort_visitation(const node::SymbolNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
-    stop_asc(&const_cast<node::InnerNodeIFace*>(_node)->visit_state());
+    stop_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state());
 #endif
 }
 
-void DefaultTour::visit(const node::InnerNodeIFace* _node)
+void DefaultTour::visit(const node::SymbolNodeIFace* _node)
 {
     while(visit_next_child(_node));
 }
@@ -105,22 +105,22 @@ void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
     switch(unknown->type())
     {
         case node::NodeIdentIFace::INT:
-            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::INT>*>(unknown));
+            visit(dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::INT>*>(unknown));
             break;
         case node::NodeIdentIFace::FLOAT:
-            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::FLOAT>*>(unknown));
+            visit(dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>*>(unknown));
             break;
         case node::NodeIdentIFace::STRING:
-            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::STRING>*>(unknown));
+            visit(dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::STRING>*>(unknown));
             break;
         case node::NodeIdentIFace::CHAR:
-            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::CHAR>*>(unknown));
+            visit(dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::CHAR>*>(unknown));
             break;
         case node::NodeIdentIFace::IDENT:
-            visit(dynamic_cast<const node::LeafNodeIFace<node::NodeIdentIFace::IDENT>*>(unknown));
+            visit(dynamic_cast<const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*>(unknown));
             break;
-        case node::NodeIdentIFace::INNER:
-            visit(dynamic_cast<const node::InnerNodeIFace*>(unknown));
+        case node::NodeIdentIFace::SYMBOL:
+            visit(dynamic_cast<const node::SymbolNodeIFace*>(unknown));
             break;
         default:
             std::cout << "unknown node type" << std::endl;

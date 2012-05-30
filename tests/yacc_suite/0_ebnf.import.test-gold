@@ -1,70 +1,70 @@
-<inner type="grammar">
-    <inner type=":">
-        <leaf type="ident" value=root/>
-        <inner type="|">
-            <leaf type="ident" value=program/>
-            <leaf type="ident" value=error/>
-        </inner>
-    </inner>
-    <inner type=":">
-        <leaf type="ident" value=program/>
-        <inner type="|">
-            <leaf type="ident" value=statement/>
-            <inner type="alt">
-                <leaf type="ident" value=statement/>
-                <leaf type="char" value=','/>
-                <leaf type="ident" value=program/>
-            </inner>
-        </inner>
-    </inner>
-    <inner type=":">
-        <leaf type="ident" value=statement/>
-        <inner type="|">
-            <leaf type="ident" value=expression/>
-            <inner type="alt">
-                <leaf type="ident" value=ID_IDENT/>
-                <leaf type="char" value='='/>
-                <leaf type="ident" value=expression/>
-            </inner>
-        </inner>
-    </inner>
-    <inner type=":">
-        <leaf type="ident" value=expression/>
-        <inner type="|">
-            <leaf type="ident" value=ID_INT/>
-            <leaf type="ident" value=ID_FLOAT/>
-            <leaf type="ident" value=ID_IDENT/>
-            <inner type="alt">
-                <leaf type="char" value='-'/>
-                <leaf type="ident" value=expression/>
-                <leaf type="ident" value=%prec/>
-                <leaf type="ident" value=UMINUS/>
-            </inner>
-            <inner type="alt">
-                <leaf type="ident" value=expression/>
-                <leaf type="char" value='+'/>
-                <leaf type="ident" value=expression/>
-            </inner>
-            <inner type="alt">
-                <leaf type="ident" value=expression/>
-                <leaf type="char" value='-'/>
-                <leaf type="ident" value=expression/>
-            </inner>
-            <inner type="alt">
-                <leaf type="ident" value=expression/>
-                <leaf type="char" value='*'/>
-                <leaf type="ident" value=expression/>
-            </inner>
-            <inner type="alt">
-                <leaf type="ident" value=expression/>
-                <leaf type="char" value='/'/>
-                <leaf type="ident" value=expression/>
-            </inner>
-            <inner type="alt">
-                <leaf type="char" value='('/>
-                <leaf type="ident" value=expression/>
-                <leaf type="char" value=')'/>
-            </inner>
-        </inner>
-    </inner>
-</inner>
+<symbol type="grammar">
+    <symbol type=":">
+        <term type="ident" value=root/>
+        <symbol type="|">
+            <term type="ident" value=program/>
+            <term type="ident" value=error/>
+        </symbol>
+    </symbol>
+    <symbol type=":">
+        <term type="ident" value=program/>
+        <symbol type="|">
+            <term type="ident" value=statement/>
+            <symbol type="alt">
+                <term type="ident" value=program/>
+                <term type="char" value=','/>
+                <term type="ident" value=statement/>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type=":">
+        <term type="ident" value=statement/>
+        <symbol type="|">
+            <term type="ident" value=expression/>
+            <symbol type="alt">
+                <term type="ident" value=ID_IDENT/>
+                <term type="char" value='='/>
+                <term type="ident" value=expression/>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type=":">
+        <term type="ident" value=expression/>
+        <symbol type="|">
+            <term type="ident" value=ID_INT/>
+            <term type="ident" value=ID_FLOAT/>
+            <term type="ident" value=ID_IDENT/>
+            <symbol type="alt">
+                <term type="char" value='-'/>
+                <term type="ident" value=expression/>
+                <term type="ident" value=%prec/>
+                <term type="ident" value=ID_UMINUS/>
+            </symbol>
+            <symbol type="alt">
+                <term type="ident" value=expression/>
+                <term type="char" value='+'/>
+                <term type="ident" value=expression/>
+            </symbol>
+            <symbol type="alt">
+                <term type="ident" value=expression/>
+                <term type="char" value='-'/>
+                <term type="ident" value=expression/>
+            </symbol>
+            <symbol type="alt">
+                <term type="ident" value=expression/>
+                <term type="char" value='*'/>
+                <term type="ident" value=expression/>
+            </symbol>
+            <symbol type="alt">
+                <term type="ident" value=expression/>
+                <term type="char" value='/'/>
+                <term type="ident" value=expression/>
+            </symbol>
+            <symbol type="alt">
+                <term type="char" value='('/>
+                <term type="ident" value=expression/>
+                <term type="char" value=')'/>
+            </symbol>
+        </symbol>
+    </symbol>
+</symbol>

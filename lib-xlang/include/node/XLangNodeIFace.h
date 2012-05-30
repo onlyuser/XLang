@@ -27,7 +27,7 @@ namespace xl { namespace node {
 
 struct NodeIdentIFace
 {
-    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, INNER } type_t;
+    typedef enum { INT, FLOAT, STRING, CHAR, IDENT, SYMBOL } type_t;
 
     virtual ~NodeIdentIFace()
     {}
@@ -45,46 +45,46 @@ struct NodeIdentIFace
 };
 
 template<NodeIdentIFace::type_t>
-struct LeafInternalType;
+struct TermInternalType;
 template<>
-struct LeafInternalType<NodeIdentIFace::INT> { typedef long type; };
+struct TermInternalType<NodeIdentIFace::INT> { typedef long type; };
 template<>
-struct LeafInternalType<NodeIdentIFace::FLOAT> { typedef float32_t type; };
+struct TermInternalType<NodeIdentIFace::FLOAT> { typedef float32_t type; };
 template<>
-struct LeafInternalType<NodeIdentIFace::STRING> { typedef std::string type; };
+struct TermInternalType<NodeIdentIFace::STRING> { typedef std::string type; };
 template<>
-struct LeafInternalType<NodeIdentIFace::CHAR> { typedef char type; };
+struct TermInternalType<NodeIdentIFace::CHAR> { typedef char type; };
 template<>
-struct LeafInternalType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
+struct TermInternalType<NodeIdentIFace::IDENT> { typedef const std::string* type; };
 template<>
-struct LeafInternalType<NodeIdentIFace::INNER> { typedef NodeIdentIFace* type; };
+struct TermInternalType<NodeIdentIFace::SYMBOL> { typedef NodeIdentIFace* type; };
 
 template<class T>
-struct LeafType;
+struct TermType;
 template<>
-struct LeafType<long> { enum { type = NodeIdentIFace::INT}; };
+struct TermType<long> { enum { type = NodeIdentIFace::INT}; };
 template<>
-struct LeafType<float32_t> { enum { type = NodeIdentIFace::FLOAT}; };
+struct TermType<float32_t> { enum { type = NodeIdentIFace::FLOAT}; };
 template<>
-struct LeafType<std::string> { enum { type = NodeIdentIFace::STRING}; };
+struct TermType<std::string> { enum { type = NodeIdentIFace::STRING}; };
 template<>
-struct LeafType<char> { enum { type = NodeIdentIFace::CHAR}; };
+struct TermType<char> { enum { type = NodeIdentIFace::CHAR}; };
 template<>
-struct LeafType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
+struct TermType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
 template<>
-struct LeafType<NodeIdentIFace*> { enum { type = NodeIdentIFace::INNER}; };
+struct TermType<NodeIdentIFace*> { enum { type = NodeIdentIFace::SYMBOL}; };
 
 template<NodeIdentIFace::type_t T>
-struct LeafNodeIFace : virtual public NodeIdentIFace
+struct TermNodeIFace : virtual public NodeIdentIFace
 {
-    virtual ~LeafNodeIFace()
+    virtual ~TermNodeIFace()
     {}
-    virtual typename LeafInternalType<T>::type value() const = 0;
+    virtual typename TermInternalType<T>::type value() const = 0;
 };
 
-struct InnerNodeIFace : virtual public NodeIdentIFace, virtual public visitor::VisitStateIFace
+struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::VisitStateIFace
 {
-    virtual ~InnerNodeIFace()
+    virtual ~SymbolNodeIFace()
     {}
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
