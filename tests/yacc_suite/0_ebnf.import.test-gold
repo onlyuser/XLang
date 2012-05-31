@@ -1,14 +1,14 @@
 <symbol type="grammar">
-    <symbol type=":">
+    <symbol type="rule">
         <term type="ident" value=root/>
-        <symbol type="|">
+        <symbol type="rule_rhs">
             <term type="ident" value=program/>
             <term type="ident" value=error/>
         </symbol>
     </symbol>
-    <symbol type=":">
+    <symbol type="rule">
         <term type="ident" value=program/>
-        <symbol type="|">
+        <symbol type="rule_rhs">
             <term type="ident" value=statement/>
             <symbol type="alt">
                 <term type="ident" value=program/>
@@ -17,9 +17,9 @@
             </symbol>
         </symbol>
     </symbol>
-    <symbol type=":">
+    <symbol type="rule">
         <term type="ident" value=statement/>
-        <symbol type="|">
+        <symbol type="rule_rhs">
             <term type="ident" value=expression/>
             <symbol type="alt">
                 <term type="ident" value=ID_IDENT/>
@@ -28,9 +28,9 @@
             </symbol>
         </symbol>
     </symbol>
-    <symbol type=":">
+    <symbol type="rule">
         <term type="ident" value=expression/>
-        <symbol type="|">
+        <symbol type="rule_rhs">
             <term type="ident" value=ID_INT/>
             <term type="ident" value=ID_FLOAT/>
             <term type="ident" value=ID_IDENT/>

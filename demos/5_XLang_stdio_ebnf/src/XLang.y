@@ -54,14 +54,14 @@ std::string id_to_name(uint32_t sym_id)
 {
     switch(sym_id)
     {
-        case ID_GRAMMAR: return "grammar";
-        case ':':        return ":";
-        case ID_ALT:     return "alt";
-        case '(':        return "(";
-        case '|':        return "|";
-        case '+':        return "+";
-        case '*':        return "*";
-        case '?':        return "?";
+        case ID_GRAMMAR:  return "grammar";
+        case ID_RULE:     return "rule";
+        case ID_RULE_RHS: return "rule_rhs";
+        case ID_ALT:      return "alt";
+        case '+':         return "+";
+        case '*':         return "*";
+        case '?':         return "?";
+        case '(':         return "(";
     }
     static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
         "int",
@@ -74,19 +74,19 @@ std::string id_to_name(uint32_t sym_id)
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "grammar") return ID_GRAMMAR;
-    if(name == ":")       return ':';
-    if(name == "alt")     return ID_ALT;
-    if(name == "(")       return '(';
-    if(name == "|")       return '|';
-    if(name == "+")       return '+';
-    if(name == "*")       return '*';
-    if(name == "?")       return '?';
-    if(name == "int")     return ID_INT;
-    if(name == "float")   return ID_FLOAT;
-    if(name == "string")  return ID_STRING;
-    if(name == "char")    return ID_CHAR;
-    if(name == "ident")   return ID_IDENT;
+    if(name == "grammar")  return ID_GRAMMAR;
+    if(name == "rule")     return ID_RULE;
+    if(name == "rule_rhs") return ID_RULE_RHS;
+    if(name == "alt")      return ID_ALT;
+    if(name == "+")        return '+';
+    if(name == "*")        return '*';
+    if(name == "?")        return '?';
+    if(name == "(")        return '(';
+    if(name == "int")      return ID_INT;
+    if(name == "float")    return ID_FLOAT;
+    if(name == "string")   return ID_STRING;
+    if(name == "char")     return ID_CHAR;
+    if(name == "ident")    return ID_IDENT;
     return 0;
 }
 xl::TreeContext* &tree_context()
@@ -122,7 +122,7 @@ xl::TreeContext* &tree_context()
 %token<ident_value> ID_IDENT
 %type<symbol_value> grammar rule rule_rhs alt term
 
-%nonassoc ID_GRAMMAR ID_ALT
+%nonassoc ID_GRAMMAR ID_RULE ID_RULE_RHS ID_ALT
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -142,12 +142,12 @@ grammar:
     ;
 
 rule:
-    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(':', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3); }
     ;
 
 rule_rhs:
       alt              { $$ = $1; }
-    | rule_rhs '|' alt { $$ = MAKE_SYMBOL('|', 2, $1, $3); }
+    | rule_rhs '|' alt { $$ = MAKE_SYMBOL(ID_RULE_RHS, 2, $1, $3); }
     ;
 
 alt:
