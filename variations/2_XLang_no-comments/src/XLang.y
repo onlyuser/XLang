@@ -171,7 +171,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
     _XLANG_set_extra(&parser_context, scanner);
     int error = _XLANG_parse(&parser_context, scanner); // parser entry point
     _XLANG_lex_destroy(scanner);
-    return ((0 == error) && errors().str().empty()) ? parser_context.tree_context().root() : NULL;
+    return (!error && errors().str().empty()) ? parser_context.tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)

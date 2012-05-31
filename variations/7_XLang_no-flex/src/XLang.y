@@ -129,7 +129,7 @@ int _XLANG_lex()
     char* cur_ptr = &yytext[PARM.m_pos - start_pos];
     int bytes_read = 0;
     YY_INPUT(cur_ptr, bytes_read, 1);
-    if(0 == bytes_read)
+    if(!bytes_read)
         return -1;
     if(isalpha(*cur_ptr) || *cur_ptr == '_')
     {
@@ -271,7 +271,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, FILE* file)
             reinterpret_cast<ParserContext*>(x)->~ParserContext();
             }) ParserContext(alloc, file);
     int error = _XLANG_parse(); // parser entry point
-    return ((0 == error) && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
+    return (!error && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)

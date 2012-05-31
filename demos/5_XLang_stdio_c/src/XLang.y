@@ -584,7 +584,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
             }) xl::TreeContext(alloc);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
-    return ((0 == error) && errors().str().empty()) ? tree_context()->root() : NULL;
+    return (!error && errors().str().empty()) ? tree_context()->root() : NULL;
 }
 
 void display_usage(bool verbose)
