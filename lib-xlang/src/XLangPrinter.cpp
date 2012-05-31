@@ -151,7 +151,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
 void DotPrinter::visit(const node::SymbolNodeIFace* _node)
 {
     if(_node->is_root())
-        std::cout << "digraph g {" << std::endl;
+        std::cout << "digraph g {graph [rankdir = \"LR\"];" << std::endl;
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->name() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
