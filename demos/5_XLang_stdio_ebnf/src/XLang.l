@@ -112,7 +112,7 @@ _float     {digit}*[.]{digit}+
 <STATE_CHAR>[\'] { yy_pop_state(); }
 
 <STATE_RULES>. {
-                char buf[20];
+                char buf[40];
                 sprintf(buf, "unknown character: \'%c\'\n", *yytext);
                 _XLANG_error(buf);
                 YY_FLUSH_BUFFER;
