@@ -15,21 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_MVC_VIEW_H_
-#define XLANG_MVC_VIEW_H_
+#ifndef XLANG_STRING_H_
+#define XLANG_STRING_H_
 
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include <string> // std::string
 
-namespace xl { namespace mvc {
+namespace xl {
 
-struct MVCView
-{
-    static void print_lisp(const node::NodeIdentIFace* _node);
-    static void print_xml(const node::NodeIdentIFace* _node);
-    static void print_dot(const node::NodeIdentIFace* _node);
-    static void print_graph(const node::NodeIdentIFace* p);
-};
+std::string escape(std::string s);
+std::string escape(char c);
+std::string unescape(std::string s);
+char unescape(char c);
 
-} }
+}
 
 #endif

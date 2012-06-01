@@ -16,6 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -39,12 +40,12 @@ void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* 
 
 void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
-    std::cout << '\"' << _node->value() << '\"';
+    std::cout << '\"' << xl::escape(_node->value()) << '\"';
 }
 
 void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
-    std::cout << '\'' << _node->value() << '\'';
+    std::cout << '\'' << xl::escape(_node->value()) << '\'';
 }
 
 void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)

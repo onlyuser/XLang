@@ -52,7 +52,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node)
     v.visit_any(_node);
 }
 
-void MVCView::print_dot(const node::NodeIdentIFace* _node, bool root)
+void MVCView::print_dot(const node::NodeIdentIFace* _node)
 {
     visitor::DotPrinter v;
     v.visit_any(_node);

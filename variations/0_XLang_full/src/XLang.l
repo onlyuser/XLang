@@ -24,6 +24,7 @@
 #include "XLangType.h" // char*
 #include "XLang.h" // NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangString.h" // xl::unescape
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
 #include <algorithm> // std::min
@@ -52,8 +53,6 @@
     } while(0)
 
 void begin_token(yyscan_t yyscanner, size_t length);
-std::string unescape_string(std::string s);
-char unescape_char(char c);
 
 %}
 
@@ -113,7 +112,7 @@ _float     {digit}*[.]{digit}+
 <STATE_STRING>[^\"]* {
                 begin_token(yyscanner, yyleng);
                 yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(
-                        unescape_string(yytext)
+                        xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
@@ -128,7 +127,7 @@ _float     {digit}*[.]{digit}+
             }
 <STATE_CHAR>[^\']* {
                 begin_token(yyscanner, yyleng);
-                std::string s = unescape_string(yytext);
+                std::string s = xl::unescape(yytext);
                 yylval->char_value = s[0];
                 return ID_CHAR;
             }
@@ -156,44 +155,4 @@ void begin_token(yyscan_t yyscanner, size_t length)
     PARM.m_prev_column = PARM.m_column;
     if(length > 1)
         PARM.m_prev_column--;
-}
-
-std::string unescape_string(std::string s)
-{
-    std::string s2;
-    char* buf = new char[s.length()+1]; // can't use allocator for arrays
-    strcpy(buf, s.c_str());
-    int n = 0;
-    bool unescape_next_char = false;
-    for(int i = 0; '\0' != buf[i]; i++)
-    {
-        if(unescape_next_char)
-        {
-            unescape_next_char = false;
-            buf[i] = unescape_char(buf[i]);
-        }
-        else
-            if('\\' == buf[i])
-            {
-                unescape_next_char = true;
-                continue;
-            }
-        buf[n++] = buf[i];
-    }
-    buf[n] = '\0';
-    s2 = buf;
-    delete []buf;
-    return s2;
-}
-
-char unescape_char(char c)
-{
-    switch(c)
-    {
-        case 'r': return '\r';
-        case 'n': return '\n';
-        case 't': return '\t';
-        case '0': return '\0';
-    }
-    return c;
 }

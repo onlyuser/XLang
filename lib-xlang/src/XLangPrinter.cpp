@@ -16,6 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "visitor/XLangPrinter.h" // visitor::LispPrinter
+#include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
 namespace xl { namespace visitor {
@@ -124,7 +125,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _
 void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
-            "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
+            "\t\tlabel=\"" << xl::escape(_node->value()) << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
@@ -133,7 +134,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* 
 void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
-            "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
+            "\t\tlabel=\"" << xl::escape(_node->value()) << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
