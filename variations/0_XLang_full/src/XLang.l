@@ -59,7 +59,7 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option noyywrap nounput noyy_top_state
 %option reentrant bison-bridge bison-locations
 %option stack
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
+%x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
 
 whitespace [ \t\n]+
 literal    [,()+\-*/=]
@@ -79,13 +79,13 @@ _float     {digit}*[.]{digit}+
                 return *yytext;
             }
 
-"/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
-<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_BLOCK>.    ;
+"/*"                      { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
+<ST_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
+<ST_COMMENT_BLOCK>.    ;
 
-"//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
-<STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_LINE>.    ;
+"//"                     { yy_push_state(ST_COMMENT_LINE, yyscanner); }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
+<ST_COMMENT_LINE>.    ;
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
@@ -107,31 +107,31 @@ _float     {digit}*[.]{digit}+
 
 [\"]        {
                 begin_token(yyscanner, yyleng);
-                yy_push_state(STATE_STRING, yyscanner);
+                yy_push_state(ST_STRING, yyscanner);
             }
-<STATE_STRING>[^\"]* {
+<ST_STRING>[^\"]* {
                 begin_token(yyscanner, yyleng);
                 yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<STATE_STRING>[\"] {
+<ST_STRING>[\"] {
                 begin_token(yyscanner, yyleng);
                 yy_pop_state(yyscanner);
             }
 
 [\']        {
                 begin_token(yyscanner, yyleng);
-                yy_push_state(STATE_CHAR, yyscanner);
+                yy_push_state(ST_CHAR, yyscanner);
             }
-<STATE_CHAR>[^\']* {
+<ST_CHAR>[^\']* {
                 begin_token(yyscanner, yyleng);
                 std::string s = xl::unescape(yytext);
                 yylval->char_value = s[0];
                 return ID_CHAR;
             }
-<STATE_CHAR>[\'] {
+<ST_CHAR>[\'] {
                 begin_token(yyscanner, yyleng);
                 yy_pop_state(yyscanner);
             }

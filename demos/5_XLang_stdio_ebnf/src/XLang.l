@@ -32,8 +32,8 @@ static char* rules_start;
 
 %option noyywrap nounput
 %option stack
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE STATE_STRING STATE_CHAR
-%s STATE_DEFINITION_CODE STATE_RULES STATE_CODE STATE_RULES_CODE
+%x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
+%s ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_CODE
 
 whitespace [ \t\n]+
 literal    [:|()+*?;]
@@ -48,25 +48,25 @@ _float     {digit}*[.]{digit}+
 
 {whitespace} ;
 
-"/*"                      { yy_push_state(STATE_COMMENT_BLOCK); }
-<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(); }
-<STATE_COMMENT_BLOCK>.    ;
+"/*"                      { yy_push_state(ST_COMMENT_BLOCK); }
+<ST_COMMENT_BLOCK>"*/" { yy_pop_state(); }
+<ST_COMMENT_BLOCK>.    ;
 
-"//"                     { yy_push_state(STATE_COMMENT_LINE); }
-<STATE_COMMENT_LINE>"\n" { yy_pop_state(); }
-<STATE_COMMENT_LINE>.    ;
+"//"                     { yy_push_state(ST_COMMENT_LINE); }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(); }
+<ST_COMMENT_LINE>.    ;
 
-"%{"                        { yy_push_state(STATE_DEFINITION_CODE); }
-<STATE_DEFINITION_CODE>"%}" { yy_pop_state(); }
-<STATE_DEFINITION_CODE>.    ;
-"%%"                        { BEGIN STATE_RULES; }
-<STATE_RULES>[\{] {
+"%{"                        { yy_push_state(ST_DEFINITION_CODE); }
+<ST_DEFINITION_CODE>"%}" { yy_pop_state(); }
+<ST_DEFINITION_CODE>.    ;
+"%%"                        { BEGIN ST_RULES; }
+<ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
                     rules_start = yytext;
-                yy_push_state(STATE_RULES_CODE);
+                yy_push_state(ST_RULES_CODE);
             }
-<STATE_RULES_CODE>[\{]      { yy_push_state(STATE_RULES_CODE); }
-<STATE_RULES_CODE>[\}]      {
+<ST_RULES_CODE>[\{]      { yy_push_state(ST_RULES_CODE); }
+<ST_RULES_CODE>[\}]      {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
@@ -76,42 +76,42 @@ _float     {digit}*[.]{digit}+
                     return ID_STRING;
                 }
             }
-<STATE_RULES_CODE>.         ;
-<STATE_RULES>"%%"           { BEGIN STATE_CODE; }
-<STATE_CODE>.               ;
+<ST_RULES_CODE>.         ;
+<ST_RULES>"%%"           { BEGIN ST_CODE; }
+<ST_CODE>.               ;
 
-<STATE_RULES>{ident} {
+<ST_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
-<STATE_RULES>{_int} {
+<ST_RULES>{_int} {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
-<STATE_RULES>{_float} {
+<ST_RULES>{_float} {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
-<STATE_RULES>{literal} { return *yytext; }
+<ST_RULES>{literal} { return *yytext; }
 
-[\"]        { yy_push_state(STATE_STRING); }
-<STATE_STRING>[^\"]* {
+[\"]        { yy_push_state(ST_STRING); }
+<ST_STRING>[^\"]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<STATE_STRING>[\"] { yy_pop_state(); }
+<ST_STRING>[\"] { yy_pop_state(); }
 
-[\']        { yy_push_state(STATE_CHAR); }
-<STATE_CHAR>[^\']* {
+[\']        { yy_push_state(ST_CHAR); }
+<ST_CHAR>[^\']* {
                 std::string s = xl::unescape(yytext);
                 _XLANG_lval.char_value = s[0];
                 return ID_CHAR;
             }
-<STATE_CHAR>[\'] { yy_pop_state(); }
+<ST_CHAR>[\'] { yy_pop_state(); }
 
-<STATE_RULES>. {
+<ST_RULES>. {
                 char buf[40];
                 sprintf(buf, "unknown character: \'%c\'\n", *yytext);
                 _XLANG_error(buf);

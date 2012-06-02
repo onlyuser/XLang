@@ -58,7 +58,7 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option noyywrap nounput noyy_top_state
 %option reentrant bison-bridge bison-locations
 %option stack
-%x STATE_COMMENT_BLOCK STATE_COMMENT_LINE
+%x ST_COMMENT_BLOCK ST_COMMENT_LINE
 
 whitespace [ \t\n]+
 literal    [,()+\-*/=]
@@ -78,13 +78,13 @@ _float     {digit}*[.]{digit}+
                 return *yytext;
             }
 
-"/*"                      { yy_push_state(STATE_COMMENT_BLOCK, yyscanner); }
-<STATE_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_BLOCK>.    ;
+"/*"                      { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
+<ST_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
+<ST_COMMENT_BLOCK>.    ;
 
-"//"                     { yy_push_state(STATE_COMMENT_LINE, yyscanner); }
-<STATE_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
-<STATE_COMMENT_LINE>.    ;
+"//"                     { yy_push_state(ST_COMMENT_LINE, yyscanner); }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
+<ST_COMMENT_LINE>.    ;
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
