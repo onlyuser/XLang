@@ -42,42 +42,50 @@ digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
 ident      {id}+({digit}|{id})*
+ident_ex   {id}+({digit}|{id}|[-])*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
+lex_option [%][^%{}]
 
 %%
 
 {whitespace} ;
 
+ /*==========================================================================*/
+ /* COMMENTS */
+
 "/*"                   { yy_push_state(ST_COMMENT_BLOCK); }
 <ST_COMMENT_BLOCK>"*/" { yy_pop_state(); }
 <ST_COMMENT_BLOCK>.    ;
 
-"//"                  { yy_push_state(ST_COMMENT_LINE); }
-<ST_COMMENT_LINE>"\n" { yy_pop_state(); }
-<ST_COMMENT_LINE>.    ;
+"//"                   { yy_push_state(ST_COMMENT_LINE); }
+<ST_COMMENT_LINE>"\n"  { yy_pop_state(); }
+<ST_COMMENT_LINE>.     ;
 
  /*==========================================================================*/
+ /* DEFINITIONS SECTION */
 
-<INITIAL>[%][^%{}] { yyless(1); return *yytext; }
-<INITIAL>[<>]      { return *yytext; }
-<INITIAL>{ident}   {
+<INITIAL>{lex_option}    { yyless(1); return *yytext; }
+<INITIAL>[<>]            { return *yytext; }
+<INITIAL>{ident_ex}      {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
-
-<INITIAL>"%{" { yy_push_state(ST_DEFINITION_CODE); }
+<INITIAL>"%{"            { yy_push_state(ST_DEFINITION_CODE); }
 <ST_DEFINITION_CODE>"%}" { yy_pop_state(); }
 <ST_DEFINITION_CODE>.    ;
-<INITIAL>"%%" { BEGIN ST_RULES; }
+<INITIAL>"%%"            { BEGIN ST_RULES; return ID_FENCE; }
 
-<ST_RULES>[\{]           {
+ /*==========================================================================*/
+ /* RULES SECTION */
+
+<ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
                     rules_start = yytext;
                 yy_push_state(ST_RULES_CODE);
             }
-<ST_RULES_CODE>[\{]      { yy_push_state(ST_RULES_CODE); }
-<ST_RULES_CODE>[\}]      {
+<ST_RULES_CODE>[\{] { yy_push_state(ST_RULES_CODE); }
+<ST_RULES_CODE>[\}] {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
@@ -87,12 +95,16 @@ _float     {digit}*[.]{digit}+
                     return ID_STRING;
                 }
             }
-<ST_RULES_CODE>.         ;
-<ST_RULES>"%%"           { BEGIN ST_CODE; }
-
-<ST_CODE>.               ;
+<ST_RULES_CODE>. ;
+<ST_RULES>"%%"   { BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
+ /* CODE SECTION */
+
+<ST_CODE>.  ;
+
+ /*==========================================================================*/
+ /* TERMS */
 
 <ST_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
@@ -113,23 +125,24 @@ _float     {digit}*[.]{digit}+
 <ST_RULES>{literal} { return *yytext; }
 
  /*==========================================================================*/
+ /* QUOTED STUFF */
 
-[\"]        { yy_push_state(ST_STRING); }
+[\"]              { yy_push_state(ST_STRING); }
 <ST_STRING>[^\"]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<ST_STRING>[\"] { yy_pop_state(); }
+<ST_STRING>[\"]   { yy_pop_state(); }
 
-[\']        { yy_push_state(ST_CHAR); }
+[\']            { yy_push_state(ST_CHAR); }
 <ST_CHAR>[^\']* {
                 std::string s = xl::unescape(yytext);
                 _XLANG_lval.char_value = s[0];
                 return ID_CHAR;
             }
-<ST_CHAR>[\'] { yy_pop_state(); }
+<ST_CHAR>[\']   { yy_pop_state(); }
 
  /*==========================================================================*/
 

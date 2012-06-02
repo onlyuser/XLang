@@ -24,7 +24,7 @@
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-	EBNFPrinter()
+    EBNFPrinter()
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
 };

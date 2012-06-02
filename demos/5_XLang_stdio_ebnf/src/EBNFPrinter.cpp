@@ -23,60 +23,103 @@
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
 {
     bool more;
-	switch(_node->sym_id())
-	{
-		case ID_GRAMMAR:
-			std::cout << "%%" << std::endl << std::endl;
-			xl::visitor::DefaultTour::visit(_node);
-			std::cout << "%%" << std::endl;
-			break;
-		case ID_RULE:
-			visit_next_child(_node);
-			std::cout << ':' << std::endl;
-			visit_next_child(_node);
-			std::cout << ';' << std::endl << std::endl;
-			break;
-		case ID_RULE_RHS:
-			std::cout << "\t  ";
-			do
-			{
-				more = visit_next_child(_node);
-				if(more)
-					std::cout << std::endl << "\t| ";
-			} while(more);
-			break;
-		case ID_ALT:
-			more = visit_next_child(_node);
-			if(more)
-				std::cout << ' '
-						<< dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-								_node->operator[](1)
-								)->value();
-			break;
-		case ID_TERMS:
-			do
-			{
-				more = visit_next_child(_node);
-				if(more)
-					std::cout << ' ';
-			} while(more);
-			break;
-		case '+':
-			xl::visitor::DefaultTour::visit(_node);
-			std::cout << '+';
-			break;
-		case '*':
-			xl::visitor::DefaultTour::visit(_node);
-			std::cout << '*';
-			break;
-		case '?':
-			xl::visitor::DefaultTour::visit(_node);
-			std::cout << '?';
-			break;
-		case '(':
-			std::cout << '(';
-			xl::visitor::DefaultTour::visit(_node);
-			std::cout << ')';
-			break;
-	}
+    switch(_node->sym_id())
+    {
+        case ID_GRAMMAR:
+            visit_next_child(_node);
+            std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
+            visit_next_child(_node);
+            std::cout << std::endl << std::endl << "%%" << std::endl;
+            break;
+        case ID_DEFINITIONS:
+            do
+            {
+                more = visit_next_child(_node);
+                if(more)
+                    std::cout << std::endl;
+            } while(more);
+            break;
+        case ID_DEFINITION:
+            std::cout << '%';
+            if(_node->size() == 3)
+            {
+                visit_next_child(_node);
+                std::cout << '<';
+                visit_next_child(_node);
+                std::cout << "> ";
+                visit_next_child(_node);
+            }
+            else
+            {
+                if(visit_next_child(_node))
+                {
+                    std::cout << ' ';
+                    visit_next_child(_node);
+                }
+            }
+            break;
+        case ID_SYMBOLS:
+            do
+            {
+                more = visit_next_child(_node);
+                if(more)
+                    std::cout << ' ';
+            } while(more);
+            break;
+        case ID_RULES:
+            do
+            {
+                more = visit_next_child(_node);
+                if(more)
+                    std::cout << std::endl << std::endl;
+            } while(more);
+            break;
+        case ID_RULE:
+            visit_next_child(_node);
+            std::cout << ':' << std::endl;
+            visit_next_child(_node);
+            std::cout << ';';
+            break;
+        case ID_RULE_RHS:
+            std::cout << "\t  ";
+            do
+            {
+                more = visit_next_child(_node);
+                if(more)
+                    std::cout << std::endl << "\t| ";
+            } while(more);
+            break;
+        case ID_ALT:
+            if(visit_next_child(_node))
+                std::cout << ' '
+                        << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
+                                _node->operator[](1)
+                                )->value();
+            break;
+        case ID_TERMS:
+            do
+            {
+                more = visit_next_child(_node);
+                if(more)
+                    std::cout << ' ';
+            } while(more);
+            break;
+        case '+':
+            xl::visitor::DefaultTour::visit(_node);
+            std::cout << '+';
+            break;
+        case '*':
+            xl::visitor::DefaultTour::visit(_node);
+            std::cout << '*';
+            break;
+        case '?':
+            xl::visitor::DefaultTour::visit(_node);
+            std::cout << '?';
+            break;
+        case '(':
+            std::cout << '(';
+            xl::visitor::DefaultTour::visit(_node);
+            std::cout << ')';
+            break;
+    }
 }

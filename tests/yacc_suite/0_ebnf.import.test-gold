@@ -1,114 +1,174 @@
 <symbol type="grammar">
-    <symbol type="rule">
-        <term type="ident" value=root/>
-        <symbol type="rule_rhs">
-            <symbol type="alt_action">
+    <symbol type="definitions">
+        <symbol type="definition">
+            <term type="ident" value=union/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=error-verbose/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <term type="ident" value=ID_BASE/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <term type="ident" value=int_value/>
+            <term type="ident" value=ID_INT/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <term type="ident" value=float_value/>
+            <term type="ident" value=ID_FLOAT/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <term type="ident" value=ident_value/>
+            <term type="ident" value=ID_IDENT/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=type/>
+            <term type="ident" value=symbol_value/>
+            <symbol type="symbols">
                 <term type="ident" value=program/>
-                <term type="string" value="{ tree_context()->root() = $1; YYACCEPT; }"/>
-            </symbol>
-            <symbol type="alt_action">
-                <term type="ident" value=error/>
-                <term type="string" value="{ yyclearin; /* yyerrok; YYABORT; */ }"/>
+                <term type="ident" value=statement/>
+                <term type="ident" value=expression/>
             </symbol>
         </symbol>
-    </symbol>
-    <symbol type="rule">
-        <term type="ident" value=program/>
-        <symbol type="rule_rhs">
-            <symbol type="alt_action">
-                <term type="ident" value=statement/>
-                <term type="string" value="{ $$ = $1; }"/>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="symbols">
+                <term type="char" value='+'/>
+                <term type="char" value='-'/>
             </symbol>
-            <symbol type="alt_action">
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="symbols">
+                <term type="char" value='*'/>
+                <term type="char" value='/'/>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <term type="ident" value=ID_UMINUS/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <term type="ident" value=ID_COUNT/>
+        </symbol>
+    </symbol>
+    <symbol type="rules">
+        <symbol type="rule">
+            <term type="ident" value=root/>
+            <symbol type="rule_rhs">
                 <symbol type="alt">
                     <term type="ident" value=program/>
-                    <term type="char" value=','/>
-                    <term type="ident" value=statement/>
+                    <term type="string" value="{ tree_context()->root() = $1; YYACCEPT; }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\',\', 2, $1, $3); }"/>
+                <symbol type="alt">
+                    <term type="ident" value=error/>
+                    <term type="string" value="{ yyclearin; /* yyerrok; YYABORT; */ }"/>
+                </symbol>
             </symbol>
         </symbol>
-    </symbol>
-    <symbol type="rule">
-        <term type="ident" value=statement/>
-        <symbol type="rule_rhs">
-            <symbol type="alt_action">
-                <term type="ident" value=expression/>
-                <term type="string" value="{ $$ = $1; }"/>
+        <symbol type="rule">
+            <term type="ident" value=program/>
+            <symbol type="rule_rhs">
+                <symbol type="alt">
+                    <term type="ident" value=statement/>
+                    <term type="string" value="{ $$ = $1; }"/>
+                </symbol>
+                <symbol type="alt">
+                    <symbol type="terms">
+                        <term type="ident" value=program/>
+                        <term type="char" value=','/>
+                        <term type="ident" value=statement/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\',\', 2, $1, $3); }"/>
+                </symbol>
             </symbol>
-            <symbol type="alt_action">
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=statement/>
+            <symbol type="rule_rhs">
+                <symbol type="alt">
+                    <term type="ident" value=expression/>
+                    <term type="string" value="{ $$ = $1; }"/>
+                </symbol>
+                <symbol type="alt">
+                    <symbol type="terms">
+                        <term type="ident" value=ID_IDENT/>
+                        <term type="char" value='='/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'=\', 2, MAKE_TERM(ID_IDENT, $1), $3); }"/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=expression/>
+            <symbol type="rule_rhs">
+                <symbol type="alt">
+                    <term type="ident" value=ID_INT/>
+                    <term type="string" value="{ $$ = MAKE_TERM(ID_INT, $1); }"/>
+                </symbol>
+                <symbol type="alt">
+                    <term type="ident" value=ID_FLOAT/>
+                    <term type="string" value="{ $$ = MAKE_TERM(ID_FLOAT, $1); }"/>
+                </symbol>
                 <symbol type="alt">
                     <term type="ident" value=ID_IDENT/>
-                    <term type="char" value='='/>
-                    <term type="ident" value=expression/>
+                    <term type="string" value="{ $$ = MAKE_TERM(ID_IDENT, $1); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\'=\', 2, MAKE_TERM(ID_IDENT, $1), $3); }"/>
-            </symbol>
-        </symbol>
-    </symbol>
-    <symbol type="rule">
-        <term type="ident" value=expression/>
-        <symbol type="rule_rhs">
-            <symbol type="alt_action">
-                <term type="ident" value=ID_INT/>
-                <term type="string" value="{ $$ = MAKE_TERM(ID_INT, $1); }"/>
-            </symbol>
-            <symbol type="alt_action">
-                <term type="ident" value=ID_FLOAT/>
-                <term type="string" value="{ $$ = MAKE_TERM(ID_FLOAT, $1); }"/>
-            </symbol>
-            <symbol type="alt_action">
-                <term type="ident" value=ID_IDENT/>
-                <term type="string" value="{ $$ = MAKE_TERM(ID_IDENT, $1); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="char" value='-'/>
-                    <term type="ident" value=expression/>
-                    <term type="ident" value=%prec/>
-                    <term type="ident" value=ID_UMINUS/>
+                    <symbol type="terms">
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expression/>
+                        <term type="ident" value=%prec/>
+                        <term type="ident" value=ID_UMINUS/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="ident" value=expression/>
-                    <term type="char" value='+'/>
-                    <term type="ident" value=expression/>
+                    <symbol type="terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='+'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'+\', 2, $1, $3); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\'+\', 2, $1, $3); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="ident" value=expression/>
-                    <term type="char" value='-'/>
-                    <term type="ident" value=expression/>
+                    <symbol type="terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'-\', 2, $1, $3); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\'-\', 2, $1, $3); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="ident" value=expression/>
-                    <term type="char" value='*'/>
-                    <term type="ident" value=expression/>
+                    <symbol type="terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='*'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'*\', 2, $1, $3); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\'*\', 2, $1, $3); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="ident" value=expression/>
-                    <term type="char" value='/'/>
-                    <term type="ident" value=expression/>
+                    <symbol type="terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='/'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'/\', 2, $1, $3); }"/>
                 </symbol>
-                <term type="string" value="{ $$ = MAKE_SYMBOL(\'/\', 2, $1, $3); }"/>
-            </symbol>
-            <symbol type="alt_action">
                 <symbol type="alt">
-                    <term type="char" value='('/>
-                    <term type="ident" value=expression/>
-                    <term type="char" value=')'/>
+                    <symbol type="terms">
+                        <term type="char" value='('/>
+                        <term type="ident" value=expression/>
+                        <term type="char" value=')'/>
+                    </symbol>
+                    <term type="string" value="{ $$ = $2; }"/>
                 </symbol>
-                <term type="string" value="{ $$ = $2; }"/>
             </symbol>
         </symbol>
     </symbol>
