@@ -25,6 +25,7 @@
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::unescape
 #include <stdlib.h> // atoi
+#include <iostream>
 
 static char* rules_start;
 
@@ -40,7 +41,7 @@ literal    [:|()+*?;]
 digit      [0-9]
 alpha      [a-zA-Z]
 id         {alpha}|[_]
-ident      [%]?{id}+({digit}|{id})*
+ident      {id}+({digit}|{id})*
 _int       {digit}+
 _float     {digit}*[.]{digit}+
 
@@ -56,11 +57,21 @@ _float     {digit}*[.]{digit}+
 <ST_COMMENT_LINE>"\n" { yy_pop_state(); }
 <ST_COMMENT_LINE>.    ;
 
-"%{"                     { yy_push_state(ST_DEFINITION_CODE); }
+ /*==========================================================================*/
+
+<INITIAL>[%][^%{}] { yyless(1); return *yytext; }
+<INITIAL>[<>]      { return *yytext; }
+<INITIAL>{ident}   {
+                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_IDENT;
+            }
+
+<INITIAL>"%{" { yy_push_state(ST_DEFINITION_CODE); }
 <ST_DEFINITION_CODE>"%}" { yy_pop_state(); }
 <ST_DEFINITION_CODE>.    ;
-"%%"                     { BEGIN ST_RULES; }
-<ST_RULES>[\{] {
+<INITIAL>"%%" { BEGIN ST_RULES; }
+
+<ST_RULES>[\{]           {
                 if(yy_top_state() == INITIAL)
                     rules_start = yytext;
                 yy_push_state(ST_RULES_CODE);
@@ -78,9 +89,16 @@ _float     {digit}*[.]{digit}+
             }
 <ST_RULES_CODE>.         ;
 <ST_RULES>"%%"           { BEGIN ST_CODE; }
+
 <ST_CODE>.               ;
 
+ /*==========================================================================*/
+
 <ST_RULES>{ident} {
+                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_IDENT;
+            }
+<ST_RULES>"%prec" {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
@@ -93,6 +111,8 @@ _float     {digit}*[.]{digit}+
                 return ID_FLOAT;
             }
 <ST_RULES>{literal} { return *yytext; }
+
+ /*==========================================================================*/
 
 [\"]        { yy_push_state(ST_STRING); }
 <ST_STRING>[^\"]* {
@@ -110,6 +130,8 @@ _float     {digit}*[.]{digit}+
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] { yy_pop_state(); }
+
+ /*==========================================================================*/
 
 <ST_RULES>. {
                 char buf[40];

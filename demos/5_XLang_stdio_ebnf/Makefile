@@ -54,7 +54,7 @@ LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
-#DEBUG = -g
+DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
 	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH
@@ -132,7 +132,7 @@ clean_objects : clean_yacc clean_lex
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) EBNFPrinter
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 

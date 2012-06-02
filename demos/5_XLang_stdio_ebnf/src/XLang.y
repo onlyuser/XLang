@@ -27,6 +27,7 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
+#include "EBNFPrinter.h"
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string
@@ -55,6 +56,10 @@ std::string id_to_name(uint32_t sym_id)
     switch(sym_id)
     {
         case ID_GRAMMAR:    return "grammar";
+        case ID_DEFINITIONS: return "definitions";
+        case ID_DEFINITION: return "definition";
+        case ID_SYMBOLS:    return "symbols";
+        case ID_RULES:      return "rules";
         case ID_RULE:       return "rule";
         case ID_RULE_RHS:   return "rule_rhs";
         case ID_TERMS:      return "terms";
@@ -76,6 +81,10 @@ std::string id_to_name(uint32_t sym_id)
 uint32_t name_to_id(std::string name)
 {
     if(name == "grammar")  return ID_GRAMMAR;
+    if(name == "definitions") return ID_DEFINITIONS;
+    if(name == "definition") return ID_DEFINITION;
+    if(name == "symbols")  return ID_SYMBOLS;
+    if(name == "rules")    return ID_RULES;
     if(name == "rule")     return ID_RULE;
     if(name == "rule_rhs") return ID_RULE_RHS;
     if(name == "terms")    return ID_TERMS;
@@ -122,9 +131,11 @@ xl::TreeContext* &tree_context()
 %token<string_value> ID_STRING
 %token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
-%type<symbol_value> grammar rule rule_rhs alt terms term
+%type<symbol_value> grammar definitions definition symbols lexer_term
+        rules rule rule_rhs alt terms term
 
-%nonassoc ID_GRAMMAR ID_RULE ID_RULE_RHS ID_ALT ID_TERMS
+%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_SYMBOLS
+        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_TERMS ID_PREC
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -139,12 +150,43 @@ root:
     ;
 
 grammar:
-      /* empty */  { $$ = NULL; }
-    | grammar rule { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $2); }
+      definitions rules { $$ = MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $2); }
+    ;
+
+definitions:
+      /* empty */            { $$ = NULL; }
+    | definitions definition { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_DEFINITIONS, 2, $1, $2); }
+    ;
+
+definition:
+      '%' ID_IDENT '<' ID_IDENT '>' symbols {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 3, MAKE_TERM(ID_IDENT, $2), MAKE_TERM(ID_IDENT, $4), $6);
+            }
+    | '%' ID_IDENT symbols {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
+            }
+    | '%' ID_IDENT {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));
+            }
+    ;
+
+symbols:
+      lexer_term         { $$ = $1; }
+    | symbols lexer_term { $$ = MAKE_SYMBOL(ID_SYMBOLS, 2, $1, $2); }
+    ;
+
+lexer_term:
+      ID_IDENT { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | ID_CHAR  { $$ = MAKE_TERM(ID_CHAR, $1); }
+    ;
+
+rules:
+      /* empty */ { $$ = NULL; }
+    | rules rule  { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_RULES, 2, $1, $2); }
     ;
 
 rule:
-    ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3); }
+      ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3); }
     ;
 
 rule_rhs:
@@ -199,6 +241,7 @@ void display_usage(bool verbose)
                 << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
+                << "  -e, --ebnf" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
@@ -214,6 +257,7 @@ struct args_t
     typedef enum
     {
         MODE_NONE,
+        MODE_EBNF,
         MODE_LISP,
         MODE_XML,
         MODE_GRAPH,
@@ -234,9 +278,10 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "i:lxgdmh?";
+    static const char *optString = "i:elxgdmh?";
     static const struct option longOpts[] = {
                 { "in-xml", required_argument, NULL, 'i' },
+                { "ebnf",   no_argument,       NULL, 'e' },
                 { "lisp",   no_argument,       NULL, 'l' },
                 { "xml",    no_argument,       NULL, 'x' },
                 { "graph",  no_argument,       NULL, 'g' },
@@ -251,6 +296,7 @@ bool parse_args(int argc, char** argv, args_t &args)
         switch(opt)
         {
             case 'i': args.in_xml = optarg; break;
+            case 'e': args.mode = args_t::MODE_EBNF; break;
             case 'l': args.mode = args_t::MODE_LISP; break;
             case 'x': args.mode = args_t::MODE_XML; break;
             case 'g': args.mode = args_t::MODE_GRAPH; break;
@@ -301,6 +347,12 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
+        case args_t::MODE_EBNF:
+            {
+                EBNFPrinter v;
+                v.visit_any(ast);
+            }
+            break;
         case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
         case args_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
