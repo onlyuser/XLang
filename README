@@ -5,27 +5,27 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
 
-    This is a parser "framework" inspired by Tom Niemann's excellent "Compact
-    Guide to Lex/Yacc". 7 variations of Lex-Yacc parser are presented, varying
-    in feature richness.
+    XLang is a parser "framework" designed for fast-prototyping of new
+    (programming) languages. Seven variations of Lex-Yacc parser are presented,
+    varying in feature completeness.
 
     The first variation (0_XLang_full), is a full-featured parser. With each
     successive variation, non-critical features are stripped until there is
     nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
-    feature <--                                                         --> feature
-    rich                                                                    poor
+    feature <--                                                         --> simple
+    complete                                                                concise
 
     full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
     The order is chosen based on "usefulness" -- for instance, it is arguably
     more useful to have a reentrant parser than to have a non-reentrant parser,
-    so the reentrant feature is enabled on the "feature rich" end. There's
+    so the reentrant feature is enabled on the "feature complete" end. There's
     really no good reason one cannot cannot have both "comments" and "file
     input" enabled, or both "reentrant" and "hand-rolled lexer" enabled.
 
-    The code is organized in a way that anyone unfamiliar with Lex-Yacc can
-    quickly isolate a variation that is most relevent, and most readily
+    The code is organized in a way such that anyone unfamiliar with Lex-Yacc
+    can quickly isolate a variation that is most relevent, and most readily
     customizable to his/her specific requirements.
 
 Variation vs Feature Table:
@@ -128,13 +128,13 @@ FAQ:
 
        XLang isn't a unified parser front-end for every language under the sun.
        It makes some assumptions about the target language, meaning, literal
-       values must be C/C++ like. Otherwise, it places no restrictions on the
+       values must be C-like. Otherwise, it places no restrictions on the
        grammar.
 
     3. How should one use XLang ?
 
        I recommend hacking the "stdio" example to your liking, but any of the
-       other variations is suitable as a base for beginners.
+       other variations equally suitable as a base for beginners.
 
     4. What licenses apply when using XLang ?
 
@@ -142,18 +142,18 @@ FAQ:
 
     5. What's the motivation behind writing XLang ?
 
-       Lex-Yacc isn't hard, and it will get the job done, but it doesn't do it
-       right out of the box. It needs other infrastructure to get most sizeable
-       projects going.
+       Lex-Yacc is a pragmatic solution that will get the job done, but it
+       doesn't do it right out of the box. It needs some infrastructure to get
+       most sizeable projects going.
 
        I built XLang to answer my own need for a parser SDK that takes care of
        the tedious tree building business so I could focus on the fun stuff --
        AST visitation.
 
-       But isn't that what Yacc production rules are all about ? No. In order
-       to visit the AST a second time, with Yacc only, one would have to re-
-       parse the input, and that's wasteful. XLang builds an AST for you so you
-       can visit it with multiple visitations.
+       But isn't that what Yacc rule actions are for ? No. In order to perform
+       multi-pass visitation to an AST, using Yacc, one would have to re-parse
+       the input everytime, and that's wasteful. XLang builds an AST for you so
+       you can visit it as many times as needed.
 
        I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
        excellent tutorial.
@@ -162,7 +162,7 @@ FAQ:
 
        a) XLang uses C++, with unions used only where necessary.
        b) XLang has its own memory management system based on allocators.
-       c) XLang offers different flavors of Lex-Yacc whereas Tom's tutorial
+       c) XLang offers several flavors of Lex-Yacc whereas Tom's tutorial
           offers just one "stdio" parser.
        d) XLang's ASTs are "flattened", meaning lists are interpreted as lists
           instead of deep-recursing binary trees. This tree organization lends
@@ -189,7 +189,7 @@ FAQ:
     8. Why c++0x ?
 
        Lambda functions are the only c++0x feature used here, and only because
-       it solves the problem elengantly.
+       it solves the problem elegantly.
 
 References:
 
