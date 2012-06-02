@@ -13,8 +13,8 @@ About:
     successive variation, non-critical features are stripped until there is
     nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
-    feature <--                                                         --> simple
-    complete                                                                concise
+    feature <--                                                         --> feature
+    complete                                                                basic
 
     full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
@@ -177,6 +177,11 @@ FAQ:
            / \
           1   2
 
+       e) XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
+          cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
+          visit double-dispatch without the need to implement the "accept"
+          method for every single AST node class.
+
     7. Why allocators ?
 
        I've incorporated a simple memory allocator in this project because I
@@ -189,7 +194,26 @@ FAQ:
     8. Why c++0x ?
 
        Lambda functions are the only c++0x feature used here, and only because
-       it solves the problem elegantly.
+       they solves the problem elegantly. The goal is to deliberately avoid
+       implementing clean-up code within the AST node destructors. This goes
+       along a grander design decision to keep the AST node class clear of
+       method clutter by moving all the predicate code into visitors. Lambdas
+       help us provide temporary anonymous callbacks for the allocator, whose
+       job is to perform clean-up originally intended for the destructor.
+
+    9. Why coroutines ?
+
+       I needed a way to store the "progress" of a visitation, so it can be
+       resumed later. A direct approach would be keeping a reference to the
+       most recently visited child node and tucking that away in a static
+       variable, but this assumes a linear visitation limited to ascending or
+       descending traversals. Enter the coroutine, whose main purpose is to
+       provide flow control for systems that need suspending and resuming of
+       execution, exactly what is needed for my visitor.
+
+       I use Simon Tatham's excellent implementation of this immensely useful
+       concept. Please visit his page to learn more (as his use of macros is
+       quite involving).
 
 References:
 
@@ -221,6 +245,15 @@ References:
 
     "O-Reilly Lex-Yacc book examples"
     http://examples.oreilly.com/lex/
+
+    "Cooperative Visitor: A Template Technique for Visitor Creation"
+    http://www.artima.com/cppsource/cooperative_visitor.html
+
+    "Java Tip 98: Reflect on the Visitor design pattern"
+    http://www.javaworld.com/javaworld/javatips/jw-javatip98.html
+
+    "Coroutines in C"
+    http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
 
 Additional Reading:
 
