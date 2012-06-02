@@ -79,11 +79,11 @@ _float     {digit}*[.]{digit}+
                 return *yytext;
             }
 
-"/*"                      { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
+"/*"                   { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
 <ST_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
 <ST_COMMENT_BLOCK>.    ;
 
-"//"                     { yy_push_state(ST_COMMENT_LINE, yyscanner); }
+"//"                  { yy_push_state(ST_COMMENT_LINE, yyscanner); }
 <ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
 <ST_COMMENT_LINE>.    ;
 

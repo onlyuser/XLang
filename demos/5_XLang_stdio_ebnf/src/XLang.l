@@ -48,18 +48,18 @@ _float     {digit}*[.]{digit}+
 
 {whitespace} ;
 
-"/*"                      { yy_push_state(ST_COMMENT_BLOCK); }
+"/*"                   { yy_push_state(ST_COMMENT_BLOCK); }
 <ST_COMMENT_BLOCK>"*/" { yy_pop_state(); }
 <ST_COMMENT_BLOCK>.    ;
 
-"//"                     { yy_push_state(ST_COMMENT_LINE); }
+"//"                  { yy_push_state(ST_COMMENT_LINE); }
 <ST_COMMENT_LINE>"\n" { yy_pop_state(); }
 <ST_COMMENT_LINE>.    ;
 
-"%{"                        { yy_push_state(ST_DEFINITION_CODE); }
+"%{"                     { yy_push_state(ST_DEFINITION_CODE); }
 <ST_DEFINITION_CODE>"%}" { yy_pop_state(); }
 <ST_DEFINITION_CODE>.    ;
-"%%"                        { BEGIN ST_RULES; }
+"%%"                     { BEGIN ST_RULES; }
 <ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
                     rules_start = yytext;
