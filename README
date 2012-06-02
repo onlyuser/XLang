@@ -100,7 +100,7 @@ Requirements:
     Environment variables:
 
         $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
-        $EXTERN_LIB_PATH -- where "libticppd.a" resides
+        $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
 Make targets:
 
