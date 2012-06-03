@@ -80,9 +80,9 @@ std::string id_to_name(uint32_t sym_id)
         "ident"
         };
     size_t n = sizeof(_id_to_name)/sizeof(_id_to_name[0]);
-    if(static_cast<int>(sym_id) - ID_BASE - 1 < 0 || sym_id > n)
+    if(static_cast<int>(sym_id)-ID_BASE-1<0 || sym_id>n)
         throw ERROR_SYM_ID_NOT_FOUND;
-    return _id_to_name[sym_id - ID_BASE - 1];
+    return _id_to_name[sym_id-ID_BASE-1];
 }
 uint32_t name_to_id(std::string name)
 {

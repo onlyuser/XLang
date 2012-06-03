@@ -22,46 +22,46 @@
 
 void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
 {
-	value = _node->value();
+    value = _node->value();
 }
 
 void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node)
 {
-	value = _node->value();
+    value = _node->value();
 }
 
 void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* _node)
 {
-	value = 0;
+    value = 0;
 }
 
 void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node)
 {
-	value = 0;
+    value = 0;
 }
 
 void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node)
 {
-	value = 0;
+    value = 0;
 }
 
 void EvalVisitor::visit(const xl::node::SymbolNodeIFace* _node)
 {
     float32_t _value = 0;
     bool more = visit_next_child(_node);
-	_value = value;
-	while(more)
-	{
-		more = visit_next_child(_node);
-		switch(_node->sym_id())
-		{
-			case '+': _value += value; break;
-			case '-': _value -= value; break;
-			case '*': _value *= value; break;
-			case '/': _value /= value; break;
-		}
-	}
-	value = _value;
+    _value = value;
+    while(more)
+    {
+        more = visit_next_child(_node);
+        switch(_node->sym_id())
+        {
+            case '+': _value += value; break;
+            case '-': _value -= value; break;
+            case '*': _value *= value; break;
+            case '/': _value /= value; break;
+        }
+    }
+    value = _value;
     if(_node->is_root())
         std::cout << _value << std::endl;
 }

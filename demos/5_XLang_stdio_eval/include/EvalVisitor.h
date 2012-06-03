@@ -24,7 +24,7 @@
 struct EvalVisitor : public xl::visitor::DefaultTour
 {
 public:
-	EvalVisitor()
+    EvalVisitor()
     {}
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node);
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node);
