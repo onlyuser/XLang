@@ -50,20 +50,21 @@
 %option noyywrap nounput
 %option reentrant bison-bridge
 
-whitespace [ \t\n]+
-literal    [,()+\-*/=]
-digit      [0-9]
-alpha      [a-zA-Z]
-id         {alpha}|[_]
-ident      {id}+({digit}|{id})*
-_int       {digit}+
-_float     {digit}*[.]{digit}+
+ws      [ \t\n]+
+literal [,()+\-*/=]
+digit   [0-9]
+alpha   [a-zA-Z]
+id      {alpha}|[_]
+ident   {id}+({digit}|{id})*
+_int    {digit}+
+_float  {digit}*[.]{digit}+
 
 %%
 
-{whitespace} ;
+{ws}        ;
 
-{literal}   { return *yytext; }
+ /*==========================================================================*/
+ /* PRIMITIVES */
 
 {ident}     {
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
@@ -79,6 +80,11 @@ _float     {digit}*[.]{digit}+
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
+
+ /*==========================================================================*/
+ /* OTHER */
+
+{literal}   { return *yytext; }
 
 .           {
                 _XLANG_error("unknown character");

@@ -29,7 +29,7 @@
 
 %option noyywrap nounput
 
-whitespace [ \t\n]+
+ws [ \t\n]+
 literal    [,()+\-*/=]
 digit      [0-9]
 alpha      [a-zA-Z]
@@ -47,7 +47,7 @@ IS (u|U|l|L)*
 
 %%
 
-{whitespace} ;
+{ws} ;
 
 {literal}   { return *yytext; }
 

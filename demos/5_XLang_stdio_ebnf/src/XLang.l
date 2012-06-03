@@ -36,7 +36,7 @@ static char* rules_start;
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
 %s ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_CODE
 
-whitespace [ \t\n]+
+ws         [ \t\n]+
 literal    [:|()+*?;]
 digit      [0-9]
 alpha      [a-zA-Z]
@@ -49,7 +49,7 @@ lex_option [%][^%{}]
 
 %%
 
-{whitespace} ;
+{ws}        ;
 
  /*==========================================================================*/
  /* COMMENTS */
@@ -61,6 +61,26 @@ lex_option [%][^%{}]
 "//"                   { yy_push_state(ST_COMMENT_LINE); }
 <ST_COMMENT_LINE>"\n"  { yy_pop_state(); }
 <ST_COMMENT_LINE>.     ;
+
+ /*==========================================================================*/
+ /* QUOTES */
+
+[\"]              { yy_push_state(ST_STRING); }
+<ST_STRING>[^\"]* {
+                _XLANG_lval.string_value = tree_context()->alloc_string(
+                        xl::unescape(yytext)
+                        );
+                return ID_STRING;
+            }
+<ST_STRING>[\"]   { yy_pop_state(); }
+
+[\']            { yy_push_state(ST_CHAR); }
+<ST_CHAR>[^\']* {
+                std::string s = xl::unescape(yytext);
+                _XLANG_lval.char_value = s[0];
+                return ID_CHAR;
+            }
+<ST_CHAR>[\']   { yy_pop_state(); }
 
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
@@ -104,7 +124,7 @@ lex_option [%][^%{}]
 <ST_CODE>.  ;
 
  /*==========================================================================*/
- /* TERMS */
+ /* PRIMITIVES */
 
 <ST_RULES>{ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
@@ -122,29 +142,11 @@ lex_option [%][^%{}]
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
+
+ /*==========================================================================*/
+ /* OTHER */
+
 <ST_RULES>{literal} { return *yytext; }
-
- /*==========================================================================*/
- /* QUOTED STUFF */
-
-[\"]              { yy_push_state(ST_STRING); }
-<ST_STRING>[^\"]* {
-                _XLANG_lval.string_value = tree_context()->alloc_string(
-                        xl::unescape(yytext)
-                        );
-                return ID_STRING;
-            }
-<ST_STRING>[\"]   { yy_pop_state(); }
-
-[\']            { yy_push_state(ST_CHAR); }
-<ST_CHAR>[^\']* {
-                std::string s = xl::unescape(yytext);
-                _XLANG_lval.char_value = s[0];
-                return ID_CHAR;
-            }
-<ST_CHAR>[\']   { yy_pop_state(); }
-
- /*==========================================================================*/
 
 <ST_RULES>. {
                 char buf[40];

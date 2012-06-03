@@ -111,10 +111,11 @@ clean_lex :
 
 COMMON_CPP_STEMS = \
 		XLangAlloc \
+		XLangDefaultTour \
 		XLangMVCView \
 		XLangNode \
 		XLangPrinter \
-		XLangDefaultTour \
+		XLangString \
 		XLangTreeContext #\
 		XLangMVCModel
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))

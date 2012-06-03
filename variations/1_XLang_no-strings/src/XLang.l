@@ -60,23 +60,21 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE
 
-whitespace [ \t\n]+
-literal    [,()+\-*/=]
-digit      [0-9]
-alpha      [a-zA-Z]
-id         {alpha}|[_]
-ident      {id}+({digit}|{id})*
-_int       {digit}+
-_float     {digit}*[.]{digit}+
+ws      [ \t\n]+
+literal [,()+\-*/=]
+digit   [0-9]
+alpha   [a-zA-Z]
+id      {alpha}|[_]
+ident   {id}+({digit}|{id})*
+_int    {digit}+
+_float  {digit}*[.]{digit}+
 
 %%
 
-{whitespace} ;
+{ws}        ;
 
-{literal}   {
-                begin_token(yyscanner, yyleng);
-                return *yytext;
-            }
+ /*==========================================================================*/
+ /* COMMENTS */
 
 "/*"                   { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
 <ST_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
@@ -85,6 +83,9 @@ _float     {digit}*[.]{digit}+
 "//"                  { yy_push_state(ST_COMMENT_LINE, yyscanner); }
 <ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
 <ST_COMMENT_LINE>.    ;
+
+ /*==========================================================================*/
+ /* PRIMITIVES */
 
 {ident}     {
                 begin_token(yyscanner, yyleng);
@@ -102,6 +103,14 @@ _float     {digit}*[.]{digit}+
                 begin_token(yyscanner, yyleng);
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
+            }
+
+ /*==========================================================================*/
+ /* OTHER */
+
+{literal}   {
+                begin_token(yyscanner, yyleng);
+                return *yytext;
             }
 
 .           {

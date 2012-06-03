@@ -49,20 +49,21 @@
 
 %option noyywrap nounput
 
-digit      [0-9]
-alpha      [a-zA-Z]
-id         {alpha}|[_]
-ident      {id}+({digit}|{id})*
-_int       {digit}+
-_float     {digit}*[.]{digit}+
-literal    [,()+\-*/=]
-whitespace [ \t\n]+
+ws      [ \t\n]+
+literal [,()+\-*/=]
+digit   [0-9]
+alpha   [a-zA-Z]
+id      {alpha}|[_]
+ident   {id}+({digit}|{id})*
+_int    {digit}+
+_float  {digit}*[.]{digit}+
 
 %%
 
-{whitespace} ;
+{ws}        ;
 
-{literal}   { return *yytext; }
+ /*==========================================================================*/
+ /* PRIMITIVES */
 
 {ident}     {
                 _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
@@ -78,6 +79,11 @@ whitespace [ \t\n]+
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
+
+ /*==========================================================================*/
+ /* OTHER */
+
+{literal}   { return *yytext; }
 
 .           {
                 _XLANG_error("unknown character");
