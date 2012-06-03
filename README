@@ -1,10 +1,8 @@
 Variations of a Lex-Yacc parser
 based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
-
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
-
     XLang is a parser "framework" designed for fast-prototyping of new
     (programming) languages. Seven variations of Lex-Yacc parser are presented,
     varying in feature completeness.
@@ -29,7 +27,6 @@ About:
     customizable to his/her specific requirements.
 
 Variation vs Feature Table:
-
                  more                                                      less
                  critical <--                                          --> critical
 +--------------+-------------+--------+-----------+-----------+----------+---------+
@@ -50,9 +47,7 @@ Variation vs Feature Table:
           hack flex into using "buffer input" or "file input".
 
 Feature Detail:
-
     lexer:
-
         flex: Use flex to generate a lexer.
               This option is preferred when regex significantly simplifies the
               lexer.
@@ -64,7 +59,6 @@ Feature Detail:
                      this writing.
 
     input:
-
         buffer: Use in-memory buffer as input.
                 This option is preferred when speed is critical -- Standard
                 streams are slow. This option is also preferred when the input
@@ -91,19 +85,15 @@ Feature Detail:
              ways to handle strings, characters, and escaped characters.
 
 Requirements:
-
     Unix tools and 3rd party components (accessible from $PATH):
-
         gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck,
         doxygen, graphviz, ticpp
 
     Environment variables:
-
         $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
         $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
 Make targets:
-
     all, test, pure, dot, lint, doc, xml, import, clean.
 
     all:    make binaries
@@ -117,31 +107,25 @@ Make targets:
     clean:  remove all intermediate files
 
 FAQ:
-
     1. What is XLang ?
-
        XLang is a starting point for people looking to construct their own
        language using Lex-Yacc. XLang is thoroughly tested and comes with its
        own test suite.
 
     2. What isn't XLang ?
-
        XLang isn't a unified parser front-end for every language under the sun.
        It makes some assumptions about the target language, meaning, literal
        values must be C-like. Otherwise, it places no restrictions on the
        grammar.
 
     3. How should one use XLang ?
-
        I recommend hacking the "stdio" example to your liking, but any of the
        other variations equally suitable as a base for beginners.
 
     4. What licenses apply when using XLang ?
-
        GPL3.
 
     5. What's the motivation behind writing XLang ?
-
        Lex-Yacc is a pragmatic solution that will get the job done, but it
        doesn't do so right out of the box. It needs some infrastructure to get
        most sizeable projects going.
@@ -159,7 +143,6 @@ FAQ:
        excellent tutorial.
 
     6. How does XLang differ from the example in Tom's tutorial ?
-
        a) XLang uses C++, with unions used only where necessary. Tom's tutorial
           uses a C-style polymorphism technique where the last member of a
           class is a union of several types. I prefer C++ polymorphism.
@@ -188,7 +171,6 @@ FAQ:
           static library.
 
     7. Why allocators ?
-
        I've incorporated a simple memory allocator in this project because I
        wanted to keep my AST node classes as clean as possible, without
        destructors that delete child nodes. But the way the allocator was
@@ -197,7 +179,6 @@ FAQ:
        true memory pooling.
 
     8. Why c++0x ?
-
        Lambda functions are the only c++0x feature used here, and only because
        they solves the problem elegantly. The goal is to deliberately avoid
        implementing clean-up code within the AST node destructors. This goes
@@ -207,7 +188,6 @@ FAQ:
        job is to perform clean-up originally intended for the destructor.
 
     9. Why coroutines ?
-
        I needed a way to store the "progress" of a visitation, so it can be
        resumed later. A direct approach would be keeping a reference to the
        most recently visited child node and tucking that away in a static
@@ -221,7 +201,6 @@ FAQ:
        quite involving).
 
 References:
-
     "Flex your lexical analysis muscles"
     http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm
     http://www.developer.com/net/cplus/article.php/3636641/Flex-Your-Lexical-Analysis-Muscles.htm
@@ -261,11 +240,9 @@ References:
     http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
 
 Additional Reading:
-
     http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
     http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
     http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 Keywords:
-
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
