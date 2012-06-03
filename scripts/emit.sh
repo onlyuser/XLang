@@ -41,16 +41,16 @@ fi
 
 case $INPUT_MODE in
     "xml")
-        $EXEC $EXEC_FLAGS --in-xml $INPUT_FILE > $OUTPUT_FILE
+        $EXEC $EXEC_FLAGS --in-xml $INPUT_FILE | tee $OUTPUT_FILE
         ;;
     "file")
-        $EXEC $EXEC_FLAGS --in-file $INPUT_FILE > $OUTPUT_FILE
+        $EXEC $EXEC_FLAGS --in-file $INPUT_FILE | tee $OUTPUT_FILE
         ;;
     "stdin")
-        cat $INPUT_FILE | $EXEC $EXEC_FLAGS > $OUTPUT_FILE
+        cat $INPUT_FILE | $EXEC $EXEC_FLAGS | tee $OUTPUT_FILE
         ;;
     "arg")
-        $EXEC $EXEC_FLAGS --expr `cat $INPUT_FILE` > $OUTPUT_FILE
+        $EXEC $EXEC_FLAGS --expr `cat $INPUT_FILE` | tee $OUTPUT_FILE
         ;;
     *)
         echo "fail! -- invalid input mode"
