@@ -58,9 +58,9 @@ lex_option [%][^%{}]
 <ST_COMMENT_BLOCK>"*/" { yy_pop_state(); }
 <ST_COMMENT_BLOCK>.    ;
 
-"//"                   { yy_push_state(ST_COMMENT_LINE); }
-<ST_COMMENT_LINE>"\n"  { yy_pop_state(); }
-<ST_COMMENT_LINE>.     ;
+"//"                  { yy_push_state(ST_COMMENT_LINE); }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(); }
+<ST_COMMENT_LINE>.    ;
 
  /*==========================================================================*/
  /* QUOTES */
