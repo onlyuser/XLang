@@ -17,14 +17,9 @@ About:
 
     full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
-    The order is based on a notion of "completeness" -- for instance it is
-    arguably more *complete* to have a reentrant parser than to have a non-
-    reentrant one, albeit, saying so may be ungrammatical, so the reentrant
-    feature is enabled on the "feature complete" end. My point is, there's no
+    The order in which features are removed is completely arbitrary. There's no
     good reason one cannot cannot have both "comments" and "file input"
-    enabled, or both "reentrant" and "hand-rolled lexer" enabled. But I'm more
-    inclined to adding features incrementally than implementing every
-    combination (2^7 == 128, no way).
+    enabled, or both "reentrant" and "hand-rolled lexer" enabled.
 
     The code is organized in a way such that anyone unfamiliar with Lex-Yacc
     can quickly isolate a variation that is most relevent, and most readily
