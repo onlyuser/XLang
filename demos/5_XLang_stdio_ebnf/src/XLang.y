@@ -134,12 +134,12 @@ xl::TreeContext* &tree_context()
 
 %nonassoc ID_BASE
 
-%token<int_value> ID_INT
-%token<float_value> ID_FLOAT
+%token<int_value>    ID_INT
+%token<float_value>  ID_FLOAT
 %token<string_value> ID_STRING
-%token<char_value> ID_CHAR
-%token<ident_value> ID_IDENT
-%type<symbol_value> grammar definitions definition symbols symbol
+%token<char_value>   ID_CHAR
+%token<ident_value>  ID_IDENT
+%type<symbol_value>  grammar definitions definition symbols symbol
         rules rule rule_rhs alt action terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_SYMBOLS

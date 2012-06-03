@@ -124,7 +124,7 @@ xl::TreeContext* &tree_context()
         expression_statement
 
 %token<ident_value> IDENTIFIER
-%token<int_value> ID_INT
+%token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 
 %token CONSTANT STRING_LITERAL SIZEOF

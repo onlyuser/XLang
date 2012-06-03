@@ -122,7 +122,7 @@ uint32_t name_to_id(std::string name)
 
 %nonassoc ID_BASE
 
-%token<int_value> ID_INT
+%token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
 %type<symbol_value> program statement expression
