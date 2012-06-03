@@ -36,8 +36,10 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(&pc->tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(&pc->tree_context(), ##__VA_ARGS__)
+#define MAKE_TERM(sym_id, ...)   xl::mvc::MVCModel::make_term(&pc->tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_SYMBOL(...)         xl::mvc::MVCModel::make_symbol(&pc->tree_context(), ##__VA_ARGS__)
+#define ERROR_SYM_ID_NOT_FOUND   "missing sym_id handler, most likely you forgot to register one"
+#define ERROR_SYM_NAME_NOT_FOUND "missing sym name handler, most likely you forgot to register one"
 
 // report error
 void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
@@ -81,6 +83,9 @@ std::string id_to_name(uint32_t sym_id)
         "float",
         "ident"
         };
+    size_t n = sizeof(_id_to_name)/sizeof(_id_to_name[0]);
+    if(static_cast<int>(sym_id) - ID_BASE - 1 < 0 || sym_id > n)
+        throw ERROR_SYM_ID_NOT_FOUND;
     return _id_to_name[sym_id - ID_BASE - 1];
 }
 uint32_t name_to_id(std::string name)
@@ -95,6 +100,7 @@ uint32_t name_to_id(std::string name)
     if(name == "int")    return ID_INT;
     if(name == "float")  return ID_FLOAT;
     if(name == "ident")  return ID_IDENT;
+    throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }
 
@@ -301,18 +307,26 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
 
 bool do_work(args_t &args)
 {
-    if(args.mode == args_t::MODE_HELP)
+    try
     {
-        display_usage(true);
-        return true;
+        if(args.mode == args_t::MODE_HELP)
+        {
+            display_usage(true);
+            return true;
+        }
+        xl::Allocator alloc(__FILE__);
+        xl::node::NodeIdentIFace* ast = NULL;
+        if(!import_ast(args, alloc, ast))
+            return false;
+        export_ast(args, ast);
+        if(args.dump_memory)
+            alloc.dump(std::string(1, '\t'));
     }
-    xl::Allocator alloc(__FILE__);
-    xl::node::NodeIdentIFace* ast = NULL;
-    if(!import_ast(args, alloc, ast))
+    catch(const char* s)
+    {
+        std::cout << "ERROR: " << s << std::endl;
         return false;
-    export_ast(args, ast);
-    if(args.dump_memory)
-        alloc.dump(std::string(1, '\t'));
+    }
     return true;
 }
 

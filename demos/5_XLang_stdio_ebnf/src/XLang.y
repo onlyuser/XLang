@@ -36,8 +36,10 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
-#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tree_context(), sym_id, ##__VA_ARGS__)
-#define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
+#define MAKE_TERM(sym_id, ...)   xl::mvc::MVCModel::make_term(tree_context(), sym_id, ##__VA_ARGS__)
+#define MAKE_SYMBOL(...)         xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
+#define ERROR_SYM_ID_NOT_FOUND   "missing sym_id handler, most likely you forgot to register one"
+#define ERROR_SYM_NAME_NOT_FOUND "missing sym name handler, most likely you forgot to register one"
 
 // report error
 void _XLANG_error(const char* s)
@@ -79,7 +81,7 @@ std::string id_to_name(uint32_t sym_id)
         };
     size_t n = sizeof(_id_to_name)/sizeof(_id_to_name[0]);
     if(static_cast<int>(sym_id) - ID_BASE - 1 < 0 || sym_id > n)
-        throw "sym_id not found";
+        throw ERROR_SYM_ID_NOT_FOUND;
     return _id_to_name[sym_id - ID_BASE - 1];
 }
 uint32_t name_to_id(std::string name)
@@ -103,7 +105,7 @@ uint32_t name_to_id(std::string name)
     if(name == "string")      return ID_STRING;
     if(name == "char")        return ID_CHAR;
     if(name == "ident")       return ID_IDENT;
-    throw "sym name not found";
+    throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }
 xl::TreeContext* &tree_context()
@@ -402,7 +404,7 @@ bool do_work(args_t &args)
     }
     catch(const char* s)
     {
-        std::cout << "exception: " << s << std::endl;
+        std::cout << "ERROR: " << s << std::endl;
         return false;
     }
     return true;
