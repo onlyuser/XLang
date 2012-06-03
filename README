@@ -3,9 +3,9 @@ based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 About:
-    XLang is a parser "framework" designed for fast-prototyping of new
-    (programming) languages. Seven variations of Lex-Yacc parser are presented,
-    varying in feature completeness.
+    XLang is a Lex-Yacc parser "framework" for language prototyping. It is also
+    a demonstration of various ways one could build a yacc-based parser. Seven
+    variations of parser are presented, varying in feature completeness.
 
     The first variation (0_XLang_full), is a full-featured parser. With each
     successive variation, non-critical features are stripped until there is
