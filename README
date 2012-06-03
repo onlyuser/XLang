@@ -96,15 +96,15 @@ Requirements:
 Make targets:
     all, test, pure, dot, lint, doc, xml, import, clean.
 
-    all:    make binaries
-    test:   all + run tests
-    pure:   test + use valgrind to check for memory leaks
-    dot:    test + generate .png graph for tests
-    lint:   use cppcheck to perform static analysis on .cpp files
-    doc:    use doxygen to generate documentation
-    xml:    test + generate .xml for tests
-    import: test + use ticpp to serialize-to/deserialize-from xml
-    clean:  remove all intermediate files
+    all    -- make binaries
+    test   -- all + run tests
+    pure   -- test + use valgrind to check for memory leaks
+    dot    -- test + generate .png graph for tests
+    lint   -- use cppcheck to perform static analysis on .cpp files
+    doc    -- use doxygen to generate documentation
+    xml    -- test + generate .xml for tests
+    import -- test + use ticpp to serialize-to/deserialize-from xml
+    clean  -- remove all intermediate files
 
 FAQ:
     1. What is XLang ?
