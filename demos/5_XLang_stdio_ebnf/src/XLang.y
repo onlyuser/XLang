@@ -64,6 +64,7 @@ std::string id_to_name(uint32_t sym_id)
         case ID_RULE_RHS:    return "rule_rhs";
         case ID_TERMS:       return "terms";
         case ID_ALT:         return "alt";
+        case ID_ACTION:      return "action";
         case '+':            return "+";
         case '*':            return "*";
         case '?':            return "?";
@@ -76,6 +77,9 @@ std::string id_to_name(uint32_t sym_id)
         "char",
         "ident"
         };
+    size_t n = sizeof(_id_to_name)/sizeof(_id_to_name[0]);
+    if(static_cast<int>(sym_id) - ID_BASE - 1 < 0 || sym_id > n)
+        throw "sym_id not found";
     return _id_to_name[sym_id - ID_BASE - 1];
 }
 uint32_t name_to_id(std::string name)
@@ -89,6 +93,7 @@ uint32_t name_to_id(std::string name)
     if(name == "rule_rhs")    return ID_RULE_RHS;
     if(name == "terms")       return ID_TERMS;
     if(name == "alt")         return ID_ALT;
+    if(name == "action")      return ID_ACTION;
     if(name == "+")           return '+';
     if(name == "*")           return '*';
     if(name == "?")           return '?';
@@ -98,6 +103,7 @@ uint32_t name_to_id(std::string name)
     if(name == "string")      return ID_STRING;
     if(name == "char")        return ID_CHAR;
     if(name == "ident")       return ID_IDENT;
+    throw "sym name not found";
     return 0;
 }
 xl::TreeContext* &tree_context()
@@ -132,10 +138,10 @@ xl::TreeContext* &tree_context()
 %token<char_value> ID_CHAR
 %token<ident_value> ID_IDENT
 %type<symbol_value> grammar definitions definition symbols symbol
-        rules rule rule_rhs alt terms term
+        rules rule rule_rhs alt action terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_SYMBOLS
-        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_TERMS ID_PREC ID_FENCE
+        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -150,8 +156,11 @@ root:
     ;
 
 grammar:
-      definitions ID_FENCE rules ID_FENCE { $$ = MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $3); }
+      definitions ID_FENCE rules ID_FENCE code { $$ = MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $3, $5); }
     ;
+
+//=============================================================================
+// DEFINITIONS SECTION
 
 definitions:
       /* empty */            { $$ = NULL; }
@@ -180,6 +189,9 @@ symbol:
     | ID_CHAR  { $$ = MAKE_TERM(ID_CHAR, $1); }
     ;
 
+//=============================================================================
+// RULES SECTION
+
 rules:
       /* empty */ { $$ = NULL; }
     | rules rule  { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_RULES, 2, $1, $2); }
@@ -195,10 +207,12 @@ rule_rhs:
     ;
 
 alt:
-      terms           { $$ = $1; }
-    | terms ID_STRING {
-                $$ = MAKE_SYMBOL(ID_ALT, 2, $1, MAKE_TERM(ID_STRING, *$2)); // NOTE: asterisk..
-            }
+      terms        { $$ = $1; }
+    | terms action { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
+    ;
+
+action:
+      ID_STRING { $$ = MAKE_SYMBOL(ID_ACTION, 1, MAKE_TERM(ID_STRING, *$1)); } // NOTE: asterisk..
     ;
 
 terms:
@@ -216,6 +230,13 @@ term:
     | term '*'         { $$ = MAKE_SYMBOL('*', 1, $1); }
     | term '?'         { $$ = MAKE_SYMBOL('?', 1, $1); }
     | '(' rule_rhs ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
+    ;
+
+//=============================================================================
+// CODE
+
+code:
+      /* empty */ { $$ = NULL; }
     ;
 
 %%
@@ -364,18 +385,26 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
 
 bool do_work(args_t &args)
 {
-    if(args.mode == args_t::MODE_HELP)
+    try
     {
-        display_usage(true);
-        return true;
+        if(args.mode == args_t::MODE_HELP)
+        {
+            display_usage(true);
+            return true;
+        }
+        xl::Allocator alloc(__FILE__);
+        xl::node::NodeIdentIFace* ast = NULL;
+        if(!import_ast(args, alloc, ast))
+            return false;
+        export_ast(args, ast);
+        if(args.dump_memory)
+            alloc.dump(std::string(1, '\t'));
     }
-    xl::Allocator alloc(__FILE__);
-    xl::node::NodeIdentIFace* ast = NULL;
-    if(!import_ast(args, alloc, ast))
+    catch(const char* s)
+    {
+        std::cout << "exception: " << s << std::endl;
         return false;
-    export_ast(args, ast);
-    if(args.dump_memory)
-        alloc.dump(std::string(1, '\t'));
+    }
     return true;
 }
 

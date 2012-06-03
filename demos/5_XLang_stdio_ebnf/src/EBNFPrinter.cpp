@@ -91,10 +91,15 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_ALT:
             if(visit_next_child(_node))
-                std::cout << ' '
-                        << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-                                _node->operator[](1)
-                                )->value();
+            {
+                std::cout << ' ';
+            	visit_next_child(_node);
+            }
+            break;
+        case ID_ACTION:
+            std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
+					_node->operator[](0)
+					)->value();
             break;
         case ID_TERMS:
             do
