@@ -27,7 +27,7 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
-#include "EvalVisitor.h"
+#include "EvalVisitor.h" // EvalVisitor
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string

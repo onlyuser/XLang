@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "EBNFPrinter.h" // visitor::LispPrinter
+#include "EBNFPrinter.h" // EBNFPrinter
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
