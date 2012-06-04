@@ -47,6 +47,12 @@ void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::
 
 void EvalVisitor::visit(const xl::node::SymbolNodeIFace* _node)
 {
+	if(_node->sym_id() == ID_UMINUS)
+	{
+		visit_next_child(_node);
+		value = -value;
+		return;
+	}
     float32_t _value = 0;
     bool more = visit_next_child(_node);
     _value = value;
