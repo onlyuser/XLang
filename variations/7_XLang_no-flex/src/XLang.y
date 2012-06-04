@@ -70,7 +70,7 @@ std::string id_to_name(uint32_t sym_id)
         case '=':       return "=";
         case ',':       return ",";
     }
-    static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
+    static const char* _id_to_name[] = {
         "int",
         "float",
         "ident"

@@ -55,7 +55,7 @@ std::stringstream &errors()
 std::string id_to_name(uint32_t sym_id)
 {
     return "";
-    static const char* _id_to_name[ID_COUNT - ID_BASE - 1] = {
+    static const char* _id_to_name[] = {
         "IDENTIFIER", "ID_INT", "ID_FLOAT",
         "CONSTANT", "STRING_LITERAL", "SIZEOF",
         "PTR_OP", "INC_OP", "DEC_OP", "LEFT_OP", "RIGHT_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP",
