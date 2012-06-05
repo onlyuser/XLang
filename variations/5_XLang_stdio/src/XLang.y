@@ -54,6 +54,14 @@ std::stringstream &errors()
 }
 std::string id_to_name(uint32_t sym_id)
 {
+    static const char* _id_to_name[] = {
+        "int",
+        "float",
+        "ident"
+        };
+    int index = static_cast<int>(sym_id)-ID_BASE-1;
+    if(index >= 0 && index < static_cast<int>(sizeof(_id_to_name)/sizeof(*_id_to_name)))
+        return _id_to_name[index];
     switch(sym_id)
     {
         case ID_UMINUS: return "uminus";
@@ -64,15 +72,8 @@ std::string id_to_name(uint32_t sym_id)
         case '=':       return "=";
         case ',':       return ",";
     }
-    static const char* _id_to_name[] = {
-        "int",
-        "float",
-        "ident"
-        };
-    int index = static_cast<int>(sym_id)-ID_BASE-1;
-    if(index<0 || index >= static_cast<int>(sizeof(_id_to_name)/sizeof(*_id_to_name)))
-        throw ERROR_SYM_ID_NOT_FOUND;
-    return _id_to_name[index];
+    throw ERROR_SYM_ID_NOT_FOUND;
+    return "";
 }
 uint32_t name_to_id(std::string name)
 {

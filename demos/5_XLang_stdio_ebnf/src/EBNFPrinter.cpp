@@ -49,14 +49,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 std::cout << "> ";
                 visit_next_child(_node);
             }
-            else
-            {
-                if(visit_next_child(_node))
-                {
-                    std::cout << ' ';
-                    visit_next_child(_node);
-                }
-            }
+            else if(visit_next_child(_node))
+			{
+				std::cout << ' ';
+				visit_next_child(_node);
+			}
             break;
         case ID_SYMBOLS:
             do
