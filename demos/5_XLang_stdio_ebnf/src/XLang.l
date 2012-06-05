@@ -136,11 +136,7 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* PRIMITIVES */
 
-<ST_RULES>{ident} {
-                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_IDENT;
-            }
-<ST_RULES>"%prec" {
+<ST_RULES>{ident}|"%prec" {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
