@@ -171,10 +171,18 @@ definitions:
 
 definition:
       '%' ID_IDENT '<' ID_IDENT '>' symbols {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 3, MAKE_TERM(ID_IDENT, $2), MAKE_TERM(ID_IDENT, $4), $6);
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 3,
+                        MAKE_TERM(ID_IDENT, $2),
+                        MAKE_TERM(ID_IDENT, $4),
+                        $6);
             }
     | '%' ID_IDENT symbols {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
+            }
+    | '%' ID_IDENT ID_STRING {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 2,
+                        MAKE_TERM(ID_IDENT, $2),
+                        MAKE_TERM(ID_STRING, *$3)); // NOTE: asterisk..
             }
     | '%' ID_IDENT {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));

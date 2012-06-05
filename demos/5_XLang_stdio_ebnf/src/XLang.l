@@ -34,7 +34,7 @@ static char* rules_start;
 %option noyywrap nounput
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
-%s ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_CODE
+%s INITIAL_UNION ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_CODE
 
 ws         [ \t\n]+
 literal    [:|()+*?;]
@@ -85,6 +85,22 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
+<INITIAL>[\{] {
+                if(yy_top_state() == INITIAL)
+                    rules_start = yytext;
+                yy_push_state(INITIAL_UNION);
+            }
+<INITIAL_UNION>[\{] { yy_push_state(INITIAL_UNION); }
+<INITIAL_UNION>[\}] {
+                yy_pop_state();
+                if(yy_top_state() == INITIAL)
+                {
+                    _XLANG_lval.string_value = tree_context()->alloc_string(
+                            xl::unescape(rules_start)
+                            );
+                    return ID_STRING;
+                }
+            }
 <INITIAL>{lex_option}    { yyless(1); return *yytext; }
 <INITIAL>[<>]            { return *yytext; }
 <INITIAL>{ident_ex}      {

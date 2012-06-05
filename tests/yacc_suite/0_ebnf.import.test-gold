@@ -2,6 +2,7 @@
     <symbol type="definitions">
         <symbol type="definition">
             <term type="ident" value=union/>
+            <term type="string" value="{\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type    int_value;    // int value\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer\n}"/>
         </symbol>
         <symbol type="definition">
             <term type="ident" value=error-verbose/>
@@ -63,11 +64,15 @@
             <symbol type="rule_rhs">
                 <symbol type="alt">
                     <term type="ident" value=program/>
-                    <term type="string" value="{ tree_context()->root() = $1; YYACCEPT; }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ tree_context()->root() = $1; YYACCEPT; }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <term type="ident" value=error/>
-                    <term type="string" value="{ yyclearin; /* yyerrok; YYABORT; */ }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ yyclearin; /* yyerrok; YYABORT; */ }"/>
+                    </symbol>
                 </symbol>
             </symbol>
         </symbol>
@@ -76,7 +81,9 @@
             <symbol type="rule_rhs">
                 <symbol type="alt">
                     <term type="ident" value=statement/>
-                    <term type="string" value="{ $$ = $1; }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = $1; }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -85,7 +92,9 @@
                         <term type="ident" value=statement/>
                         <term type="char" value=','/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\',\', 2, $1, $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\',\', 2, $1, $3); }"/>
+                    </symbol>
                 </symbol>
             </symbol>
         </symbol>
@@ -94,7 +103,9 @@
             <symbol type="rule_rhs">
                 <symbol type="alt">
                     <term type="ident" value=expression/>
-                    <term type="string" value="{ $$ = $1; }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = $1; }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -103,7 +114,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value='='/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'=\', 2, MAKE_TERM(ID_IDENT, $1), $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\'=\', 2, MAKE_TERM(ID_IDENT, $1), $3); }"/>
+                    </symbol>
                 </symbol>
             </symbol>
         </symbol>
@@ -112,15 +125,21 @@
             <symbol type="rule_rhs">
                 <symbol type="alt">
                     <term type="ident" value=ID_INT/>
-                    <term type="string" value="{ $$ = MAKE_TERM(ID_INT, $1); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_TERM(ID_INT, $1); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <term type="ident" value=ID_FLOAT/>
-                    <term type="string" value="{ $$ = MAKE_TERM(ID_FLOAT, $1); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_TERM(ID_FLOAT, $1); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <term type="ident" value=ID_IDENT/>
-                    <term type="string" value="{ $$ = MAKE_TERM(ID_IDENT, $1); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_TERM(ID_IDENT, $1); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -129,7 +148,9 @@
                         <term type="ident" value=%prec/>
                         <term type="ident" value=ID_UMINUS/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -138,7 +159,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value='+'/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'+\', 2, $1, $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\'+\', 2, $1, $3); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -147,7 +170,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value='-'/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'-\', 2, $1, $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\'-\', 2, $1, $3); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -156,7 +181,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value='*'/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'*\', 2, $1, $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\'*\', 2, $1, $3); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -165,7 +192,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value='/'/>
                     </symbol>
-                    <term type="string" value="{ $$ = MAKE_SYMBOL(\'/\', 2, $1, $3); }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = MAKE_SYMBOL(\'/\', 2, $1, $3); }"/>
+                    </symbol>
                 </symbol>
                 <symbol type="alt">
                     <symbol type="terms">
@@ -173,7 +202,9 @@
                         <term type="ident" value=expression/>
                         <term type="char" value=')'/>
                     </symbol>
-                    <term type="string" value="{ $$ = $2; }"/>
+                    <symbol type="action">
+                        <term type="string" value="{ $$ = $2; }"/>
+                    </symbol>
                 </symbol>
             </symbol>
         </symbol>
