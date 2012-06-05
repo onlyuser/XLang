@@ -34,7 +34,7 @@ static char* rules_code;
 %option noyywrap nounput
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
-%s INITIAL_UNION ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_CODE
+%s ST_INITIAL_UNION ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_ACTION
 
 ws         [ \t\n]+
 literal    [:|()+*?;]
@@ -65,6 +65,11 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* QUOTES */
 
+<ST_DEFINITION_CODE>[\"] ;
+<ST_DEFINITION_CODE>[\'] ;
+<ST_RULES_ACTION>[\"] ;
+<ST_RULES_ACTION>[\'] ;
+
 [\"]              { yy_push_state(ST_STRING); }
 <ST_STRING>[^\"]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
@@ -85,14 +90,14 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{]            { yy_push_state(INITIAL_UNION); }
-<INITIAL_UNION>[^\}]*    {
+<INITIAL>[\{]            { yy_push_state(ST_INITIAL_UNION); }
+<ST_INITIAL_UNION>[^\}]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<INITIAL_UNION>[\}]      { yy_pop_state(); }
+<ST_INITIAL_UNION>[\}]   { yy_pop_state(); }
 <INITIAL>{lex_option}    { yyless(1); return *yytext; }
 <INITIAL>[<>]            { return *yytext; }
 <INITIAL>{ident_ex}      {
@@ -110,10 +115,10 @@ lex_option [%][^%{}]
 <ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
                     rules_code = yytext+1;
-                yy_push_state(ST_RULES_CODE);
+                yy_push_state(ST_RULES_ACTION);
             }
-<ST_RULES_CODE>[\{] { yy_push_state(ST_RULES_CODE); }
-<ST_RULES_CODE>[\}] {
+<ST_RULES_ACTION>[\{] { yy_push_state(ST_RULES_ACTION); }
+<ST_RULES_ACTION>[\}] {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
@@ -125,7 +130,7 @@ lex_option [%][^%{}]
                     return ID_STRING;
                 }
             }
-<ST_RULES_CODE>. ;
+<ST_RULES_ACTION>. ;
 <ST_RULES>"%%"   { BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
