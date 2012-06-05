@@ -27,7 +27,7 @@
 #include <stdlib.h> // atoi
 #include <iostream>
 
-static char* rules_start;
+static char* rules_code;
 
 %}
 
@@ -85,22 +85,14 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{] {
-                if(yy_top_state() == INITIAL)
-                    rules_start = yytext;
-                yy_push_state(INITIAL_UNION);
+<INITIAL>[\{]            { yy_push_state(INITIAL_UNION); }
+<INITIAL_UNION>[^\}]*    {
+                _XLANG_lval.string_value = tree_context()->alloc_string(
+                        xl::unescape(yytext)
+                        );
+                return ID_STRING;
             }
-<INITIAL_UNION>[\{] { yy_push_state(INITIAL_UNION); }
-<INITIAL_UNION>[\}] {
-                yy_pop_state();
-                if(yy_top_state() == INITIAL)
-                {
-                    _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(rules_start)
-                            );
-                    return ID_STRING;
-                }
-            }
+<INITIAL_UNION>[\}]      { yy_pop_state(); }
 <INITIAL>{lex_option}    { yyless(1); return *yytext; }
 <INITIAL>[<>]            { return *yytext; }
 <INITIAL>{ident_ex}      {
@@ -117,7 +109,7 @@ lex_option [%][^%{}]
 
 <ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
-                    rules_start = yytext;
+                    rules_code = yytext+1;
                 yy_push_state(ST_RULES_CODE);
             }
 <ST_RULES_CODE>[\{] { yy_push_state(ST_RULES_CODE); }
@@ -125,8 +117,10 @@ lex_option [%][^%{}]
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
+                    std::string s = rules_code;
+                    s = s.substr(0, s.length()-1);
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(rules_start)
+                            xl::unescape(s)
                             );
                     return ID_STRING;
                 }

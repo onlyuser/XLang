@@ -70,6 +70,7 @@ std::string id_to_name(uint32_t sym_id)
         case ID_GRAMMAR:     return "grammar";
         case ID_DEFINITIONS: return "definitions";
         case ID_DEFINITION:  return "definition";
+        case ID_UNION_DEFINITION: return "union_definition";
         case ID_SYMBOLS:     return "symbols";
         case ID_RULES:       return "rules";
         case ID_RULE:        return "rule";
@@ -90,6 +91,7 @@ uint32_t name_to_id(std::string name)
     if(name == "grammar")     return ID_GRAMMAR;
     if(name == "definitions") return ID_DEFINITIONS;
     if(name == "definition")  return ID_DEFINITION;
+    if(name == "union_definition") return ID_UNION_DEFINITION;
     if(name == "symbols")     return ID_SYMBOLS;
     if(name == "rules")       return ID_RULES;
     if(name == "rule")        return ID_RULE;
@@ -140,10 +142,10 @@ xl::TreeContext* &tree_context()
 %token<string_value> ID_STRING
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
-%type<symbol_value>  grammar definitions definition symbols symbol
+%type<symbol_value>  grammar definitions definition union_definition symbols symbol
         rules rule rule_rhs alt action terms term code
 
-%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_SYMBOLS
+%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_UNION_DEFINITION ID_SYMBOLS
         ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
@@ -180,14 +182,16 @@ definition:
     | '%' ID_IDENT symbols {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
             }
-    | '%' ID_IDENT ID_STRING {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 2,
-                        MAKE_TERM(ID_IDENT, $2),
-                        MAKE_TERM(ID_STRING, *$3)); // NOTE: asterisk..
+    | '%' ID_IDENT union_definition {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
             }
     | '%' ID_IDENT {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));
             }
+    ;
+
+union_definition:
+      ID_STRING { $$ = MAKE_SYMBOL(ID_UNION_DEFINITION, 1, MAKE_TERM(ID_STRING, *$1)); } // NOTE: asterisk..
     ;
 
 symbols:
