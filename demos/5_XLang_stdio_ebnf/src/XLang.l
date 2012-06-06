@@ -27,7 +27,7 @@
 #include <stdlib.h> // atoi
 #include <iostream>
 
-static char* rules_code;
+static char* range_begin;
 
 %}
 
@@ -36,16 +36,17 @@ static char* rules_code;
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
 %s ST_INITIAL_UNION ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_ACTION
 
-ws         [ \t\n]+
-literal    [:|()+*?;]
-digit      [0-9]
-alpha      [a-zA-Z]
-id         {alpha}|[_]
-ident      {id}+({digit}|{id})*
-ident_ex   {id}+({digit}|{id}|[-])*
-_int       {digit}+
-_float     {digit}*[.]{digit}+
-lex_option [%][^%{}]
+ws          [ \t\n]+
+initial_lit [<>=]
+rule_lit    [:|()+*?;]
+digit       [0-9]
+alpha       [a-zA-Z]
+id          {alpha}|[_]
+ident       {id}+({digit}|{id})*
+ident_ex    {id}+({digit}|{id}|[-])*
+_int        {digit}+
+_float      {digit}*[.]{digit}+
+lex_option  [%][^%{}]
 
 %%
 
@@ -99,7 +100,7 @@ lex_option [%][^%{}]
             }
 <ST_INITIAL_UNION>[\}]   { yy_pop_state(); }
 <INITIAL>{lex_option}    { yyless(1); return *yytext; }
-<INITIAL>[<>]            { return *yytext; }
+<INITIAL>{initial_lit}   { return *yytext; }
 <INITIAL>{ident_ex}      {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
@@ -114,7 +115,7 @@ lex_option [%][^%{}]
 
 <ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
-                    rules_code = yytext+1;
+                    range_begin = yytext+yyleng;
                 yy_push_state(ST_RULES_ACTION);
             }
 <ST_RULES_ACTION>[\{] { yy_push_state(ST_RULES_ACTION); }
@@ -122,8 +123,8 @@ lex_option [%][^%{}]
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
-                    std::string s = rules_code;
-                    s = s.substr(0, s.length()-1);
+                    std::string s = range_begin;
+                    s = s.substr(0, s.length()-yyleng);
                     _XLANG_lval.string_value = tree_context()->alloc_string(
                             xl::unescape(s)
                             );
@@ -131,12 +132,20 @@ lex_option [%][^%{}]
                 }
             }
 <ST_RULES_ACTION>. ;
-<ST_RULES>"%%"   { BEGIN ST_CODE; return ID_FENCE; }
+<ST_RULES>"%%"   { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
-<ST_CODE>.  ;
+<ST_CODE><<EOF>> {
+                std::string s = range_begin;
+                s = s.substr(0, s.length()-1);
+                _XLANG_lval.string_value = tree_context()->alloc_string(
+                        xl::unescape(s)
+                        );
+                return ID_STRING;
+            }
+<ST_CODE>.  { std::cout << "ST_CODE: " << yytext << std::endl;  }
 
  /*==========================================================================*/
  /* PRIMITIVES */
@@ -157,9 +166,10 @@ lex_option [%][^%{}]
  /*==========================================================================*/
  /* OTHER */
 
-<ST_RULES>{literal} { return *yytext; }
+<ST_RULES>{rule_lit} { return *yytext; }
 
 <ST_RULES>. {
+                std::cout << "ST_RULES: " << yytext << std::endl;
                 char buf[40];
                 sprintf(buf, "unknown character: \'%c\'\n", *yytext);
                 _XLANG_error(buf);
@@ -167,6 +177,6 @@ lex_option [%][^%{}]
                 BEGIN INITIAL;
             }
 
-.           ;
+.           { std::cout << "INITIAL: " << yytext << std::endl;  }
 
 %%

@@ -67,47 +67,51 @@ std::string id_to_name(uint32_t sym_id)
         return _id_to_name[index];
     switch(sym_id)
     {
-        case ID_GRAMMAR:     return "grammar";
-        case ID_DEFINITIONS: return "definitions";
-        case ID_DEFINITION:  return "definition";
+        case ID_GRAMMAR:          return "grammar";
+        case ID_DEFINITIONS:      return "definitions";
+        case ID_DEFINITION:       return "definitionm";
+        case ID_DEFINITION_EQ:    return "definition_eq";
+        case ID_DEFINITION_BRACE: return "definition_brace";
         case ID_UNION_DEFINITION: return "union_definition";
-        case ID_SYMBOLS:     return "symbols";
-        case ID_RULES:       return "rules";
-        case ID_RULE:        return "rule";
-        case ID_RULE_RHS:    return "rule_rhs";
-        case ID_TERMS:       return "terms";
-        case ID_ALT:         return "alt";
-        case ID_ACTION:      return "action";
-        case '+':            return "+";
-        case '*':            return "*";
-        case '?':            return "?";
-        case '(':            return "(";
+        case ID_SYMBOLS:          return "symbols";
+        case ID_RULES:            return "rules";
+        case ID_RULE:             return "rule";
+        case ID_RULE_RHS:         return "rule_rhs";
+        case ID_TERMS:            return "terms";
+        case ID_ALT:              return "alt";
+        case ID_ACTION:           return "action";
+        case '+':                 return "+";
+        case '*':                 return "*";
+        case '?':                 return "?";
+        case '(':                 return "(";
     }
     throw ERROR_SYM_ID_NOT_FOUND;
     return "";
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "grammar")     return ID_GRAMMAR;
-    if(name == "definitions") return ID_DEFINITIONS;
-    if(name == "definition")  return ID_DEFINITION;
+    if(name == "grammar")          return ID_GRAMMAR;
+    if(name == "definitions")      return ID_DEFINITIONS;
+    if(name == "definition")       return ID_DEFINITION;
+    if(name == "definition_eq")    return ID_DEFINITION_EQ;
+    if(name == "definition_brace") return ID_DEFINITION_BRACE;
     if(name == "union_definition") return ID_UNION_DEFINITION;
-    if(name == "symbols")     return ID_SYMBOLS;
-    if(name == "rules")       return ID_RULES;
-    if(name == "rule")        return ID_RULE;
-    if(name == "rule_rhs")    return ID_RULE_RHS;
-    if(name == "terms")       return ID_TERMS;
-    if(name == "alt")         return ID_ALT;
-    if(name == "action")      return ID_ACTION;
-    if(name == "+")           return '+';
-    if(name == "*")           return '*';
-    if(name == "?")           return '?';
-    if(name == "(")           return '(';
-    if(name == "int")         return ID_INT;
-    if(name == "float")       return ID_FLOAT;
-    if(name == "string")      return ID_STRING;
-    if(name == "char")        return ID_CHAR;
-    if(name == "ident")       return ID_IDENT;
+    if(name == "symbols")          return ID_SYMBOLS;
+    if(name == "rules")            return ID_RULES;
+    if(name == "rule")             return ID_RULE;
+    if(name == "rule_rhs")         return ID_RULE_RHS;
+    if(name == "terms")            return ID_TERMS;
+    if(name == "alt")              return ID_ALT;
+    if(name == "action")           return ID_ACTION;
+    if(name == "+")                return '+';
+    if(name == "*")                return '*';
+    if(name == "?")                return '?';
+    if(name == "(")                return '(';
+    if(name == "int")              return ID_INT;
+    if(name == "float")            return ID_FLOAT;
+    if(name == "string")           return ID_STRING;
+    if(name == "char")             return ID_CHAR;
+    if(name == "ident")            return ID_IDENT;
     throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }
@@ -145,8 +149,9 @@ xl::TreeContext* &tree_context()
 %type<symbol_value>  grammar definitions definition union_definition symbols symbol
         rules rule rule_rhs alt action terms term code
 
-%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_UNION_DEFINITION ID_SYMBOLS
-        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE
+%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_DEFINITION_EQ ID_DEFINITION_BRACE
+        ID_UNION_DEFINITION ID_SYMBOLS
+        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE ID_EOF
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -161,7 +166,7 @@ root:
     ;
 
 grammar:
-      definitions ID_FENCE rules ID_FENCE code { $$ = MAKE_SYMBOL(ID_GRAMMAR, 2, $1, $3, $5); }
+      definitions ID_FENCE rules ID_FENCE code { $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5); }
     ;
 
 //=============================================================================
@@ -173,11 +178,8 @@ definitions:
     ;
 
 definition:
-      '%' ID_IDENT '<' ID_IDENT '>' symbols {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 3,
-                        MAKE_TERM(ID_IDENT, $2),
-                        MAKE_TERM(ID_IDENT, $4),
-                        $6);
+      '%' ID_IDENT {
+                $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));
             }
     | '%' ID_IDENT symbols {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
@@ -185,8 +187,16 @@ definition:
     | '%' ID_IDENT union_definition {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
             }
-    | '%' ID_IDENT {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));
+    | '%' ID_IDENT '=' ID_STRING {
+                $$ = MAKE_SYMBOL(ID_DEFINITION_EQ, 2,
+                        MAKE_TERM(ID_IDENT, $2),
+                        MAKE_TERM(ID_STRING, *$4)); // NOTE: asterisk..
+            }
+    | '%' ID_IDENT '<' ID_IDENT '>' symbols {
+                $$ = MAKE_SYMBOL(ID_DEFINITION_BRACE, 3,
+                        MAKE_TERM(ID_IDENT, $2),
+                        MAKE_TERM(ID_IDENT, $4),
+                        $6);
             }
     ;
 

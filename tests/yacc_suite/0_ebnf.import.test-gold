@@ -1,40 +1,38 @@
 <symbol type="grammar">
     <symbol type="definitions">
-        <symbol type="definition">
+        <symbol type="definition_eq">
             <term type="ident" value=name-prefix/>
-            <symbol type="union_definition">
-                <term type="string" value="_XLANG_"/>
-            </symbol>
+            <term type="string" value="_XLANG_"/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=union/>
             <symbol type="union_definition">
                 <term type="string" value="\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type    int_value;    // int value\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index\n    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer\n"/>
             </symbol>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=error-verbose/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=nonassoc/>
             <term type="ident" value=ID_BASE/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definition_brace">
             <term type="ident" value=token/>
             <term type="ident" value=int_value/>
             <term type="ident" value=ID_INT/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definition_brace">
             <term type="ident" value=token/>
             <term type="ident" value=float_value/>
             <term type="ident" value=ID_FLOAT/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definition_brace">
             <term type="ident" value=token/>
             <term type="ident" value=ident_value/>
             <term type="ident" value=ID_IDENT/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definition_brace">
             <term type="ident" value=type/>
             <term type="ident" value=symbol_value/>
             <symbol type="symbols">
@@ -43,25 +41,25 @@
                 <term type="ident" value=expression/>
             </symbol>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=left/>
             <symbol type="symbols">
                 <term type="char" value='+'/>
                 <term type="char" value='-'/>
             </symbol>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=left/>
             <symbol type="symbols">
                 <term type="char" value='*'/>
                 <term type="char" value='/'/>
             </symbol>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=nonassoc/>
             <term type="ident" value=ID_UMINUS/>
         </symbol>
-        <symbol type="definition">
+        <symbol type="definitionm">
             <term type="ident" value=nonassoc/>
             <term type="ident" value=ID_COUNT/>
         </symbol>

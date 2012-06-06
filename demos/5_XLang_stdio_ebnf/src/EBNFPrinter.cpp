@@ -41,19 +41,26 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEFINITION:
             std::cout << '%';
-            if(_node->size() == 3)
+			more = visit_next_child(_node);
+            if(more)
             {
-                visit_next_child(_node);
-                std::cout << '<';
-                visit_next_child(_node);
-                std::cout << "> ";
-                visit_next_child(_node);
-            }
-            else if(visit_next_child(_node))
-			{
 				std::cout << ' ';
 				visit_next_child(_node);
-			}
+            }
+            break;
+        case ID_DEFINITION_EQ:
+            std::cout << '%';
+			visit_next_child(_node);
+			std::cout << '=';
+			visit_next_child(_node);
+            break;
+        case ID_DEFINITION_BRACE:
+            std::cout << '%';
+            visit_next_child(_node);
+            std::cout << '<';
+            visit_next_child(_node);
+            std::cout << "> ";
+            visit_next_child(_node);
             break;
         case ID_UNION_DEFINITION:
         	std::cout << '{';
