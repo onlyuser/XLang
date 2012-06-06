@@ -38,7 +38,7 @@ static char* range_begin;
 
 ws          [ \t\n]+
 initial_lit [<>=]
-rule_lit    [:|()+*?;]
+rules_lit   [:|()+*?;]
 digit       [0-9]
 alpha       [a-zA-Z]
 id          {alpha}|[_]
@@ -166,7 +166,7 @@ lex_option  [%][^%{}]
  /*==========================================================================*/
  /* OTHER */
 
-<ST_RULES>{rule_lit} { return *yytext; }
+<ST_RULES>{rules_lit} { return *yytext; }
 
 <ST_RULES>. {
                 std::cout << "ST_RULES: " << yytext << std::endl;
