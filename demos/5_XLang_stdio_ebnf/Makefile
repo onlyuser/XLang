@@ -92,13 +92,14 @@ YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
 .SECONDARY : $(YACC_GEN)
 
 $(SRC_PATH)/%.tab.cpp $(INCLUDE_PATH)/%.tab.h : $(SRC_PATH)/%.y
-	bison -d $<
+	bison -d -v $<
 	mv $*.tab.c $(SRC_PATH)/$*.tab.cpp
 	mv $*.tab.h $(INCLUDE_PATH)/$*.tab.h
+	mv $*.output $(SRC_PATH)/$*.output
 
 .PHONY : clean_yacc
 clean_yacc :
-	-rm $(YACC_GEN)
+	-rm $(YACC_GEN) $(SRC_PATH)/*.output
 
 #==================
 # lex-gen

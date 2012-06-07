@@ -80,6 +80,7 @@ std::string id_to_name(uint32_t sym_id)
         case ID_TERMS:            return "terms";
         case ID_ALT:              return "alt";
         case ID_ACTION:           return "action";
+        case ID_CODE:             return "code";
         case '+':                 return "+";
         case '*':                 return "*";
         case '?':                 return "?";
@@ -103,6 +104,7 @@ uint32_t name_to_id(std::string name)
     if(name == "terms")            return ID_TERMS;
     if(name == "alt")              return ID_ALT;
     if(name == "action")           return ID_ACTION;
+    if(name == "code")             return ID_CODE;
     if(name == "+")                return '+';
     if(name == "*")                return '*';
     if(name == "?")                return '?';
@@ -151,7 +153,7 @@ xl::TreeContext* &tree_context()
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_DEFINITION_EQ ID_DEFINITION_BRACE
         ID_UNION_DEFINITION ID_SYMBOLS
-        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE ID_EOF
+        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -201,7 +203,10 @@ definition:
     ;
 
 union_definition:
-      ID_STRING { $$ = MAKE_SYMBOL(ID_UNION_DEFINITION, 1, MAKE_TERM(ID_STRING, *$1)); } // NOTE: asterisk..
+      ID_STRING {
+                $$ = MAKE_SYMBOL(ID_UNION_DEFINITION, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
     ;
 
 symbols:
@@ -237,7 +242,10 @@ alt:
     ;
 
 action:
-      ID_STRING { $$ = MAKE_SYMBOL(ID_ACTION, 1, MAKE_TERM(ID_STRING, *$1)); } // NOTE: asterisk..
+      ID_STRING {
+                $$ = MAKE_SYMBOL(ID_ACTION, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
     ;
 
 terms:
@@ -261,7 +269,10 @@ term:
 // CODE
 
 code:
-      /* empty */ { $$ = NULL; }
+      ID_STRING {
+                $$ = MAKE_SYMBOL(ID_CODE, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
     ;
 
 %%

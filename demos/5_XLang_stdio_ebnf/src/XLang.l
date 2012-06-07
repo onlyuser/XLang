@@ -132,16 +132,15 @@ lex_option  [%][^%{}]
                 }
             }
 <ST_RULES_ACTION>. ;
-<ST_RULES>"%%"   { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
+<ST_RULES>"%%" { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
 <ST_CODE><<EOF>> {
-                std::string s = range_begin;
-                s = s.substr(0, s.length()-1);
+                std::cout << strlen(range_begin) << std::endl;
                 _XLANG_lval.string_value = tree_context()->alloc_string(
-                        xl::unescape(s)
+                        xl::unescape(range_begin)
                         );
                 return ID_STRING;
             }
