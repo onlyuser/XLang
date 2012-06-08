@@ -25,17 +25,23 @@
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::unescape
 #include <stdlib.h> // atoi
-#include <iostream>
+#include <string>
+#include <sstream>
 
-static char* range_begin;
-std::string code_section;
+std::stringstream accum_buf;
+
+void reset_ss(std::stringstream &ss)
+{
+    ss.str("");
+    ss.clear();
+}
 
 %}
 
 %option noyywrap nounput
 %option stack
-%x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
-%x ST_UNION ST_DEFINITION ST_ACTION ST_CODE
+%x ST_COMMENT_BLK ST_COMMENT_LINE ST_STRING ST_CHAR
+%x ST_UNION_BLK ST_PROTO_BLK ST_ACTION_BLK ST_CODE
 %s ST_RULES
 
 ws          [ \t\n]+
@@ -58,9 +64,9 @@ decl        [%][^%{}]
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"                    { yy_push_state(ST_COMMENT_BLOCK); }
-<ST_COMMENT_BLOCK>"*/"  { yy_pop_state(); }
-<ST_COMMENT_BLOCK>{any} ;
+"/*"                  { yy_push_state(ST_COMMENT_BLK); }
+<ST_COMMENT_BLK>"*/"  { yy_pop_state(); }
+<ST_COMMENT_BLK>{any} ;
 
 "//"                   { yy_push_state(ST_COMMENT_LINE); }
 <ST_COMMENT_LINE>"\n"  { yy_pop_state(); }
@@ -89,14 +95,14 @@ decl        [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{]    { yy_push_state(ST_UNION); }
-<ST_UNION>[^\}]* {
+<INITIAL>[\{]        { yy_push_state(ST_UNION_BLK); }
+<ST_UNION_BLK>[^\}]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<ST_UNION>[\}]        { yy_pop_state(); }
+<ST_UNION_BLK>[\}]    { yy_pop_state(); }
 <INITIAL>{decl}       { yyless(1); return *yytext; }
 <INITIAL>{ident_dash} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
@@ -104,22 +110,20 @@ decl        [%][^%{}]
             }
 <INITIAL>"%{" {
                 if(yy_top_state() == INITIAL)
-                    range_begin = yytext+yyleng;
-                yy_push_state(ST_DEFINITION);
+                    reset_ss(accum_buf);
+                yy_push_state(ST_PROTO_BLK);
             }
-<ST_DEFINITION>"%}" {
+<ST_PROTO_BLK>"%}" {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
-                    std::string s = range_begin;
-                    s = s.substr(0, s.length()-yyleng);
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(s)
+                            xl::unescape(accum_buf.str())
                             );
                     return ID_STRING;
                 }
             }
-<ST_DEFINITION>{any}   ;
+<ST_PROTO_BLK>{any}    { accum_buf << yytext; }
 <INITIAL>"%%"          { BEGIN ST_RULES; return ID_FENCE; }
 <INITIAL>{lit_initial} { return *yytext; }
 <INITIAL>{any}         ;
@@ -129,37 +133,33 @@ decl        [%][^%{}]
 
 <ST_RULES>[\{] {
                 if(yy_top_state() == INITIAL)
-                    range_begin = yytext+yyleng;
-                yy_push_state(ST_ACTION);
+                    reset_ss(accum_buf);
+                yy_push_state(ST_ACTION_BLK);
             }
-<ST_ACTION>[\{] { yy_push_state(ST_ACTION); }
-<ST_ACTION>[\}] {
+<ST_ACTION_BLK>[\{] { yy_push_state(ST_ACTION_BLK); }
+<ST_ACTION_BLK>[\}] {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
-                    std::string s = range_begin;
-                    s = s.substr(0, s.length()-yyleng);
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(s)
+                            xl::unescape(accum_buf.str())
                             );
                     return ID_STRING;
                 }
             }
-<ST_ACTION>{any} ;
-<ST_RULES>"%%"   { BEGIN ST_CODE; return ID_FENCE; }
+<ST_ACTION_BLK>{any} { accum_buf << yytext; }
+<ST_RULES>"%%"       { reset_ss(accum_buf); BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
 <ST_CODE><<EOF>> {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
-                        xl::unescape(code_section)
+                        xl::unescape(accum_buf.str())
                         );
                 return ID_STRING;
             }
-<ST_CODE>{any} {
-                code_section += yytext;
-            }
+<ST_CODE>{any} { accum_buf << yytext; }
 
  /*==========================================================================*/
  /* PRIMITIVES */
