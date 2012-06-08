@@ -34,7 +34,8 @@ static char* range_begin;
 %option noyywrap nounput
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
-%s ST_INITIAL_UNION ST_DEFINITION_CODE ST_RULES ST_CODE ST_RULES_ACTION
+%x ST_UNION ST_DEFINITION ST_ACTION ST_CODE
+%s ST_RULES
 
 ws          [ \t\n]+
 initial_lit [<>=]
@@ -66,10 +67,10 @@ lex_option  [%][^%{}]
  /*==========================================================================*/
  /* QUOTES */
 
-<ST_DEFINITION_CODE>[\"] ;
-<ST_DEFINITION_CODE>[\'] ;
-<ST_RULES_ACTION>[\"] ;
-<ST_RULES_ACTION>[\'] ;
+<ST_DEFINITION>[\"] ;
+<ST_DEFINITION>[\'] ;
+<ST_ACTION>[\"]     ;
+<ST_ACTION>[\']     ;
 
 [\"]              { yy_push_state(ST_STRING); }
 <ST_STRING>[^\"]* {
@@ -80,46 +81,46 @@ lex_option  [%][^%{}]
             }
 <ST_STRING>[\"]   { yy_pop_state(); }
 
-[\']            { yy_push_state(ST_CHAR); }
-<ST_CHAR>[^\']* {
+[\']              { yy_push_state(ST_CHAR); }
+<ST_CHAR>[^\']*   {
                 std::string s = xl::unescape(yytext);
                 _XLANG_lval.char_value = s[0];
                 return ID_CHAR;
             }
-<ST_CHAR>[\']   { yy_pop_state(); }
+<ST_CHAR>[\']     { yy_pop_state(); }
 
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{]            { yy_push_state(ST_INITIAL_UNION); }
-<ST_INITIAL_UNION>[^\}]* {
+<INITIAL>[\{]          { yy_push_state(ST_UNION); }
+<ST_UNION>[^\}]*       {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<ST_INITIAL_UNION>[\}]   { yy_pop_state(); }
-<INITIAL>{lex_option}    { yyless(1); return *yytext; }
-<INITIAL>{initial_lit}   { return *yytext; }
-<INITIAL>{ident_ex}      {
+<ST_UNION>[\}]         { yy_pop_state(); }
+<INITIAL>{lex_option}  { yyless(1); return *yytext; }
+<INITIAL>{initial_lit} { return *yytext; }
+<INITIAL>{ident_ex}    {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
-<INITIAL>"%{"            { yy_push_state(ST_DEFINITION_CODE); }
-<ST_DEFINITION_CODE>"%}" { yy_pop_state(); }
-<ST_DEFINITION_CODE>.    ;
-<INITIAL>"%%"            { BEGIN ST_RULES; return ID_FENCE; }
+<INITIAL>"%{"          { yy_push_state(ST_DEFINITION); }
+<ST_DEFINITION>"%}"    { yy_pop_state(); } //FIX-ME!
+<ST_DEFINITION>.       ;
+<INITIAL>"%%"          { BEGIN ST_RULES; return ID_FENCE; }
 
  /*==========================================================================*/
  /* RULES SECTION */
 
-<ST_RULES>[\{] {
+<ST_RULES>[\{]  {
                 if(yy_top_state() == INITIAL)
                     range_begin = yytext+yyleng;
-                yy_push_state(ST_RULES_ACTION);
+                yy_push_state(ST_ACTION);
             }
-<ST_RULES_ACTION>[\{] { yy_push_state(ST_RULES_ACTION); }
-<ST_RULES_ACTION>[\}] {
+<ST_ACTION>[\{] { yy_push_state(ST_ACTION); }
+<ST_ACTION>[\}] {
                 yy_pop_state();
                 if(yy_top_state() == INITIAL)
                 {
@@ -131,20 +132,18 @@ lex_option  [%][^%{}]
                     return ID_STRING;
                 }
             }
-<ST_RULES_ACTION>. ;
-<ST_RULES>"%%" { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
+<ST_ACTION>.    ;
+<ST_RULES>"%%"  { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
 <ST_CODE><<EOF>> {
-                std::cout << strlen(range_begin) << std::endl;
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(range_begin)
                         );
                 return ID_STRING;
             }
-<ST_CODE>.  { std::cout << "ST_CODE: " << yytext << std::endl;  }
 
  /*==========================================================================*/
  /* PRIMITIVES */
@@ -168,7 +167,7 @@ lex_option  [%][^%{}]
 <ST_RULES>{rules_lit} { return *yytext; }
 
 <ST_RULES>. {
-                std::cout << "ST_RULES: " << yytext << std::endl;
+                //std::cout << "ST_RULES: " << yytext << std::endl;
                 char buf[40];
                 sprintf(buf, "unknown character: \'%c\'\n", *yytext);
                 _XLANG_error(buf);
@@ -176,6 +175,12 @@ lex_option  [%][^%{}]
                 BEGIN INITIAL;
             }
 
-.           { std::cout << "INITIAL: " << yytext << std::endl;  }
+<ST_CODE>.  {
+                //std::cout << "ST_CODE: " << yytext << std::endl;
+            }
+
+.           {
+                //std::cout << "INITIAL: " << yytext << std::endl;
+            }
 
 %%
