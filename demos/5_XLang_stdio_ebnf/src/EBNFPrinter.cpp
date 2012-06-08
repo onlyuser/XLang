@@ -33,7 +33,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << std::endl;
             break;
-        case ID_DEFINITIONS:
+        case ID_DECLS:
             do
             {
                 more = visit_next_child(_node);
@@ -41,7 +41,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << std::endl;
             } while(more);
             break;
-        case ID_DEFINITION:
+        case ID_DECL:
             std::cout << '%';
             more = visit_next_child(_node);
             if(more)
@@ -50,13 +50,13 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 visit_next_child(_node);
             }
             break;
-        case ID_DEFINITION_EQ:
+        case ID_DECL_EQ:
             std::cout << '%';
             visit_next_child(_node);
             std::cout << '=';
             visit_next_child(_node);
             break;
-        case ID_DEFINITION_BRACE:
+        case ID_DECL_BRACE:
             std::cout << '%';
             visit_next_child(_node);
             std::cout << '<';
@@ -64,14 +64,14 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << "> ";
             visit_next_child(_node);
             break;
-        case ID_PROTO_BLOCK:
+        case ID_PROTO_BLK:
             std::cout << "%{";
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
                     )->value();
             std::cout << "%}";
             break;
-        case ID_UNION_BLOCK:
+        case ID_UNION_BLK:
             std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
@@ -113,7 +113,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             if(visit_next_child(_node))
                 visit_next_child(_node);
             break;
-        case ID_ACTION_BLOCK:
+        case ID_ACTION_BLK:
             std::cout << " {";
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)

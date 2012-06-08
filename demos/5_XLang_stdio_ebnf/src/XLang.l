@@ -38,16 +38,16 @@ static char* range_begin;
 %s ST_RULES
 
 ws          [ \t\n]+
-initial_lit [<>=]
-rules_lit   [:|()+*?;]
+lit_initial [<>=]
+lit_rules   [:|()+*?;]
 digit       [0-9]
 alpha       [a-zA-Z]
 id          {alpha}|[_]
 ident       {id}+({digit}|{id})*
-ident_ex    {id}+({digit}|{id}|[-])*
+ident_dash  {id}+({digit}|{id}|[-])*
 _int        {digit}+
 _float      {digit}*[.]{digit}+
-lex_option  [%][^%{}]
+decl        [%][^%{}]
 
 %%
 
@@ -100,9 +100,9 @@ lex_option  [%][^%{}]
                 return ID_STRING;
             }
 <ST_UNION>[\}]         { yy_pop_state(); }
-<INITIAL>{lex_option}  { yyless(1); return *yytext; }
-<INITIAL>{initial_lit} { return *yytext; }
-<INITIAL>{ident_ex}    {
+<INITIAL>{decl}        { yyless(1); return *yytext; }
+<INITIAL>{lit_initial} { return *yytext; }
+<INITIAL>{ident_dash}  {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
@@ -148,7 +148,7 @@ lex_option  [%][^%{}]
                 }
             }
 <ST_ACTION>.    ;
-<ST_RULES>"%%"  { BEGIN ST_CODE; range_begin = yytext+yyleng; return ID_FENCE; }
+<ST_RULES>"%%"  { range_begin = yytext+yyleng; BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
@@ -179,7 +179,7 @@ lex_option  [%][^%{}]
  /*==========================================================================*/
  /* OTHER */
 
-<ST_RULES>{rules_lit} { return *yytext; }
+<ST_RULES>{lit_rules} { return *yytext; }
 
 <ST_RULES>. {
                 //std::cout << "ST_RULES: " << yytext << std::endl;
