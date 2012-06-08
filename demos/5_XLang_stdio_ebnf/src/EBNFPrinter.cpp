@@ -43,18 +43,18 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEFINITION:
             std::cout << '%';
-			more = visit_next_child(_node);
+            more = visit_next_child(_node);
             if(more)
             {
-				std::cout << ' ';
-				visit_next_child(_node);
+                std::cout << ' ';
+                visit_next_child(_node);
             }
             break;
         case ID_DEFINITION_EQ:
             std::cout << '%';
-			visit_next_child(_node);
-			std::cout << '=';
-			visit_next_child(_node);
+            visit_next_child(_node);
+            std::cout << '=';
+            visit_next_child(_node);
             break;
         case ID_DEFINITION_BRACE:
             std::cout << '%';
@@ -65,12 +65,12 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             break;
         case ID_UNION_DEFINITION:
-        	std::cout << '{';
+            std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
                     )->value();
-        	std::cout << '}' << std::endl;
-        	break;
+            std::cout << '}' << std::endl;
+            break;
         case ID_SYMBOLS:
             do
             {
@@ -111,7 +111,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
                     )->value();
-        	std::cout << '}';
+            std::cout << '}';
             break;
         case ID_TERMS:
             do
