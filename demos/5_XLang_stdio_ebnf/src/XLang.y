@@ -171,7 +171,9 @@ root:
     ;
 
 grammar:
-      definitions ID_FENCE rules ID_FENCE code_section { $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5); }
+      definitions ID_FENCE rules ID_FENCE code_section {
+                $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5);
+            }
     ;
 
 //=============================================================================
@@ -183,15 +185,9 @@ definitions:
     ;
 
 definition:
-      '%' ID_IDENT {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2));
-            }
-    | '%' ID_IDENT symbols {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
-            }
-    | '%' ID_IDENT union_block {
-                $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
-            }
+      '%' ID_IDENT             { $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2)); }
+    | '%' ID_IDENT symbols     { $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | '%' ID_IDENT union_block { $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3); }
     | '%' ID_IDENT '=' ID_STRING {
                 $$ = MAKE_SYMBOL(ID_DEFINITION_EQ, 2,
                         MAKE_TERM(ID_IDENT, $2),
@@ -203,9 +199,7 @@ definition:
                         MAKE_TERM(ID_IDENT, $4),
                         $6);
             }
-    | proto_block {
-                $$ = $1;
-            }
+    | proto_block { $$ = $1; }
     ;
 
 symbols:
@@ -241,7 +235,9 @@ rules:
     ;
 
 rule:
-      ID_IDENT ':' rule_rhs ';' { $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3); }
+      ID_IDENT ':' rule_rhs ';' {
+                $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3);
+            }
     ;
 
 rule_rhs:
@@ -250,7 +246,7 @@ rule_rhs:
     ;
 
 alt:
-      terms        { $$ = $1; }
+      terms              { $$ = $1; }
     | terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
