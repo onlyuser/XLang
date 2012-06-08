@@ -64,12 +64,19 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << "> ";
             visit_next_child(_node);
             break;
-        case ID_UNION_DEFINITION:
+        case ID_PROTO_BLOCK:
+            std::cout << "%{";
+            std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
+                    _node->operator[](0)
+                    )->value();
+            std::cout << "%}";
+            break;
+        case ID_UNION_BLOCK:
             std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
                     )->value();
-            std::cout << '}' << std::endl;
+            std::cout << '}';
             break;
         case ID_SYMBOLS:
             do
@@ -106,7 +113,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             if(visit_next_child(_node))
                 visit_next_child(_node);
             break;
-        case ID_ACTION:
+        case ID_ACTION_BLOCK:
             std::cout << " {";
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
@@ -122,23 +129,17 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             } while(more);
             break;
         case '+':
-            xl::visitor::DefaultTour::visit(_node);
-            std::cout << '+';
-            break;
         case '*':
-            xl::visitor::DefaultTour::visit(_node);
-            std::cout << '*';
-            break;
         case '?':
             xl::visitor::DefaultTour::visit(_node);
-            std::cout << '?';
+            std::cout << static_cast<char>(_node->sym_id());
             break;
         case '(':
             std::cout << '(';
             xl::visitor::DefaultTour::visit(_node);
             std::cout << ')';
             break;
-        case ID_CODE:
+        case ID_CODE_SECTION:
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     _node->operator[](0)
                     )->value();

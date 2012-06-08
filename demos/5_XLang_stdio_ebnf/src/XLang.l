@@ -106,8 +106,23 @@ lex_option  [%][^%{}]
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
-<INITIAL>"%{"          { yy_push_state(ST_DEFINITION); }
-<ST_DEFINITION>"%}"    { yy_pop_state(); } //FIX-ME!
+<INITIAL>"%{"          {
+                if(yy_top_state() == INITIAL)
+                    range_begin = yytext+yyleng;
+                yy_push_state(ST_DEFINITION);
+            }
+<ST_DEFINITION>"%}"    {
+                yy_pop_state();
+                if(yy_top_state() == INITIAL)
+                {
+                    std::string s = range_begin;
+                    s = s.substr(0, s.length()-yyleng);
+                    _XLANG_lval.string_value = tree_context()->alloc_string(
+                            xl::unescape(s)
+                            );
+                    return ID_STRING;
+                }
+            }
 <ST_DEFINITION>.       ;
 <INITIAL>"%%"          { BEGIN ST_RULES; return ID_FENCE; }
 

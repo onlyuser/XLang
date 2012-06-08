@@ -72,15 +72,16 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DEFINITION:       return "definitionm";
         case ID_DEFINITION_EQ:    return "definition_eq";
         case ID_DEFINITION_BRACE: return "definition_brace";
-        case ID_UNION_DEFINITION: return "union_definition";
+        case ID_PROTO_BLOCK:      return "proto_block";
+        case ID_UNION_BLOCK:      return "union_block";
         case ID_SYMBOLS:          return "symbols";
         case ID_RULES:            return "rules";
         case ID_RULE:             return "rule";
         case ID_RULE_RHS:         return "rule_rhs";
         case ID_TERMS:            return "terms";
         case ID_ALT:              return "alt";
-        case ID_ACTION:           return "action";
-        case ID_CODE:             return "code";
+        case ID_ACTION_BLOCK:     return "action_block";
+        case ID_CODE_SECTION:     return "code_section";
         case '+':                 return "+";
         case '*':                 return "*";
         case '?':                 return "?";
@@ -96,15 +97,16 @@ uint32_t name_to_id(std::string name)
     if(name == "definition")       return ID_DEFINITION;
     if(name == "definition_eq")    return ID_DEFINITION_EQ;
     if(name == "definition_brace") return ID_DEFINITION_BRACE;
-    if(name == "union_definition") return ID_UNION_DEFINITION;
+    if(name == "proto_block")      return ID_PROTO_BLOCK;
+    if(name == "union_block")      return ID_UNION_BLOCK;
     if(name == "symbols")          return ID_SYMBOLS;
     if(name == "rules")            return ID_RULES;
     if(name == "rule")             return ID_RULE;
     if(name == "rule_rhs")         return ID_RULE_RHS;
     if(name == "terms")            return ID_TERMS;
     if(name == "alt")              return ID_ALT;
-    if(name == "action")           return ID_ACTION;
-    if(name == "code")             return ID_CODE;
+    if(name == "action_block")     return ID_ACTION_BLOCK;
+    if(name == "code_section")     return ID_CODE_SECTION;
     if(name == "+")                return '+';
     if(name == "*")                return '*';
     if(name == "?")                return '?';
@@ -148,12 +150,13 @@ xl::TreeContext* &tree_context()
 %token<string_value> ID_STRING
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
-%type<symbol_value>  grammar definitions definition union_definition symbols symbol
-        rules rule rule_rhs alt action terms term code
+%type<symbol_value>  grammar definitions definition
+        proto_block union_block symbols symbol
+        rules rule rule_rhs alt action_block terms term code_section
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_DEFINITION_EQ ID_DEFINITION_BRACE
-        ID_UNION_DEFINITION ID_SYMBOLS
-        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION ID_TERMS ID_PREC ID_FENCE ID_CODE
+        ID_PROTO_BLOCK ID_UNION_BLOCK ID_SYMBOLS
+        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_PREC ID_FENCE ID_CODE_SECTION
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -168,7 +171,7 @@ root:
     ;
 
 grammar:
-      definitions ID_FENCE rules ID_FENCE code { $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5); }
+      definitions ID_FENCE rules ID_FENCE code_section { $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5); }
     ;
 
 //=============================================================================
@@ -186,7 +189,7 @@ definition:
     | '%' ID_IDENT symbols {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
             }
-    | '%' ID_IDENT union_definition {
+    | '%' ID_IDENT union_block {
                 $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3);
             }
     | '%' ID_IDENT '=' ID_STRING {
@@ -200,12 +203,8 @@ definition:
                         MAKE_TERM(ID_IDENT, $4),
                         $6);
             }
-    ;
-
-union_definition:
-      ID_STRING {
-                $$ = MAKE_SYMBOL(ID_UNION_DEFINITION, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+    | proto_block {
+                $$ = $1;
             }
     ;
 
@@ -217,6 +216,20 @@ symbols:
 symbol:
       ID_IDENT { $$ = MAKE_TERM(ID_IDENT, $1); }
     | ID_CHAR  { $$ = MAKE_TERM(ID_CHAR, $1); }
+    ;
+
+union_block:
+      ID_STRING {
+                $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
+    ;
+
+proto_block:
+      ID_STRING {
+                $$ = MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
     ;
 
 //=============================================================================
@@ -238,12 +251,12 @@ rule_rhs:
 
 alt:
       terms        { $$ = $1; }
-    | terms action { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
+    | terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
-action:
+action_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_ACTION, 1,
+                $$ = MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
             }
     ;
@@ -268,9 +281,9 @@ term:
 //=============================================================================
 // CODE
 
-code:
+code_section:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_CODE, 1,
+                $$ = MAKE_SYMBOL(ID_CODE_SECTION, 1,
                         MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
             }
     ;
