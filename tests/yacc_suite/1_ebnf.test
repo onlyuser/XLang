@@ -8,9 +8,9 @@ root:
     ;
 
 program:
-      statement (
-            ',' statement { $$ = $2; }
-            )*            { $$ = (!$2) ? $1 : MAKE_SYMBOL(',', 2, $1, $2); }
+      (
+            statement ',' { $$ = $1; }
+      )* statement        { $$ = (!$1) ? $2 : MAKE_SYMBOL(',', 2, $1, $2); }
     ;
 
 statement:
