@@ -28,15 +28,18 @@
 #include <string>
 #include <sstream>
 
-std::stringstream accum_buf;
-
+std::stringstream &buf()
+{
+    static std::stringstream _buf;
+    return _buf;
+}
 void reset_ss(std::stringstream &ss)
 {
     ss.str("");
     ss.clear();
 }
 
-// Temporary workaround for: yy_top_state crashes on INITIAL state - ID: 3462982
+// Temporary workaround for flex bug: yy_top_state crashes on INITIAL state - ID: 3462982
 // http://sourceforge.net/tracker/?func=detail&aid=3462982&group_id=97492&atid=618177
 #define TOP_STATE (yy_push_state(INITIAL), yy_pop_state(), yy_top_state())
 
@@ -114,7 +117,7 @@ decl        [%][^%{}]
             }
 <INITIAL>"%{" {
                 if(TOP_STATE == INITIAL)
-                    reset_ss(accum_buf);
+                    reset_ss(buf());
                 yy_push_state(ST_PROTO_BLK);
             }
 <ST_PROTO_BLK>"%}" {
@@ -122,12 +125,12 @@ decl        [%][^%{}]
                 if(TOP_STATE == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            accum_buf.str()
+                            buf().str()
                             );
                     return ID_STRING;
                 }
             }
-<ST_PROTO_BLK>{any}    { accum_buf << yytext; }
+<ST_PROTO_BLK>{any}    { buf() << yytext; }
 <INITIAL>"%%"          { BEGIN ST_RULES; return ID_FENCE; }
 <INITIAL>{lit_initial} { return *yytext; }
 <INITIAL>{any}         ;
@@ -137,7 +140,7 @@ decl        [%][^%{}]
 
 <ST_RULES>[\{] {
                 if(TOP_STATE == INITIAL)
-                    reset_ss(accum_buf);
+                    reset_ss(buf());
                 yy_push_state(ST_ACTION_BLK);
             }
 <ST_ACTION_BLK>[\{] { yy_push_state(ST_ACTION_BLK); }
@@ -146,24 +149,24 @@ decl        [%][^%{}]
                 if(TOP_STATE == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            accum_buf.str()
+                            buf().str()
                             );
                     return ID_STRING;
                 }
             }
-<ST_ACTION_BLK>{any} { accum_buf << yytext; }
-<ST_RULES>"%%"       { reset_ss(accum_buf); BEGIN ST_CODE; return ID_FENCE; }
+<ST_ACTION_BLK>{any} { buf() << yytext; }
+<ST_RULES>"%%"       { reset_ss(buf()); BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
 <ST_CODE><<EOF>> {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
-                        accum_buf.str()
+                        buf().str()
                         );
                 return ID_STRING;
             }
-<ST_CODE>{any} { accum_buf << yytext; }
+<ST_CODE>{any} { buf() << yytext; }
 
  /*==========================================================================*/
  /* PRIMITIVES */
