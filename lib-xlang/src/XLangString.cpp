@@ -57,8 +57,8 @@ std::string unescape(std::string s)
     {
         if(unescape_next_char)
         {
-            unescape_next_char = false;
             buf[i] = unescape(buf[i]);
+            unescape_next_char = false;
         }
         else
             if('\\' == buf[i])
