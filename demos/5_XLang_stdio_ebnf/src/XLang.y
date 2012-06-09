@@ -92,6 +92,11 @@ std::string id_to_name(uint32_t sym_id)
 }
 uint32_t name_to_id(std::string name)
 {
+    if(name == "int")          return ID_INT;
+    if(name == "float")        return ID_FLOAT;
+    if(name == "string")       return ID_STRING;
+    if(name == "char")         return ID_CHAR;
+    if(name == "ident")        return ID_IDENT;
     if(name == "grammar")      return ID_GRAMMAR;
     if(name == "decls")        return ID_DECLS;
     if(name == "decl")         return ID_DECL;
@@ -111,11 +116,6 @@ uint32_t name_to_id(std::string name)
     if(name == "*")            return '*';
     if(name == "?")            return '?';
     if(name == "(")            return '(';
-    if(name == "int")          return ID_INT;
-    if(name == "float")        return ID_FLOAT;
-    if(name == "string")       return ID_STRING;
-    if(name == "char")         return ID_CHAR;
-    if(name == "ident")        return ID_IDENT;
     throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }

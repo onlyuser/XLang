@@ -118,7 +118,7 @@ decl        [%][^%{}]
                 if(yy_top_state() == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(accum_buf.str())
+                            accum_buf.str()
                             );
                     return ID_STRING;
                 }
@@ -142,7 +142,7 @@ decl        [%][^%{}]
                 if(yy_top_state() == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
-                            xl::unescape(accum_buf.str())
+                            accum_buf.str()
                             );
                     return ID_STRING;
                 }
@@ -155,7 +155,7 @@ decl        [%][^%{}]
 
 <ST_CODE><<EOF>> {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
-                        xl::unescape(accum_buf.str())
+                        accum_buf.str()
                         );
                 return ID_STRING;
             }
