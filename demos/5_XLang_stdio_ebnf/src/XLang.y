@@ -77,10 +77,10 @@ std::string id_to_name(uint32_t sym_id)
         case ID_SYMBOLS:      return "symbols";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
-        case ID_RULE_RHS:     return "rule_rhs";
-        case ID_TERMS:        return "terms";
+        case ID_ALTS:         return "alts";
         case ID_ALT:          return "alt";
         case ID_ACTION_BLK:   return "action_blk";
+        case ID_TERMS:        return "terms";
         case ID_CODE_SECTION: return "code_section";
         case '+':             return "+";
         case '*':             return "*";
@@ -107,10 +107,10 @@ uint32_t name_to_id(std::string name)
     if(name == "symbols")      return ID_SYMBOLS;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
-    if(name == "rule_rhs")     return ID_RULE_RHS;
-    if(name == "terms")        return ID_TERMS;
+    if(name == "alts")         return ID_ALTS;
     if(name == "alt")          return ID_ALT;
     if(name == "action_blk")   return ID_ACTION_BLK;
+    if(name == "terms")        return ID_TERMS;
     if(name == "code_section") return ID_CODE_SECTION;
     if(name == "+")            return '+';
     if(name == "*")            return '*';
@@ -152,11 +152,11 @@ xl::TreeContext* &tree_context()
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
         proto_blk union_blk symbols symbol
-        rules rule rule_rhs alt action_blk terms term code_section
+        rules rule alts alt action_blk terms term code_section
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
         ID_PROTO_BLK ID_UNION_BLK ID_SYMBOLS
-        ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION_BLK ID_TERMS ID_FENCE ID_CODE_SECTION
+        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLK ID_TERMS ID_FENCE ID_CODE_SECTION
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -235,14 +235,14 @@ rules:
     ;
 
 rule:
-      ID_IDENT ':' rule_rhs ';' {
+      ID_IDENT ':' alts ';' {
                 $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3);
             }
     ;
 
-rule_rhs:
+alts:
       alt              { $$ = $1; }
-    | rule_rhs '|' alt { $$ = MAKE_SYMBOL(ID_RULE_RHS, 2, $1, $3); }
+    | alts '|' alt { $$ = MAKE_SYMBOL(ID_ALTS, 2, $1, $3); }
     ;
 
 alt:
@@ -263,15 +263,15 @@ terms:
     ;
 
 term:
-      ID_INT           { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT         { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_STRING        { $$ = MAKE_TERM(ID_STRING, *$1); } // NOTE: asterisk..
-    | ID_CHAR          { $$ = MAKE_TERM(ID_CHAR, $1); }
-    | ID_IDENT         { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | term '+'         { $$ = MAKE_SYMBOL('+', 1, $1); }
-    | term '*'         { $$ = MAKE_SYMBOL('*', 1, $1); }
-    | term '?'         { $$ = MAKE_SYMBOL('?', 1, $1); }
-    | '(' rule_rhs ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
+      ID_INT       { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT     { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_STRING    { $$ = MAKE_TERM(ID_STRING, *$1); } // NOTE: asterisk..
+    | ID_CHAR      { $$ = MAKE_TERM(ID_CHAR, $1); }
+    | ID_IDENT     { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }
+    | term '*'     { $$ = MAKE_SYMBOL('*', 1, $1); }
+    | term '?'     { $$ = MAKE_SYMBOL('?', 1, $1); }
+    | '(' alts ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
     ;
 
 //=============================================================================
@@ -307,7 +307,7 @@ void display_usage(bool verbose)
                 << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
-                << "  -e, --ebnf" << std::endl
+                << "  -y, --yacc" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl

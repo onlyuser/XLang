@@ -100,7 +100,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << ';';
             break;
-        case ID_RULE_RHS:
+        case ID_ALTS:
             std::cout << "\t  ";
             do
             {

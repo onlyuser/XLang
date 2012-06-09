@@ -70,7 +70,7 @@
     <symbol type="rules">
         <symbol type="rule">
             <term type="ident" value=root/>
-            <symbol type="rule_rhs">
+            <symbol type="alts">
                 <symbol type="alt">
                     <term type="ident" value=program/>
                     <symbol type="action_blk">
@@ -87,7 +87,7 @@
         </symbol>
         <symbol type="rule">
             <term type="ident" value=program/>
-            <symbol type="rule_rhs">
+            <symbol type="alts">
                 <symbol type="alt">
                     <term type="ident" value=statement/>
                     <symbol type="action_blk">
@@ -108,7 +108,7 @@
         </symbol>
         <symbol type="rule">
             <term type="ident" value=statement/>
-            <symbol type="rule_rhs">
+            <symbol type="alts">
                 <symbol type="alt">
                     <term type="ident" value=expression/>
                     <symbol type="action_blk">
@@ -129,7 +129,7 @@
         </symbol>
         <symbol type="rule">
             <term type="ident" value=expression/>
-            <symbol type="rule_rhs">
+            <symbol type="alts">
                 <symbol type="alt">
                     <term type="ident" value=ID_INT/>
                     <symbol type="action_blk">
