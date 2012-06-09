@@ -72,14 +72,14 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DECL:         return "decl";
         case ID_DECL_EQ:      return "decl_eq";
         case ID_DECL_BRACE:   return "decl_brace";
-        case ID_PROTO_BLK:    return "proto_blk";
-        case ID_UNION_BLK:    return "union_blk";
+        case ID_PROTO_BLOCK:  return "proto_block";
+        case ID_UNION_BLOCK:  return "union_block";
         case ID_SYMBOLS:      return "symbols";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
         case ID_ALTS:         return "alts";
         case ID_ALT:          return "alt";
-        case ID_ACTION_BLK:   return "action_blk";
+        case ID_ACTION_BLOCK: return "action_block";
         case ID_TERMS:        return "terms";
         case ID_CODE_SECTION: return "code_section";
         case '+':             return "+";
@@ -102,14 +102,14 @@ uint32_t name_to_id(std::string name)
     if(name == "decl")         return ID_DECL;
     if(name == "decl_eq")      return ID_DECL_EQ;
     if(name == "decl_brace")   return ID_DECL_BRACE;
-    if(name == "proto_blk")    return ID_PROTO_BLK;
-    if(name == "union_blk")    return ID_UNION_BLK;
+    if(name == "proto_block")  return ID_PROTO_BLOCK;
+    if(name == "union_block")  return ID_UNION_BLOCK;
     if(name == "symbols")      return ID_SYMBOLS;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
     if(name == "alts")         return ID_ALTS;
     if(name == "alt")          return ID_ALT;
-    if(name == "action_blk")   return ID_ACTION_BLK;
+    if(name == "action_block") return ID_ACTION_BLOCK;
     if(name == "terms")        return ID_TERMS;
     if(name == "code_section") return ID_CODE_SECTION;
     if(name == "+")            return '+';
@@ -151,12 +151,12 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        proto_blk union_blk symbols symbol
-        rules rule alts alt action_blk terms term code_section
+        proto_block union_block symbols symbol
+        rules rule alts alt action_block terms term code_section
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
-        ID_PROTO_BLK ID_UNION_BLK ID_SYMBOLS
-        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLK ID_TERMS ID_FENCE ID_CODE_SECTION
+        ID_PROTO_BLOCK ID_UNION_BLOCK ID_SYMBOLS
+        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE_SECTION
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -187,7 +187,7 @@ definitions:
 definition:
       '%' ID_IDENT               { $$ = MAKE_SYMBOL(ID_DECL, 1, MAKE_TERM(ID_IDENT, $2)); }
     | '%' ID_IDENT symbols       { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | '%' ID_IDENT union_blk     { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | '%' ID_IDENT union_block   { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
     | '%' ID_IDENT '=' ID_STRING {
                 $$ = MAKE_SYMBOL(ID_DECL_EQ, 2,
                         MAKE_TERM(ID_IDENT, $2),
@@ -199,7 +199,7 @@ definition:
                         MAKE_TERM(ID_IDENT, $4),
                         $6);
             }
-    | proto_blk { $$ = $1; }
+    | proto_block { $$ = $1; }
     ;
 
 symbols:
@@ -212,16 +212,16 @@ symbol:
     | ID_CHAR  { $$ = MAKE_TERM(ID_CHAR, $1); }
     ;
 
-union_blk:
+union_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_UNION_BLK, 1,
+                $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
             }
     ;
 
-proto_blk:
+proto_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_PROTO_BLK, 1,
+                $$ = MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
             }
     ;
@@ -247,12 +247,12 @@ alts:
 
 alt:
       terms            { $$ = $1; }
-    | terms action_blk { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
+    | terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
-action_blk:
+action_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_ACTION_BLK, 1,
+                $$ = MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
             }
     ;
