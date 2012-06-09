@@ -9,14 +9,14 @@ root:
 
 program:
       statement (
-            ',' statement { /* ??? */ }
-            )*            { /* ??? */ }
+            ',' statement { $$ = $2; }
+            )*            { $$ = (!$2) ? $1 : MAKE_SYMBOL(',', 2, $1, $2); }
     ;
 
 statement:
       (
-            ID_IDENT '=' { /* ??? */ }
-      )? expression      { /* ??? */ }
+            ID_IDENT '=' { $$ = $1; }
+      )? expression      { $$ = (!$1) ? $2 : MAKE_SYMBOL('=', 2, $1, $2); }
     ;
 
 expression:
