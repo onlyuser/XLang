@@ -8,11 +8,15 @@ root:
     ;
 
 program:
-      statement (',' statement { $$.push_back($2); })* { /* not sure what goes here */ }
+      statement (
+            ',' statement { /* ??? */ }
+            )*            { /* ??? */ }
     ;
 
 statement:
-      (ID_IDENT '=' { $$ = $1; })? expression { /* not sure what goes here */ }
+      (
+            ID_IDENT '=' { /* ??? */ }
+      )? expression      { /* ??? */ }
     ;
 
 expression:
