@@ -71,7 +71,7 @@ decl        [%][^%{}]
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"                  { yy_push_state(ST_COMMENT_BLOCK); }
+"/*"                    { yy_push_state(ST_COMMENT_BLOCK); }
 <ST_COMMENT_BLOCK>"*/"  { yy_pop_state(); }
 <ST_COMMENT_BLOCK>{any} ;
 
@@ -102,14 +102,14 @@ decl        [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{]        { yy_push_state(ST_UNION_BLOCK); }
+<INITIAL>[\{]          { yy_push_state(ST_UNION_BLOCK); }
 <ST_UNION_BLOCK>[^\}]* {
                 _XLANG_lval.string_value = tree_context()->alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
-<ST_UNION_BLOCK>[\}]    { yy_pop_state(); }
+<ST_UNION_BLOCK>[\}]  { yy_pop_state(); }
 <INITIAL>{decl}       { yyless(1); return *yytext; }
 <INITIAL>{ident_dash} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
@@ -124,13 +124,11 @@ decl        [%][^%{}]
                 yy_pop_state();
                 if(TOP_STATE == INITIAL)
                 {
-                    _XLANG_lval.string_value = tree_context()->alloc_string(
-                            buf().str()
-                            );
+                    _XLANG_lval.string_value = tree_context()->alloc_string(buf().str());
                     return ID_STRING;
                 }
             }
-<ST_PROTO_BLOCK>{any}    { buf() << yytext; }
+<ST_PROTO_BLOCK>{any}  { buf() << yytext; }
 <INITIAL>"%%"          { BEGIN ST_RULES; return ID_FENCE; }
 <INITIAL>{lit_initial} { return *yytext; }
 <INITIAL>{any}         ;
@@ -148,22 +146,18 @@ decl        [%][^%{}]
                 yy_pop_state();
                 if(TOP_STATE == INITIAL)
                 {
-                    _XLANG_lval.string_value = tree_context()->alloc_string(
-                            buf().str()
-                            );
+                    _XLANG_lval.string_value = tree_context()->alloc_string(buf().str());
                     return ID_STRING;
                 }
             }
 <ST_ACTION_BLOCK>{any} { buf() << yytext; }
-<ST_RULES>"%%"       { reset_ss(buf()); BEGIN ST_CODE; return ID_FENCE; }
+<ST_RULES>"%%"         { reset_ss(buf()); BEGIN ST_CODE; return ID_FENCE; }
 
  /*==========================================================================*/
  /* CODE SECTION */
 
 <ST_CODE><<EOF>> {
-                _XLANG_lval.string_value = tree_context()->alloc_string(
-                        buf().str()
-                        );
+                _XLANG_lval.string_value = tree_context()->alloc_string(buf().str());
                 return ID_STRING;
             }
 <ST_CODE>{any} { buf() << yytext; }

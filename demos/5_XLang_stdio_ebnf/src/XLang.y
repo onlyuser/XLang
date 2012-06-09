@@ -241,12 +241,12 @@ rule:
     ;
 
 alts:
-      alt              { $$ = $1; }
+      alt          { $$ = $1; }
     | alts '|' alt { $$ = MAKE_SYMBOL(ID_ALTS, 2, $1, $3); }
     ;
 
 alt:
-      terms            { $$ = $1; }
+      terms              { $$ = $1; }
     | terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
