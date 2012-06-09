@@ -123,8 +123,6 @@ xl::TreeContext* &tree_context()
 %left '*' '/'
 %nonassoc ID_UMINUS
 
-%nonassoc ID_COUNT
-
 %%
 
 root:

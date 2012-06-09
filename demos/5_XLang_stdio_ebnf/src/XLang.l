@@ -36,6 +36,10 @@ void reset_ss(std::stringstream &ss)
     ss.clear();
 }
 
+// Temporary workaround for: yy_top_state crashes on INITIAL state - ID: 3462982
+// http://sourceforge.net/tracker/?func=detail&aid=3462982&group_id=97492&atid=618177
+#define TOP_STATE (yy_push_state(INITIAL), yy_pop_state(), yy_top_state())
+
 %}
 
 %option noyywrap nounput
@@ -109,13 +113,13 @@ decl        [%][^%{}]
                 return ID_IDENT;
             }
 <INITIAL>"%{" {
-                if(yy_top_state() == INITIAL)
+                if(TOP_STATE == INITIAL)
                     reset_ss(accum_buf);
                 yy_push_state(ST_PROTO_BLK);
             }
 <ST_PROTO_BLK>"%}" {
                 yy_pop_state();
-                if(yy_top_state() == INITIAL)
+                if(TOP_STATE == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
                             accum_buf.str()
@@ -132,14 +136,14 @@ decl        [%][^%{}]
  /* RULES SECTION */
 
 <ST_RULES>[\{] {
-                if(yy_top_state() == INITIAL)
+                if(TOP_STATE == INITIAL)
                     reset_ss(accum_buf);
                 yy_push_state(ST_ACTION_BLK);
             }
 <ST_ACTION_BLK>[\{] { yy_push_state(ST_ACTION_BLK); }
 <ST_ACTION_BLK>[\}] {
                 yy_pop_state();
-                if(yy_top_state() == INITIAL)
+                if(TOP_STATE == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(
                             accum_buf.str()

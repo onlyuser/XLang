@@ -231,8 +231,6 @@ int _XLANG_lex()
 %left '*' '/'
 %nonassoc ID_UMINUS
 
-%nonassoc ID_COUNT
-
 %%
 
 root:

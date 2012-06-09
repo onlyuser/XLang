@@ -323,7 +323,7 @@ struct args_t
     typedef enum
     {
         MODE_NONE,
-        MODE_EBNF,
+        MODE_YACC,
         MODE_LISP,
         MODE_XML,
         MODE_GRAPH,
@@ -344,10 +344,10 @@ bool parse_args(int argc, char** argv, args_t &args)
 {
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "i:elxgdmh?";
+    static const char *optString = "i:ylxgdmh?";
     static const struct option longOpts[] = {
                 { "in-xml", required_argument, NULL, 'i' },
-                { "ebnf",   no_argument,       NULL, 'e' },
+                { "yacc",   no_argument,       NULL, 'y' },
                 { "lisp",   no_argument,       NULL, 'l' },
                 { "xml",    no_argument,       NULL, 'x' },
                 { "graph",  no_argument,       NULL, 'g' },
@@ -362,7 +362,7 @@ bool parse_args(int argc, char** argv, args_t &args)
         switch(opt)
         {
             case 'i': args.in_xml = optarg; break;
-            case 'e': args.mode = args_t::MODE_EBNF; break;
+            case 'y': args.mode = args_t::MODE_YACC; break;
             case 'l': args.mode = args_t::MODE_LISP; break;
             case 'x': args.mode = args_t::MODE_XML; break;
             case 'g': args.mode = args_t::MODE_GRAPH; break;
@@ -413,7 +413,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
-        case args_t::MODE_EBNF:
+        case args_t::MODE_YACC:
             {
                 EBNFPrinter v;
                 v.visit_any(ast);

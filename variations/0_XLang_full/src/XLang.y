@@ -138,8 +138,6 @@ uint32_t name_to_id(std::string name)
 %left '*' '/'
 %nonassoc ID_UMINUS
 
-%nonassoc ID_COUNT
-
 %%
 
 root:
