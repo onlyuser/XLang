@@ -68,7 +68,7 @@ std::string id_to_name(uint32_t sym_id)
     switch(sym_id)
     {
         case ID_GRAMMAR:      return "grammar";
-        case ID_DECLS:        return "decls";
+        case ID_DEFINITIONS:  return "definitions";
         case ID_DECL:         return "decl";
         case ID_DECL_EQ:      return "decl_eq";
         case ID_DECL_BRACE:   return "decl_brace";
@@ -98,7 +98,7 @@ uint32_t name_to_id(std::string name)
     if(name == "char")         return ID_CHAR;
     if(name == "ident")        return ID_IDENT;
     if(name == "grammar")      return ID_GRAMMAR;
-    if(name == "decls")        return ID_DECLS;
+    if(name == "definitions")  return ID_DEFINITIONS;
     if(name == "decl")         return ID_DECL;
     if(name == "decl_eq")      return ID_DECL_EQ;
     if(name == "decl_brace")   return ID_DECL_BRACE;
@@ -154,7 +154,7 @@ xl::TreeContext* &tree_context()
         proto_blk union_blk symbols symbol
         rules rule rule_rhs alt action_blk terms term code_section
 
-%nonassoc ID_GRAMMAR ID_DECLS ID_DECL ID_DECL_EQ ID_DECL_BRACE
+%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
         ID_PROTO_BLK ID_UNION_BLK ID_SYMBOLS
         ID_RULES ID_RULE ID_RULE_RHS ID_ALT ID_ACTION_BLK ID_TERMS ID_FENCE ID_CODE_SECTION
 %nonassoc ':'
@@ -181,7 +181,7 @@ grammar:
 
 definitions:
       /* empty */            { $$ = NULL; }
-    | definitions definition { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_DECLS, 2, $1, $2); }
+    | definitions definition { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_DEFINITIONS, 2, $1, $2); }
     ;
 
 definition:

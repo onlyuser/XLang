@@ -1,5 +1,5 @@
 <symbol type="grammar">
-    <symbol type="decls">
+    <symbol type="definitions">
         <symbol type="decl_eq">
             <term type="ident" value=name-prefix/>
             <term type="string" value="_XLANG_"/>

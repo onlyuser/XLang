@@ -33,7 +33,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << std::endl;
             break;
-        case ID_DECLS:
+        case ID_DEFINITIONS:
             do
             {
                 more = visit_next_child(_node);
