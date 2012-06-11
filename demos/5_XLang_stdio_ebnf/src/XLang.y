@@ -81,7 +81,7 @@ std::string id_to_name(uint32_t sym_id)
         case ID_ALT:          return "alt";
         case ID_ACTION_BLOCK: return "action_block";
         case ID_TERMS:        return "terms";
-        case ID_CODE_SECTION: return "code_section";
+        case ID_CODE:         return "code";
         case '+':             return "+";
         case '*':             return "*";
         case '?':             return "?";
@@ -111,7 +111,7 @@ uint32_t name_to_id(std::string name)
     if(name == "alt")          return ID_ALT;
     if(name == "action_block") return ID_ACTION_BLOCK;
     if(name == "terms")        return ID_TERMS;
-    if(name == "code_section") return ID_CODE_SECTION;
+    if(name == "code")         return ID_CODE;
     if(name == "+")            return '+';
     if(name == "*")            return '*';
     if(name == "?")            return '?';
@@ -152,11 +152,11 @@ xl::TreeContext* &tree_context()
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
         proto_block union_block symbols symbol
-        rules rule alts alt action_block terms term code_section
+        rules rule alts alt action_block terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
         ID_PROTO_BLOCK ID_UNION_BLOCK ID_SYMBOLS
-        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE_SECTION
+        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -171,7 +171,7 @@ root:
     ;
 
 grammar:
-      definitions ID_FENCE rules ID_FENCE code_section {
+      definitions ID_FENCE rules ID_FENCE code {
                 $$ = MAKE_SYMBOL(ID_GRAMMAR, 3, $1, $3, $5);
             }
     ;
@@ -277,10 +277,10 @@ term:
 //=============================================================================
 // CODE
 
-code_section:
+code:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_CODE_SECTION, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_CODE, 1,
+                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
 
