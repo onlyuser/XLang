@@ -13,17 +13,15 @@ program:
       )* statement        { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
     ;
 
-/*
-program:
-      program_0 statement { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
-    ;
-
-program_0:
-                              { $$ = NULL; }
-    | statement ','           { $$ = $1; }
-    | program_0 statement ',' { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
-    ;
-*/
+//program:
+//      program_0 statement { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+//    ;
+//
+//program_0:
+//      /* empty */             { $$ = NULL; }
+//    | statement ','           { $$ = $1; }
+//    | program_0 statement ',' { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+//    ;
 
 statement:
       (
@@ -31,16 +29,14 @@ statement:
       )? expression      { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
     ;
 
-/*
-statement:
-      statement_0 expression { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
-    ;
-
-statement_0:
-                   { $$ = NULL; }
-    | ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
-    ;
-*/
+//statement:
+//      statement_0 expression { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+//    ;
+//
+//statement_0:
+//      /* empty */  { $$ = NULL; }
+//    | ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
+//    ;
 
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
