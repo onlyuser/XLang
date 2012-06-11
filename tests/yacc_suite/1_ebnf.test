@@ -10,14 +10,37 @@ root:
 program:
       (
             statement ',' { $$ = $1; }
-      )* statement        { $$ = (!$1) ? $2 : MAKE_SYMBOL(',', 2, $1, $2); }
+      )* statement        { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
     ;
+
+/*
+program:
+      program_0 statement { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+    ;
+
+program_0:
+                              { $$ = NULL; }
+    | statement ','           { $$ = $1; }
+    | program_0 statement ',' { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+    ;
+*/
 
 statement:
       (
-            ID_IDENT '=' { $$ = $1; }
-      )? expression      { $$ = (!$1) ? $2 : MAKE_SYMBOL('=', 2, $1, $2); }
+            ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
+      )? expression      { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
     ;
+
+/*
+statement:
+      statement_0 expression { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+    ;
+
+statement_0:
+                   { $$ = NULL; }
+    | ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
+    ;
+*/
 
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }

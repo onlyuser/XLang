@@ -181,7 +181,7 @@ grammar:
 
 definitions:
       /* empty */            { $$ = NULL; }
-    | definitions definition { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_DEFINITIONS, 2, $1, $2); }
+    | definitions definition { $$ = MAKE_SYMBOL(ID_DEFINITIONS, 2, $1, $2); }
     ;
 
 definition:
@@ -231,7 +231,7 @@ proto_block:
 
 rules:
       /* empty */ { $$ = NULL; }
-    | rules rule  { $$ = (!$1) ? $2 : MAKE_SYMBOL(ID_RULES, 2, $1, $2); }
+    | rules rule  { $$ = MAKE_SYMBOL(ID_RULES, 2, $1, $2); }
     ;
 
 rule:
