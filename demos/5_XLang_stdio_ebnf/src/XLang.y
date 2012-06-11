@@ -214,15 +214,15 @@ symbol:
 
 union_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_UNION_BLOCK, 1,
+                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
 
 proto_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
+                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
 
@@ -252,8 +252,8 @@ alt:
 
 action_block:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
+                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
 
