@@ -30,7 +30,7 @@ program:
 //program_0:
 //      /* empty */         {           $$ = NULL; }
 //    | program_0 program_1 { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
-//    ;
+//    ; // TODO: is it necessary to repeat this action (BBB) ?
 //
 //program_1:
 //      statement ',' { /* AAA */ $$ = $1; }
