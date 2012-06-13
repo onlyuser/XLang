@@ -117,7 +117,7 @@ xl::TreeContext* &tree_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<symbol_value> program statement expression program_0 program_1 statement_0
+%type<symbol_value> program statement expression program_0 program_1 statement_0 statement_1
 
 %left '+' '-'
 %left '*' '/'
@@ -179,8 +179,12 @@ statement:
     ;
 
 statement_0:
-      /* empty */  {           $$ = NULL; }
-    | ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+      /* empty */ { $$ = NULL; }
+    | statement_1 { $$ = $1; }
+    ;
+
+statement_1:
+      ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
     ;
 // ]
 

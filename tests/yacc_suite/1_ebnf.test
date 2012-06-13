@@ -1,4 +1,4 @@
-%type<symbol_value> program statement expression // program_0 program_1 statement_0
+%type<symbol_value> program statement expression // program_0 program_1 statement_0 statement_1
 
 %%
 
@@ -57,8 +57,12 @@ statement:
 //    ;
 //
 //statement_0:
-//      /* empty */  {           $$ = NULL; }
-//    | ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+//      /* empty */ { $$ = NULL; }
+//    | statement_1 { $$ = $1; }
+//    ;
+//
+//statement_1:
+//      ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
 //    ;
 
 expression:
