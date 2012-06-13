@@ -7,31 +7,51 @@ root:
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
+// ORIGINAL:
+//program:
+//      statement             { $$ = $1; }
+//    | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
+//    ;
+
+// EBNF:
+// [
 program:
       (
             statement ',' { /* AAA */ $$ = $1; }
-      )* statement        { /* BBB */ $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
     ;
+// ]
 
+// EBNF-EXPANDED:
 //program:
-//      program_0 statement { /* BBB */ $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+//      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 //
 //program_0:
 //      /* empty */         {           $$ = NULL; }
-//    | program_0 program_1 { /* BBB */ $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+//    | program_0 program_1 { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 //
 //program_1:
 //      statement ',' { /* AAA */ $$ = $1; }
 //    ;
 
+// ORIGINAL:
+//statement:
+//      expression              { $$ = $1; }
+//    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+//    ;
+
+// EBNF:
+// [
 statement:
       (
             ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
       )? expression      { /* DDD */ $$ = MAKE_SYMBOL('=', 2, $1, $2); }
     ;
+// ]
 
+// EBNF-EXPANDED:
 //statement:
 //      statement_0 expression { /* DDD */ $$ = MAKE_SYMBOL('=', 2, $1, $2); }
 //    ;
