@@ -1,4 +1,4 @@
-%type<symbol_value> program statement expression
+%type<symbol_value> program statement expression // program_0 statement_0
 
 %%
 
@@ -9,33 +9,32 @@ root:
 
 program:
       (
-            statement ',' { $$ = $1; }
-      )* statement        { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+            statement ',' { /* AAA */ $$ = $1; }
+      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
     ;
 
 //program:
-//      program_0 statement { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
+//      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 //
 //program_0:
 //      /* empty */             { $$ = NULL; }
-//    | statement ','           { $$ = $1; }
 //    | program_0 statement ',' { $$ = MAKE_SYMBOL(',', 2, $1, $2); }
 //    ;
 
 statement:
       (
-            ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
-      )? expression      { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+            ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
     ;
 
 //statement:
-//      statement_0 expression { $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+//      statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
 //    ;
 //
 //statement_0:
-//      /* empty */  { $$ = NULL; }
-//    | ID_IDENT '=' { $$ = MAKE_TERM(ID_IDENT, $1); }
+//      /* empty */  {           $$ = NULL; }
+//    | ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
 //    ;
 
 expression:
