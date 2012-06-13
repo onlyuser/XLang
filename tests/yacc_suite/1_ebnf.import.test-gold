@@ -48,7 +48,7 @@
                     <term type="ident" value=statement/>
                 </symbol>
                 <symbol type="action_block">
-                    <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+                    <term type="string" value=" /* BBB */ $$ = MAKE_SYMBOL(\',\', 2, $1, $2); "/>
                 </symbol>
             </symbol>
         </symbol>
@@ -72,7 +72,7 @@
                     <term type="ident" value=expression/>
                 </symbol>
                 <symbol type="action_block">
-                    <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+                    <term type="string" value=" /* DDD */ $$ = MAKE_SYMBOL(\'=\', 2, $1, $2); "/>
                 </symbol>
             </symbol>
         </symbol>
