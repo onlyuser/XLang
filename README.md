@@ -105,52 +105,52 @@ Make targets:
     clean  -- remove all intermediate files
 
 FAQ:
-    1. What is XLang ?
-       XLang is a starting point for people looking to construct their own
-       language using Lex-Yacc. XLang is thoroughly tested and comes with its
-       own test suite.
+1.  What is XLang ?
+    XLang is a starting point for people looking to construct their own
+    language using Lex-Yacc. XLang is thoroughly tested and comes with its
+    own test suite.
 
-    2. What isn't XLang ?
-       XLang isn't a unified parser front-end for every language under the sun.
-       It makes some assumptions about the target language, meaning, literal
-       values must be C-like. Otherwise, it places no restrictions on the
-       grammar.
+2.  What isn't XLang ?
+    XLang isn't a unified parser front-end for every language under the sun.
+    It makes some assumptions about the target language, meaning, literal
+    values must be C-like. Otherwise, it places no restrictions on the
+    grammar.
 
-    3. How should one use XLang ?
-       I recommend hacking the "stdio" example to your liking, but any of the
-       other variations equally suitable as a base for beginners.
+3.  How should one use XLang ?
+    I recommend hacking the "stdio" example to your liking, but any of the
+    other variations equally suitable as a base for beginners.
 
-    4. What licenses apply when using XLang ?
-       GPL3.
+4.  What licenses apply when using XLang ?
+    GPL3.
 
-    5. What's the motivation behind writing XLang ?
-       Lex-Yacc is a pragmatic solution that will get the job done, but it
-       doesn't do so right out of the box. It needs some infrastructure to get
-       most sizeable projects going.
+5.  What's the motivation behind writing XLang ?
+    Lex-Yacc is a pragmatic solution that will get the job done, but it
+    doesn't do so right out of the box. It needs some infrastructure to get
+    most sizeable projects going.
 
-       I built XLang out of my own need for a parser SDK that takes care of the
-       tedious tree building business so I could focus more on the fun stuff --
-       AST visitation.
+    I built XLang out of my own need for a parser SDK that takes care of the
+    tedious tree building business so I could focus more on the fun stuff --
+    AST visitation.
 
-       But isn't this exactly what production rule actions are for ? No. In
-       order to perform multi-pass visitation to an AST, using Yacc, one would
-       have to re-parse the input everytime, and that's wasteful. XLang builds
-       an AST for you so you can visit it as many times as needed.
+    But isn't this exactly what production rule actions are for ? No. In
+    order to perform multi-pass visitation to an AST, using Yacc, one would
+    have to re-parse the input everytime, and that's wasteful. XLang builds
+    an AST for you so you can visit it as many times as needed.
 
-       I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
-       excellent tutorial.
+    I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
+    excellent tutorial.
 
-    6. How does XLang differ from the example in Tom's tutorial ?
-       a) XLang uses C++, with unions used only where necessary. Tom's tutorial
-          uses a C-style polymorphism technique where the last member of a
-          class is a union of several types. I prefer C++ polymorphism.
-       b) XLang has its own memory management system based on allocators. Tom's
-          tutorial omits AST node freeing entirely.
-       c) XLang offers several flavors of Lex-Yacc whereas Tom's tutorial
-          offers just one "stdio" parser.
-       d) XLang's ASTs are "flattened", meaning lists are interpreted as lists
-          instead of deep-recursing binary trees. This tree organization lends
-          itself better to AST visitation (less likely to stack-overflow).
+6.  How does XLang differ from the example in Tom's tutorial ?
+    a)  XLang uses C++, with unions used only where necessary. Tom's tutorial
+        uses a C-style polymorphism technique where the last member of a
+        class is a union of several types. I prefer C++ polymorphism.
+    b)  XLang has its own memory management system based on allocators. Tom's
+        tutorial omits AST node freeing entirely.
+    c)  XLang offers several flavors of Lex-Yacc whereas Tom's tutorial
+        offers just one "stdio" parser.
+    d)  XLang's ASTs are "flattened", meaning lists are interpreted as lists
+        instead of deep-recursing binary trees. This tree organization lends
+        itself better to AST visitation (less likely to stack-overflow).
 
 <pre>
           (1+2+3)        (1+2+3)
