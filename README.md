@@ -95,6 +95,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     all, test, pure, dot, lint, doc, xml, import, clean.
 
 <table>
+    <tr><th> target </th><th> action                                                </th></tr>
     <tr><td> all    </td><td> make binaries                                         </td></tr>
     <tr><td> test   </td><td> all + run tests                                       </td></tr>
     <tr><td> pure   </td><td> test + use valgrind to check for memory leaks         </td></tr>
