@@ -187,6 +187,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
         cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
         visit double-dispatch without the need to implement the "accept"
         method for every single AST node class.
+
     f)  XLang uses namespaces and isolates all the AST building code into a
         static library.
 
