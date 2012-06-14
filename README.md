@@ -5,6 +5,7 @@ based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 *About:*
+
     XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
     is also a demonstration of various ways one could build a yacc-based
     parser. Seven variations of parser are presented, varying in feature
@@ -28,6 +29,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     customizable to his/her specific requirements.
 
 *Variation vs Feature Table:*
+
                  more                                                      less
                  critical <--                                          --> critical
 <table>
@@ -47,6 +49,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
           hack flex into using "buffer input" or "file input".
 
 *Feature Detail:*
+
     lexer:
         flex: Use flex to generate a lexer.
               This option is preferred when regex significantly simplifies the
@@ -85,6 +88,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
              ways to handle strings, characters, and escaped characters.
 
 *Requirements:*
+
     Unix tools and 3rd party components (accessible from $PATH):
         gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck,
         doxygen, graphviz, ticpp
@@ -94,6 +98,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
         $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
 *Make targets:*
+
     all, test, pure, dot, lint, doc, xml, import, clean.
 
 <table>
@@ -110,6 +115,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 </table>
 
 *FAQ:*
+
 1.  What is XLang ?
 
     XLang is a starting point for people looking to construct their own
@@ -218,6 +224,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     quite involving).
 
 *References:*
+
 <dl>
     <dt>"Flex your lexical analysis muscles"</dt>
     <dd>http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
@@ -258,9 +265,11 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 </dl>
 
 *Additional Reading:*
+
 * http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
 * http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
 * http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 *Keywords:*
+
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
