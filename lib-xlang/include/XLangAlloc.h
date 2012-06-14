@@ -28,8 +28,8 @@ namespace xl {
 class MemChunk
 {
 public:
-    typedef void (*dtor_type)(void*);
-    MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_type dtor = NULL);
+    typedef void (*dtor_cb_t)(void*);
+    MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_cb_t dtor_cb = NULL);
     ~MemChunk();
     void* ptr() const { return m_ptr; }
     size_t size() const { return m_size_bytes; }
@@ -41,7 +41,7 @@ private:
     size_t m_size_bytes;
     std::string m_filename;
     size_t m_line_number;
-    dtor_type m_dtor;
+    dtor_cb_t m_dtor_cb;
     void* m_ptr;
 };
 
@@ -52,7 +52,7 @@ public:
     ~Allocator();
     std::string name() const { return m_name; }
     size_t size() const { return m_size_bytes; }
-    void* _malloc(size_t size_bytes, std::string filename, size_t line_number, MemChunk::dtor_type dtor = NULL);
+    void* _malloc(size_t size_bytes, std::string filename, size_t line_number, MemChunk::dtor_cb_t dtor_cb = NULL);
     void _free(void* ptr);
     void _free();
     void dump(std::string indent) const;
@@ -68,7 +68,7 @@ private:
 
 // NOTE: doesn't work for arrays
 void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number,
-        xl::MemChunk::dtor_type dtor);
+        xl::MemChunk::dtor_cb_t dtor_cb);
 void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number);
 
 #endif

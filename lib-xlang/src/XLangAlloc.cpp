@@ -23,8 +23,8 @@
 
 namespace xl {
 
-MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_type dtor)
-    : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number), m_dtor(dtor)
+MemChunk::MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_cb_t dtor_cb)
+    : m_size_bytes(_size_bytes), m_filename(_filename), m_line_number(_line_number), m_dtor_cb(dtor_cb)
 {
     m_ptr = malloc(_size_bytes);
 }
@@ -33,8 +33,8 @@ MemChunk::~MemChunk()
 {
     if(m_ptr)
     {
-        if(m_dtor)
-            m_dtor(m_ptr);
+        if(m_dtor_cb)
+            m_dtor_cb(m_ptr);
         free(m_ptr);
     }
 }
@@ -54,9 +54,9 @@ Allocator::~Allocator()
 }
 
 void* Allocator::_malloc(size_t size_bytes, std::string filename, size_t line_number,
-        MemChunk::dtor_type dtor)
+        MemChunk::dtor_cb_t dtor_cb)
 {
-    MemChunk* chunk = new MemChunk(size_bytes, filename, line_number, dtor);
+    MemChunk* chunk = new MemChunk(size_bytes, filename, line_number, dtor_cb);
     m_size_bytes += size_bytes;
     m_chunk_map.insert(internal_type::value_type(chunk->ptr(), chunk));
     return chunk->ptr();
@@ -95,9 +95,9 @@ void Allocator::dump(std::string indent) const
 }
 
 void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number,
-        xl::MemChunk::dtor_type dtor)
+        xl::MemChunk::dtor_cb_t dtor_cb)
 {
-    return alloc._malloc(size_bytes, filename, line_number, dtor);
+    return alloc._malloc(size_bytes, filename, line_number, dtor_cb);
 }
 
 void* operator new(size_t size_bytes, xl::Allocator &alloc, std::string filename, size_t line_number)

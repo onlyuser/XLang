@@ -20,13 +20,18 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include <vector>
 
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
+    typedef void (*delayed_ast_mutate_cb_t)(void*);
     EBNFPrinter()
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
+
+private:
+    std::vector<delayed_ast_mutate_cb_t> delayed_ast_mutate_cb_vec; // FIX-ME!
 };
 
 #endif
