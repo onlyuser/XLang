@@ -1,5 +1,7 @@
 Variations of a Lex-Yacc parser
+
 based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 *About:*
@@ -109,24 +111,29 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 *FAQ:*
 1.  What is XLang ?
+
     XLang is a starting point for people looking to construct their own
     language using Lex-Yacc. XLang is thoroughly tested and comes with its
     own test suite.
 
 2.  What isn't XLang ?
+
     XLang isn't a unified parser front-end for every language under the sun.
     It makes some assumptions about the target language, meaning, literal
     values must be C-like. Otherwise, it places no restrictions on the
     grammar.
 
 3.  How should one use XLang ?
+
     I recommend hacking the "stdio" example to your liking, but any of the
     other variations equally suitable as a base for beginners.
 
 4.  What licenses apply when using XLang ?
+
     GPL3.
 
 5.  What's the motivation behind writing XLang ?
+
     Lex-Yacc is a pragmatic solution that will get the job done, but it
     doesn't do so right out of the box. It needs some infrastructure to get
     most sizeable projects going.
@@ -144,13 +151,17 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     excellent tutorial.
 
 6.  How does XLang differ from the example in Tom's tutorial ?
+
     a)  XLang uses C++, with unions used only where necessary. Tom's tutorial
         uses a C-style polymorphism technique where the last member of a
         class is a union of several types. I prefer C++ polymorphism.
+
     b)  XLang has its own memory management system based on allocators. Tom's
         tutorial omits AST node freeing entirely.
+
     c)  XLang offers several flavors of Lex-Yacc whereas Tom's tutorial
         offers just one "stdio" parser.
+
     d)  XLang's ASTs are "flattened", meaning lists are interpreted as lists
         instead of deep-recursing binary trees. This tree organization lends
         itself better to AST visitation (less likely to stack-overflow).
@@ -174,6 +185,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
         static library.
 
 7.  Why allocators ?
+
     I've incorporated a simple memory allocator in this project because I
     wanted to keep my AST node classes as clean as possible, without
     destructors that delete child nodes. But the way the allocator was
@@ -182,6 +194,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     true memory pooling.
 
 8.  Why c++0x ?
+
     Lambda functions are the only c++0x feature used here, and only because
     they solves the problem elegantly. The goal is to deliberately avoid
     implementing clean-up code within the AST node destructors. This goes
@@ -191,6 +204,7 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
     job is to perform clean-up originally intended for the destructor.
 
 9.  Why coroutines ?
+
     I needed a way to store the "progress" of a visitation, so it can be
     resumed later. A direct approach would be keeping a reference to the
     most recently visited child node and tucking that away in a static
