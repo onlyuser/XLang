@@ -2,7 +2,7 @@ Variations of a Lex-Yacc parser
 based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
-About:
+*About:*
     XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
     is also a demonstration of various ways one could build a yacc-based
     parser. Seven variations of parser are presented, varying in feature
@@ -25,7 +25,7 @@ About:
     can quickly isolate a variation that is most relevent, and most readily
     customizable to his/her specific requirements.
 
-Variation vs Feature Table:
+*Variation vs Feature Table:*
                  more                                                      less
                  critical <--                                          --> critical
 <table>
@@ -44,7 +44,7 @@ Variation vs Feature Table:
           accepts standard stream input by default. It takes extra effort to
           hack flex into using "buffer input" or "file input".
 
-Feature Detail:
+*Feature Detail:*
     lexer:
         flex: Use flex to generate a lexer.
               This option is preferred when regex significantly simplifies the
@@ -82,7 +82,7 @@ Feature Detail:
              for stateful scanning. This option demonstrates *one* of the many
              ways to handle strings, characters, and escaped characters.
 
-Requirements:
+*Requirements:*
     Unix tools and 3rd party components (accessible from $PATH):
         gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck,
         doxygen, graphviz, ticpp
@@ -91,20 +91,22 @@ Requirements:
         $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
         $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
-Make targets:
+*Make targets:*
     all, test, pure, dot, lint, doc, xml, import, clean.
 
-    all    -- make binaries
-    test   -- all + run tests
-    pure   -- test + use valgrind to check for memory leaks
-    dot    -- test + generate .png graph for tests
-    lint   -- use cppcheck to perform static analysis on .cpp files
-    doc    -- use doxygen to generate documentation
-    xml    -- test + generate .xml for tests
-    import -- test + use ticpp to serialize-to/deserialize-from xml
-    clean  -- remove all intermediate files
+<table>
+    <tr><td> all    </td><td> make binaries                                         </td></tr>
+    <tr><td> test   </td><td> all + run tests                                       </td></tr>
+    <tr><td> pure   </td><td> test + use valgrind to check for memory leaks         </td></tr>
+    <tr><td> dot    </td><td> test + generate .png graph for tests                  </td></tr>
+    <tr><td> lint   </td><td> use cppcheck to perform static analysis on .cpp files </td></tr>
+    <tr><td> doc    </td><td> use doxygen to generate documentation                 </td></tr>
+    <tr><td> xml    </td><td> test + generate .xml for tests                        </td></tr>
+    <tr><td> import </td><td> test + use ticpp to serialize-to/deserialize-from xml </td></tr>
+    <tr><td> clean  </td><td> remove all intermediate files                         </td></tr>
+</table>
 
-FAQ:
+*FAQ:*
 1.  What is XLang ?
     XLang is a starting point for people looking to construct their own
     language using Lex-Yacc. XLang is thoroughly tested and comes with its
@@ -163,44 +165,44 @@ FAQ:
           1   2
 </pre>
 
-       e) XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
-          cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
-          visit double-dispatch without the need to implement the "accept"
-          method for every single AST node class.
-       f) XLang uses namespaces and isolates all the AST building code into a
-          static library.
+    e)  XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
+        cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
+        visit double-dispatch without the need to implement the "accept"
+        method for every single AST node class.
+    f)  XLang uses namespaces and isolates all the AST building code into a
+        static library.
 
-    7. Why allocators ?
-       I've incorporated a simple memory allocator in this project because I
-       wanted to keep my AST node classes as clean as possible, without
-       destructors that delete child nodes. But the way the allocator was
-       written really doesn't improve the program's memory usage patterns. With
-       some effort, I suppose one could upgrade that into a real allocator with
-       true memory pooling.
+7.  Why allocators ?
+    I've incorporated a simple memory allocator in this project because I
+    wanted to keep my AST node classes as clean as possible, without
+    destructors that delete child nodes. But the way the allocator was
+    written really doesn't improve the program's memory usage patterns. With
+    some effort, I suppose one could upgrade that into a real allocator with
+    true memory pooling.
 
-    8. Why c++0x ?
-       Lambda functions are the only c++0x feature used here, and only because
-       they solves the problem elegantly. The goal is to deliberately avoid
-       implementing clean-up code within the AST node destructors. This goes
-       along a grander design decision to keep the AST node class clear of
-       method clutter by moving all the predicate code into visitors. Lambdas
-       help us provide temporary anonymous callbacks for the allocator, whose
-       job is to perform clean-up originally intended for the destructor.
+8.  Why c++0x ?
+    Lambda functions are the only c++0x feature used here, and only because
+    they solves the problem elegantly. The goal is to deliberately avoid
+    implementing clean-up code within the AST node destructors. This goes
+    along a grander design decision to keep the AST node class clear of
+    method clutter by moving all the predicate code into visitors. Lambdas
+    help us provide temporary anonymous callbacks for the allocator, whose
+    job is to perform clean-up originally intended for the destructor.
 
-    9. Why coroutines ?
-       I needed a way to store the "progress" of a visitation, so it can be
-       resumed later. A direct approach would be keeping a reference to the
-       most recently visited child node and tucking that away in a static
-       variable, but this assumes a linear visitation limited to ascending or
-       descending traversals. Enter the coroutine, whose main purpose is to
-       provide flow control for systems that need suspending and resuming of
-       execution, exactly what is needed for my visitor.
+9.  Why coroutines ?
+    I needed a way to store the "progress" of a visitation, so it can be
+    resumed later. A direct approach would be keeping a reference to the
+    most recently visited child node and tucking that away in a static
+    variable, but this assumes a linear visitation limited to ascending or
+    descending traversals. Enter the coroutine, whose main purpose is to
+    provide flow control for systems that need suspending and resuming of
+    execution, exactly what is needed for my visitor.
 
-       I use Simon Tatham's excellent implementation of this immensely useful
-       concept. Please visit his page to learn more (as his use of macros is
-       quite involving).
+    I use Simon Tatham's excellent implementation of this immensely useful
+    concept. Please visit his page to learn more (as his use of macros is
+    quite involving).
 
-References:
+*References:*
 <dl>
     <dt>"Flex your lexical analysis muscles"</dt>
     <dd>http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
@@ -240,10 +242,10 @@ References:
     <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
 </dl>
 
-Additional Reading:
+*Additional Reading:*
 * http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
 * http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
 * http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
-Keywords:
+*Keywords:*
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
