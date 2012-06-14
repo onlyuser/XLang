@@ -204,48 +204,49 @@ FAQ:
        quite involving).
 
 References:
-    "Flex your lexical analysis muscles"
-    http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm
-    http://www.developer.com/net/cplus/article.php/3636641/Flex-Your-Lexical-Analysis-Muscles.htm
+<dl>
+    <dt>"Flex your lexical analysis muscles"</dt>
+    <dd>http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
+    <dd>http://www.developer.com/net/cplus/article.php/3636641/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
 
-    "Classic Parsing with Flex-Bison"
-    http://www.codeguru.com/csharp/.net/net_general/patterns/article.php/c12805/Classic-Parsing-with-Flex-and-Bison.htm
-    http://www.developer.com/net/cplus/article.php/3642516/Classic-Parsing-with-Flex-and-Bison.htm
+    <dt>"Classic Parsing with Flex-Bison"</dt>
+    <dd>http://www.codeguru.com/csharp/.net/net_general/patterns/article.php/c12805/Classic-Parsing-with-Flex-and-Bison.htm</dd>
+    <dd>http://www.developer.com/net/cplus/article.php/3642516/Classic-Parsing-with-Flex-and-Bison.htm</dd>
 
-    "Tom Niemann Flex-Bison AST examples"
-    http://epaperpress.com/lexandyacc/
+    <dt>"Tom Niemann Flex-Bison AST examples"</dt>
+    <dd>http://epaperpress.com/lexandyacc/</dd>
 
-    "UsualCoding.eu Reentrant Flex-Bison example"
-    http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison
-    (code example needs "void yyerror() {}" inserted in declaration section of
-    parser.y)
-    (page seems down as of May 19, 2012)
+    <dt>"UsualCoding.eu Reentrant Flex-Bison example"</dt>
+    <dd>http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison</dd>
+    <dd>(code example needs "void yyerror() {}" inserted in declaration section of parser.y)</dd>
+    <dd>(page seems down as of May 19, 2012)</dd>
 
-    "Make a reentrant parser with Flex and Bison"
-    http://www.lemoda.net/c/reentrant-parser/index.html
+    <dt>"Make a reentrant parser with Flex and Bison"</dt>
+    <dd>http://www.lemoda.net/c/reentrant-parser/index.html</dd>
 
-    "Better error handling using Flex and Bison"
-    http://www.ibm.com/developerworks/library/l-flexbison.html
+    <dt>"Better error handling using Flex and Bison"</dt>
+    <dd>http://www.ibm.com/developerworks/library/l-flexbison.html</dd>
 
-    "ProgTools Flex-Bison AST tutorial (with classes)"
-    http://www.progtools.org/compilers/tutorials/cxx_and_bison/cxx_and_bison.html
+    <dt>"ProgTools Flex-Bison AST tutorial (with classes)"</dt>
+    <dd>http://www.progtools.org/compilers/tutorials/cxx_and_bison/cxx_and_bison.html</dd>
 
-    "O-Reilly Lex-Yacc book examples"
-    http://examples.oreilly.com/lex/
+    <dt>"O-Reilly Lex-Yacc book examples"</dt>
+    <dd>http://examples.oreilly.com/lex/</dd>
 
-    "Cooperative Visitor: A Template Technique for Visitor Creation"
-    http://www.artima.com/cppsource/cooperative_visitor.html
+    <dt>"Cooperative Visitor: A Template Technique for Visitor Creation"</dt>
+    <dd>http://www.artima.com/cppsource/cooperative_visitor.html</dd>
 
-    "Java Tip 98: Reflect on the Visitor design pattern"
-    http://www.javaworld.com/javaworld/javatips/jw-javatip98.html
+    <dt>"Java Tip 98: Reflect on the Visitor design pattern"</dt>
+    <dd>http://www.javaworld.com/javaworld/javatips/jw-javatip98.html</dd>
 
-    "Coroutines in C"
-    http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
+    <dt>"Coroutines in C"</dt>
+    <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
+</dl>
 
 Additional Reading:
-    http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
-    http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
-    http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
+* http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
+* http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
+* http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 Keywords:
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
