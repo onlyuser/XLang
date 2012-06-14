@@ -26,6 +26,7 @@ About:
     customizable to his/her specific requirements.
 
 Variation vs Feature Table:
+<pre>
                  more                                                      less
                  critical <--                                          --> critical
 +--------------+-------------+--------+-----------+-----------+----------+---------+
@@ -40,6 +41,7 @@ Variation vs Feature Table:
 | file         | flex        | file   | no        | no        | no       | no      |
 | no-flex      | hand-rolled | file   | no        | no        | no       | no      |
 +--------------+-------------+--------+-----------+-----------+----------+---------+
+</pre>
 
     HINT: The "stdio" variation is easiest to implement -- The flex lexer
           accepts standard stream input by default. It takes extra effort to
@@ -153,6 +155,7 @@ FAQ:
           instead of deep-recursing binary trees. This tree organization lends
           itself better to AST visitation (less likely to stack-overflow).
 
+<pre>
           (1+2+3)        (1+2+3)
           non-flattened: flattened:
 
@@ -161,6 +164,7 @@ FAQ:
             +   3        1  2  3
            / \
           1   2
+</pre>
 
        e) XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
           cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
