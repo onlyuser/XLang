@@ -172,7 +172,7 @@ customizable to his/her specific requirements.
         instead of deep-recursing binary trees. This tree organization lends
         itself better to AST visitation (less likely to stack-overflow).
 
-    <pre>
+        <pre>
         (1+2+3)        (1+2+3)
         non-flattened: flattened:
         
@@ -181,7 +181,7 @@ customizable to his/her specific requirements.
           +   3        1  2  3
          / \
         1   2
-    </pre>
+        </pre>
 
     e)  XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
         cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
