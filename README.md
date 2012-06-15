@@ -15,9 +15,6 @@ The first variation (0_XLang_full), is a full-featured parser. With each
 successive variation, non-critical features are stripped until there is
 nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
-feature <--                                                         --> feature
-complete                                                                basic
-
 full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
 The order in which features are removed is completely arbitrary. There's no
@@ -29,8 +26,6 @@ can quickly isolate a variation that is most relevent, and most readily
 customizable to his/her specific requirements.
 
 **Variation vs Feature Table:**
-
-    more critical <--> less critical
 
 <table>
     <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
