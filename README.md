@@ -1,8 +1,8 @@
 **Variations of a Lex-Yacc parser**
 
-**based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann**
+based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
 
-**Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>**
+Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 **About:**
 
