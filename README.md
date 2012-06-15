@@ -173,14 +173,14 @@ customizable to his/her specific requirements.
         itself better to AST visitation (less likely to stack-overflow).
 
     <pre>
-    (1+2+3)        (1+2+3)
-    non-flattened: flattened:
-    
-        +             +
-       / \          / | \
-      +   3        1  2  3
-     / \
-    1   2
+        (1+2+3)        (1+2+3)
+        non-flattened: flattened:
+        
+            +             +
+           / \          / | \
+          +   3        1  2  3
+         / \
+        1   2
     </pre>
 
     e)  XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
