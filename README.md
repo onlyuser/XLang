@@ -1,8 +1,8 @@
-Variations of a Lex-Yacc parser
+**Variations of a Lex-Yacc parser**
 
-based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+**based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann**
 
-Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
+**Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>**
 
 **About:**
 
@@ -51,6 +51,7 @@ customizable to his/her specific requirements.
 **Feature Detail:**
 
     lexer:
+
         flex: Use flex to generate a lexer.
               This option is preferred when regex significantly simplifies the
               lexer.
@@ -62,6 +63,7 @@ customizable to his/her specific requirements.
                      this writing.
 
     input:
+
         buffer: Use in-memory buffer as input.
                 This option is preferred when speed is critical -- Standard
                 streams are slow. This option is also preferred when the input
@@ -201,7 +203,7 @@ customizable to his/her specific requirements.
 8.  Why c++0x ?
 
     Lambda functions are the only c++0x feature used here, and only because
-    they solves the problem elegantly. The goal is to deliberately avoid
+    they solve the problem elegantly. The goal is to deliberately avoid
     implementing clean-up code within the AST node destructors. This goes
     along a grander design decision to keep the AST node class clear of
     method clutter by moving all the predicate code into visitors. Lambdas
