@@ -6,27 +6,27 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 **About:**
 
-    XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
-    is also a demonstration of various ways one could build a yacc-based
-    parser. Seven variations of parser are presented, varying in feature
-    completeness.
+XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
+is also a demonstration of various ways one could build a yacc-based
+parser. Seven variations of parser are presented, varying in feature
+completeness.
 
-    The first variation (0_XLang_full), is a full-featured parser. With each
-    successive variation, non-critical features are stripped until there is
-    nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
+The first variation (0_XLang_full), is a full-featured parser. With each
+successive variation, non-critical features are stripped until there is
+nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
-    feature <--                                                         --> feature
-    complete                                                                basic
+feature <--                                                         --> feature
+complete                                                                basic
 
-    full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
+full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
-    The order in which features are removed is completely arbitrary. There's no
-    good reason one cannot cannot have both "comments" and "file input"
-    enabled, or both "reentrant" and "hand-rolled lexer" enabled.
+The order in which features are removed is completely arbitrary. There's no
+good reason one cannot cannot have both "comments" and "file input"
+enabled, or both "reentrant" and "hand-rolled lexer" enabled.
 
-    The code is organized in a way such that anyone unfamiliar with Lex-Yacc
-    can quickly isolate a variation that is most relevent, and most readily
-    customizable to his/her specific requirements.
+The code is organized in a way such that anyone unfamiliar with Lex-Yacc
+can quickly isolate a variation that is most relevent, and most readily
+customizable to his/her specific requirements.
 
 **Variation vs Feature Table:**
 
@@ -89,13 +89,13 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 **Requirements:**
 
-    Unix tools and 3rd party components (accessible from $PATH):
-        gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck,
-        doxygen, graphviz, ticpp
-
-    Environment variables:
-        $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
-        $EXTERN_LIB_PATH     -- where "libticppd.a" resides
+<dl>
+    <dt>Unix tools and 3rd party components (accessible from $PATH):</dt>
+    <dd>gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck, doxygen, graphviz, ticpp</dd>
+    <dt>Environment variables:</dt>
+    <dd>$EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides</dd>
+    <dd>$EXTERN_LIB_PATH     -- where "libticppd.a" resides</dd>
+</dl>
 
 **Make targets:**
 
