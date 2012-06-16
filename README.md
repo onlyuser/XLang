@@ -6,6 +6,8 @@ Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 About:
 ------
 
+![picture alt](https://sites.google.com/site/onlyuser/files/ast.png "1+2*3")
+
 XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
 is also a demonstration of various ways one could build a yacc-based
 parser. Seven variations of parser are presented, varying in feature
