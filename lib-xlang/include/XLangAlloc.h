@@ -58,9 +58,9 @@ public:
     void dump(std::string indent) const;
 
 private:
-    typedef std::map<void*, MemChunk*> internal_type;
+    typedef std::map<void*, MemChunk*> internal_type_t;
     std::string m_name;
-    internal_type m_chunk_map;
+    internal_type_t m_chunk_map;
     size_t m_size_bytes;
 };
 
