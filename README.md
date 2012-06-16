@@ -1,7 +1,5 @@
 **Variations of a Lex-Yacc parser**
 
-based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
-
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
 **About:**
@@ -15,7 +13,7 @@ The first variation (0_XLang_full), is a full-featured parser. With each
 successive variation, non-critical features are stripped until there is
 nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
 
-full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
+    full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
 
 The order in which features are removed is completely arbitrary. There's no
 good reason one cannot cannot have both "comments" and "file input"
