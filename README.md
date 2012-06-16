@@ -266,6 +266,7 @@ References:
 
     <dt>"Coroutines in C"</dt>
     <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
+    <dd>(code originally intended for a C compiler, needs additional c++ style casting for use with g++)</dd>
 </dl>
 
 Additional Reading:
