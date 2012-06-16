@@ -151,13 +151,15 @@ FAQ:
     tedious tree building business so I could focus more on the fun stuff --
     AST visitation.
 
-    But isn't this exactly what production rule actions are for ? No. In
-    order to perform multi-pass visitation to an AST, using Yacc, one would
-    have to re-parse the input everytime, and that's wasteful. XLang builds
-    an AST for you so you can visit it as many times as needed.
+    But one may ask, isn't this exactly what production rule actions are
+    for ? No. In order to perform multi-pass visitation to an AST, using
+    Yacc, one would have to re-parse the input everytime, and that's
+    wasteful. XLang builds an AST for you so you can visit it as many times
+    as needed.
 
-    I owe everything I know about Lex-Yacc to Tom Niemann. Please read his
-    excellent tutorial.
+    To make a long answer short, Tom Niemann's Lex-Yacc tutorial is my
+    primary source of inspiration for building XLang. Please visit his site
+    to learn more.
 
 6.  How does XLang differ from the example in Tom's tutorial ?
 
@@ -216,7 +218,7 @@ FAQ:
     I needed a way to store the "progress" of a visitation, so it can be
     suspended temporarily and resumed later. A direct approach would be to
     keep a reference to the most recently visited child node in a static
-    variable, but that assumes a linear visitation limited to ascending or
+    variable, but this assumes a linear visitation limited to ascending or
     descending traversals. Enter the coroutine, whose main purpose is to
     provide flow control for systems that involve pre-emption, even in a
     single-threaded programming model, exactly what I need for my visitor.
