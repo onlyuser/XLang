@@ -38,9 +38,9 @@ void LispPrinter::visit(const node::SymbolNodeIFace* _node)
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<term ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
@@ -49,9 +49,9 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _no
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<term ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
@@ -60,9 +60,9 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<term ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
@@ -71,9 +71,9 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* 
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<term ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
@@ -82,9 +82,9 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _n
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<term ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
@@ -93,15 +93,15 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
 
 void XMLPrinter::visit(const node::SymbolNodeIFace* _node)
 {
-    std::cout << std::string(depth*4, ' ');
+    std::cout << std::string(m_depth*4, ' ');
     std::cout << "<symbol ";
-    if(include_node_uid)
+    if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\">" << std::endl;
-    depth++;
+    m_depth++;
     DefaultTour::visit(_node);
-    depth--;
-    std::cout << std::string(depth*4, ' ') << "</symbol>" << std::endl;
+    m_depth--;
+    std::cout << std::string(m_depth*4, ' ') << "</symbol>" << std::endl;
 }
 
 void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)

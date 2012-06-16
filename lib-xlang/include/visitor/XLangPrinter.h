@@ -34,7 +34,7 @@ public:
 struct XMLPrinter : public DefaultTour
 {
 public:
-    XMLPrinter() : depth(0), include_node_uid(false)
+    XMLPrinter() : m_depth(0), m_include_node_uid(false)
     {}
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
@@ -44,8 +44,8 @@ public:
     void visit(const node::SymbolNodeIFace* _node);
 
 private:
-    size_t depth;
-    bool include_node_uid;
+    size_t m_depth;
+    bool m_include_node_uid;
 };
 
 struct DotPrinter : public DefaultTour

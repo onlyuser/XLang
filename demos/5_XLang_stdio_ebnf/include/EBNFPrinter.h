@@ -31,7 +31,7 @@ public:
     void visit(const xl::node::SymbolNodeIFace* _node);
 
 private:
-    std::vector<delayed_ast_mutate_cb_t> delayed_ast_mutate_cb_vec; // FIX-ME!
+    std::vector<delayed_ast_mutate_cb_t> m_delayed_ast_mutate_cb_vec; // FIX-ME!
 };
 
 #endif
