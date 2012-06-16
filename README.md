@@ -1,8 +1,10 @@
-**Variations of a Lex-Yacc parser**
+Variations of a Lex-Yacc parser
+===============================
 
 Copyright (C) 2011-2012 Jerry Chen <mailto:onlyuser@gmail.com>
 
-**About:**
+About:
+------
 
 XLang is a Lex-Yacc parser "framework" for rapid language prototyping. It
 is also a demonstration of various ways one could build a yacc-based
@@ -23,7 +25,8 @@ The code is organized in a way such that anyone unfamiliar with Lex-Yacc
 can quickly isolate a variation that is most relevent, and most readily
 customizable to his/her specific requirements.
 
-**Variation vs Feature Table:**
+Variation vs Feature Table:
+---------------------------
 
 <table>
     <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
@@ -41,7 +44,8 @@ customizable to his/her specific requirements.
           accepts standard stream input by default. It takes extra effort to
           hack flex into using "buffer input" or "file input".
 
-**Feature Detail:**
+Feature Detail:
+---------------
 
     lexer:
 
@@ -82,7 +86,8 @@ customizable to his/her specific requirements.
              for stateful scanning. This option demonstrates *one* of the many
              ways to handle strings, characters, and escaped characters.
 
-**Requirements:**
+Requirements:
+-------------
 
 <dl>
     <dt>Unix tools and 3rd party components (accessible from $PATH):</dt>
@@ -92,7 +97,8 @@ customizable to his/her specific requirements.
     <dd>$EXTERN_LIB_PATH     -- where "libticppd.a" resides</dd>
 </dl>
 
-**Make targets:**
+Make targets:
+-------------
 
     all, test, pure, dot, lint, doc, xml, import, clean.
 
@@ -109,7 +115,8 @@ customizable to his/her specific requirements.
     <tr><td> clean  </td><td> remove all intermediate files                         </td></tr>
 </table>
 
-**FAQ:**
+FAQ:
+----
 
 1.  What is XLang ?
 
@@ -217,7 +224,8 @@ customizable to his/her specific requirements.
     concept. Please visit his page to learn more (as his use of macros is
     quite involving).
 
-**References:**
+References:
+-----------
 
 <dl>
     <dt>"Flex your lexical analysis muscles"</dt>
@@ -258,12 +266,14 @@ customizable to his/her specific requirements.
     <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
 </dl>
 
-**Additional Reading:**
+Additional Reading:
+-------------------
 
 * http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
 * http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
 * http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
-**Keywords:**
+Keywords:
+---------
 
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
