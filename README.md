@@ -89,13 +89,14 @@ Feature Detail:
 Requirements:
 -------------
 
-<dl>
-    <dt>Unix tools and 3rd party components (accessible from $PATH):</dt>
-    <dd>gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck, doxygen, graphviz, ticpp</dd>
-    <dt>Environment variables:</dt>
-    <dd>$EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides</dd>
-    <dd>$EXTERN_LIB_PATH     -- where "libticppd.a" resides</dd>
-</dl>
+Unix tools and 3rd party components (accessible from $PATH):
+
+    gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck, doxygen, graphviz, ticpp
+
+**Environment variables:**
+
+* $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
+* $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
 Make targets:
 -------------
@@ -274,6 +275,6 @@ Additional Reading:
 * http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 Keywords:
----------
+=========
 
     Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
