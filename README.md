@@ -208,22 +208,21 @@ FAQ:
     implementing clean-up code within the AST node destructors. This goes
     along a grander design decision to keep the AST node class clear of
     method clutter by moving all the predicate code into visitors. Lambdas
-    help us provide temporary anonymous callbacks for the allocator, whose
-    job is to perform clean-up originally intended for the destructor.
+    help us provide ad hoc anonymous callbacks for the allocator, whose job
+    is to perform clean-up originally intended for the destructor.
 
 9.  Why coroutines ?
 
     I needed a way to store the "progress" of a visitation, so it can be
-    resumed later. A direct approach would be keeping a reference to the
-    most recently visited child node and tucking that away in a static
-    variable, but this assumes a linear visitation limited to ascending or
+    suspended temporarily and resumed later. A direct approach would be to
+    keep a reference to the most recently visited child node in a static
+    variable, but that assumes a linear visitation limited to ascending or
     descending traversals. Enter the coroutine, whose main purpose is to
-    provide flow control for systems that need suspending and resuming of
-    execution, exactly what is needed for my visitor.
+    provide flow control for systems that involve pre-emption, even in a
+    single-threaded programming model, exactly what I need for my visitor.
 
-    I use Simon Tatham's excellent implementation of this immensely useful
-    concept. Please visit his page to learn more (as his use of macros is
-    quite involving).
+    I use Simon Tatham's excellent implementation of coroutines. Please
+    visit his site to learn more.
 
 References:
 -----------
