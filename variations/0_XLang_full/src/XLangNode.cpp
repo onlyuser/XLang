@@ -44,48 +44,48 @@ std::string Node::uid() const
 
 template<>
 NodeIdentIFace* TermNode<
-		static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-		>::clone(TreeContext* tc) const
+        static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
+        >::clone(TreeContext* tc) const
 {
-	return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
-			reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-			}) TermNode<
-					static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-					>(m_sym_id, const_cast<YYLTYPE &>(m_loc), m_value);
+    return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
+            }) TermNode<
+                    static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
+                    >(m_sym_id, const_cast<YYLTYPE &>(m_loc), m_value);
 }
 
 SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
-	: Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
-	  m_visit_state(NULL)
+    : Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
+      m_visit_state(NULL)
 {
-	for(size_t i = 0; i<_size; i++)
-	{
-		NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
-		if(is_same_type(child))
-		{
-			SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
-			m_child_vec.insert(m_child_vec.end(),
-					symbol_node->m_child_vec.begin(),
-					symbol_node->m_child_vec.end());
-			std::vector<NodeIdentIFace*>::iterator p;
-			for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
-				(*p)->set_parent(this);
-			continue;
-		}
-		m_child_vec.push_back(child);
-		child->set_parent(this);
-	}
+    for(size_t i = 0; i<_size; i++)
+    {
+        NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
+        if(is_same_type(child))
+        {
+            SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
+            m_child_vec.insert(m_child_vec.end(),
+                    symbol_node->m_child_vec.begin(),
+                    symbol_node->m_child_vec.end());
+            std::vector<NodeIdentIFace*>::iterator p;
+            for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
+                (*p)->set_parent(this);
+            continue;
+        }
+        m_child_vec.push_back(child);
+        child->set_parent(this);
+    }
 }
 
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
-	SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
-			reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-			}) SymbolNode(m_sym_id, const_cast<YYLTYPE &>(m_loc), 0, ap);
-	std::copy(m_child_vec.begin(), m_child_vec.end(),
-			std::back_inserter(_clone->m_child_vec));
-	return _clone;
+    SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
+            }) SymbolNode(m_sym_id, const_cast<YYLTYPE &>(m_loc), 0, ap);
+    std::copy(m_child_vec.begin(), m_child_vec.end(),
+            std::back_inserter(_clone->m_child_vec));
+    return _clone;
 }
 
 } }

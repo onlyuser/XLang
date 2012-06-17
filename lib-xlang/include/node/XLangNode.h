@@ -79,8 +79,8 @@ public:
     }
     NodeIdentIFace* clone(TreeContext* tc) const
     {
-    	return new (tc->alloc(), __FILE__, __LINE__)
-    			TermNode<_type>(m_sym_id, m_value); // default case assumes no non-trivial dtor
+        return new (tc->alloc(), __FILE__, __LINE__)
+                TermNode<_type>(m_sym_id, m_value); // default case assumes no non-trivial dtor
     }
 
 private:

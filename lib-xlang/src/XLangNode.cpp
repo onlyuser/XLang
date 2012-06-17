@@ -44,14 +44,14 @@ std::string Node::uid() const
 
 template<>
 NodeIdentIFace* TermNode<
-		static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-		>::clone(TreeContext* tc) const
+        static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
+        >::clone(TreeContext* tc) const
 {
-	return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
-			reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-			}) TermNode<
-					static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-					>(m_sym_id, m_value);
+    return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
+            }) TermNode<
+                    static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
+                    >(m_sym_id, m_value);
 }
 
 SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
@@ -82,12 +82,12 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
-	SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
-			reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-			}) SymbolNode(m_sym_id, 0, ap);
-	std::copy(m_child_vec.begin(), m_child_vec.end(),
-			std::back_inserter(_clone->m_child_vec));
-	return _clone;
+    SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
+            reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
+            }) SymbolNode(m_sym_id, 0, ap);
+    std::copy(m_child_vec.begin(), m_child_vec.end(),
+            std::back_inserter(_clone->m_child_vec));
+    return _clone;
 }
 
 } }
