@@ -33,7 +33,7 @@ namespace xl { namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id, YYLTYPE &_loc)
+    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id, YYLTYPE _loc)
         : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_loc(_loc)
     {}
     NodeIdentIFace::type_t type() const
@@ -76,7 +76,7 @@ class TermNode
     : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type> >
 {
 public:
-    TermNode(uint32_t _sym_id, YYLTYPE &loc, typename TermInternalType<_type>::type _value)
+    TermNode(uint32_t _sym_id, YYLTYPE loc, typename TermInternalType<_type>::type _value)
         : Node(_type, _sym_id, loc), visitor::Visitable<TermNode<_type> >(this), m_value(_value)
     {
     }
@@ -87,9 +87,7 @@ public:
     NodeIdentIFace* clone(TreeContext* tc) const
     {
         return new (tc->alloc(), __FILE__, __LINE__)
-                TermNode<_type>(m_sym_id,
-                        const_cast<YYLTYPE &>(m_loc),
-                        m_value); // default case assumes no non-trivial dtor
+                TermNode<_type>(m_sym_id, m_loc, m_value); // default case assumes no non-trivial dtor
     }
 
 private:
@@ -101,7 +99,7 @@ class SymbolNode
       virtual public visitor::VisitStateIFace
 {
 public:
-    SymbolNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap);
+    SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap);
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];

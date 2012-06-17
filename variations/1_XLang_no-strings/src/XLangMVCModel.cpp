@@ -36,7 +36,7 @@
 namespace xl { namespace mvc {
 
 template<>
-node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, std::string value)
+node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, std::string value)
 {
     node::NodeIdentIFace* node = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<node::NodeIdentIFace*>(x)->~NodeIdentIFace();
@@ -46,7 +46,7 @@ node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t
     return node;
 }
 
-node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE &loc, size_t size, ...)
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);

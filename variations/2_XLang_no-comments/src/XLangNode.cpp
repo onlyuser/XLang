@@ -51,10 +51,10 @@ NodeIdentIFace* TermNode<
             reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
             }) TermNode<
                     static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-                    >(m_sym_id, const_cast<YYLTYPE &>(m_loc), m_value);
+                    >(m_sym_id, m_loc, m_value);
 }
 
-SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
+SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
     : Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
@@ -82,7 +82,7 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     va_list ap;
     SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) SymbolNode(m_sym_id, const_cast<YYLTYPE &>(m_loc), 0, ap);
+            }) SymbolNode(m_sym_id, m_loc, 0, ap);
     std::copy(m_child_vec.begin(), m_child_vec.end(),
             std::back_inserter(_clone->m_child_vec));
     return _clone;
