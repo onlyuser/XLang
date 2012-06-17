@@ -113,11 +113,11 @@ COMMON_CPP_STEMS = \
 		XLangAlloc \
 		XLangDefaultTour \
 		XLangMVCView \
-		XLangNode \
 		XLangPrinter \
 		XLangString \
 		XLangTreeContext #\
-		XLangMVCModel
+		XLangMVCModel \
+		XLangNode
 COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
 COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
 
@@ -146,7 +146,7 @@ clean_objects : clean_common_objects clean_yacc clean_lex
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel XLangNode
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 

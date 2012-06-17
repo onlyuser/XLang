@@ -45,7 +45,7 @@ std::string Node::uid() const
 template<>
 NodeIdentIFace* TermNode<
 		static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-		>::clone(TreeContext* tc) const
+		>::clone(TreeContext* tc)
 {
 	return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
 			reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
@@ -79,7 +79,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     }
 }
 
-NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
+NodeIdentIFace* SymbolNode::clone(TreeContext* tc)
 {
     va_list ap;
 	SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {

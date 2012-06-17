@@ -21,6 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitable.h" // visitor::Visitable
 #include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
+#include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
 #include <string> // std::string
@@ -61,6 +62,7 @@ public:
     {
         return m_loc;
     }
+    virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
 
 protected:
     NodeIdentIFace::type_t m_type;
@@ -82,6 +84,13 @@ public:
     {
         return m_value;
     }
+    NodeIdentIFace* clone(TreeContext* tc) const
+    {
+    	return new (tc->alloc(), __FILE__, __LINE__)
+    			TermNode<_type>(m_sym_id,
+    					const_cast<YYLTYPE &>(m_loc),
+    					m_value); // default case assumes no non-trivial dtor
+    }
 
 private:
     typename TermInternalType<_type>::type m_value;
@@ -92,28 +101,7 @@ class SymbolNode
       virtual public visitor::VisitStateIFace
 {
 public:
-    SymbolNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap)
-        : Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
-          m_visit_state(NULL)
-    {
-        for(size_t i = 0; i<_size; i++)
-        {
-            NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
-            if(is_same_type(child))
-            {
-                SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
-                m_child_vec.insert(m_child_vec.end(),
-                        symbol_node->m_child_vec.begin(),
-                        symbol_node->m_child_vec.end());
-                std::vector<NodeIdentIFace*>::iterator p;
-                for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
-                    (*p)->set_parent(this);
-                continue;
-            }
-            m_child_vec.push_back(child);
-            child->set_parent(this);
-        }
-    }
+    SymbolNode(uint32_t _sym_id, YYLTYPE &loc, size_t _size, va_list ap);
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
@@ -130,6 +118,7 @@ public:
     {
         return m_visit_state;
     }
+    NodeIdentIFace* clone(TreeContext* tc) const;
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
