@@ -51,7 +51,7 @@ private:
 struct DotPrinter : public DefaultTour
 {
 public:
-    DotPrinter()
+    DotPrinter(bool horizontal = false) : m_horizontal(horizontal)
     {}
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
@@ -59,6 +59,9 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     void visit(const node::SymbolNodeIFace* _node);
+
+private:
+    bool m_horizontal;
 };
 
 } }

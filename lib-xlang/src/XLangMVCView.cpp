@@ -54,7 +54,7 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node)
 
 void MVCView::print_dot(const node::NodeIdentIFace* _node)
 {
-    visitor::DotPrinter v;
+    visitor::DotPrinter v(true);
     v.visit_any(_node);
 }
 
