@@ -18,6 +18,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <sstream> // std::stringstream
+#include <vector>
 
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
@@ -85,8 +86,13 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     SymbolNode *_clone = new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
             }) SymbolNode(m_sym_id, 0, ap);
-    std::copy(m_child_vec.begin(), m_child_vec.end(),
-            std::back_inserter(_clone->m_child_vec));
+    std::vector<NodeIdentIFace*>::const_iterator p;
+    for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
+    {
+    	NodeIdentIFace *child_clone = dynamic_cast<Node*>(*p)->clone(tc);
+        _clone->m_child_vec.push_back(child_clone);
+        child_clone->set_parent(_clone);
+    }
     return _clone;
 }
 
