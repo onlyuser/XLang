@@ -43,15 +43,11 @@ std::string Node::uid() const
 }
 
 template<>
-NodeIdentIFace* TermNode<
-        static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-        >::clone(TreeContext* tc) const
+NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
     return new (tc->alloc(), __FILE__, __LINE__, [](void* x) {
             reinterpret_cast<NodeIdentIFace*>(x)->~NodeIdentIFace();
-            }) TermNode<
-                    static_cast<NodeIdentIFace::type_t>(TermType<std::string>::type)
-                    >(m_sym_id, m_loc, m_value);
+            }) TermNode<NodeIdentIFace::STRING>(m_sym_id, m_loc, m_value);
 }
 
 SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
