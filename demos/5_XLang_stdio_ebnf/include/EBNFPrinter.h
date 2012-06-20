@@ -25,13 +25,16 @@
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-    typedef void (*delayed_ast_mutate_cb_t)(void*);
-    EBNFPrinter()
+    typedef void (*delayed_ast_mutate_cb_t)(void*, void*);
+    typedef std::vector<delayed_ast_mutate_cb_t> delayed_ast_mutate_cb_vec_t;
+
+    EBNFPrinter(delayed_ast_mutate_cb_vec_t delayed_ast_mutate_cb_vec)
+    	: m_delayed_ast_mutate_cb_vec(delayed_ast_mutate_cb_vec)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
 
 private:
-    std::vector<delayed_ast_mutate_cb_t> m_delayed_ast_mutate_cb_vec; // FIX-ME!
+    delayed_ast_mutate_cb_vec_t &m_delayed_ast_mutate_cb_vec; // FIX-ME!
 };
 
 #endif

@@ -29,6 +29,7 @@ class MemChunk
 {
 public:
     typedef void (*dtor_cb_t)(void*);
+
     MemChunk(size_t _size_bytes, std::string _filename, size_t _line_number, dtor_cb_t dtor_cb = NULL);
     ~MemChunk();
     void* ptr() const { return m_ptr; }
