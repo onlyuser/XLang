@@ -246,20 +246,21 @@ alts:
     ;
 
 alt:
-      terms              { $$ = $1; }
-    | terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
+      terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
     ;
 
 action_block:
-      ID_STRING {
+      /* empty */ { $$ = NULL; }
+    | ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
 
 terms:
-      term       { $$ = $1; }
-    | terms term { $$ = MAKE_SYMBOL(ID_TERMS, 2, $1, $2); }
+      /* empty */ { $$ = NULL; }
+    | term        { $$ = $1; }
+    | terms term  { $$ = MAKE_SYMBOL(ID_TERMS, 2, $1, $2); }
     ;
 
 term:

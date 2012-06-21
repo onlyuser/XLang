@@ -154,6 +154,10 @@ expression:
     | '(' expression ')'             { $$ = $2; }
     ;
 
+dummy:
+      /* empty */                    { $$ = NULL; }
+    ;
+
 %%
 
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
