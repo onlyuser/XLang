@@ -75,15 +75,13 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_PROTO_BLOCK:
             std::cout << "%{";
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-                    (*_node)[0]
-                    )->value();
+                    (*_node)[0])->value();
             std::cout << "%}";
             break;
         case ID_UNION_BLOCK:
             std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-                    (*_node)[0]
-                    )->value();
+                    (*_node)[0])->value();
             std::cout << '}';
             break;
         case ID_SYMBOLS:
@@ -123,8 +121,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_ACTION_BLOCK:
             std::cout << " {";
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-                    (*_node)[0]
-                    )->value();
+                    (*_node)[0])->value();
             std::cout << '}';
             break;
         case ID_TERMS:
@@ -148,8 +145,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_CODE:
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
-                    (*_node)[0]
-                    )->value();
+                    (*_node)[0])->value();
             break;
     }
 }

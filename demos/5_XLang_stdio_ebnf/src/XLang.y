@@ -259,7 +259,6 @@ action_block:
 
 terms:
       /* empty */ { $$ = NULL; }
-    | term        { $$ = $1; }
     | terms term  { $$ = MAKE_SYMBOL(ID_TERMS, 2, $1, $2); }
     ;
 
