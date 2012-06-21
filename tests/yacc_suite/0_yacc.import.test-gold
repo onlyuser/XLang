@@ -72,13 +72,17 @@
             <term type="ident" value=root/>
             <symbol type="alts">
                 <symbol type="alt">
-                    <term type="ident" value=program/>
+                    <symbol type="terms">
+                        <term type="ident" value=program/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" tree_context()->root() = $1; YYACCEPT; "/>
                     </symbol>
                 </symbol>
                 <symbol type="alt">
-                    <term type="ident" value=error/>
+                    <symbol type="terms">
+                        <term type="ident" value=error/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" yyclearin; /* yyerrok; YYABORT; */ "/>
                     </symbol>
@@ -89,7 +93,9 @@
             <term type="ident" value=program/>
             <symbol type="alts">
                 <symbol type="alt">
-                    <term type="ident" value=statement/>
+                    <symbol type="terms">
+                        <term type="ident" value=statement/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" $$ = $1; "/>
                     </symbol>
@@ -110,7 +116,9 @@
             <term type="ident" value=statement/>
             <symbol type="alts">
                 <symbol type="alt">
-                    <term type="ident" value=expression/>
+                    <symbol type="terms">
+                        <term type="ident" value=expression/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" $$ = $1; "/>
                     </symbol>
@@ -131,19 +139,25 @@
             <term type="ident" value=expression/>
             <symbol type="alts">
                 <symbol type="alt">
-                    <term type="ident" value=ID_INT/>
+                    <symbol type="terms">
+                        <term type="ident" value=ID_INT/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" $$ = MAKE_TERM(ID_INT, $1); "/>
                     </symbol>
                 </symbol>
                 <symbol type="alt">
-                    <term type="ident" value=ID_FLOAT/>
+                    <symbol type="terms">
+                        <term type="ident" value=ID_FLOAT/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" $$ = MAKE_TERM(ID_FLOAT, $1); "/>
                     </symbol>
                 </symbol>
                 <symbol type="alt">
-                    <term type="ident" value=ID_IDENT/>
+                    <symbol type="terms">
+                        <term type="ident" value=ID_IDENT/>
+                    </symbol>
                     <symbol type="action_block">
                         <term type="string" value=" $$ = MAKE_TERM(ID_IDENT, $1); "/>
                     </symbol>
@@ -208,6 +222,14 @@
                     <symbol type="action_block">
                         <term type="string" value=" $$ = $2; "/>
                     </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=dummy/>
+            <symbol type="alt">
+                <symbol type="action_block">
+                    <term type="string" value=" $$ = NULL; "/>
                 </symbol>
             </symbol>
         </symbol>
