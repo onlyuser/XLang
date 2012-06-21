@@ -19,6 +19,7 @@
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include <iostream> // std::cout
+#include <vector>
 
 static xl::node::NodeIdentIFace* make_rule(xl::node::NodeIdentIFace* lhs)
 {
@@ -161,7 +162,17 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '+':
         case '*':
         case '?':
-            xl::visitor::DefaultTour::visit(_node);
+			//xl::visitor::DefaultTour::visit(_node);
+			{
+				std::vector<xl::node::NodeIdentIFace*> node_vec; // FIX-ME!
+				do
+				{
+					xl::node::NodeIdentIFace* cur_node = NULL;
+					more = visit_next_child(_node, &cur_node);
+					node_vec.push_back(cur_node);
+					//xl::visitor::DefaultTour::visit_any(cur_node);
+				} while(more);
+			}
             std::cout << static_cast<char>(_node->sym_id());
             break;
         case '(':

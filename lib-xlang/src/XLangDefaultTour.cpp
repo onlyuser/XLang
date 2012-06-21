@@ -71,13 +71,15 @@ static void stop_asc(ccrContParam)
 }
 #endif
 
-bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node)
+bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node, node::NodeIdentIFace** ref_node)
 {
 #ifdef USE_COROUTINE
     int index = get_next_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state(), _node);
     if(index == -1)
         return false;
-    visit_any(_node->operator[](index));
+    if(ref_node)
+    	*ref_node = (*_node)[index];
+    visit_any((*_node)[index]);
     if(index == static_cast<int>(_node->size())-1)
     {
         abort_visitation(_node);
