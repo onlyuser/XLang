@@ -17,15 +17,41 @@
 
 #include "EBNFPrinter.h" // EBNFPrinter
 #include "XLang.tab.h" // ID_XXX (yacc generated)
-#include "XLangString.h" // xl::escape
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include <iostream> // std::cout
 
-static void make_recursive_rule()
+static xl::node::NodeIdentIFace* make_rule(xl::node::NodeIdentIFace* lhs)
 {
+	return NULL;
 }
 
-static void make_term_rule()
+static xl::node::NodeIdentIFace* make_recursive_rule()
 {
+	return make_rule(NULL);
+}
+
+static xl::node::NodeIdentIFace* make_term_rule()
+{
+	return make_rule(NULL);
+}
+
+static void expand_kleene_closure(char closure_type)
+{
+	switch(closure_type)
+	{
+		case '+':
+			make_recursive_rule();
+			make_term_rule();
+			break;
+		case '*':
+			make_recursive_rule();
+			make_term_rule();
+			break;
+		case '?':
+			make_recursive_rule();
+			make_term_rule();
+			break;
+	}
 }
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
