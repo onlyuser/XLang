@@ -20,6 +20,14 @@
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
+static void make_recursive_rule()
+{
+}
+
+static void make_term_rule()
+{
+}
+
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
 {
     bool more;

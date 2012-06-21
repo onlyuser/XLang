@@ -416,8 +416,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
     {
         case args_t::MODE_YACC:
             {
-                EBNFPrinter::delayed_ast_mutate_cb_vec_t delayed_ast_mutate_cb_vec;
-                EBNFPrinter v(delayed_ast_mutate_cb_vec);
+                EBNFPrinter v;
                 v.visit_any(ast);
             }
             break;
