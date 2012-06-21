@@ -76,7 +76,7 @@
                     <term type="ident" value=expression/>
                 </symbol>
                 <symbol type="action_block">
-                    <term type="string" value=" /* DDD */ $$ = MAKE_SYMBOL(\'=\', 2, $1, $2); "/>
+                    <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
                 </symbol>
             </symbol>
         </symbol>
@@ -170,8 +170,5 @@
                 </symbol>
             </symbol>
         </symbol>
-    </symbol>
-    <symbol type="code">
-        <term type="string" value="\n"/>
     </symbol>
 </symbol>
