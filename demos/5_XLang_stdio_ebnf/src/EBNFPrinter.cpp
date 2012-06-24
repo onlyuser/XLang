@@ -35,6 +35,11 @@ static xl::node::NodeIdentIFace* make_rule(xl::node::NodeIdentIFace* lhs)
 	return NULL;
 }
 
+static xl::node::NodeIdentIFace* make_stem_rule(std::string name)
+{
+	return make_rule(NULL);
+}
+
 static xl::node::NodeIdentIFace* make_recursive_rule(std::string name1, std::string name2)
 {
 	return make_rule(NULL);
@@ -47,19 +52,24 @@ static xl::node::NodeIdentIFace* make_term_rule(std::string name)
 
 static void expand_kleene_closure(char closure_type)
 {
+	std::string name1 = gen_name("");
+	std::string name2 = gen_name("");
 	switch(closure_type)
 	{
 		case '+':
-			make_recursive_rule("", "");
-			make_term_rule("");
+			make_stem_rule(name1);
+			make_recursive_rule(name1, name2);
+			make_term_rule(name2);
 			break;
 		case '*':
-			make_recursive_rule("", "");
-			make_term_rule("");
+			make_stem_rule(name1);
+			make_recursive_rule(name1, name2);
+			make_term_rule(name2);
 			break;
 		case '?':
-			make_recursive_rule("", "");
-			make_term_rule("");
+			make_stem_rule(name1);
+			make_recursive_rule(name1, name2);
+			make_term_rule(name2);
 			break;
 	}
 }
