@@ -32,14 +32,14 @@ Variation vs Feature Table:
 
 <table>
     <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
-    <tr><td> full         </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> yes     </td><tr/>
-    <tr><td> no-strings   </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> no      </td><tr/>
-    <tr><td> no-comments  </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> no       </td><td> no      </td><tr/>
-    <tr><td> no-locations </td><td> flex        </td><td> buffer </td><td> yes       </td><td> no        </td><td> no       </td><td> no      </td><tr/>
-    <tr><td> no-reentrant </td><td> flex        </td><td> buffer </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td><tr/>
-    <tr><td> stdio        </td><td> flex        </td><td> stdio  </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td><tr/>
-    <tr><td> file         </td><td> flex        </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td><tr/>
-    <tr><td> no-flex      </td><td> hand-rolled </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td><tr/>
+    <tr><td> full         </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> yes     </td></tr>
+    <tr><td> no-strings   </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> no      </td></tr>
+    <tr><td> no-comments  </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> no       </td><td> no      </td></tr>
+    <tr><td> no-locations </td><td> flex        </td><td> buffer </td><td> yes       </td><td> no        </td><td> no       </td><td> no      </td></tr>
+    <tr><td> no-reentrant </td><td> flex        </td><td> buffer </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
+    <tr><td> stdio        </td><td> flex        </td><td> stdio  </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
+    <tr><td> file         </td><td> flex        </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
+    <tr><td> no-flex      </td><td> hand-rolled </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
 </table>
 
     HINT: The "stdio" variation is easiest to implement -- The flex lexer
