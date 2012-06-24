@@ -30,27 +30,35 @@ static std::string gen_name(std::string stem)
 	return ss.str();
 }
 
-static xl::node::NodeIdentIFace* make_rule(xl::node::NodeIdentIFace* lhs)
+static xl::node::NodeIdentIFace* make_stem_rule(std::string name)
 {
 	return NULL;
 }
 
-static xl::node::NodeIdentIFace* make_stem_rule(std::string name)
-{
-	return make_rule(NULL);
-}
-
 static xl::node::NodeIdentIFace* make_recursive_rule(std::string name1, std::string name2)
 {
-	return make_rule(NULL);
+	return NULL;
 }
 
 static xl::node::NodeIdentIFace* make_term_rule(std::string name)
 {
-	return make_rule(NULL);
+	return NULL;
 }
 
-static void expand_kleene_closure(char closure_type)
+static const xl::node::NodeIdentIFace* find_node_uptrace(uint32_t sym_id,
+		const xl::node::NodeIdentIFace* node)
+{
+	const xl::node::NodeIdentIFace* cur_node = node;
+	do
+	{
+		if(cur_node->sym_id() == sym_id)
+			return cur_node;
+	} while((cur_node = cur_node->parent()));
+	return NULL;
+}
+
+static void expand_kleene_closure(char closure_type, const xl::node::NodeIdentIFace* rule_node,
+		xl::node::NodeIdentIFace* child)
 {
 	std::string name1 = gen_name("");
 	std::string name2 = gen_name("");
@@ -181,17 +189,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '+':
         case '*':
         case '?':
-			//xl::visitor::DefaultTour::visit(_node);
-			{
-				std::vector<xl::node::NodeIdentIFace*> node_vec; // FIX-ME!
-				do
-				{
-					xl::node::NodeIdentIFace* cur_node = NULL;
-					more = visit_next_child(_node, &cur_node);
-					node_vec.push_back(cur_node);
-					//xl::visitor::DefaultTour::visit_any(cur_node);
-				} while(more);
-			}
+        	{
+        		const xl::node::NodeIdentIFace* rule_node = find_node_uptrace(ID_RULE, _node);
+        		expand_kleene_closure(_node->sym_id(), rule_node, (*_node)[0]);
+        	}
+			xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
             break;
         case '(':

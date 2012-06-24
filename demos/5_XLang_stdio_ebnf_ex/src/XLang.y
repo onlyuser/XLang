@@ -143,7 +143,34 @@ root:
 //      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 
-// EBNF-EXPANDED:
+/* EBNF-XML:
+<symbol type="rule">
+    <term type="ident" value=program/>
+    <symbol type="alt">
+        <symbol type="terms">
+            <symbol type="*">
+                <symbol type="(">
+                    <symbol type="alt">
+                        <symbol type="terms">
+                            <term type="ident" value=statement/>
+                            <term type="char" value=','/>
+                        </symbol>
+                        <symbol type="action_block">
+                            <term type="string" value=" /* AAA */ $$ = $1; "/>
+                        </symbol>
+                    </symbol>
+                </symbol>
+            </symbol>
+            <term type="ident" value=statement/>
+        </symbol>
+        <symbol type="action_block">
+            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+        </symbol>
+    </symbol>
+</symbol>
+*/
+
+// EBNF-EXPANDED-AS-BNF:
 // [
 program:
       program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
@@ -172,7 +199,34 @@ program_1:
 //      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
 //    ;
 
-// EBNF-EXPANDED:
+/* EBNF-XML:
+<symbol type="rule">
+    <term type="ident" value=statement/>
+    <symbol type="alt">
+        <symbol type="terms">
+            <symbol type="?">
+                <symbol type="(">
+                    <symbol type="alt">
+                        <symbol type="terms">
+                            <term type="ident" value=ID_IDENT/>
+                            <term type="char" value='='/>
+                        </symbol>
+                        <symbol type="action_block">
+                            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
+                        </symbol>
+                    </symbol>
+                </symbol>
+            </symbol>
+            <term type="ident" value=expression/>
+        </symbol>
+        <symbol type="action_block">
+            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+        </symbol>
+    </symbol>
+</symbol>
+*/
+
+// EBNF-EXPANDED-AS-BNF:
 // [
 statement:
       statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
