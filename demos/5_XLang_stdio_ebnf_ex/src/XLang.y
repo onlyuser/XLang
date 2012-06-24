@@ -151,7 +151,7 @@ program:
 
 program_0:
       /* empty */         {           $$ = NULL; }
-    | program_0 program_1 { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
     ;
 
 program_1:

@@ -20,18 +20,27 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include <iostream> // std::cout
 #include <vector>
+#include <sstream>
+
+static std::string gen_name(std::string stem)
+{
+	static int index;
+	std::stringstream ss;
+	ss << stem << '_' << index;
+	return ss.str();
+}
 
 static xl::node::NodeIdentIFace* make_rule(xl::node::NodeIdentIFace* lhs)
 {
 	return NULL;
 }
 
-static xl::node::NodeIdentIFace* make_recursive_rule()
+static xl::node::NodeIdentIFace* make_recursive_rule(std::string name1, std::string name2)
 {
 	return make_rule(NULL);
 }
 
-static xl::node::NodeIdentIFace* make_term_rule()
+static xl::node::NodeIdentIFace* make_term_rule(std::string name)
 {
 	return make_rule(NULL);
 }
@@ -41,16 +50,16 @@ static void expand_kleene_closure(char closure_type)
 	switch(closure_type)
 	{
 		case '+':
-			make_recursive_rule();
-			make_term_rule();
+			make_recursive_rule("", "");
+			make_term_rule("");
 			break;
 		case '*':
-			make_recursive_rule();
-			make_term_rule();
+			make_recursive_rule("", "");
+			make_term_rule("");
 			break;
 		case '?':
-			make_recursive_rule();
-			make_term_rule();
+			make_recursive_rule("", "");
+			make_term_rule("");
 			break;
 	}
 }
