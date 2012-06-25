@@ -143,6 +143,22 @@ root:
 //      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 
+// EBNF-EXPANDED-AS-BNF:
+// [
+program:
+      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+    ;
+
+program_0:
+      /* empty */         {           $$ = NULL; }
+    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+    ;
+
+program_1:
+      statement ',' { /* AAA */ $$ = $1; }
+    ;
+// ]
+
 // EBNF-XML:
 //<symbol type="rule">
 //    <term type="ident" value=program/>
@@ -169,20 +185,51 @@ root:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED-AS-BNF-XML:
 // [
-program:
-      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
-    ;
-
-program_0:
-      /* empty */         {           $$ = NULL; }
-    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
-    ;
-
-program_1:
-      statement ',' { /* AAA */ $$ = $1; }
-    ;
+//<symbol type="rule">
+//    <term type="ident" value=program/>
+//    <symbol type="alt">
+//        <symbol type="terms">
+//            <term type="ident" value=program_0/>
+//            <term type="ident" value=statement/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
+//<symbol type="rule">
+//    <term type="ident" value=program_0/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="action_block">
+//                <term type="string" value="           $$ = NULL; "/>
+//            </symbol>
+//        </symbol>
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=program_0/>
+//                <term type="ident" value=program_1/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//            </symbol>
+//        </symbol>
+//    </symbol>
+//</symbol>
+//<symbol type="rule">
+//    <term type="ident" value=program_1/>
+//    <symbol type="alt">
+//        <symbol type="terms">
+//            <term type="ident" value=statement/>
+//            <term type="char" value=','/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* AAA */ $$ = $1; "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
 // ]
 
 // ORIGINAL:
@@ -197,6 +244,22 @@ program_1:
 //            ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
 //      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
 //    ;
+
+// EBNF-EXPANDED-AS-BNF:
+// [
+statement:
+      statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
+    ;
+
+statement_0:
+      /* empty */ { $$ = NULL; }
+    | statement_1 { $$ = $1; }
+    ;
+
+statement_1:
+      ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+    ;
+// ]
 
 // EBNF-XML:
 //<symbol type="rule">
@@ -224,20 +287,50 @@ program_1:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED-AS-BNF-XML:
 // [
-statement:
-      statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
-    ;
-
-statement_0:
-      /* empty */ { $$ = NULL; }
-    | statement_1 { $$ = $1; }
-    ;
-
-statement_1:
-      ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
-    ;
+//<symbol type="rule">
+//    <term type="ident" value=statement/>
+//    <symbol type="alt">
+//        <symbol type="terms">
+//            <term type="ident" value=statement_0/>
+//            <term type="ident" value=expression/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
+//<symbol type="rule">
+//    <term type="ident" value=statement_0/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="action_block">
+//                <term type="string" value=" $$ = NULL; "/>
+//            </symbol>
+//        </symbol>
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=statement_1/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" $$ = $1; "/>
+//            </symbol>
+//        </symbol>
+//    </symbol>
+//</symbol>
+//<symbol type="rule">
+//    <term type="ident" value=statement_1/>
+//    <symbol type="alt">
+//        <symbol type="terms">
+//            <term type="ident" value=ID_IDENT/>
+//            <term type="char" value='='/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
 // ]
 
 expression:

@@ -58,7 +58,8 @@ ifneq ($(strip $(YACC_SUITE)),)
 	TEST_PATH = yacc_suite
 	TEST_FILE_STEMS = \
 			0_yacc \
-			1_ebnf
+			1_ebnf \
+			2_ebnf-ex
 endif
 OUT_PREFIX = $(TEST_PATH)
 

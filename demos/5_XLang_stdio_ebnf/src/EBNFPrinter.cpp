@@ -45,7 +45,7 @@ static xl::node::NodeIdentIFace* make_term_rule(std::string name)
 	return NULL;
 }
 
-static const xl::node::NodeIdentIFace* find_node_uptrace(uint32_t sym_id,
+static const xl::node::NodeIdentIFace* find_ancestor_node(uint32_t sym_id,
 		const xl::node::NodeIdentIFace* node)
 {
 	const xl::node::NodeIdentIFace* cur_node = node;
@@ -190,8 +190,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '*':
         case '?':
         	{
-        		const xl::node::NodeIdentIFace* rule_node = find_node_uptrace(ID_RULE, _node);
-        		expand_kleene_closure(_node->sym_id(), rule_node, (*_node)[0]);
+        		const xl::node::NodeIdentIFace* rule_node = find_ancestor_node(ID_RULE, _node);
+        		xl::node::SymbolNodeIFace* paren_node =
+        				dynamic_cast<xl::node::SymbolNodeIFace*>((*_node)[0]);
+        		xl::node::NodeIdentIFace* alt_node = (*paren_node)[0];
+        		expand_kleene_closure(_node->sym_id(), rule_node, alt_node);
         	}
 			xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
