@@ -143,6 +143,34 @@ root:
 //      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
 //    ;
 
+// EBNF-XML:
+//<symbol type="rule">                    // <-- rule_node
+//    <term type="ident" value=program/>  // <-- lhs body
+//    <symbol type="alt">                 // <-- rhs body
+//        <symbol type="terms">
+
+//            <symbol type="*">           // <-- isolate this part out as "program_0"
+//                <symbol type="(">       // <-- paren_node
+//                    <symbol type="alt"> // <-- alt_node
+//                        <symbol type="terms">
+//                            <term type="ident" value=statement/>
+//                            <term type="char" value=','/>
+//                        </symbol>
+//                        <symbol type="action_block">
+//                            <term type="string" value=" /* AAA */ $$ = $1; "/>
+//                        </symbol>
+//                    </symbol>
+//                </symbol>
+//            </symbol>
+
+//            <term type="ident" value=statement/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
+
 // EBNF-EXPANDED-AS-BNF:
 // [
 program:
@@ -159,24 +187,13 @@ program_1:
     ;
 // ]
 
-// EBNF-XML:
+// EBNF-EXPANDED-AS-BNF-XML:
+// [
 //<symbol type="rule">
 //    <term type="ident" value=program/>
 //    <symbol type="alt">
 //        <symbol type="terms">
-//            <symbol type="*">
-//                <symbol type="(">
-//                    <symbol type="alt">
-//                        <symbol type="terms">
-//                            <term type="ident" value=statement/>
-//                            <term type="char" value=','/>
-//                        </symbol>
-//                        <symbol type="action_block">
-//                            <term type="string" value=" /* AAA */ $$ = $1; "/>
-//                        </symbol>
-//                    </symbol>
-//                </symbol>
-//            </symbol>
+//            <term type="ident" value=program_0/> // <-- replaced kleene closure '*'
 //            <term type="ident" value=statement/>
 //        </symbol>
 //        <symbol type="action_block">
@@ -185,20 +202,6 @@ program_1:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF-XML:
-// [
-//<symbol type="rule">
-//    <term type="ident" value=program/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=program_0/>
-//            <term type="ident" value=statement/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
-//        </symbol>
-//    </symbol>
-//</symbol>
 //<symbol type="rule">
 //    <term type="ident" value=program_0/>
 //    <symbol type="alts">
@@ -218,6 +221,7 @@ program_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
+
 //<symbol type="rule">
 //    <term type="ident" value=program_1/>
 //    <symbol type="alt">
@@ -245,6 +249,34 @@ program_1:
 //      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
 //    ;
 
+// EBNF-XML:
+//<symbol type="rule">                     // <-- rule_node
+//    <term type="ident" value=statement/> // <-- lhs body
+//    <symbol type="alt">                  // <-- rhs body
+//        <symbol type="terms">
+
+//            <symbol type="?">            // <-- isolate this part out as "statement_0"
+//                <symbol type="(">        // <-- paren_node
+//                    <symbol type="alt">  // <-- alt_node
+//                        <symbol type="terms">
+//                            <term type="ident" value=ID_IDENT/>
+//                            <term type="char" value='='/>
+//                        </symbol>
+//                        <symbol type="action_block">
+//                            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
+//                        </symbol>
+//                    </symbol>
+//                </symbol>
+//            </symbol>
+
+//            <term type="ident" value=expression/>
+//        </symbol>
+//        <symbol type="action_block">
+//            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+//        </symbol>
+//    </symbol>
+//</symbol>
+
 // EBNF-EXPANDED-AS-BNF:
 // [
 statement:
@@ -261,24 +293,13 @@ statement_1:
     ;
 // ]
 
-// EBNF-XML:
+// EBNF-EXPANDED-AS-BNF-XML:
+// [
 //<symbol type="rule">
 //    <term type="ident" value=statement/>
 //    <symbol type="alt">
 //        <symbol type="terms">
-//            <symbol type="?">
-//                <symbol type="(">
-//                    <symbol type="alt">
-//                        <symbol type="terms">
-//                            <term type="ident" value=ID_IDENT/>
-//                            <term type="char" value='='/>
-//                        </symbol>
-//                        <symbol type="action_block">
-//                            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
-//                        </symbol>
-//                    </symbol>
-//                </symbol>
-//            </symbol>
+//            <term type="ident" value=statement_0/> // <-- replaced kleene closure '?'
 //            <term type="ident" value=expression/>
 //        </symbol>
 //        <symbol type="action_block">
@@ -287,20 +308,6 @@ statement_1:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF-XML:
-// [
-//<symbol type="rule">
-//    <term type="ident" value=statement/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=statement_0/>
-//            <term type="ident" value=expression/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
-//        </symbol>
-//    </symbol>
-//</symbol>
 //<symbol type="rule">
 //    <term type="ident" value=statement_0/>
 //    <symbol type="alts">
@@ -319,6 +326,7 @@ statement_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
+
 //<symbol type="rule">
 //    <term type="ident" value=statement_1/>
 //    <symbol type="alt">
