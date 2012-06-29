@@ -18,6 +18,8 @@
 #include "EBNFPrinter.h" // EBNFPrinter
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "node/XLangNode.h" // node::Node
+#include "XLangTreeContext.h" // TreeContext
 #include <iostream> // std::cout
 #include <vector>
 #include <sstream>
@@ -30,8 +32,11 @@ static std::string gen_name(std::string stem)
 	return ss.str();
 }
 
-static xl::node::NodeIdentIFace* make_stem_rule(std::string name)
+static xl::node::NodeIdentIFace* make_stem_rule(std::string name,
+		const xl::node::NodeIdentIFace* rule_node, xl::TreeContext* tc)
 {
+	const xl::node::NodeIdentIFace* rule_node_copy =
+			dynamic_cast<const xl::node::Node*>(rule_node)->clone(tc);
 	return NULL;
 }
 
@@ -58,24 +63,24 @@ static const xl::node::NodeIdentIFace* find_ancestor_node(uint32_t sym_id,
 }
 
 static void expand_kleene_closure(char closure_type, const xl::node::NodeIdentIFace* rule_node,
-		xl::node::NodeIdentIFace* child)
+		xl::node::NodeIdentIFace* child, xl::TreeContext* tc)
 {
 	std::string name1 = gen_name("");
 	std::string name2 = gen_name("");
 	switch(closure_type)
 	{
 		case '+':
-			make_stem_rule(name1);
+			make_stem_rule(name1, rule_node, tc);
 			make_recursive_rule(name1, name2);
 			make_term_rule(name2);
 			break;
 		case '*':
-			make_stem_rule(name1);
+			make_stem_rule(name1, rule_node, tc);
 			make_recursive_rule(name1, name2);
 			make_term_rule(name2);
 			break;
 		case '?':
-			make_stem_rule(name1);
+			make_stem_rule(name1, rule_node, tc);
 			make_recursive_rule(name1, name2);
 			make_term_rule(name2);
 			break;
@@ -194,7 +199,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         		xl::node::SymbolNodeIFace* paren_node =
         				dynamic_cast<xl::node::SymbolNodeIFace*>((*_node)[0]);
         		xl::node::NodeIdentIFace* alt_node = (*paren_node)[0];
-        		expand_kleene_closure(_node->sym_id(), rule_node, alt_node);
+        		expand_kleene_closure(_node->sym_id(), rule_node, alt_node, m_tc);
         	}
 			xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());

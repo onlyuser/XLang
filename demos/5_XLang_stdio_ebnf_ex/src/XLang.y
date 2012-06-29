@@ -130,6 +130,7 @@ root:
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
+//=============================================================================
 // ORIGINAL:
 //program:
 //      statement             { $$ = $1; }
@@ -254,6 +255,7 @@ program_1:
 //     (alt (terms ident ident) action_block)
 // )
 
+//=============================================================================
 // ORIGINAL:
 //statement:
 //      expression              { $$ = $1; }

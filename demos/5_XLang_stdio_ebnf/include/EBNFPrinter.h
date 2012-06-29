@@ -20,13 +20,17 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "XLangTreeContext.h" // TreeContext
 
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-    EBNFPrinter()
+    EBNFPrinter(xl::TreeContext* tc) : m_tc(tc)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
+
+private:
+    xl::TreeContext* m_tc;
 };
 
 #endif

@@ -415,7 +415,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
     {
         case args_t::MODE_YACC:
             {
-                EBNFPrinter v;
+                EBNFPrinter v(tree_context());
                 v.visit_any(ast);
             }
             break;
