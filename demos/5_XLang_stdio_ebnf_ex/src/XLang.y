@@ -149,7 +149,7 @@ root:
 //    <symbol type="alt">                 // <-- rhs body
 //        <symbol type="terms">
 
-//            <symbol type="*">           // <-- isolate this part out as "program_0"
+//            <symbol type="*">           // <-- isolate this part as "program_0"
 //                <symbol type="(">       // <-- paren_node
 //                    <symbol type="alt"> // <-- alt_node
 //                        <symbol type="terms">
@@ -202,6 +202,11 @@ program_1:
 //    </symbol>
 //</symbol>
 
+// (rule
+//     ident
+//     (alt (terms ident ident) action_block)
+// )
+
 //<symbol type="rule">
 //    <term type="ident" value=program_0/>
 //    <symbol type="alts">
@@ -222,6 +227,14 @@ program_1:
 //    </symbol>
 //</symbol>
 
+// (rule
+//     ident
+//     (alts
+//         (alt action_block)
+//         (alt (terms ident ident) action_block)
+//     )
+// )
+
 //<symbol type="rule">
 //    <term type="ident" value=program_1/>
 //    <symbol type="alt">
@@ -235,6 +248,11 @@ program_1:
 //    </symbol>
 //</symbol>
 // ]
+
+// (rule
+//     ident
+//     (alt (terms ident ident) action_block)
+// )
 
 // ORIGINAL:
 //statement:
@@ -255,7 +273,7 @@ program_1:
 //    <symbol type="alt">                  // <-- rhs body
 //        <symbol type="terms">
 
-//            <symbol type="?">            // <-- isolate this part out as "statement_0"
+//            <symbol type="?">            // <-- isolate this part as "statement_0"
 //                <symbol type="(">        // <-- paren_node
 //                    <symbol type="alt">  // <-- alt_node
 //                        <symbol type="terms">
@@ -308,6 +326,11 @@ statement_1:
 //    </symbol>
 //</symbol>
 
+// (rule
+//     ident
+//     (alt (terms ident ident) action_block)
+// )
+
 //<symbol type="rule">
 //    <term type="ident" value=statement_0/>
 //    <symbol type="alts">
@@ -327,6 +350,14 @@ statement_1:
 //    </symbol>
 //</symbol>
 
+// (rule
+//     ident
+//     (alts
+//         (alt action_block)
+//         (alt (terms ident) action_block)
+//     )
+// )
+
 //<symbol type="rule">
 //    <term type="ident" value=statement_1/>
 //    <symbol type="alt">
@@ -340,6 +371,11 @@ statement_1:
 //    </symbol>
 //</symbol>
 // ]
+
+// (rule
+//     ident
+//     (alt (terms ident char) action_block)
+// )
 
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
