@@ -57,7 +57,9 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
     for(size_t i = 0; i<_size; i++)
     {
         NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
-        if(is_same_type(child))
+        if(child == SymbolNode::eol())
+            continue;
+        if(child && is_same_type(child))
         {
             SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
             m_child_vec.insert(m_child_vec.end(),
@@ -65,11 +67,15 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
                     symbol_node->m_child_vec.end());
             std::vector<NodeIdentIFace*>::iterator p;
             for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
-                (*p)->set_parent(this);
+            {
+                if(*p)
+                    (*p)->set_parent(this);
+            }
             continue;
         }
         m_child_vec.push_back(child);
-        child->set_parent(this);
+        if(child)
+            child->set_parent(this);
     }
 }
 
@@ -82,9 +88,10 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     std::vector<NodeIdentIFace*>::const_iterator p;
     for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {
-        NodeIdentIFace *child_clone = (*p)->clone(tc);
+        NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;
         _clone->m_child_vec.push_back(child_clone);
-        child_clone->set_parent(_clone);
+        if(child_clone)
+            child_clone->set_parent(_clone);
     }
     return _clone;
 }

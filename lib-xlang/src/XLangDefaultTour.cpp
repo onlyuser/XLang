@@ -53,6 +53,11 @@ void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* 
     std::cout << *_node->value();
 }
 
+void DefaultTour::visit_null()
+{
+    std::cout << "NULL";
+}
+
 #ifdef USE_COROUTINE
 static int get_next_asc(ccrContParam, const node::SymbolNodeIFace* _node)
 {

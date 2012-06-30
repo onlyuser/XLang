@@ -117,6 +117,11 @@ public:
         return m_visit_state;
     }
     NodeIdentIFace* clone(TreeContext* tc) const;
+    static NodeIdentIFace* eol()
+    {
+        static int dummy;
+        return reinterpret_cast<NodeIdentIFace*>(&dummy);
+    }
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;

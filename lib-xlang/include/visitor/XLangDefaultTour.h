@@ -32,8 +32,7 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-    virtual void visit_null()
-    {}
+    virtual void visit_null();
     int get_next_child_index(const node::SymbolNodeIFace* _node);
     node::NodeIdentIFace* get_next_child(const node::SymbolNodeIFace* _node);
     virtual bool visit_next_child(const node::SymbolNodeIFace* _node,

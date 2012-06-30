@@ -18,7 +18,6 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <sstream> // std::stringstream
-#include <vector>
 
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
