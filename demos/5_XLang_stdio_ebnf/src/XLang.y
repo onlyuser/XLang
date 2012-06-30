@@ -40,6 +40,7 @@
 #define MAKE_SYMBOL(...)         xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
 #define ERROR_SYM_ID_NOT_FOUND   "missing sym_id handler, most likely you forgot to register one"
 #define ERROR_SYM_NAME_NOT_FOUND "missing sym name handler, most likely you forgot to register one"
+#define EOL                      xl::node::SymbolNode::eol();
 
 // report error
 void _XLANG_error(const char* s)
@@ -180,7 +181,7 @@ grammar:
 // DEFINITIONS SECTION
 
 definitions:
-      /* empty */            { $$ = NULL; }
+      /* empty */            { $$ = EOL; }
     | definitions definition { $$ = MAKE_SYMBOL(ID_DEFINITIONS, 2, $1, $2); }
     ;
 
@@ -230,7 +231,7 @@ proto_block:
 // RULES SECTION
 
 rules:
-      /* empty */ { $$ = NULL; }
+      /* empty */ { $$ = EOL; }
     | rules rule  { $$ = MAKE_SYMBOL(ID_RULES, 2, $1, $2); }
     ;
 
@@ -250,7 +251,7 @@ alt:
     ;
 
 action_block:
-      /* empty */ { $$ = NULL; }
+      /* empty */ { $$ = EOL; }
     | ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
@@ -258,7 +259,7 @@ action_block:
     ;
 
 terms:
-      /* empty */ { $$ = NULL; }
+      /* empty */ { $$ = EOL; }
     | terms term  { $$ = MAKE_SYMBOL(ID_TERMS, 2, $1, $2); }
     ;
 

@@ -36,6 +36,11 @@ void LispPrinter::visit(const node::SymbolNodeIFace* _node)
         std::cout << std::endl;
 }
 
+void LispPrinter::visit_null()
+{
+    std::cout << "(NULL)";
+}
+
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
     std::cout << std::string(m_depth*4, ' ');
@@ -89,6 +94,12 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
     std::cout << "type=\"" << _node->name() << "\" value=";
     DefaultTour::visit(_node);
     std::cout << "/>" << std::endl;
+}
+
+void XMLPrinter::visit_null()
+{
+    std::cout << std::string(m_depth*4, ' ');
+    std::cout << "<NULL/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::SymbolNodeIFace* _node)
@@ -147,6 +158,11 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
+}
+
+void DotPrinter::visit_null()
+{
+    std::cout << "/* NULL */";
 }
 
 void DotPrinter::visit(const node::SymbolNodeIFace* _node)

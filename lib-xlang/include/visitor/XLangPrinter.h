@@ -28,6 +28,7 @@ class LispPrinter : public DefaultTour
 public:
     LispPrinter()
     {}
+    void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
 };
 
@@ -41,6 +42,7 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
 
 private:
@@ -58,6 +60,7 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
+    void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
 
 private:

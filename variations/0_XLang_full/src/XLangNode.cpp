@@ -82,7 +82,7 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     std::vector<NodeIdentIFace*>::const_iterator p;
     for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {
-    	NodeIdentIFace *child_clone = (*p)->clone(tc);
+        NodeIdentIFace *child_clone = (*p)->clone(tc);
         _clone->m_child_vec.push_back(child_clone);
         child_clone->set_parent(_clone);
     }

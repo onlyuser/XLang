@@ -95,7 +95,7 @@ bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node, node::Nod
     if(index == -1)
         return false;
     if(ref_node)
-    	*ref_node = (*_node)[index];
+        *ref_node = (*_node)[index];
     visit_any((*_node)[index]);
     if(index == static_cast<int>(_node->size())-1)
     {
@@ -122,6 +122,11 @@ void DefaultTour::visit(const node::SymbolNodeIFace* _node)
 
 void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
 {
+    if(!unknown)
+    {
+        visit_null();
+        return;
+    }
     switch(unknown->type())
     {
         case node::NodeIdentIFace::INT:
