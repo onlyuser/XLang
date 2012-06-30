@@ -149,7 +149,6 @@ root:
 //    <term type="ident" value=program/>  // <-- lhs body
 //    <symbol type="alt">                 // <-- rhs body
 //        <symbol type="terms">
-
 //            <symbol type="*">           // <-- isolate this part as "program_0"
 //                <symbol type="(">       // <-- paren_node
 //                    <symbol type="alt"> // <-- alt_node
@@ -163,7 +162,6 @@ root:
 //                    </symbol>
 //                </symbol>
 //            </symbol>
-
 //            <term type="ident" value=statement/>
 //        </symbol>
 //        <symbol type="action_block">
@@ -202,12 +200,6 @@ program_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
-
-// (rule
-//     ident
-//     (alt (terms ident ident) action_block)
-// )
-
 //<symbol type="rule">
 //    <term type="ident" value=program_0/>
 //    <symbol type="alts">
@@ -227,15 +219,6 @@ program_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
-
-// (rule
-//     ident
-//     (alts
-//         (alt action_block)
-//         (alt (terms ident ident) action_block)
-//     )
-// )
-
 //<symbol type="rule">
 //    <term type="ident" value=program_1/>
 //    <symbol type="alt">
@@ -249,11 +232,6 @@ program_1:
 //    </symbol>
 //</symbol>
 // ]
-
-// (rule
-//     ident
-//     (alt (terms ident ident) action_block)
-// )
 
 //=============================================================================
 // ORIGINAL:
@@ -274,7 +252,6 @@ program_1:
 //    <term type="ident" value=statement/> // <-- lhs body
 //    <symbol type="alt">                  // <-- rhs body
 //        <symbol type="terms">
-
 //            <symbol type="?">            // <-- isolate this part as "statement_0"
 //                <symbol type="(">        // <-- paren_node
 //                    <symbol type="alt">  // <-- alt_node
@@ -288,7 +265,6 @@ program_1:
 //                    </symbol>
 //                </symbol>
 //            </symbol>
-
 //            <term type="ident" value=expression/>
 //        </symbol>
 //        <symbol type="action_block">
@@ -327,12 +303,6 @@ statement_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
-
-// (rule
-//     ident
-//     (alt (terms ident ident) action_block)
-// )
-
 //<symbol type="rule">
 //    <term type="ident" value=statement_0/>
 //    <symbol type="alts">
@@ -351,15 +321,6 @@ statement_1:
 //        </symbol>
 //    </symbol>
 //</symbol>
-
-// (rule
-//     ident
-//     (alts
-//         (alt action_block)
-//         (alt (terms ident) action_block)
-//     )
-// )
-
 //<symbol type="rule">
 //    <term type="ident" value=statement_1/>
 //    <symbol type="alt">
