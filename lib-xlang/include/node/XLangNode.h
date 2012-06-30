@@ -57,7 +57,6 @@ public:
         return m_parent == NULL;
     }
     std::string uid() const;
-    virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
 
 protected:
     NodeIdentIFace::type_t m_type;

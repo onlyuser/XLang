@@ -35,8 +35,7 @@ static std::string gen_name(std::string stem)
 static xl::node::NodeIdentIFace* make_stem_rule(std::string name,
 		const xl::node::NodeIdentIFace* rule_node, xl::TreeContext* tc)
 {
-	const xl::node::NodeIdentIFace* rule_node_copy =
-			dynamic_cast<const xl::node::Node*>(rule_node)->clone(tc);
+	const xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
 	return NULL;
 }
 

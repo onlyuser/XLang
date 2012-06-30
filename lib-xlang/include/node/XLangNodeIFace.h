@@ -23,6 +23,8 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
+namespace xl { class TreeContext; }
+
 namespace xl { namespace node {
 
 struct NodeIdentIFace
@@ -42,6 +44,7 @@ struct NodeIdentIFace
     virtual NodeIdentIFace* parent() const = 0;
     virtual bool is_root() const = 0;
     virtual std::string uid() const = 0;
+    virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
 };
 
 template<NodeIdentIFace::type_t>
