@@ -62,7 +62,7 @@ static const xl::node::NodeIdentIFace* find_ancestor_node(uint32_t sym_id,
 }
 
 static void expand_kleene_closure(char closure_type,
-		const xl::node::NodeIdentIFace* rule_node,
+        const xl::node::NodeIdentIFace* rule_node,
         const xl::node::NodeIdentIFace* kleene_node,
         const xl::node::NodeIdentIFace* child,
         xl::TreeContext* tc)

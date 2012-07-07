@@ -39,7 +39,7 @@ template<>
 node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, std::string value)
 {
     node::NodeIdentIFace* node = new (tc->alloc(), __FILE__, __LINE__, DTOR_CB(node, NodeIdentIFace))
-			node::TermNode<
+            node::TermNode<
                     static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
                     >(sym_id, loc, value);
     return node;
@@ -50,7 +50,7 @@ node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYP
     va_list ap;
     va_start(ap, size);
     node::SymbolNode* node = new (tc->alloc(), __FILE__, __LINE__, DTOR_CB(node, NodeIdentIFace))
-			node::SymbolNode(sym_id, loc, size, ap);
+            node::SymbolNode(sym_id, loc, size, ap);
     va_end(ap);
     return node;
 }
