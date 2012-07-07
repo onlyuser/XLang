@@ -22,9 +22,8 @@ namespace xl {
 
 std::string* TreeContext::alloc_string(std::string s)
 {
-    return new (m_alloc, __FILE__, __LINE__, [](void *x) {
-            reinterpret_cast<std::string*>(x)->~basic_string();
-            }) std::string(s);
+    return new (m_alloc, __FILE__, __LINE__, DTOR_CB_EX(std::, string, basic_string))
+            std::string(s);
 }
 
 const std::string* TreeContext::alloc_unique_string(std::string name)
@@ -32,9 +31,8 @@ const std::string* TreeContext::alloc_unique_string(std::string name)
     string_set_t::iterator p = m_string_set.find(&name);
     if(p == m_string_set.end())
     {
-        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, [](void *x) {
-                reinterpret_cast<std::string*>(x)->~basic_string();
-                }) std::string(name));
+        m_string_set.insert(new (m_alloc, __FILE__, __LINE__, DTOR_CB_EX(std::, string, basic_string))
+                std::string(name));
         p = m_string_set.find(&name);
     }
     return *p;

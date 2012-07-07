@@ -23,8 +23,12 @@
 #include <stddef.h> // size_t
 #include <list> // std::list
 
-#define DTOR_CB(ns, c) [](void* x) {           \
-            reinterpret_cast<ns::c*>(x)->~c(); \
+#define DTOR_CB(ns, c) [](void* x) {          \
+            reinterpret_cast<ns c*>(x)->~c(); \
+            }
+
+#define DTOR_CB_EX(ns, c, f) [](void* x) {    \
+            reinterpret_cast<ns c*>(x)->~f(); \
             }
 
 namespace xl {
