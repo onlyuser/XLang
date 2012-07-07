@@ -257,9 +257,9 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
 {
     if(args.in_xml != "")
     {
-        ast = xl::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
-                }) xl::TreeContext(alloc), args.in_xml);
+        ast = xl::mvc::MVCModel::make_ast(
+                new (alloc, __FILE__, __LINE__, DTOR_CB(xl, TreeContext)) xl::TreeContext(alloc),
+                args.in_xml);
         if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
