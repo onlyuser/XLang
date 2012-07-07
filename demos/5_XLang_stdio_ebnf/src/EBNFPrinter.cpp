@@ -61,8 +61,11 @@ static const xl::node::NodeIdentIFace* find_ancestor_node(uint32_t sym_id,
     return NULL;
 }
 
-static void expand_kleene_closure(char closure_type, const xl::node::NodeIdentIFace* rule_node,
-        xl::node::NodeIdentIFace* child, xl::TreeContext* tc)
+static void expand_kleene_closure(char closure_type,
+		const xl::node::NodeIdentIFace* rule_node,
+        const xl::node::NodeIdentIFace* kleene_node,
+        const xl::node::NodeIdentIFace* child,
+        xl::TreeContext* tc)
 {
     std::string name1 = gen_name("");
     std::string name2 = gen_name("");
@@ -198,7 +201,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 xl::node::SymbolNodeIFace* paren_node =
                         dynamic_cast<xl::node::SymbolNodeIFace*>((*_node)[0]);
                 xl::node::NodeIdentIFace* alt_node = (*paren_node)[0];
-                expand_kleene_closure(_node->sym_id(), rule_node, alt_node, m_tc);
+                expand_kleene_closure(_node->sym_id(), rule_node, _node, alt_node, m_tc);
             }
             xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
