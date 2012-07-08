@@ -171,4 +171,7 @@
             </symbol>
         </symbol>
     </symbol>
+    <symbol type="code">
+        <term type="string" value="\n"/>
+    </symbol>
 </symbol>

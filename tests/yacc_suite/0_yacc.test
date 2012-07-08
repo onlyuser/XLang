@@ -77,6 +77,9 @@ std::string id_to_name(uint32_t sym_id)
 }
 uint32_t name_to_id(std::string name)
 {
+    if(name == "int")    return ID_INT;
+    if(name == "float")  return ID_FLOAT;
+    if(name == "ident")  return ID_IDENT;
     if(name == "uminus") return ID_UMINUS;
     if(name == "+")      return '+';
     if(name == "-")      return '-';
@@ -84,9 +87,6 @@ uint32_t name_to_id(std::string name)
     if(name == "/")      return '/';
     if(name == "=")      return '=';
     if(name == ",")      return ',';
-    if(name == "int")    return ID_INT;
-    if(name == "float")  return ID_FLOAT;
-    if(name == "ident")  return ID_IDENT;
     throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }
@@ -123,8 +123,6 @@ xl::TreeContext* &tree_context()
 %left '*' '/'
 %nonassoc ID_UMINUS
 
-%nonassoc ID_COUNT
-
 %%
 
 root:
@@ -154,17 +152,12 @@ expression:
     | '(' expression ')'             { $$ = $2; }
     ;
 
-dummy:
-      /* empty */                    { $$ = NULL; }
-    ;
-
 %%
 
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
 {
-    tree_context() = new (alloc, __FILE__, __LINE__, [](void* x) {
-            reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
-            }) xl::TreeContext(alloc);
+    tree_context() = new (alloc, __FILE__, __LINE__, DTOR_CB(xl::, TreeContext))
+            xl::TreeContext(alloc);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
     return (!error && errors().str().empty()) ? tree_context()->root() : NULL;
@@ -258,9 +251,9 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
 {
     if(args.in_xml != "")
     {
-        ast = xl::mvc::MVCModel::make_ast(new (alloc, __FILE__, __LINE__, [](void* x) {
-                reinterpret_cast<xl::TreeContext*>(x)->~TreeContext();
-                }) xl::TreeContext(alloc), args.in_xml);
+        ast = xl::mvc::MVCModel::make_ast(
+                new (alloc, __FILE__, __LINE__, DTOR_CB(xl::, TreeContext)) xl::TreeContext(alloc),
+                args.in_xml);
         if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
