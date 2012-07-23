@@ -25,12 +25,16 @@
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-    EBNFPrinter(xl::TreeContext* tc) : m_tc(tc)
+    EBNFPrinter(xl::TreeContext* tc)
+        : m_tc(tc), m_symbols_node(NULL), m_rules_node(NULL)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
 
 private:
     xl::TreeContext* m_tc;
+    std::list<std::string> m_new_symbol_list;
+    std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
+    const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
 };
 
 #endif

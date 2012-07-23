@@ -36,18 +36,45 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
+static xl::node::NodeIdentIFace* kleene_node_from_rule_node(
+        const xl::node::NodeIdentIFace* rule_node)
+{
+    return NULL;
+}
+
+static xl::node::NodeIdentIFace* replace_node(
+        xl::node::NodeIdentIFace* root,
+        const xl::node::NodeIdentIFace* replaced_node,
+        const xl::node::NodeIdentIFace* replacement_node)
+{
+    return root;
+}
+
 static xl::node::NodeIdentIFace* make_stem_rule(
         std::string name,
         const xl::node::NodeIdentIFace* rule_node,
         xl::TreeContext* tc)
 {
-    const xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
-    xl::node::NodeIdentIFace* replaced_kleene_closure =
+    xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
+    xl::node::NodeIdentIFace* kleene_node = kleene_node_from_rule_node(rule_node_copy);
+    xl::node::NodeIdentIFace* kleene_node_replacement =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
+    return replace_node(rule_node_copy, kleene_node, kleene_node_replacement);
+}
+
+static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std::string name2,
+        xl::TreeContext* tc)
+{
     return NULL;
 }
 
-static xl::node::NodeIdentIFace* make_recursive_rule(std::string name1, std::string name2,
+static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
+        xl::TreeContext* tc)
+{
+    return NULL;
+}
+
+static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1, std::string name2,
         xl::TreeContext* tc)
 {
     return NULL;
@@ -60,8 +87,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
 {
     return MAKE_SYMBOL(ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
-            alt_node->clone(tc)
-            );
+            alt_node->clone(tc));
 }
 
 static const xl::node::NodeIdentIFace* ancestor_node(
@@ -85,36 +111,54 @@ static std::string lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule
     return *lhs_term->value();
 }
 
-static xl::node::NodeIdentIFace* expand_kleene_closure(char closure_type,
+static void expand_kleene_closure(
+        std::list<std::string> *new_symbol_list,
+        std::list<xl::node::NodeIdentIFace*> *new_rule_list,
+        char closure_type,
         const xl::node::NodeIdentIFace* rule_node,
         const xl::node::NodeIdentIFace* alt_node,
         xl::TreeContext* tc)
 {
-    xl::node::NodeIdentIFace* result = NULL;
-    std::string lhs_value = lhs_value_from_rule_node(rule_node);
-    std::string name1 = gen_name(lhs_value);
-    std::string name2 = gen_name(lhs_value);
+    if(!new_symbol_list || !new_rule_list)
+        return;
+    std::string name_stem = lhs_value_from_rule_node(rule_node);
+    std::string name1 = gen_name(name_stem);
+    std::string name2 = gen_name(name_stem);
 //    std::cout << "NAME1: " << name1 << std::endl;
 //    std::cout << "NAME2: " << name2 << std::endl;
+    xl::node::NodeIdentIFace* new_rule = NULL;
+    new_rule = make_stem_rule(name1, rule_node, tc);
+    if(new_rule)
+    {
+        std::cout << "stem_rule: {" << std::endl;
+        xl::visitor::DefaultTour v; v.visit_any(new_rule); std::cout << std::endl;
+        std::cout << "}" << std::endl;
+        new_symbol_list->push_back(name_stem);
+        new_rule_list->push_back(new_rule);
+    }
     switch(closure_type)
     {
-        case '+':
-            make_stem_rule(name1, rule_node, tc);
-            make_recursive_rule(name1, name2, tc);
-            result = make_term_rule(name2, alt_node, tc);
-            break;
-        case '*':
-            make_stem_rule(name1, rule_node, tc);
-            make_recursive_rule(name1, name2, tc);
-            result = make_term_rule(name2, alt_node, tc);
-            break;
-        case '?':
-            make_stem_rule(name1, rule_node, tc);
-            make_recursive_rule(name1, name2, tc);
-            result = make_term_rule(name2, alt_node, tc);
-            break;
+        case '+': new_rule = make_recursive_rule_plus(name1, name2, tc); break;
+        case '*': new_rule = make_recursive_rule_star(name1, name2, tc); break;
+        case '?': new_rule = make_recursive_rule_optional(name1, name2, tc); break;
     }
-    return result;
+    if(new_rule)
+    {
+        std::cout << "recursive_rule: {" << std::endl;
+        xl::visitor::DefaultTour v; v.visit_any(new_rule); std::cout << std::endl;
+        std::cout << "}" << std::endl;
+        new_symbol_list->push_back(name1);
+        new_rule_list->push_back(new_rule);
+    }
+    new_rule = make_term_rule(name2, alt_node, tc);
+    if(new_rule)
+    {
+        std::cout << "term_rule: {" << std::endl;
+        xl::visitor::DefaultTour v; v.visit_any(new_rule); std::cout << std::endl;
+        std::cout << "}" << std::endl;
+        new_symbol_list->push_back(name2);
+        new_rule_list->push_back(new_rule);
+    }
 }
 
 static xl::node::NodeIdentIFace* alt_node_from_kleene_node(
@@ -131,12 +175,40 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     switch(_node->sym_id())
     {
         case ID_GRAMMAR:
-            visit_next_child(_node);
-            std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
-            visit_next_child(_node);
-            std::cout << std::endl << std::endl << "%%";
-            visit_next_child(_node);
-            std::cout << std::endl;
+            {
+                m_rules_node = NULL;
+                visit_next_child(_node);
+                std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
+                visit_next_child(_node);
+                std::cout << std::endl << std::endl << "%%";
+                visit_next_child(_node);
+                std::cout << std::endl;
+                if(m_symbols_node)
+                {
+                    xl::node::SymbolNodeIFace* attach_point =
+                            const_cast<xl::node::SymbolNodeIFace*>(
+                                    dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_node)
+                                    );
+                    std::list<std::string>::iterator p;
+                    for(p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); p++)
+                    {
+                        xl::TreeContext* tc = m_tc;
+                        attach_point->add_child(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(*p)));
+                    }
+                }
+                if(m_rules_node)
+                {
+                    xl::node::SymbolNodeIFace* attach_point =
+                            const_cast<xl::node::SymbolNodeIFace*>(
+                                    dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_node)
+                                    );
+                    std::list<xl::node::NodeIdentIFace*>::iterator q;
+                    for(q = m_new_rule_list.begin(); q != m_new_rule_list.end(); q++)
+                    {
+                        attach_point->add_child(*q);
+                    }
+                }
+            }
             break;
         case ID_DEFINITIONS:
             do
@@ -190,6 +262,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             } while(more);
             break;
         case ID_RULES:
+            m_rules_node = _node;
             do
             {
                 more = visit_next_child(_node);
@@ -235,11 +308,9 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             {
                 const xl::node::NodeIdentIFace* rule_node = ancestor_node(ID_RULE, _node);
                 xl::node::NodeIdentIFace* alt_node = alt_node_from_kleene_node(_node);
-                xl::node::NodeIdentIFace* temp =
-                        expand_kleene_closure(_node->sym_id(), rule_node, alt_node, m_tc);
-//                std::cout << "BEFORE" << std::endl;
-//                xl::visitor::DefaultTour::visit_any(temp);
-//                std::cout << "AFTER" << std::endl;
+                expand_kleene_closure(
+                        &m_new_symbol_list, &m_new_rule_list,
+                        _node->sym_id(), rule_node, alt_node, m_tc);
             }
             xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());

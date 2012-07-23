@@ -77,6 +77,7 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
 {
     virtual ~SymbolNodeIFace()
     {}
+    virtual void add_child(NodeIdentIFace* node) = 0;
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
 };
