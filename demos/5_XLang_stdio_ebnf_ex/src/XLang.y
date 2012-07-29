@@ -356,7 +356,7 @@ expression:
 
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
 {
-    tree_context() = new (ALLOC(alloc, xl::, TreeContext))
+    tree_context() = new (PNEW(alloc, xl::, TreeContext))
             xl::TreeContext(alloc);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
@@ -452,7 +452,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     if(args.in_xml != "")
     {
         ast = xl::mvc::MVCModel::make_ast(
-                new (ALLOC(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
+                new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
                 args.in_xml);
         if(!ast)
         {

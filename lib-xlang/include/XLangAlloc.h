@@ -30,9 +30,9 @@
         reinterpret_cast<ns c*>(x)->~f();  \
         }
 
-#define ALLOC(a, ns, c) \
+#define PNEW(a, ns, c) \
         a, __FILE__, __LINE__, DTOR_CB(ns, c)
-#define ALLOC_EX(a, ns, c, f) \
+#define PNEW_EX(a, ns, c, f) \
         a, __FILE__, __LINE__, DTOR_CB_EX(ns, c, f)
 
 namespace xl {

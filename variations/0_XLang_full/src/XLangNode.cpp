@@ -45,7 +45,7 @@ std::string Node::uid() const
 template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
-    return new (ALLOC(tc->alloc(), , NodeIdentIFace))
+    return new (PNEW(tc->alloc(), , NodeIdentIFace))
             TermNode<NodeIdentIFace::STRING>(m_sym_id, m_loc, m_value);
 }
 
@@ -81,7 +81,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
-    SymbolNode *_clone = new (ALLOC(tc->alloc(), , NodeIdentIFace))
+    SymbolNode *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             SymbolNode(m_sym_id, m_loc, 0, ap);
     std::vector<NodeIdentIFace*>::const_iterator p;
     for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
