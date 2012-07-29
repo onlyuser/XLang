@@ -161,8 +161,7 @@ ScannerContext::ScannerContext(const char* buf)
 
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
 {
-    parser_context() = new (alloc, __FILE__, __LINE__, DTOR_CB(, ParserContext))
-            ParserContext(alloc, s);
+    parser_context() = new (ALLOC(alloc, , ParserContext)) ParserContext(alloc, s);
     int error = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
     return (!error && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
@@ -260,7 +259,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     if(args.in_xml != "")
     {
         ast = xl::mvc::MVCModel::make_ast(
-                new (alloc, __FILE__, __LINE__, DTOR_CB(xl::, TreeContext)) xl::TreeContext(alloc),
+                new (ALLOC(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
                 args.in_xml);
         if(!ast)
         {

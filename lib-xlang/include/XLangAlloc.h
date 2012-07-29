@@ -23,13 +23,17 @@
 #include <stddef.h> // size_t
 #include <list> // std::list
 
-#define DTOR_CB(ns, c) [](void* x) {          \
-            reinterpret_cast<ns c*>(x)->~c(); \
-            }
+#define DTOR_CB(ns, c) [](void* x) {      \
+        reinterpret_cast<ns c*>(x)->~c(); \
+        }
+#define DTOR_CB_EX(ns, c, f) [](void* x) { \
+        reinterpret_cast<ns c*>(x)->~f();  \
+        }
 
-#define DTOR_CB_EX(ns, c, f) [](void* x) {    \
-            reinterpret_cast<ns c*>(x)->~f(); \
-            }
+#define ALLOC(a, ns, c) \
+        a, __FILE__, __LINE__, DTOR_CB(ns, c)
+#define ALLOC_EX(a, ns, c, f) \
+        a, __FILE__, __LINE__, DTOR_CB_EX(ns, c, f)
 
 namespace xl {
 
