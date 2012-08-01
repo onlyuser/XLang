@@ -21,6 +21,6 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 
-void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ebnf_ast);
+void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast);
 
 #endif
