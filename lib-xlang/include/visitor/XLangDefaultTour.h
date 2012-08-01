@@ -20,6 +20,7 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitor.h" // visitor::Visitor
+#include <sstream> // std::stringstream
 
 namespace xl { namespace visitor {
 
@@ -40,6 +41,15 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
     virtual void abort_visitation(const node::SymbolNodeIFace* _node);
     virtual void visit(const node::SymbolNodeIFace* _node);
     virtual void visit_any(const node::NodeIdentIFace* unknown);
+
+    // redirect stdout
+    void redirect_stdout();
+    std::string restore_stdout();
+
+protected:
+    // redirect stdout
+    std::stringstream m_cout_buf;
+    std::streambuf* m_prev_stream_buf;
 };
 
 } }

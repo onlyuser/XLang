@@ -21,28 +21,41 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 #include "XLangTreeContext.h" // TreeContext
-#include <sstream>
+#include <list> // std::list
+#include <set> // std::set
+
+struct EBNFChanges
+{
+    EBNFChanges(xl::TreeContext* tc)
+        : m_tc(tc), m_symbols_node(NULL), m_rules_node(NULL)
+    {}
+    void reset();
+    bool apply_changes();
+
+private:
+    xl::TreeContext* m_tc;
+public:
+    const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
+    std::list<std::string> m_new_symbol_list;
+    std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
+    std::set<xl::node::NodeIdentIFace*> m_remove_set;
+};
 
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
     EBNFPrinter(xl::TreeContext* tc)
-        : m_tc(tc), m_symbols_node(NULL), m_rules_node(NULL)
+        : m_tc(tc), m_changes(tc)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
-    void apply_changes(bool* changed);
-    void redirect_stdout();
-    std::string restore_stdout();
+    EBNFChanges &get_changes()
+    {
+        return m_changes;
+    }
 
 private:
     xl::TreeContext* m_tc;
-    std::list<std::string> m_new_symbol_list;
-    std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
-    const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
-
-    // redirect stdout
-    std::stringstream m_cout_buf;
-    std::streambuf* m_prev_stream_buf;
+    EBNFChanges m_changes;
 };
 
 #endif
