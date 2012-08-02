@@ -38,7 +38,7 @@ public:
     const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
     std::list<std::string> m_new_symbol_list;
     std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
-    std::set<xl::node::NodeIdentIFace*> m_remove_set;
+    std::set<const xl::node::NodeIdentIFace*> m_remove_set;
 };
 
 class EBNFPrinter : public xl::visitor::DefaultTour
