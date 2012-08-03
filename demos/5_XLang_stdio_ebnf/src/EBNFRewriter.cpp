@@ -28,14 +28,15 @@ void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-c
     do
     {
         std::cout << "(iter #" << n << ") <<<" << std::endl;
-        EBNFPrinter v(tc);
+        EBNFChanges changes(tc);
+        EBNFPrinter v(tc, &changes);
         std::string captured_stdout;
         {
             v.redirect_stdout(); // begin capture stdout
             v.visit_any(ast); // accumulate changes encountered during visit
             captured_stdout = v.restore_stdout(); // end capture stdout
         }
-        changed = v.get_changes().apply_changes(); // change EBNF --> BNF
+        changed = changes.apply(); // change EBNF --> BNF
         //if(!changed) // only keep stdout from last iteration
         {
             std::cout << "(stdout) <<<" << std::endl;

@@ -56,9 +56,9 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         const xl::node::NodeIdentIFace* rule_node,
         xl::TreeContext* tc)
 {
-    return NULL; // FIX-ME!: causes segfault
+    return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
-    xl::node::NodeIdentIFace* kleene_node = kleene_node_from_rule_node(rule_node_copy);
+    xl::node::NodeIdentIFace* kleene_node = kleene_node_from_rule_node(rule_node_copy); // <-- NULL
     xl::node::NodeIdentIFace* kleene_node_replacement =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
     replace_node(kleene_node, kleene_node_replacement); // <-- FIX-ME!: segfault here
@@ -181,7 +181,7 @@ void EBNFChanges::reset()
     m_remove_set.clear();
 }
 
-bool EBNFChanges::apply_changes()
+bool EBNFChanges::apply()
 {
     bool changed = false;
     if(m_symbols_node)
@@ -236,7 +236,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     switch(_node->sym_id())
     {
         case ID_GRAMMAR:
-            m_changes.reset(); // clear existing changes before starting over
+            if(m_changes)
+                m_changes->reset(); // clear existing changes before starting over
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
             visit_next_child(_node);
@@ -288,7 +289,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << '}';
             break;
         case ID_SYMBOLS:
-            m_changes.m_symbols_node = _node; // record location so we can insert here later!
+            if(m_changes)
+                m_changes->m_symbols_node = _node; // record location so we can insert here later!
             do
             {
                 more = visit_next_child(_node);
@@ -297,7 +299,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             } while(more);
             break;
         case ID_RULES:
-            m_changes.m_rules_node = _node; // record location so we can insert here later!
+            if(m_changes)
+                m_changes->m_rules_node = _node; // record location so we can insert here later!
             do
             {
                 more = visit_next_child(_node);
@@ -340,14 +343,15 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '+':
         case '*':
         case '?':
-            expand_kleene_closure(
-                    &m_changes.m_new_symbol_list,
-                    &m_changes.m_new_rule_list,
-                    &m_changes.m_remove_set,
-                    _node->sym_id(),
-                    ancestor_node(ID_RULE, _node),
-                    alt_node_from_kleene_node(_node),
-                    m_tc);
+            if(m_changes)
+                expand_kleene_closure(
+                        &m_changes->m_new_symbol_list,
+                        &m_changes->m_new_rule_list,
+                        &m_changes->m_remove_set,
+                        _node->sym_id(),
+                        ancestor_node(ID_RULE, _node),
+                        alt_node_from_kleene_node(_node),
+                        m_tc);
             xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
             break;

@@ -30,7 +30,7 @@ struct EBNFChanges
         : m_tc(tc), m_symbols_node(NULL), m_rules_node(NULL)
     {}
     void reset();
-    bool apply_changes();
+    bool apply();
 
 private:
     xl::TreeContext* m_tc;
@@ -44,18 +44,14 @@ public:
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-    EBNFPrinter(xl::TreeContext* tc)
-        : m_tc(tc), m_changes(tc)
+    EBNFPrinter(xl::TreeContext* tc, EBNFChanges* changes = NULL)
+        : m_tc(tc), m_changes(changes)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
-    EBNFChanges &get_changes()
-    {
-        return m_changes;
-    }
 
 private:
     xl::TreeContext* m_tc;
-    EBNFChanges m_changes;
+    EBNFChanges* m_changes;
 };
 
 #endif
