@@ -18,6 +18,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <sstream> // std::stringstream
+#include <algorithm> // std::remove_if
 
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
@@ -40,6 +41,13 @@ std::string Node::name() const
 std::string Node::uid() const
 {
     return ptr_to_string(this);
+}
+
+int Node::child_index() const
+{
+    if(!m_parent)
+        return -1;
+    return dynamic_cast<SymbolNodeIFace*>(m_parent)->index_of(this);
 }
 
 template<>
@@ -76,6 +84,25 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
         if(child)
             child->set_parent(this);
     }
+}
+
+void SymbolNode::remove(NodeIdentIFace* node)
+{
+    m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), node), m_child_vec.end());
+}
+
+void SymbolNode::replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
+{
+    std::replace(m_child_vec.begin(), m_child_vec.end(), replaced_node, replacement_node);
+}
+
+int SymbolNode::index_of(const NodeIdentIFace* _node) const
+{
+    std::vector<NodeIdentIFace*>::const_iterator p =
+            std::find(m_child_vec.begin(), m_child_vec.end(), _node);
+    if(p == m_child_vec.end())
+        return -1;
+    return std::distance(m_child_vec.begin(), p);
 }
 
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const

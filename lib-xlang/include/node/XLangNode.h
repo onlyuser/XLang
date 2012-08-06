@@ -25,7 +25,6 @@
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 #include <vector> // std::vector
-#include <algorithm> // std::remove_if
 #include <stdarg.h> // va_list
 
 namespace xl { namespace node {
@@ -58,6 +57,7 @@ public:
         return m_parent == NULL;
     }
     std::string uid() const;
+    int child_index() const;
 
 protected:
     NodeIdentIFace::type_t m_type;
@@ -97,22 +97,17 @@ public:
     {
         return m_child_vec[index];
     }
-    void add_child(NodeIdentIFace* node)
+    void push_back(NodeIdentIFace* node)
     {
         m_child_vec.push_back(node);
     }
-    void insert_child(NodeIdentIFace* node)
+    void push_front(NodeIdentIFace* node)
     {
         m_child_vec.insert(m_child_vec.begin(), node);
     }
-    void remove_child(NodeIdentIFace* node)
-    {
-        m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), node), m_child_vec.end());
-    }
-    void replace_child(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
-    {
-        std::replace(m_child_vec.begin(), m_child_vec.end(), replaced_node, replacement_node);
-    }
+    void remove(NodeIdentIFace* node);
+    void replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node);
+    int index_of(const NodeIdentIFace* _node) const;
     size_t size() const
     {
         return m_child_vec.size();

@@ -90,7 +90,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         {
             ticpp::Iterator<ticpp::Node> child;
             for(child = child.begin(node); child != child.end(); child++)
-                dest_node->add_child(visit(tc, child.Get()));
+                dest_node->push_back(visit(tc, child.Get()));
             if(dest_node->size() == 1)
             {
                 node::NodeIdentIFace* dest_child = (*dest_node)[0];
@@ -125,7 +125,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(type), dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
-            dest_node->add_child(visit(tc, child.Get()));
+            dest_node->push_back(visit(tc, child.Get()));
         return dest_node;
     }
 }

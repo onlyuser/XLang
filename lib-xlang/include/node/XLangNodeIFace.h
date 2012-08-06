@@ -45,6 +45,10 @@ struct NodeIdentIFace
     virtual bool is_root() const = 0;
     virtual std::string uid() const = 0;
     virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
+    virtual int child_index() const
+    {
+        return -1;
+    }
 };
 
 template<NodeIdentIFace::type_t>
@@ -77,11 +81,19 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
 {
     virtual ~SymbolNodeIFace()
     {}
-    virtual void add_child(NodeIdentIFace* node) = 0;
-    virtual void insert_child(NodeIdentIFace* node) = 0;
-    virtual void remove_child(NodeIdentIFace* node) = 0;
-    virtual void replace_child(
-            NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node) = 0;
+    virtual void push_back(NodeIdentIFace* node)
+    {}
+    virtual void push_front(NodeIdentIFace* node)
+    {}
+    virtual void remove(NodeIdentIFace* node)
+    {}
+    virtual void replace(
+            NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
+    {}
+    virtual int index_of(const NodeIdentIFace* _node) const
+    {
+        return -1;
+    }
     virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
     virtual size_t size() const = 0;
 };

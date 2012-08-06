@@ -62,7 +62,6 @@ public:
     {
         return m_loc;
     }
-    virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
 
 protected:
     NodeIdentIFace::type_t m_type;
@@ -103,10 +102,6 @@ public:
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
-    }
-    void add_child(NodeIdentIFace* node)
-    {
-        m_child_vec.push_back(node);
     }
     size_t size() const
     {
