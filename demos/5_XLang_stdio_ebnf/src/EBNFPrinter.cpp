@@ -45,11 +45,14 @@ static void replace_node(
         const xl::node::NodeIdentIFace* replaced_node,
         const xl::node::NodeIdentIFace* replacement_node)
 {
+	if(!replaced_node)
+		return;
     xl::node::SymbolNodeIFace* parent =
             dynamic_cast<xl::node::SymbolNodeIFace*>(replaced_node->parent());
-    parent->replace(
-            const_cast<xl::node::NodeIdentIFace*>(replaced_node),
-            const_cast<xl::node::NodeIdentIFace*>(replacement_node));
+    if(parent)
+		parent->replace(
+				const_cast<xl::node::NodeIdentIFace*>(replaced_node),
+				const_cast<xl::node::NodeIdentIFace*>(replacement_node));
 }
 
 static const xl::node::NodeIdentIFace* ancestor_node(
@@ -68,18 +71,31 @@ static const xl::node::NodeIdentIFace* ancestor_node(
 static const xl::node::NodeIdentIFace* alt_node_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
+	if(!kleene_node)
+		return NULL;
     xl::node::NodeIdentIFace* paren_node =
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(kleene_node))[0];
+    if(!paren_node)
+    	return NULL;
     return (*dynamic_cast<xl::node::SymbolNodeIFace*>(paren_node))[0];
 }
 
 static std::string lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
 {
+	if(!rule_node)
+		return "";
     xl::node::NodeIdentIFace* lhs_node =
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node))[0];
+    if(!lhs_node)
+    	return "";
     const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* lhs_term =
             dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(lhs_node);
-    return *lhs_term->value();
+    if(!lhs_term)
+    	return "";
+    const std::string* lhs_value_ptr = lhs_term->value();
+    if(!lhs_value_ptr)
+    	return "";
+    return *lhs_value_ptr;
 }
 
 static void relative_path_from_node(
@@ -87,13 +103,15 @@ static void relative_path_from_node(
         xl::node::NodeIdentIFace* child_node,
         xl::node::NodeIdentIFace* ancestor_node)
 {
+	if(!child_node)
+		return;
     const xl::node::NodeIdentIFace* cur_node = child_node;
     do
     {
         index_vec.insert(index_vec.begin(), cur_node->child_index());
         cur_node = cur_node->parent();
         if(cur_node == ancestor_node)
-            return;
+            break;
     } while(cur_node);
 }
 
@@ -101,9 +119,11 @@ static const xl::node::NodeIdentIFace* node_from_relative_path(
         std::vector<int> &index_vec,
         xl::node::NodeIdentIFace* child_node)
 {
+	if(!child_node)
+		return NULL;
     const xl::node::NodeIdentIFace* cur_node = child_node;
     std::vector<int>::iterator p;
-    for(p = index_vec.begin(); p != index_vec.end(); p++)
+    for(p = index_vec.begin(); p != index_vec.end(); ++p)
     {
         const xl::node::SymbolNodeIFace* parent =
                 dynamic_cast<const xl::node::SymbolNodeIFace*>(cur_node);
@@ -152,6 +172,8 @@ static xl::node::NodeIdentIFace* make_term_rule(
         const xl::node::NodeIdentIFace* alt_node,
         xl::TreeContext* tc)
 {
+	if(!alt_node)
+		return NULL;
     return MAKE_SYMBOL(ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
             alt_node->clone(tc));
@@ -219,16 +241,16 @@ void EBNFChanges::reset()
 bool EBNFChanges::apply()
 {
     bool changed = false;
-    if(m_symbols_node)
+    if(m_symbols_node && m_new_symbol_list.size() > 0)
     {
         xl::node::SymbolNodeIFace* attach_point =
                 const_cast<xl::node::SymbolNodeIFace*>(
                         dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_node)
                         );
-        if(m_new_symbol_list.size() > 0)
+        if(attach_point)
         {
             std::list<std::string>::iterator p;
-            for(p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); p++)
+            for(p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); ++p)
             {
                 // insert front to avoid eol-symbol
                 xl::TreeContext* tc = m_tc;
@@ -237,16 +259,16 @@ bool EBNFChanges::apply()
             changed = true;
         }
     }
-    if(m_rules_node)
+    if(m_rules_node && m_new_rule_list.size() > 0)
     {
         xl::node::SymbolNodeIFace* attach_point =
                 const_cast<xl::node::SymbolNodeIFace*>(
                         dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_node)
                         );
-        if(m_new_rule_list.size() > 0)
+        if(attach_point)
         {
             std::list<xl::node::NodeIdentIFace*>::iterator q;
-            for(q = m_new_rule_list.begin(); q != m_new_rule_list.end(); q++)
+            for(q = m_new_rule_list.begin(); q != m_new_rule_list.end(); ++q)
                 attach_point->push_front(*q); // insert front to avoid eol-symbol
             changed = true;
         }
@@ -254,11 +276,17 @@ bool EBNFChanges::apply()
     if(m_remove_set.size() > 0)
     {
         std::set<const xl::node::NodeIdentIFace*>::iterator r;
-        for(r = m_remove_set.begin(); r != m_remove_set.end(); r++)
+        for(r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
         {
-            xl::node::SymbolNodeIFace* parent =
-                    dynamic_cast<xl::node::SymbolNodeIFace*>((*r)->parent());
-            parent->remove(const_cast<xl::node::NodeIdentIFace*>(*r));
+        	const xl::node::NodeIdentIFace* cur_node = (*r);
+        	if(!cur_node)
+        		break;
+        	xl::node::NodeIdentIFace* parent = (*r)->parent();
+        	if(!parent)
+        		break;
+            xl::node::SymbolNodeIFace* sym_parent =
+                    dynamic_cast<xl::node::SymbolNodeIFace*>(parent);
+            sym_parent->remove(const_cast<xl::node::NodeIdentIFace*>(*r));
         }
         changed = true;
     }
