@@ -35,8 +35,9 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
-static xl::node::NodeIdentIFace* kleene_node_from_rule_node(
-        const xl::node::NodeIdentIFace* rule_node)
+static xl::node::NodeIdentIFace* find_clone_of_original(
+        const xl::node::NodeIdentIFace* root,
+        const xl::node::NodeIdentIFace* original)
 {
     return NULL;
 }
@@ -45,17 +46,17 @@ static void replace_node(
         const xl::node::NodeIdentIFace* replaced_node,
         const xl::node::NodeIdentIFace* replacement_node)
 {
-	if(!replaced_node)
-		return;
+    if(!replaced_node)
+        return;
     xl::node::SymbolNodeIFace* parent =
             dynamic_cast<xl::node::SymbolNodeIFace*>(replaced_node->parent());
     if(parent)
-		parent->replace(
-				const_cast<xl::node::NodeIdentIFace*>(replaced_node),
-				const_cast<xl::node::NodeIdentIFace*>(replacement_node));
+        parent->replace(
+                const_cast<xl::node::NodeIdentIFace*>(replaced_node),
+                const_cast<xl::node::NodeIdentIFace*>(replacement_node));
 }
 
-static const xl::node::NodeIdentIFace* ancestor_node(
+static const xl::node::NodeIdentIFace* get_ancestor_node(
         uint32_t sym_id,
         const xl::node::NodeIdentIFace* node)
 {
@@ -68,70 +69,34 @@ static const xl::node::NodeIdentIFace* ancestor_node(
 }
 
 // kleene_node --> paren_node --> alt_node
-static const xl::node::NodeIdentIFace* alt_node_from_kleene_node(
+static const xl::node::NodeIdentIFace* get_alt_node_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
-	if(!kleene_node)
-		return NULL;
+    if(!kleene_node)
+        return NULL;
     xl::node::NodeIdentIFace* paren_node =
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(kleene_node))[0];
     if(!paren_node)
-    	return NULL;
+        return NULL;
     return (*dynamic_cast<xl::node::SymbolNodeIFace*>(paren_node))[0];
 }
 
-static std::string lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
+static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
 {
-	if(!rule_node)
-		return "";
+    if(!rule_node)
+        return "";
     xl::node::NodeIdentIFace* lhs_node =
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node))[0];
     if(!lhs_node)
-    	return "";
+        return "";
     const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* lhs_term =
             dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(lhs_node);
     if(!lhs_term)
-    	return "";
+        return "";
     const std::string* lhs_value_ptr = lhs_term->value();
     if(!lhs_value_ptr)
-    	return "";
+        return "";
     return *lhs_value_ptr;
-}
-
-static void relative_path_from_node(
-        std::vector<int> &index_vec,
-        xl::node::NodeIdentIFace* child_node,
-        xl::node::NodeIdentIFace* ancestor_node)
-{
-	if(!child_node)
-		return;
-    const xl::node::NodeIdentIFace* cur_node = child_node;
-    do
-    {
-        index_vec.insert(index_vec.begin(), cur_node->child_index());
-        cur_node = cur_node->parent();
-        if(cur_node == ancestor_node)
-            break;
-    } while(cur_node);
-}
-
-static const xl::node::NodeIdentIFace* node_from_relative_path(
-        std::vector<int> &index_vec,
-        xl::node::NodeIdentIFace* child_node)
-{
-	if(!child_node)
-		return NULL;
-    const xl::node::NodeIdentIFace* cur_node = child_node;
-    std::vector<int>::iterator p;
-    for(p = index_vec.begin(); p != index_vec.end(); ++p)
-    {
-        const xl::node::SymbolNodeIFace* parent =
-                dynamic_cast<const xl::node::SymbolNodeIFace*>(cur_node);
-        if(!parent)
-            return NULL;
-        cur_node = (*parent)[*p];
-    }
-    return cur_node;
 }
 
 static xl::node::NodeIdentIFace* make_stem_rule(
@@ -142,10 +107,10 @@ static xl::node::NodeIdentIFace* make_stem_rule(
 {
     return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
-    xl::node::NodeIdentIFace* replaced_node = kleene_node_from_rule_node(rule_node_copy); // <-- NULL
+    xl::node::NodeIdentIFace* kleene_node_copy = find_clone_of_original(rule_node_copy, kleene_node);
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
-    replace_node(replaced_node, replacement_node); // <-- FIX-ME!: segfault here
+    replace_node(kleene_node_copy, replacement_node); // <-- FIX-ME!: segfault here
     return rule_node_copy;
 }
 
@@ -172,8 +137,8 @@ static xl::node::NodeIdentIFace* make_term_rule(
         const xl::node::NodeIdentIFace* alt_node,
         xl::TreeContext* tc)
 {
-	if(!alt_node)
-		return NULL;
+    if(!alt_node)
+        return NULL;
     return MAKE_SYMBOL(ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
             alt_node->clone(tc));
@@ -188,8 +153,8 @@ static void expand_kleene_closure(
 {
     if(!new_symbol_list || !new_rule_list || !remove_set)
         return;
-    const xl::node::NodeIdentIFace* rule_node = ancestor_node(ID_RULE, kleene_node);
-    std::string lhs_value = lhs_value_from_rule_node(rule_node);
+    const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
+    std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
     std::string name1 = gen_name(lhs_value);
     std::string name2 = gen_name(lhs_value);
     xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
@@ -216,7 +181,7 @@ static void expand_kleene_closure(
         new_symbol_list->push_back(name1);
         new_rule_list->push_back(recursive_rule);
     }
-    const xl::node::NodeIdentIFace* alt_node = alt_node_from_kleene_node(kleene_node);
+    const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
     if(term_rule)
     {
@@ -278,12 +243,12 @@ bool EBNFChanges::apply()
         std::set<const xl::node::NodeIdentIFace*>::iterator r;
         for(r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
         {
-        	const xl::node::NodeIdentIFace* cur_node = (*r);
-        	if(!cur_node)
-        		break;
-        	xl::node::NodeIdentIFace* parent = (*r)->parent();
-        	if(!parent)
-        		break;
+            const xl::node::NodeIdentIFace* cur_node = (*r);
+            if(!cur_node)
+                break;
+            xl::node::NodeIdentIFace* parent = (*r)->parent();
+            if(!parent)
+                break;
             xl::node::SymbolNodeIFace* sym_parent =
                     dynamic_cast<xl::node::SymbolNodeIFace*>(parent);
             sym_parent->remove(const_cast<xl::node::NodeIdentIFace*>(*r));

@@ -43,13 +43,6 @@ std::string Node::uid() const
     return ptr_to_string(this);
 }
 
-int Node::child_index() const
-{
-    if(!m_parent)
-        return -1;
-    return dynamic_cast<SymbolNodeIFace*>(m_parent)->index_of(this);
-}
-
 template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
@@ -96,20 +89,12 @@ void SymbolNode::replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacem
     std::replace(m_child_vec.begin(), m_child_vec.end(), replaced_node, replacement_node);
 }
 
-int SymbolNode::index_of(const NodeIdentIFace* _node) const
-{
-    std::vector<NodeIdentIFace*>::const_iterator p =
-            std::find(m_child_vec.begin(), m_child_vec.end(), _node);
-    if(p == m_child_vec.end())
-        return -1;
-    return std::distance(m_child_vec.begin(), p);
-}
-
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
     SymbolNode *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             SymbolNode(m_sym_id, 0, ap);
+    _clone->set_original(this);
     std::vector<NodeIdentIFace*>::const_iterator p;
     for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {

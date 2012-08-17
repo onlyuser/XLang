@@ -33,7 +33,7 @@ class Node : virtual public NodeIdentIFace
 {
 public:
     Node(NodeIdentIFace::type_t _type, uint32_t _sym_id)
-        : m_type(_type), m_sym_id(_sym_id), m_parent(NULL)
+        : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_original(NULL)
     {}
     NodeIdentIFace::type_t type() const
     {
@@ -52,17 +52,25 @@ public:
     {
         return m_parent;
     }
+    void set_original(const NodeIdentIFace* original)
+    {
+        m_original = original;
+    }
+    const NodeIdentIFace* original() const
+    {
+        return m_original;
+    }
     bool is_root() const
     {
         return m_parent == NULL;
     }
     std::string uid() const;
-    int child_index() const;
 
 protected:
     NodeIdentIFace::type_t m_type;
     uint32_t m_sym_id;
     NodeIdentIFace* m_parent;
+    const NodeIdentIFace* m_original;
 };
 
 template<NodeIdentIFace::type_t _type>
@@ -107,7 +115,6 @@ public:
     }
     void remove(NodeIdentIFace* node);
     void replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node);
-    int index_of(const NodeIdentIFace* _node) const;
     size_t size() const
     {
         return m_child_vec.size();
