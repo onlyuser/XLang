@@ -36,6 +36,8 @@ public:
     Node(NodeIdentIFace::type_t _type, uint32_t _sym_id, YYLTYPE _loc)
         : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_loc(_loc)
     {}
+
+    // required
     NodeIdentIFace::type_t type() const
     {
         return m_type;
@@ -53,11 +55,9 @@ public:
     {
         return m_parent;
     }
-    bool is_root() const
-    {
-        return !m_parent;
-    }
     std::string uid() const;
+
+    // built-in
     YYLTYPE loc() const
     {
         return m_loc;
@@ -99,6 +99,8 @@ class SymbolNode
 {
 public:
     SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap);
+
+    // required
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
@@ -107,11 +109,12 @@ public:
     {
         return m_child_vec.size();
     }
+
+    // built-in
     visitor::VisitStateIFace::state_t &visit_state()
     {
         return m_visit_state;
     }
-    NodeIdentIFace* clone(TreeContext* tc) const;
     static NodeIdentIFace* eol()
     {
         static int dummy;

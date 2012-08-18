@@ -33,20 +33,36 @@ struct NodeIdentIFace
 
     virtual ~NodeIdentIFace()
     {}
+
+    // required
     virtual type_t type() const = 0;
     virtual uint32_t sym_id() const = 0;
     virtual std::string name() const = 0;
+    virtual void set_parent(NodeIdentIFace* parent) = 0;
+    virtual NodeIdentIFace* parent() const = 0;
+    virtual std::string uid() const = 0;
+
+    // optional
+    virtual NodeIdentIFace* clone(TreeContext* tc) const
+    {
+        return NULL;
+    }
+    virtual void set_original(const NodeIdentIFace* original)
+    {}
+    virtual const NodeIdentIFace* original() const
+    {
+        return NULL;
+    }
+
+    // built-in
     bool is_same_type(const NodeIdentIFace* _node) const
     {
         return type() == _node->type() && sym_id() == _node->sym_id();
     }
-    virtual void set_parent(NodeIdentIFace* parent) = 0;
-    virtual NodeIdentIFace* parent() const = 0;
-    virtual void set_original(const NodeIdentIFace* original) = 0;
-    virtual const NodeIdentIFace* original() const = 0;
-    virtual bool is_root() const = 0;
-    virtual std::string uid() const = 0;
-    virtual NodeIdentIFace* clone(TreeContext* tc) const = 0;
+    bool is_root() const
+    {
+        return parent() == NULL;
+    }
 };
 
 template<NodeIdentIFace::type_t>
@@ -79,6 +95,12 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
 {
     virtual ~SymbolNodeIFace()
     {}
+
+    // required
+    virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
+    virtual size_t size() const = 0;
+
+    // optional
     virtual void push_back(NodeIdentIFace* node)
     {}
     virtual void push_front(NodeIdentIFace* node)
@@ -88,8 +110,6 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     virtual void replace(
             NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
     {}
-    virtual NodeIdentIFace* operator[](uint32_t index) const = 0;
-    virtual size_t size() const = 0;
 };
 
 } }

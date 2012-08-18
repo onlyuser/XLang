@@ -78,20 +78,4 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
     }
 }
 
-NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
-{
-    va_list ap;
-    SymbolNode *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
-            SymbolNode(m_sym_id, m_loc, 0, ap);
-    std::vector<NodeIdentIFace*>::const_iterator p;
-    for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
-    {
-        NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;
-        _clone->m_child_vec.push_back(child_clone);
-        if(child_clone)
-            child_clone->set_parent(_clone);
-    }
-    return _clone;
-}
-
 } }

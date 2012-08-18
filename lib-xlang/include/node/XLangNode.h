@@ -35,6 +35,8 @@ public:
     Node(NodeIdentIFace::type_t _type, uint32_t _sym_id)
         : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_original(NULL)
     {}
+
+    // required
     NodeIdentIFace::type_t type() const
     {
         return m_type;
@@ -52,6 +54,9 @@ public:
     {
         return m_parent;
     }
+    std::string uid() const;
+
+    // optional
     void set_original(const NodeIdentIFace* original)
     {
         m_original = original;
@@ -60,11 +65,6 @@ public:
     {
         return m_original;
     }
-    bool is_root() const
-    {
-        return m_parent == NULL;
-    }
-    std::string uid() const;
 
 protected:
     NodeIdentIFace::type_t m_type;
@@ -101,10 +101,19 @@ class SymbolNode
 {
 public:
     SymbolNode(uint32_t _sym_id, size_t _size, va_list ap);
+
+    // required
     NodeIdentIFace* operator[](uint32_t index) const
     {
         return m_child_vec[index];
     }
+    size_t size() const
+    {
+        return m_child_vec.size();
+    }
+
+    // optional
+    NodeIdentIFace* clone(TreeContext* tc) const;
     void push_back(NodeIdentIFace* node)
     {
         m_child_vec.push_back(node);
@@ -115,15 +124,12 @@ public:
     }
     void remove(NodeIdentIFace* node);
     void replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node);
-    size_t size() const
-    {
-        return m_child_vec.size();
-    }
+
+    // built-in
     visitor::VisitStateIFace::state_t &visit_state()
     {
         return m_visit_state;
     }
-    NodeIdentIFace* clone(TreeContext* tc) const;
     static NodeIdentIFace* eol()
     {
         static int dummy;
