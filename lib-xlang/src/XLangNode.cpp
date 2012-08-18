@@ -94,7 +94,7 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     va_list ap;
     SymbolNode *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             SymbolNode(m_sym_id, 0, ap);
-    _clone->set_original(this);
+    _clone->set_original(parent() ? parent() : this);
     std::vector<NodeIdentIFace*>::const_iterator p;
     for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {

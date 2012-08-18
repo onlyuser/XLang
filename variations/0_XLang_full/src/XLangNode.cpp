@@ -42,13 +42,6 @@ std::string Node::uid() const
     return ptr_to_string(this);
 }
 
-template<>
-NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
-{
-    return new (PNEW(tc->alloc(), , NodeIdentIFace))
-            TermNode<NodeIdentIFace::STRING>(m_sym_id, m_loc, m_value);
-}
-
 SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
     : Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
