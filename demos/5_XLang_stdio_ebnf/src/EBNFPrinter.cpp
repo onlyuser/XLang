@@ -22,6 +22,7 @@
 #include "node/XLangNode.h" // node::Node
 #include "XLangTreeContext.h" // TreeContext
 #include <iostream> // std::cout
+#include <map> // std::map
 #include <algorithm> // std::replace
 
 #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
@@ -29,9 +30,9 @@
 
 static std::string gen_name(std::string stem)
 {
-    static int index;
+    static std::map<std::string, int> tally_map;
     std::stringstream ss;
-    ss << stem << '_' << index++;
+    ss << stem << '_' << tally_map[stem]++;
     return ss.str();
 }
 
@@ -118,13 +119,13 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         const xl::node::NodeIdentIFace* kleene_node,
         xl::TreeContext* tc)
 {
-    return NULL;
+    // TODO: error checking
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
     xl::node::NodeIdentIFace* kleene_node_copy =
             find_clone_of_original_recursive(rule_node_copy, kleene_node);
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
-    replace_node(kleene_node_copy, replacement_node); // <-- FIX-ME!: segfault here
+    replace_node(kleene_node_copy, replacement_node);
     return rule_node_copy;
 }
 
