@@ -60,7 +60,7 @@ static const xl::node::NodeIdentIFace* get_ancestor_node(
         uint32_t sym_id,
         const xl::node::NodeIdentIFace* node)
 {
-    for(const xl::node::NodeIdentIFace* p = node; p; p = p->parent())
+    for(auto p = node; p; p = p->parent())
     {
         if(p->sym_id() == sym_id)
             return p;

@@ -56,7 +56,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
-    for(size_t i = 0; i<_size; i++)
+    for(auto i = 0; i<_size; i++)
     {
         NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
         if(child == SymbolNode::eol())
