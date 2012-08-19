@@ -101,6 +101,15 @@ NodeIdentIFace* SymbolNode::find_clone_of_original(const NodeIdentIFace* origina
     return m_child_vec[index];
 }
 
+NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) const
+{
+    auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), pred);
+    if(p == m_child_vec.end())
+        return NULL;
+    int index = std::distance(m_child_vec.begin(), p);
+    return m_child_vec[index];
+}
+
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;

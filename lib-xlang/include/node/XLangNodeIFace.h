@@ -113,6 +113,10 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {
         return NULL;
     }
+    virtual NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const
+    {
+        return NULL;
+    }
 };
 
 } }

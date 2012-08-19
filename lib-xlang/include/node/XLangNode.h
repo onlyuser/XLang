@@ -125,6 +125,7 @@ public:
     void remove(NodeIdentIFace* node);
     void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
     NodeIdentIFace* find_clone_of_original(const NodeIdentIFace* original) const;
+    NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;
 
     // built-in
     visitor::VisitStateIFace::state_t &visit_state()
