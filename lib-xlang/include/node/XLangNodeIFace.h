@@ -109,9 +109,9 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
     {}
-    virtual NodeIdentIFace* find_clone_of_original(NodeIdentIFace* original) const
+    virtual NodeIdentIFace* find_clone_of_original(const NodeIdentIFace* original) const
     {
-    	return NULL;
+        return NULL;
     }
 };
 

@@ -46,7 +46,7 @@ std::string Node::uid() const
 template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
-	TermNodeIFace<NodeIdentIFace::STRING> *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
+    TermNodeIFace<NodeIdentIFace::STRING> *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             TermNode<NodeIdentIFace::STRING>(m_sym_id, m_value);
     _clone->set_original(original() ? original() : this);
     return _clone;
@@ -56,7 +56,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
-    for(auto i = 0; i<_size; i++)
+    for(size_t i = 0; i<_size; i++)
     {
         NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
         if(child == SymbolNode::eol())
@@ -90,15 +90,15 @@ void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node
     std::replace(m_child_vec.begin(), m_child_vec.end(), find_node, replace_node);
 }
 
-NodeIdentIFace* SymbolNode::find_clone_of_original(NodeIdentIFace* original) const
+NodeIdentIFace* SymbolNode::find_clone_of_original(const NodeIdentIFace* original) const
 {
-	auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), [&original](const NodeIdentIFace* _node) {
-			return _node->original() == original;
-			});
-	if(p == m_child_vec.end())
-		return NULL;
-	int index = std::distance(m_child_vec.begin(), p);
-	return m_child_vec[index];
+    auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), [&original](const NodeIdentIFace* _node) {
+            return _node->original() == original;
+            });
+    if(p == m_child_vec.end())
+        return NULL;
+    int index = std::distance(m_child_vec.begin(), p);
+    return m_child_vec[index];
 }
 
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const

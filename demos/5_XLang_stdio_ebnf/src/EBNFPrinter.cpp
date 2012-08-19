@@ -35,11 +35,24 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
-static xl::node::NodeIdentIFace* find_clone_of_original(
+static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
         const xl::node::NodeIdentIFace* root,
         const xl::node::NodeIdentIFace* original)
 {
-    return NULL;
+    const xl::node::SymbolNodeIFace* root_sym = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
+    if(!root_sym)
+        return NULL;
+    xl::node::NodeIdentIFace* result = root_sym->find_clone_of_original(original);
+    if(!result)
+    {
+        for(size_t i = 0; i < root_sym->size(); i++)
+        {
+            result = find_clone_of_original_recursive((*root_sym)[i], original);
+            if(result)
+                return result;
+        }
+    }
+    return result;
 }
 
 static void replace_node(
@@ -107,7 +120,8 @@ static xl::node::NodeIdentIFace* make_stem_rule(
 {
     return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
-    xl::node::NodeIdentIFace* kleene_node_copy = find_clone_of_original(rule_node_copy, kleene_node);
+    xl::node::NodeIdentIFace* kleene_node_copy =
+            find_clone_of_original_recursive(rule_node_copy, kleene_node);
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
     replace_node(kleene_node_copy, replacement_node); // <-- FIX-ME!: segfault here
