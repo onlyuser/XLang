@@ -107,9 +107,12 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void remove(NodeIdentIFace* node)
     {}
-    virtual void replace(
-            NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
+    virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
     {}
+    virtual int find_clone_of_original(NodeIdentIFace* original)
+    {
+    	return -1;
+    }
 };
 
 } }

@@ -46,8 +46,10 @@ std::string Node::uid() const
 template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
-    return new (PNEW(tc->alloc(), , NodeIdentIFace))
+	TermNodeIFace<NodeIdentIFace::STRING> *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             TermNode<NodeIdentIFace::STRING>(m_sym_id, m_value);
+    _clone->set_original(original() ? original() : this);
+    return _clone;
 }
 
 SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
@@ -65,8 +67,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
             m_child_vec.insert(m_child_vec.end(),
                     symbol_node->m_child_vec.begin(),
                     symbol_node->m_child_vec.end());
-            std::vector<NodeIdentIFace*>::iterator p;
-            for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
+            for(auto p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
             {
                 if(*p)
                     (*p)->set_parent(this);
@@ -84,22 +85,31 @@ void SymbolNode::remove(NodeIdentIFace* node)
     m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), node), m_child_vec.end());
 }
 
-void SymbolNode::replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node)
+void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
 {
-    std::replace(m_child_vec.begin(), m_child_vec.end(), replaced_node, replacement_node);
+    std::replace(m_child_vec.begin(), m_child_vec.end(), find_node, replace_node);
+}
+
+int SymbolNode::find_clone_of_original(NodeIdentIFace* original)
+{
+	auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), [](NodeIdentIFace*) {
+			return false;
+			});
+	if(p == m_child_vec.end())
+		return -1;
+	return std::distance(m_child_vec.begin(), p);
 }
 
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
-    SymbolNode *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
+    SymbolNodeIFace *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             SymbolNode(m_sym_id, 0, ap);
-    _clone->set_original(parent() ? parent() : this);
-    std::vector<NodeIdentIFace*>::const_iterator p;
-    for(p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
+    _clone->set_original(original() ? original() : this);
+    for(auto p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {
         NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;
-        _clone->m_child_vec.push_back(child_clone);
+        _clone->push_back(child_clone);
         if(child_clone)
             child_clone->set_parent(_clone);
     }

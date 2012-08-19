@@ -64,7 +64,7 @@ void* Allocator::_malloc(size_t size_bytes, std::string filename, size_t line_nu
 
 void Allocator::_free(void* ptr)
 {
-    internal_type_t::iterator p = m_chunk_map.find(ptr);
+    auto p = m_chunk_map.find(ptr);
     if(p != m_chunk_map.end())
     {
         MemChunk* chunk = (*p).second;
@@ -76,7 +76,7 @@ void Allocator::_free(void* ptr)
 
 void Allocator::_free()
 {
-    for(internal_type_t::iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
+    for(auto p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
         delete (*p).second;
     m_chunk_map.clear();
 }
@@ -84,7 +84,7 @@ void Allocator::_free()
 void Allocator::dump(std::string indent) const
 {
     std::cout << '\"' << m_name << "\" {" << std::endl;
-    for(internal_type_t::const_iterator p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
+    for(auto p = m_chunk_map.begin(); p != m_chunk_map.end(); ++p)
     {
         (*p).second->dump(indent);
         std::cout << std::endl;

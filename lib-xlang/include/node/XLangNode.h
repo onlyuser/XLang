@@ -123,7 +123,8 @@ public:
         m_child_vec.insert(m_child_vec.begin(), node);
     }
     void remove(NodeIdentIFace* node);
-    void replace(NodeIdentIFace* replaced_node, NodeIdentIFace* replacement_node);
+    void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
+    int find_clone_of_original(NodeIdentIFace* original);
 
     // built-in
     visitor::VisitStateIFace::state_t &visit_state()

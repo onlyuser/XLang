@@ -63,6 +63,7 @@ int ex (nodeType *p);
 void MVCView::print_graph(nodeType* p)
 {
     ex (p);
+    std::cout << std::endl;
 }
 
 int del = 1; /* distance of graph columns */

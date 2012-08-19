@@ -57,8 +57,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
             m_child_vec.insert(m_child_vec.end(),
                     symbol_node->m_child_vec.begin(),
                     symbol_node->m_child_vec.end());
-            std::vector<NodeIdentIFace*>::iterator p;
-            for(p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
+            for(auto p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
             {
                 if(*p)
                     (*p)->set_parent(this);

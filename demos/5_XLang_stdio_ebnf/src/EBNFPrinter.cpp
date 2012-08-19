@@ -43,17 +43,17 @@ static xl::node::NodeIdentIFace* find_clone_of_original(
 }
 
 static void replace_node(
-        const xl::node::NodeIdentIFace* replaced_node,
-        const xl::node::NodeIdentIFace* replacement_node)
+        const xl::node::NodeIdentIFace* find_node,
+        const xl::node::NodeIdentIFace* replace_node)
 {
-    if(!replaced_node)
+    if(!find_node)
         return;
     xl::node::SymbolNodeIFace* parent =
-            dynamic_cast<xl::node::SymbolNodeIFace*>(replaced_node->parent());
+            dynamic_cast<xl::node::SymbolNodeIFace*>(find_node->parent());
     if(parent)
         parent->replace(
-                const_cast<xl::node::NodeIdentIFace*>(replaced_node),
-                const_cast<xl::node::NodeIdentIFace*>(replacement_node));
+                const_cast<xl::node::NodeIdentIFace*>(find_node),
+                const_cast<xl::node::NodeIdentIFace*>(replace_node));
 }
 
 static const xl::node::NodeIdentIFace* get_ancestor_node(
@@ -214,8 +214,7 @@ bool EBNFChanges::apply()
                         );
         if(attach_point)
         {
-            std::list<std::string>::iterator p;
-            for(p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); ++p)
+            for(auto p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); ++p)
             {
                 // insert front to avoid eol-symbol
                 xl::TreeContext* tc = m_tc;
@@ -232,16 +231,14 @@ bool EBNFChanges::apply()
                         );
         if(attach_point)
         {
-            std::list<xl::node::NodeIdentIFace*>::iterator q;
-            for(q = m_new_rule_list.begin(); q != m_new_rule_list.end(); ++q)
+            for(auto q = m_new_rule_list.begin(); q != m_new_rule_list.end(); ++q)
                 attach_point->push_front(*q); // insert front to avoid eol-symbol
             changed = true;
         }
     }
     if(m_remove_set.size() > 0)
     {
-        std::set<const xl::node::NodeIdentIFace*>::iterator r;
-        for(r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
+        for(auto r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
         {
             const xl::node::NodeIdentIFace* cur_node = (*r);
             if(!cur_node)
