@@ -90,14 +90,15 @@ void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node
     std::replace(m_child_vec.begin(), m_child_vec.end(), find_node, replace_node);
 }
 
-int SymbolNode::find_clone_of_original(NodeIdentIFace* original)
+NodeIdentIFace* SymbolNode::find_clone_of_original(NodeIdentIFace* original) const
 {
-	auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), [](NodeIdentIFace*) {
-			return false;
+	auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), [&original](const NodeIdentIFace* _node) {
+			return _node->original() == original;
 			});
 	if(p == m_child_vec.end())
-		return -1;
-	return std::distance(m_child_vec.begin(), p);
+		return NULL;
+	int index = std::distance(m_child_vec.begin(), p);
+	return m_child_vec[index];
 }
 
 NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
