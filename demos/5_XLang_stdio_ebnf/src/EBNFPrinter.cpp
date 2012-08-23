@@ -40,16 +40,16 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
         const xl::node::NodeIdentIFace* root,
         const xl::node::NodeIdentIFace* original)
 {
-    // TODO: fix-me!
     if(!root || !original)
         return NULL;
     const xl::node::SymbolNodeIFace* root_sym = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
     if(!root_sym)
         return NULL;
-    xl::node::NodeIdentIFace* result = root_sym->find_clone_of_original(original);
-//    xl::node::NodeIdentIFace* result = root_sym->find_if([&original](const xl::node::NodeIdentIFace* _node) {
-//            return _node->original() == original;
-//            });
+    static const xl::node::NodeIdentIFace* temp;
+    temp = original;
+    xl::node::NodeIdentIFace* result = root_sym->find_if([](const xl::node::NodeIdentIFace* _node) {
+            return _node->original() == temp;
+            });
     if(!result)
     {
         for(size_t i = 0; i < root_sym->size(); i++)
