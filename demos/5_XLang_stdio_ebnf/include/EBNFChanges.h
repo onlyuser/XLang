@@ -15,25 +15,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EBNF_PRINTER_H_
-#define EBNF_PRINTER_H_
+#ifndef EBNF_CHANGES_H_
+#define EBNF_CHANGES_H_
 
-#include "node/XLangNodeIFace.h" // node::SymbolNodeIFace
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
-#include "EBNFChanges.h" // EBNFChanges
+#include <string> // std::string
+#include <list> // std::list
+#include <map> // std::map
+#include <set> // std::set
 
-class EBNFPrinter : public xl::visitor::DefaultTour
+struct EBNFChanges
 {
-public:
-    EBNFPrinter(xl::TreeContext* tc, EBNFChanges* changes = NULL)
-        : m_tc(tc), m_changes(changes)
+    EBNFChanges(xl::TreeContext* tc)
+        : m_tc(tc), m_symbols_node(NULL), m_rules_node(NULL)
     {}
-    void visit(const xl::node::SymbolNodeIFace* _node);
+    void reset();
+    bool apply();
 
 private:
     xl::TreeContext* m_tc;
-    EBNFChanges* m_changes;
+public:
+    const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
+    std::list<std::string> m_new_symbol_list;
+    std::map<std::string, xl::node::NodeIdentIFace*> m_existing_symbol_map;
+    std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
+    std::set<const xl::node::NodeIdentIFace*> m_remove_set;
 };
 
 #endif

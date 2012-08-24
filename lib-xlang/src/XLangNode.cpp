@@ -18,7 +18,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <sstream> // std::stringstream
-#include <algorithm> // std::remove_if
+#include <algorithm> // std::replace, std::find_if
 
 // prototype
 extern std::string id_to_name(uint32_t sym_id);
@@ -41,6 +41,17 @@ std::string Node::name() const
 std::string Node::uid() const
 {
     return ptr_to_string(this);
+}
+
+void Node::detach()
+{
+    if(!m_parent)
+        return;
+    xl::node::SymbolNodeIFace* sym_parent =
+            dynamic_cast<xl::node::SymbolNodeIFace*>(m_parent);
+    if(!sym_parent)
+        return;
+    sym_parent->remove(this);
 }
 
 template<>
@@ -80,14 +91,26 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     }
 }
 
-void SymbolNode::remove(NodeIdentIFace* node)
+void SymbolNode::remove(NodeIdentIFace* _node)
 {
-    m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), node), m_child_vec.end());
+    if(!_node)
+        return;
+    if(std::find(m_child_vec.begin(), m_child_vec.end(), _node) == m_child_vec.end()) // TODO: fix-me!
+        return;
+    m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), _node), m_child_vec.end());
+    _node->set_parent(NULL);
 }
 
 void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
 {
+    if(!find_node)
+        return;
+    if(std::find(m_child_vec.begin(), m_child_vec.end(), find_node) == m_child_vec.end()) // TODO: fix-me!
+        return;
     std::replace(m_child_vec.begin(), m_child_vec.end(), find_node, replace_node);
+    find_node->set_parent(NULL);
+    if(replace_node)
+        replace_node->set_parent(this);
 }
 
 NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) const

@@ -57,6 +57,7 @@ public:
     std::string uid() const;
 
     // optional
+    void detach();
     void set_original(const NodeIdentIFace* original)
     {
         m_original = original;
@@ -114,15 +115,21 @@ public:
 
     // optional
     NodeIdentIFace* clone(TreeContext* tc) const;
-    void push_back(NodeIdentIFace* node)
+    void push_back(NodeIdentIFace* _node)
     {
-        m_child_vec.push_back(node);
+        if(!_node)
+            return;
+        m_child_vec.push_back(_node);
+        _node->set_parent(this);
     }
-    void push_front(NodeIdentIFace* node)
+    void push_front(NodeIdentIFace* _node)
     {
-        m_child_vec.insert(m_child_vec.begin(), node);
+        if(!_node)
+            return;
+        m_child_vec.insert(m_child_vec.begin(), _node);
+        _node->set_parent(this);
     }
-    void remove(NodeIdentIFace* node);
+    void remove(NodeIdentIFace* _node);
     void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
     NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;
 

@@ -22,8 +22,8 @@
 #include "node/XLangNode.h" // node::Node
 #include "XLangTreeContext.h" // TreeContext
 #include <iostream> // std::cout
+#include <string> // std::string
 #include <map> // std::map
-#include <algorithm> // std::replace
 
 #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)       xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
@@ -46,7 +46,7 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
     if(!root_sym)
         return NULL;
     static const xl::node::NodeIdentIFace* temp;
-    temp = original;
+    temp = original; // NOTE: do not combine with previous line!
     xl::node::NodeIdentIFace* result = root_sym->find_if([](const xl::node::NodeIdentIFace* _node) {
             return _node->original() == temp;
             });
@@ -214,67 +214,6 @@ static void expand_kleene_closure(
         new_rule_list->push_back(term_rule);
     }
     remove_set->insert(rule_node);
-}
-
-void EBNFChanges::reset()
-{
-    m_symbols_node = NULL;
-    m_rules_node = NULL;
-    m_new_symbol_list.clear();
-    m_new_rule_list.clear();
-    m_remove_set.clear();
-}
-
-bool EBNFChanges::apply()
-{
-    bool changed = false;
-    if(m_symbols_node && m_new_symbol_list.size() > 0)
-    {
-        xl::node::SymbolNodeIFace* attach_point =
-                const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_node)
-                        );
-        if(attach_point)
-        {
-            for(auto p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); ++p)
-            {
-                // insert front to avoid eol-symbol
-                xl::TreeContext* tc = m_tc;
-                attach_point->push_front(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(*p)));
-            }
-            changed = true;
-        }
-    }
-    if(m_rules_node && m_new_rule_list.size() > 0)
-    {
-        xl::node::SymbolNodeIFace* attach_point =
-                const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_node)
-                        );
-        if(attach_point)
-        {
-            for(auto q = m_new_rule_list.begin(); q != m_new_rule_list.end(); ++q)
-                attach_point->push_front(*q); // insert front to avoid eol-symbol
-            changed = true;
-        }
-    }
-    if(m_remove_set.size() > 0)
-    {
-        for(auto r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
-        {
-            const xl::node::NodeIdentIFace* cur_node = (*r);
-            if(!cur_node)
-                break;
-            xl::node::NodeIdentIFace* parent = (*r)->parent();
-            if(!parent)
-                break;
-            xl::node::SymbolNodeIFace* sym_parent =
-                    dynamic_cast<xl::node::SymbolNodeIFace*>(parent);
-            sym_parent->remove(const_cast<xl::node::NodeIdentIFace*>(*r));
-        }
-        changed = true;
-    }
-    return changed;
 }
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)

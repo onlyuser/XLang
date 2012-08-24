@@ -43,6 +43,8 @@ struct NodeIdentIFace
     virtual std::string uid() const = 0;
 
     // optional
+    virtual void detach()
+    {}
     virtual NodeIdentIFace* clone(TreeContext* tc) const
     {
         return NULL;
