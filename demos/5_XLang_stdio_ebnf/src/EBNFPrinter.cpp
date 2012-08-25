@@ -279,7 +279,25 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 m_changes->m_symbols_node = _node; // record location so we can insert here later!
             do
             {
-                more = visit_next_child(_node);
+                xl::node::NodeIdentIFace* child = NULL;
+                more = visit_next_child(_node, &child);
+                if(child)
+                {
+                    do
+                    {
+                        std::string s;
+                        const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* child_term =
+                                dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(child);
+                        if(!child_term)
+                            break;
+                        const std::string* child_value_ptr = child_term->value();
+                        if(!child_value_ptr)
+                            break;
+                        s = *child_value_ptr;
+                        if(!s.empty())
+                            m_changes->m_existing_symbol_map[s] = child;
+                    } while(false);
+                }
                 if(more)
                     std::cout << ' ';
             } while(more);

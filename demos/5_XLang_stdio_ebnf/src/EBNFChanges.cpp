@@ -58,7 +58,10 @@ bool EBNFChanges::apply()
             {
                 auto u = m_existing_symbol_map.find(*t);
                 if(u != m_existing_symbol_map.end())
+                {
                     const_cast<xl::node::NodeIdentIFace*>((*u).second)->detach(); // TODO: fix-me!
+                    changed = true;
+                }
             }
         }
     }
