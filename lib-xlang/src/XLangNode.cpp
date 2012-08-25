@@ -47,11 +47,10 @@ void Node::detach()
 {
     if(!m_parent)
         return;
-    xl::node::SymbolNodeIFace* sym_parent =
+    xl::node::SymbolNodeIFace* symbol_parent =
             dynamic_cast<xl::node::SymbolNodeIFace*>(m_parent);
-    if(!sym_parent)
-        return;
-    sym_parent->remove(this);
+    if(symbol_parent)
+        symbol_parent->remove(this);
 }
 
 template<>
@@ -74,11 +73,11 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
             continue;
         if(child && is_same_type(child))
         {
-            SymbolNode* symbol_node = dynamic_cast<SymbolNode*>(child);
+            SymbolNode* symbol_child = dynamic_cast<SymbolNode*>(child);
             m_child_vec.insert(m_child_vec.end(),
-                    symbol_node->m_child_vec.begin(),
-                    symbol_node->m_child_vec.end());
-            for(auto p = symbol_node->m_child_vec.begin(); p != symbol_node->m_child_vec.end(); ++p)
+                    symbol_child->m_child_vec.begin(),
+                    symbol_child->m_child_vec.end());
+            for(auto p = symbol_child->m_child_vec.begin(); p != symbol_child->m_child_vec.end(); ++p)
             {
                 if(*p)
                     (*p)->set_parent(this);
