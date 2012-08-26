@@ -171,7 +171,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
-static void expand_kleene_closure(
+static void enqueue_changes_for_kleene_closure(
         std::list<std::string>*                                               new_symbols,
         std::list<xl::node::NodeIdentIFace*>*                                 new_rules,
         std::set<const xl::node::NodeIdentIFace*>*                            removals,
@@ -340,7 +340,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '*':
         case '?':
             if(m_changes)
-                expand_kleene_closure(
+                enqueue_changes_for_kleene_closure(
                         &m_changes->m_new_symbols,
                         &m_changes->m_new_rules,
                         &m_changes->m_removals,

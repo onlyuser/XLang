@@ -103,11 +103,13 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     virtual size_t size() const = 0;
 
     // optional
-    virtual void push_back(NodeIdentIFace* node)
+    virtual void push_back(NodeIdentIFace* _node)
     {}
-    virtual void push_front(NodeIdentIFace* node)
+    virtual void push_front(NodeIdentIFace* _node)
     {}
-    virtual void remove(NodeIdentIFace* node)
+    virtual void insert_after(NodeIdentIFace* _node, NodeIdentIFace* after_node) // TODO: fix-me!
+    {}
+    virtual void remove(NodeIdentIFace* _node)
     {}
     virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
     {}

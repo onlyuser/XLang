@@ -25,8 +25,7 @@
 
 void EBNFChanges::reset()
 {
-    m_symbols_attach_loc = NULL;
-    m_rules_attach_loc = NULL;
+    m_symbols_attach_loc = m_rules_attach_loc = NULL;
     m_new_symbols.clear();
     m_existing_symbols.clear();
     m_new_rules.clear();
@@ -41,8 +40,7 @@ bool EBNFChanges::apply()
     {
         xl::node::SymbolNodeIFace* symbols_attach_loc =
                 const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_attach_loc)
-                        );
+                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_attach_loc));
         if(symbols_attach_loc)
         {
             for(auto p = m_new_symbols.begin(); p != m_new_symbols.end(); ++p)
@@ -61,8 +59,7 @@ bool EBNFChanges::apply()
     {
         xl::node::SymbolNodeIFace* rules_attach_loc =
                 const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_attach_loc)
-                        );
+                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_attach_loc));
         if(rules_attach_loc)
         {
             for(auto q = m_new_rules.begin(); q != m_new_rules.end(); ++q)
@@ -87,7 +84,8 @@ bool EBNFChanges::apply()
             xl::node::NodeIdentIFace* parent_node = find_node->parent();
             if(!parent_node)
                 continue;
-            xl::node::SymbolNodeIFace* parent_symbol = dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
+            xl::node::SymbolNodeIFace* parent_symbol =
+            		dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
             if(parent_symbol)
                 parent_symbol->replace(
                         const_cast<xl::node::NodeIdentIFace*>(find_node),
