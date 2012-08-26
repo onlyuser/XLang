@@ -101,6 +101,18 @@ static const xl::node::NodeIdentIFace* get_alt_node_from_kleene_node(
     return (*dynamic_cast<xl::node::SymbolNodeIFace*>(paren_node))[0];
 }
 
+static std::string get_string_from_ident_node(const xl::node::NodeIdentIFace* ident_node)
+{
+    const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* ident_term =
+            dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(ident_node);
+    if(!ident_term)
+        return "";
+    const std::string* value_ptr = ident_term->value();
+    if(!value_ptr)
+        return "";
+    return *value_ptr;
+}
+
 static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
 {
     if(!rule_node)
@@ -109,14 +121,7 @@ static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* 
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node))[0];
     if(!lhs_node)
         return "";
-    const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* lhs_term =
-            dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(lhs_node);
-    if(!lhs_term)
-        return "";
-    const std::string* lhs_value_ptr = lhs_term->value();
-    if(!lhs_value_ptr)
-        return "";
-    return *lhs_value_ptr;
+    return get_string_from_ident_node(lhs_node);
 }
 
 static xl::node::NodeIdentIFace* make_stem_rule(
@@ -167,13 +172,14 @@ static xl::node::NodeIdentIFace* make_term_rule(
 }
 
 static void expand_kleene_closure(
-        std::list<std::string>*                    new_symbol_list,
-        std::list<xl::node::NodeIdentIFace*>*      new_rule_list,
-        std::set<const xl::node::NodeIdentIFace*>* remove_set,
-        const xl::node::NodeIdentIFace*            kleene_node,
+        std::list<std::string>*                                               new_symbol_list,
+        std::list<xl::node::NodeIdentIFace*>*                                 new_rule_list,
+        std::set<const xl::node::NodeIdentIFace*>*                            remove_set,
+        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* replace_map,
+        const xl::node::NodeIdentIFace*                                       kleene_node,
         xl::TreeContext* tc)
 {
-    if(!new_symbol_list || !new_rule_list || !remove_set)
+    if(!new_symbol_list || !new_rule_list || !remove_set || !replace_map)
         return;
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
@@ -186,7 +192,7 @@ static void expand_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
         std::cout << ">>> (stem_rule)" << std::endl;
         new_symbol_list->push_back(lhs_value);
-        new_rule_list->push_back(stem_rule);
+        (*replace_map)[rule_node] = stem_rule;
     }
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
@@ -213,7 +219,6 @@ static void expand_kleene_closure(
         new_symbol_list->push_back(name2);
         new_rule_list->push_back(term_rule);
     }
-    remove_set->insert(rule_node);
 }
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
@@ -222,8 +227,6 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     switch(_node->sym_id())
     {
         case ID_GRAMMAR:
-            if(m_changes)
-                m_changes->reset(); // clear existing changes before starting over
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
             visit_next_child(_node);
@@ -283,20 +286,9 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 more = visit_next_child(_node, &child);
                 if(child)
                 {
-                    do
-                    {
-                        std::string s;
-                        const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* child_term =
-                                dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(child);
-                        if(!child_term)
-                            break;
-                        const std::string* child_value_ptr = child_term->value();
-                        if(!child_value_ptr)
-                            break;
-                        s = *child_value_ptr;
-                        if(!s.empty())
-                            m_changes->m_existing_symbol_map[s] = child;
-                    } while(false);
+                    std::string s = get_string_from_ident_node(child);
+                    if(!s.empty())
+                        m_changes->m_existing_symbol_set.insert(s);
                 }
                 if(more)
                     std::cout << ' ';
@@ -352,6 +344,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                         &m_changes->m_new_symbol_list,
                         &m_changes->m_new_rule_list,
                         &m_changes->m_remove_set,
+                        &m_changes->m_replace_map,
                         _node,
                         m_tc);
             xl::visitor::DefaultTour::visit(_node);

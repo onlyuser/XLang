@@ -38,9 +38,10 @@ private:
 public:
     const xl::node::NodeIdentIFace *m_symbols_node, *m_rules_node;
     std::list<std::string> m_new_symbol_list;
-    std::map<std::string, const xl::node::NodeIdentIFace*> m_existing_symbol_map;
+    std::set<std::string> m_existing_symbol_set;
     std::list<xl::node::NodeIdentIFace*> m_new_rule_list;
     std::set<const xl::node::NodeIdentIFace*> m_remove_set;
+    std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_replace_map;
 };
 
 #endif
