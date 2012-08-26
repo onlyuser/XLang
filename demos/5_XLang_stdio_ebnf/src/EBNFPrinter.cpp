@@ -172,14 +172,14 @@ static xl::node::NodeIdentIFace* make_term_rule(
 }
 
 static void expand_kleene_closure(
-        std::list<std::string>*                                               new_symbol_list,
-        std::list<xl::node::NodeIdentIFace*>*                                 new_rule_list,
-        std::set<const xl::node::NodeIdentIFace*>*                            remove_set,
-        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* replace_map,
+        std::list<std::string>*                                               new_symbols,
+        std::list<xl::node::NodeIdentIFace*>*                                 new_rules,
+        std::set<const xl::node::NodeIdentIFace*>*                            removals,
+        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* replacements,
         const xl::node::NodeIdentIFace*                                       kleene_node,
         xl::TreeContext* tc)
 {
-    if(!new_symbol_list || !new_rule_list || !remove_set || !replace_map)
+    if(!new_symbols || !new_rules || !removals || !replacements)
         return;
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
@@ -191,8 +191,8 @@ static void expand_kleene_closure(
         std::cout << "(stem_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
         std::cout << ">>> (stem_rule)" << std::endl;
-        new_symbol_list->push_back(lhs_value);
-        (*replace_map)[rule_node] = stem_rule;
+        new_symbols->push_back(lhs_value);
+        (*replacements)[rule_node] = stem_rule;
     }
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
@@ -206,8 +206,8 @@ static void expand_kleene_closure(
         std::cout << "(recursive_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
         std::cout << ">>> (recursive_rule)" << std::endl;
-        new_symbol_list->push_back(name1);
-        new_rule_list->push_back(recursive_rule);
+        new_symbols->push_back(name1);
+        new_rules->push_back(recursive_rule);
     }
     const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
@@ -216,8 +216,8 @@ static void expand_kleene_closure(
         std::cout << "(term_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
         std::cout << ">>> (term_rule)" << std::endl;
-        new_symbol_list->push_back(name2);
-        new_rule_list->push_back(term_rule);
+        new_symbols->push_back(name2);
+        new_rules->push_back(term_rule);
     }
 }
 
@@ -278,8 +278,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << '}';
             break;
         case ID_SYMBOLS:
-            if(m_changes && !m_changes->m_symbols_node)
-                m_changes->m_symbols_node = _node; // record location so we can insert here later!
+            if(m_changes && !m_changes->m_symbols_attach_loc)
+                m_changes->m_symbols_attach_loc = _node; // record location so we can insert here later!
             do
             {
                 xl::node::NodeIdentIFace* child = NULL;
@@ -288,15 +288,15 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 {
                     std::string s = get_string_from_ident_node(child);
                     if(!s.empty())
-                        m_changes->m_existing_symbol_set.insert(s);
+                        m_changes->m_existing_symbols.insert(s);
                 }
                 if(more)
                     std::cout << ' ';
             } while(more);
             break;
         case ID_RULES:
-            if(m_changes && !m_changes->m_rules_node)
-                m_changes->m_rules_node = _node; // record location so we can insert here later!
+            if(m_changes && !m_changes->m_rules_attach_loc)
+                m_changes->m_rules_attach_loc = _node; // record location so we can insert here later!
             do
             {
                 more = visit_next_child(_node);
@@ -341,10 +341,10 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '?':
             if(m_changes)
                 expand_kleene_closure(
-                        &m_changes->m_new_symbol_list,
-                        &m_changes->m_new_rule_list,
-                        &m_changes->m_remove_set,
-                        &m_changes->m_replace_map,
+                        &m_changes->m_new_symbols,
+                        &m_changes->m_new_rules,
+                        &m_changes->m_removals,
+                        &m_changes->m_replacements,
                         _node,
                         m_tc);
             xl::visitor::DefaultTour::visit(_node);

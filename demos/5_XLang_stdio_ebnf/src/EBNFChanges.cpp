@@ -25,60 +25,60 @@
 
 void EBNFChanges::reset()
 {
-    m_symbols_node = NULL;
-    m_rules_node = NULL;
-    m_new_symbol_list.clear();
-    m_existing_symbol_set.clear();
-    m_new_rule_list.clear();
-    m_remove_set.clear();
-    m_replace_map.clear();
+    m_symbols_attach_loc = NULL;
+    m_rules_attach_loc = NULL;
+    m_new_symbols.clear();
+    m_existing_symbols.clear();
+    m_new_rules.clear();
+    m_removals.clear();
+    m_replacements.clear();
 }
 
 bool EBNFChanges::apply()
 {
     bool changed = false;
-    if(m_symbols_node && !m_new_symbol_list.empty())
+    if(m_symbols_attach_loc && !m_new_symbols.empty())
     {
-        xl::node::SymbolNodeIFace* symbol_attach_point =
+        xl::node::SymbolNodeIFace* symbols_attach_loc =
                 const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_node)
+                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_symbols_attach_loc)
                         );
-        if(symbol_attach_point)
+        if(symbols_attach_loc)
         {
-            for(auto p = m_new_symbol_list.begin(); p != m_new_symbol_list.end(); ++p)
+            for(auto p = m_new_symbols.begin(); p != m_new_symbols.end(); ++p)
             {
-                if(m_existing_symbol_set.find(*p) == m_existing_symbol_set.end())
+                if(m_existing_symbols.find(*p) == m_existing_symbols.end())
                 {
                     // insert front to avoid eol-symbol
                     xl::TreeContext* tc = m_tc;
-                    symbol_attach_point->push_front(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(*p)));
+                    symbols_attach_loc->push_front(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(*p)));
                 }
             }
             changed = true;
         }
     }
-    if(m_rules_node && !m_new_rule_list.empty())
+    if(m_rules_attach_loc && !m_new_rules.empty())
     {
-        xl::node::SymbolNodeIFace* rule_attach_point =
+        xl::node::SymbolNodeIFace* rules_attach_loc =
                 const_cast<xl::node::SymbolNodeIFace*>(
-                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_node)
+                        dynamic_cast<const xl::node::SymbolNodeIFace*>(m_rules_attach_loc)
                         );
-        if(rule_attach_point)
+        if(rules_attach_loc)
         {
-            for(auto q = m_new_rule_list.begin(); q != m_new_rule_list.end(); ++q)
-                rule_attach_point->push_front(*q); // insert front to avoid eol-symbol
+            for(auto q = m_new_rules.begin(); q != m_new_rules.end(); ++q)
+                rules_attach_loc->push_front(*q); // insert front to avoid eol-symbol
             changed = true;
         }
     }
-    if(!m_remove_set.empty())
+    if(!m_removals.empty())
     {
-        for(auto r = m_remove_set.begin(); r != m_remove_set.end(); ++r)
+        for(auto r = m_removals.begin(); r != m_removals.end(); ++r)
             const_cast<xl::node::NodeIdentIFace*>(*r)->detach(); // TODO: fix-me!
         changed = true;
     }
-    if(!m_replace_map.empty())
+    if(!m_replacements.empty())
     {
-        for(auto t = m_replace_map.begin(); t != m_replace_map.end(); ++t)
+        for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
         {
             const xl::node::NodeIdentIFace* find_node = (*t).first;
             xl::node::NodeIdentIFace* replace_node = (*t).second;
