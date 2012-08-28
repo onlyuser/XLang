@@ -90,13 +90,39 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     }
 }
 
+void SymbolNode::push_back(NodeIdentIFace* _node)
+{
+    if(!_node)
+        return;
+    m_child_vec.push_back(_node);
+    _node->set_parent(this);
+}
+
+void SymbolNode::push_front(NodeIdentIFace* _node)
+{
+    if(!_node)
+        return;
+    m_child_vec.insert(m_child_vec.begin(), _node);
+    _node->set_parent(this);
+}
+
+void SymbolNode::insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node)
+{
+    auto p = std::find(m_child_vec.begin(), m_child_vec.end(), after_node);
+    if(p == m_child_vec.end())
+        return;
+    p++;
+    m_child_vec.insert(p, _node);
+}
+
 void SymbolNode::remove(NodeIdentIFace* _node)
 {
     if(!_node)
         return;
-    if(std::find(m_child_vec.begin(), m_child_vec.end(), _node) == m_child_vec.end()) // TODO: fix-me!
+    auto p = std::find(m_child_vec.begin(), m_child_vec.end(), _node);
+    if(p == m_child_vec.end())
         return;
-    m_child_vec.erase(std::remove(m_child_vec.begin(), m_child_vec.end(), _node), m_child_vec.end());
+    m_child_vec.erase(std::remove(p, m_child_vec.end(), _node), m_child_vec.end());
     _node->set_parent(NULL);
 }
 
@@ -104,9 +130,10 @@ void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node
 {
     if(!find_node)
         return;
-    if(std::find(m_child_vec.begin(), m_child_vec.end(), find_node) == m_child_vec.end()) // TODO: fix-me!
+    auto p = std::find(m_child_vec.begin(), m_child_vec.end(), find_node);
+    if(p == m_child_vec.end())
         return;
-    std::replace(m_child_vec.begin(), m_child_vec.end(), find_node, replace_node);
+    std::replace(p, m_child_vec.end(), find_node, replace_node);
     find_node->set_parent(NULL);
     if(replace_node)
         replace_node->set_parent(this);
@@ -114,6 +141,8 @@ void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node
 
 NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) const
 {
+    if(!pred)
+        return NULL;
     auto p = std::find_if(m_child_vec.begin(), m_child_vec.end(), pred);
     if(p == m_child_vec.end())
         return NULL;

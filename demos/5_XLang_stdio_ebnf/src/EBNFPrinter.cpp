@@ -45,8 +45,8 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
     const xl::node::SymbolNodeIFace* root_sym = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
     if(!root_sym)
         return NULL;
-    static const xl::node::NodeIdentIFace* temp;
-    temp = original; // NOTE: do not combine with previous line!
+    static const xl::node::NodeIdentIFace* temp; // NOTE: must be static for compile-time closure!
+    temp = original; // NOTE: do not combine with previous line! -- must assign every time
     xl::node::NodeIdentIFace* result = root_sym->find_if([](const xl::node::NodeIdentIFace* _node) {
             return _node->original() == temp;
             });
@@ -71,9 +71,11 @@ static void replace_node(
     xl::node::SymbolNodeIFace* parent =
             dynamic_cast<xl::node::SymbolNodeIFace*>(find_node->parent());
     if(parent)
+    {
         parent->replace(
                 const_cast<xl::node::NodeIdentIFace*>(find_node),
                 const_cast<xl::node::NodeIdentIFace*>(replace_node));
+    }
 }
 
 static const xl::node::NodeIdentIFace* get_ancestor_node(
@@ -171,16 +173,37 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
-static void enqueue_changes_for_kleene_closure(
-        std::list<std::string>*                                               new_symbols,
-        std::list<xl::node::NodeIdentIFace*>*                                 new_rules,
-        std::set<const xl::node::NodeIdentIFace*>*                            removals,
-        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* replacements,
-        const xl::node::NodeIdentIFace*                                       kleene_node,
+// TODO: fix-me! -- BUG: "symbols_attach_loc" always refers to the final yacc declaration
+static void insert_name_after(
+        const xl::node::NodeIdentIFace* symbols_attach_loc,
+        std::string after_name,
+        std::string name,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
         xl::TreeContext* tc)
 {
-    if(!new_symbols || !new_rules || !removals || !replacements)
+    if(!symbols_attach_loc)
         return;
+    xl::node::SymbolNodeIFace* symbols_attach_loc_symbol =
+            const_cast<xl::node::SymbolNodeIFace*>(
+                    dynamic_cast<const xl::node::SymbolNodeIFace*>(symbols_attach_loc));
+    if(!symbols_attach_loc_symbol)
+        return;
+    static std::string temp; // NOTE: must be static for compile-time closure!
+    temp = after_name; // NOTE: do not combine with previous line! -- must assign every time
+    xl::node::NodeIdentIFace* result =
+            symbols_attach_loc_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
+                    return get_string_from_ident_node(_node) == temp;
+                    });
+    (*insertions_after)[result].push_back(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)));
+}
+
+static void enqueue_changes_for_kleene_closure(
+        const xl::node::NodeIdentIFace*                                                  symbols_attach_loc,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
+        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            replacements,
+        const xl::node::NodeIdentIFace*                                                  kleene_node,
+        xl::TreeContext* tc)
+{
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
     std::string name1 = gen_name(lhs_value);
@@ -191,8 +214,8 @@ static void enqueue_changes_for_kleene_closure(
         std::cout << "(stem_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
         std::cout << ">>> (stem_rule)" << std::endl;
-        new_symbols->push_back(lhs_value);
-        (*replacements)[rule_node] = stem_rule;
+        if(replacements)
+            (*replacements)[rule_node] = stem_rule;
     }
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
@@ -206,8 +229,14 @@ static void enqueue_changes_for_kleene_closure(
         std::cout << "(recursive_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
         std::cout << ">>> (recursive_rule)" << std::endl;
-        new_symbols->push_back(name1);
-        new_rules->push_back(recursive_rule);
+        insert_name_after(
+                symbols_attach_loc,
+                lhs_value,
+                name1,
+                insertions_after,
+                tc);
+        if(insertions_after)
+            (*insertions_after)[rule_node].push_back(recursive_rule);
     }
     const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
@@ -216,8 +245,14 @@ static void enqueue_changes_for_kleene_closure(
         std::cout << "(term_rule) <<<" << std::endl;
         EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
         std::cout << ">>> (term_rule)" << std::endl;
-        new_symbols->push_back(name2);
-        new_rules->push_back(term_rule);
+        insert_name_after(
+                symbols_attach_loc,
+                lhs_value,
+                name2,
+                insertions_after,
+                tc);
+        if(insertions_after)
+            (*insertions_after)[rule_node].push_back(term_rule);
     }
 }
 
@@ -341,9 +376,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '?':
             if(m_changes)
                 enqueue_changes_for_kleene_closure(
-                        &m_changes->m_new_symbols,
-                        &m_changes->m_new_rules,
-                        &m_changes->m_removals,
+                        m_changes->m_symbols_attach_loc,
+                        &m_changes->m_insertions_after,
                         &m_changes->m_replacements,
                         _node,
                         m_tc);

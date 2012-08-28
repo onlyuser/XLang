@@ -115,20 +115,9 @@ public:
 
     // optional
     NodeIdentIFace* clone(TreeContext* tc) const;
-    void push_back(NodeIdentIFace* _node)
-    {
-        if(!_node)
-            return;
-        m_child_vec.push_back(_node);
-        _node->set_parent(this);
-    }
-    void push_front(NodeIdentIFace* _node)
-    {
-        if(!_node)
-            return;
-        m_child_vec.insert(m_child_vec.begin(), _node);
-        _node->set_parent(this);
-    }
+    void push_back(NodeIdentIFace* _node);
+    void push_front(NodeIdentIFace* _node);
+    void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node);
     void remove(NodeIdentIFace* _node);
     void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
     NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;

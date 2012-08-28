@@ -26,16 +26,67 @@
 void EBNFChanges::reset()
 {
     m_symbols_attach_loc = m_rules_attach_loc = NULL;
-    m_new_symbols.clear();
     m_existing_symbols.clear();
+    m_insertions_after.clear();
+    m_replacements.clear();
+#if 0 // NOTE: unused
+    m_new_symbols.clear();
     m_new_rules.clear();
     m_removals.clear();
-    m_replacements.clear();
+#endif
 }
 
 bool EBNFChanges::apply()
 {
     bool changed = false;
+    if(!m_insertions_after.empty())
+    {
+        for(auto u = m_insertions_after.begin(); u != m_insertions_after.end(); ++u)
+        {
+            const xl::node::NodeIdentIFace* after_node = (*u).first;
+            std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*u).second;
+            if(!after_node)
+                continue;
+            xl::node::NodeIdentIFace* parent_node = after_node->parent();
+            if(!parent_node)
+                continue;
+            xl::node::SymbolNodeIFace* parent_symbol =
+                    dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
+            if(parent_symbol)
+            {
+                for(auto v = insert_after_list.begin(); v != insert_after_list.end(); ++v)
+                {
+                    parent_symbol->insert_after(
+                            const_cast<xl::node::NodeIdentIFace*>(after_node),
+                            *v); // TODO: fix-me!
+                }
+            }
+        }
+        changed = true;
+    }
+    if(!m_replacements.empty())
+    {
+        for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
+        {
+            const xl::node::NodeIdentIFace* find_node = (*t).first;
+            xl::node::NodeIdentIFace* replace_node = (*t).second;
+            if(!find_node)
+                continue;
+            xl::node::NodeIdentIFace* parent_node = find_node->parent();
+            if(!parent_node)
+                continue;
+            xl::node::SymbolNodeIFace* parent_symbol =
+                    dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
+            if(parent_symbol)
+            {
+                parent_symbol->replace(
+                        const_cast<xl::node::NodeIdentIFace*>(find_node),
+                        replace_node); // TODO: fix-me!
+            }
+        }
+        changed = true;
+    }
+#if 0 // NOTE: unused
     if(m_symbols_attach_loc && !m_new_symbols.empty())
     {
         xl::node::SymbolNodeIFace* symbols_attach_loc =
@@ -73,25 +124,6 @@ bool EBNFChanges::apply()
             const_cast<xl::node::NodeIdentIFace*>(*r)->detach(); // TODO: fix-me!
         changed = true;
     }
-    if(!m_replacements.empty())
-    {
-        for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
-        {
-            const xl::node::NodeIdentIFace* find_node = (*t).first;
-            xl::node::NodeIdentIFace* replace_node = (*t).second;
-            if(!find_node)
-                continue;
-            xl::node::NodeIdentIFace* parent_node = find_node->parent();
-            if(!parent_node)
-                continue;
-            xl::node::SymbolNodeIFace* parent_symbol =
-            		dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
-            if(parent_symbol)
-                parent_symbol->replace(
-                        const_cast<xl::node::NodeIdentIFace*>(find_node),
-                        replace_node); // TODO: fix-me!
-        }
-        changed = true;
-    }
+#endif
     return changed;
 }

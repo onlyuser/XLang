@@ -107,7 +107,7 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void push_front(NodeIdentIFace* _node)
     {}
-    virtual void insert_after(NodeIdentIFace* _node, NodeIdentIFace* after_node) // TODO: fix-me!
+    virtual void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node)
     {}
     virtual void remove(NodeIdentIFace* _node)
     {}
