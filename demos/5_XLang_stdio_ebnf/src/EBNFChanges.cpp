@@ -22,13 +22,18 @@
 #include "XLangTreeContext.h" // TreeContext
 
 #if 0 // NOTE: unused
-	#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
+    #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
 #endif
 
 void EBNFChanges::reset()
 {
+#if 0 // NOTE: unused
     m_symbols_attach_loc = m_rules_attach_loc = NULL;
+#endif
+    m_symbols_attach_loc_map.clear();
+#if 0 // NOTE: unused
     m_existing_symbols.clear();
+#endif
     m_insertions_after.clear();
     m_replacements.clear();
 #if 0 // NOTE: unused

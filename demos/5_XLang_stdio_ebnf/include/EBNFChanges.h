@@ -28,7 +28,10 @@
 struct EBNFChanges
 {
     EBNFChanges(xl::TreeContext* tc)
-        : m_tc(tc), m_symbols_attach_loc(NULL), m_rules_attach_loc(NULL)
+        : m_tc(tc)
+#if 0 // NOTE: unused
+          , m_symbols_attach_loc(NULL), m_rules_attach_loc(NULL)
+#endif
     {}
     void reset();
     bool apply();
@@ -36,8 +39,13 @@ struct EBNFChanges
 private:
     xl::TreeContext* m_tc;
 public:
+#if 0 // NOTE: unused
     const xl::node::NodeIdentIFace *m_symbols_attach_loc, *m_rules_attach_loc;
+#endif
+    std::map<std::string, const xl::node::NodeIdentIFace*> m_symbols_attach_loc_map;
+#if 0 // NOTE: unused
     std::set<std::string> m_existing_symbols;
+#endif
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_insertions_after;
     std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_replacements;
 #if 0 // NOTE: unused
