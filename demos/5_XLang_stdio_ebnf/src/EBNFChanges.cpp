@@ -21,7 +21,9 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 
-#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
+#if 0 // NOTE: unused
+	#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
+#endif
 
 void EBNFChanges::reset()
 {

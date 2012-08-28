@@ -37,11 +37,11 @@ private:
     xl::TreeContext* m_tc;
 public:
     const xl::node::NodeIdentIFace *m_symbols_attach_loc, *m_rules_attach_loc;
-    std::list<std::string> m_new_symbols;
     std::set<std::string> m_existing_symbols;
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_insertions_after;
     std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_replacements;
 #if 0 // NOTE: unused
+    std::list<std::string> m_new_symbols;
     std::list<xl::node::NodeIdentIFace*> m_new_rules;
     std::set<const xl::node::NodeIdentIFace*> m_removals;
 #endif
