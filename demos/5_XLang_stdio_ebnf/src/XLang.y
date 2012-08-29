@@ -204,7 +204,7 @@ definition:
     ;
 
 symbols:
-      symbol         { $$ = $1; }
+      symbol         { $$ = MAKE_SYMBOL(ID_SYMBOLS, 1, $1); }
     | symbols symbol { $$ = MAKE_SYMBOL(ID_SYMBOLS, 2, $1, $2); }
     ;
 

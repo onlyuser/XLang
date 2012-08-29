@@ -173,7 +173,6 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
-// TODO: fix-me! -- BUG: "symbols_attach_loc" always refers to the final yacc declaration
 static void insert_name_after(
         const xl::node::NodeIdentIFace* symbols_attach_loc,
         std::string after_name,
@@ -194,7 +193,8 @@ static void insert_name_after(
             symbols_attach_loc_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
                     return get_string_from_ident_node(_node) == temp;
                     });
-    (*insertions_after)[result].push_back(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)));
+    if(result)
+        (*insertions_after)[result].push_back(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)));
 }
 
 static void enqueue_changes_for_kleene_closure(
@@ -315,10 +315,6 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << '}';
             break;
         case ID_SYMBOLS:
-#if 0 // NOTE: unused
-            if(m_changes && !m_changes->m_symbols_attach_loc)
-                m_changes->m_symbols_attach_loc = _node; // record location so we can insert here later!
-#endif
             do
             {
                 xl::node::NodeIdentIFace* child = NULL;
@@ -327,22 +323,13 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 {
                     std::string s = get_string_from_ident_node(child);
                     if(!s.empty() && m_changes)
-                    {
-#if 0 // NOTE: unused
-                        m_changes->m_existing_symbols.insert(s);
-#endif
                         m_changes->m_symbols_attach_loc_map[s] = _node;
-                    }
                 }
                 if(more)
                     std::cout << ' ';
             } while(more);
             break;
         case ID_RULES:
-#if 0 // NOTE: unused
-            if(m_changes && !m_changes->m_rules_attach_loc)
-                m_changes->m_rules_attach_loc = _node; // record location so we can insert here later!
-#endif
             do
             {
                 more = visit_next_child(_node);
