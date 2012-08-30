@@ -26,7 +26,8 @@
 #include <map> // std::map
 
 #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
-#define MAKE_SYMBOL(...)       xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
+//#define MAKE_SYMBOL(...)       xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
+#define MAKE_SYMBOL            xl::mvc::MVCModel::make_symbol
 
 static std::string gen_name(std::string stem)
 {
@@ -152,13 +153,103 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
         xl::TreeContext* tc)
 {
-    return NULL;
+    //program_0:
+    //      /* empty */         {           $$ = NULL; }
+    //    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+    //    ;
+    //
+    //<symbol type="rule">
+    //    <term type="ident" value=program_0/>
+    //    <symbol type="alts">
+    //        <symbol type="alt">
+    //            <symbol type="action_block">
+    //                <term type="string" value="           $$ = NULL; "/>
+    //            </symbol>
+    //        </symbol>
+    //        <symbol type="alt">
+    //            <symbol type="terms">
+    //                <term type="ident" value=program_0/>
+    //                <term type="ident" value=program_1/>
+    //            </symbol>
+    //            <symbol type="action_block">
+    //                <term type="string" value=" /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+    //            </symbol>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    xl::node::NodeIdentIFace* node =
+            MAKE_SYMBOL(tc, ID_RULE, 2,
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                    MAKE_SYMBOL(tc, ID_ALTS, 2,
+                            MAKE_SYMBOL(tc, ID_ALT, 1,
+                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = NULL; "))
+                                            )
+                                    ),
+                            MAKE_SYMBOL(tc, ID_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_TERMS, 2,
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                            ),
+                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(
+                                                    " /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "
+                                                    ))
+                                            )
+                                    )
+                            )
+                    );
+    return node;
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1, std::string name2,
         xl::TreeContext* tc)
 {
-    return NULL;
+    //statement_0:
+    //      /* empty */ { $$ = NULL; }
+    //    | statement_1 { $$ = $1; }
+    //    ;
+    //
+    //<symbol type="rule">
+    //    <term type="ident" value=statement_0/>
+    //    <symbol type="alts">
+    //        <symbol type="alt">
+    //            <symbol type="action_block">
+    //                <term type="string" value=" $$ = NULL; "/>
+    //            </symbol>
+    //        </symbol>
+    //        <symbol type="alt">
+    //            <symbol type="terms">
+    //                <term type="ident" value=statement_1/>
+    //            </symbol>
+    //            <symbol type="action_block">
+    //                <term type="string" value=" $$ = $1; "/>
+    //            </symbol>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    xl::node::NodeIdentIFace* node =
+            MAKE_SYMBOL(tc, ID_RULE, 2,
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                    MAKE_SYMBOL(tc, ID_ALTS, 2,
+                            MAKE_SYMBOL(tc, ID_ALT, 1,
+                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = NULL; "))
+                                            )
+                                    ),
+                            MAKE_SYMBOL(tc, ID_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_TERMS, 1,
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                            ),
+                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = $1; "))
+                                            )
+                                    )
+                            )
+                    );
+    return node;
 }
 
 static xl::node::NodeIdentIFace* make_term_rule(
@@ -168,7 +259,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
 {
     if(!alt_node)
         return NULL;
-    return MAKE_SYMBOL(ID_RULE, 2,
+    return MAKE_SYMBOL(tc, ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
             alt_node->clone(tc));
 }
