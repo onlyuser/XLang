@@ -91,6 +91,34 @@ static const xl::node::NodeIdentIFace* get_ancestor_node(
     return NULL;
 }
 
+static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ident_node)
+{
+    switch(ident_node->type())
+    {
+        case xl::node::NodeIdentIFace::IDENT:
+            {
+                const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* ident_term =
+                        dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(ident_node);
+                if(!ident_term)
+                    return "";
+                const std::string* value_ptr = ident_term->value();
+                if(!value_ptr)
+                    return "";
+                return *value_ptr;
+            }
+        case xl::node::NodeIdentIFace::STRING:
+            {
+                const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* string_term =
+                        dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(ident_node);
+                if(!string_term)
+                    return "";
+                return string_term->value();
+            }
+        default:
+            return "";
+    }
+}
+
 // kleene_node --> paren_node --> alt_node
 static const xl::node::NodeIdentIFace* get_alt_node_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
@@ -104,16 +132,21 @@ static const xl::node::NodeIdentIFace* get_alt_node_from_kleene_node(
     return (*dynamic_cast<xl::node::SymbolNodeIFace*>(paren_node))[0];
 }
 
-static std::string get_string_from_ident_node(const xl::node::NodeIdentIFace* ident_node)
+// kleene_node --> alt_node (up) --> action_node
+static std::string get_action_string_from_kleene_node(
+        const xl::node::NodeIdentIFace* kleene_node)
 {
-    const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* ident_term =
-            dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(ident_node);
-    if(!ident_term)
-        return "";
-    const std::string* value_ptr = ident_term->value();
-    if(!value_ptr)
-        return "";
-    return *value_ptr;
+    if(!kleene_node)
+        return NULL;
+    const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_ALT, kleene_node);
+    if(!alt_node)
+        return NULL;
+    xl::node::NodeIdentIFace* action_node = (*dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node))[1];
+    if(!action_node)
+        return NULL;
+    xl::node::NodeIdentIFace* action_string_node =
+            (*dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node))[0];
+    return get_string_from_term_node(action_string_node);
 }
 
 static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
@@ -124,7 +157,7 @@ static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* 
             (*dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node))[0];
     if(!lhs_node)
         return "";
-    return get_string_from_ident_node(lhs_node);
+    return get_string_from_term_node(lhs_node);
 }
 
 static xl::node::NodeIdentIFace* make_stem_rule(
@@ -151,7 +184,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
-        xl::TreeContext* tc)
+        std::string action_string, xl::TreeContext* tc)
 {
     //program_0:
     //      /* empty */         {           $$ = NULL; }
@@ -193,9 +226,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(
-                                                    " /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "
-                                                    ))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(action_string))
                                             )
                                     )
                             )
@@ -264,7 +295,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
-static void insert_name_after(
+static void enqueue_add_to_symbols(
         const xl::node::NodeIdentIFace* symbols_attach_loc,
         std::string after_name,
         std::string name,
@@ -282,7 +313,7 @@ static void insert_name_after(
     temp = after_name; // NOTE: do not combine with previous line! -- must assign every time
     xl::node::NodeIdentIFace* result =
             symbols_attach_loc_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
-                    return get_string_from_ident_node(_node) == temp;
+                    return get_string_from_term_node(_node) == temp;
                     });
     if(result)
         (*insertions_after)[result].push_back(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)));
@@ -299,37 +330,6 @@ static void enqueue_changes_for_kleene_closure(
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
     std::string name1 = gen_name(lhs_value);
     std::string name2 = gen_name(lhs_value);
-    xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
-    if(stem_rule)
-    {
-        std::cout << "(stem_rule) <<<" << std::endl;
-        EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
-        std::cout << ">>> (stem_rule)" << std::endl;
-        if(replacements)
-            (*replacements)[rule_node] = stem_rule;
-    }
-    xl::node::NodeIdentIFace* recursive_rule = NULL;
-    switch(kleene_node->sym_id())
-    {
-        case '+': recursive_rule = make_recursive_rule_plus(name1, name2, tc); break;
-        case '*': recursive_rule = make_recursive_rule_star(name1, name2, tc); break;
-        case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
-    }
-    if(recursive_rule)
-    {
-        std::cout << "(recursive_rule) <<<" << std::endl;
-        EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
-        std::cout << ">>> (recursive_rule)" << std::endl;
-        if(symbols_attach_loc_map)
-            insert_name_after(
-                    (*symbols_attach_loc_map)[lhs_value],
-                    lhs_value,
-                    name1,
-                    insertions_after,
-                    tc);
-        if(insertions_after)
-            (*insertions_after)[rule_node].push_back(recursive_rule);
-    }
     const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
     if(term_rule)
@@ -338,7 +338,7 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
         std::cout << ">>> (term_rule)" << std::endl;
         if(symbols_attach_loc_map)
-            insert_name_after(
+            enqueue_add_to_symbols(
                     (*symbols_attach_loc_map)[lhs_value],
                     lhs_value,
                     name2,
@@ -346,6 +346,42 @@ static void enqueue_changes_for_kleene_closure(
                     tc);
         if(insertions_after)
             (*insertions_after)[rule_node].push_back(term_rule);
+    }
+    xl::node::NodeIdentIFace* recursive_rule = NULL;
+    switch(kleene_node->sym_id())
+    {
+        case '+': recursive_rule = make_recursive_rule_plus(name1, name2, tc); break;
+        case '*':
+            {
+                std::string action_string = get_action_string_from_kleene_node(kleene_node);
+                recursive_rule = make_recursive_rule_star(name1, name2, action_string, tc);
+                break;
+            }
+        case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
+    }
+    if(recursive_rule)
+    {
+        std::cout << "(recursive_rule) <<<" << std::endl;
+        EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
+        std::cout << ">>> (recursive_rule)" << std::endl;
+        if(symbols_attach_loc_map)
+            enqueue_add_to_symbols(
+                    (*symbols_attach_loc_map)[lhs_value],
+                    lhs_value,
+                    name1,
+                    insertions_after,
+                    tc);
+        if(insertions_after)
+            (*insertions_after)[rule_node].push_back(recursive_rule);
+    }
+    xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
+    if(stem_rule)
+    {
+        std::cout << "(stem_rule) <<<" << std::endl;
+        EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
+        std::cout << ">>> (stem_rule)" << std::endl;
+        if(replacements)
+            (*replacements)[rule_node] = stem_rule;
     }
 }
 
@@ -412,7 +448,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 more = visit_next_child(_node, &child);
                 if(child)
                 {
-                    std::string s = get_string_from_ident_node(child);
+                    std::string s = get_string_from_term_node(child);
                     if(!s.empty() && m_changes)
                         m_changes->m_symbols_attach_loc_map[s] = _node;
                 }
