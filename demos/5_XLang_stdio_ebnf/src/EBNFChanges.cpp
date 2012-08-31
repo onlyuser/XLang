@@ -33,7 +33,6 @@ bool EBNFChanges::apply()
         for(auto u = m_insertions_after.begin(); u != m_insertions_after.end(); ++u)
         {
             const xl::node::NodeIdentIFace* after_node = (*u).first;
-            std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*u).second;
             if(!after_node)
                 continue;
             xl::node::NodeIdentIFace* parent_node = after_node->parent();
@@ -43,6 +42,7 @@ bool EBNFChanges::apply()
                     dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
             if(parent_symbol)
             {
+                std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*u).second;
                 for(auto v = insert_after_list.begin(); v != insert_after_list.end(); ++v)
                 {
                     parent_symbol->insert_after(
