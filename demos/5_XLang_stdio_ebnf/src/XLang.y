@@ -242,7 +242,7 @@ rule:
     ;
 
 alts:
-      alt          { $$ = $1; }
+      alt          { $$ = MAKE_SYMBOL(ID_ALTS, 1, $1); }
     | alts '|' alt { $$ = MAKE_SYMBOL(ID_ALTS, 2, $1, $3); }
     ;
 

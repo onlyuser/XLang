@@ -30,6 +30,7 @@ bool EBNFChanges::apply()
     bool changed = false;
     if(!m_insertions_after.empty())
     {
+    	// NOTE: not necessarily "in order"
         for(auto u = m_insertions_after.begin(); u != m_insertions_after.end(); ++u)
         {
             const xl::node::NodeIdentIFace* after_node = (*u).first;
@@ -55,6 +56,7 @@ bool EBNFChanges::apply()
     }
     if(!m_replacements.empty())
     {
+    	// NOTE: not necessarily "in order"
         for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
         {
             const xl::node::NodeIdentIFace* find_node = (*t).first;
