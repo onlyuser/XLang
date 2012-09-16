@@ -16,7 +16,7 @@ root:
 // EBNF:
 program:
       (
-            statement ',' { /* AAA */ $$ = $1; }
+            (statement { /* TEST */ })* ',' { /* AAA */ $$ = $1; }
       )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
     ;
 

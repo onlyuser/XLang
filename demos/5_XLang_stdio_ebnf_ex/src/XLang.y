@@ -34,6 +34,7 @@
 #include <iostream> // std::cout
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
+#include <vector> // std::vector
 
 #define MAKE_TERM(sym_id, ...)   xl::mvc::MVCModel::make_term(tree_context(), sym_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)         xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
@@ -107,6 +108,7 @@ xl::TreeContext* &tree_context()
     xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
+    std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type>* symbol_vec_value; // node pointer
 }
 
 // show detailed parse errors
@@ -117,7 +119,8 @@ xl::TreeContext* &tree_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<symbol_value> program statement expression program_0 program_1 statement_0 statement_1
+%type<symbol_value> program statement expression program_1 statement_0 statement_1
+%type<symbol_vec_value> program_0
 
 %left '+' '-'
 %left '*' '/'
@@ -140,8 +143,8 @@ root:
 // EBNF:
 //program:
 //      (
-//            statement ',' { /* AAA */ $$ = $1; }
-//      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+//            statement ',' { /* AAA */ $$->push_back($1); }
+//      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, NULL, $2) : $2; }
 //    ;
 
 // EBNF-XML:
@@ -173,12 +176,12 @@ root:
 // EBNF-EXPANDED-AS-BNF:
 // [
 program:
-      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, NULL, $2) : $2; }
     ;
 
 program_0:
-      /* empty */         {           $$ = NULL; }
-    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+      /* empty */         {}
+    | program_0 program_1 { $$->push_back($2); }
     ;
 
 program_1:

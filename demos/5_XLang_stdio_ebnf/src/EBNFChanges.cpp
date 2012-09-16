@@ -18,6 +18,21 @@
 #include "EBNFChanges.h" // EBNFChanges
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 
+//#define DEBUG_EBNF
+#ifdef DEBUG_EBNF
+    #include "mvc/XLangMVCView.h" // mvc::MVCView
+    #include <iostream> // std::cout
+    #include <sstream> // std::stringstream
+
+    static std::string ptr_to_string(const void* x)
+    {
+        std::stringstream ss;
+        ss << '_' << x;
+        std::string s = ss.str();
+        return s;
+    }
+#endif
+
 void EBNFChanges::reset()
 {
     m_symbols_attach_loc_map.clear();
@@ -27,10 +42,13 @@ void EBNFChanges::reset()
 
 bool EBNFChanges::apply()
 {
+#ifdef DEBUG_EBNF
+    std::cout << "BEGIN APPLYING CHANGES" << std::endl;
+#endif
     bool changed = false;
     if(!m_insertions_after.empty())
     {
-    	// NOTE: not necessarily "in order"
+        // NOTE: not necessarily "in order"
         for(auto u = m_insertions_after.begin(); u != m_insertions_after.end(); ++u)
         {
             const xl::node::NodeIdentIFace* after_node = (*u).first;
@@ -46,6 +64,11 @@ bool EBNFChanges::apply()
                 std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*u).second;
                 for(auto v = insert_after_list.begin(); v != insert_after_list.end(); ++v)
                 {
+#ifdef DEBUG_EBNF
+                    std::cout << "INSERT_AFTER " << ptr_to_string(after_node) << " ==> "
+                            << ptr_to_string(*v) << std::endl;
+                    //xl::mvc::MVCView::print_xml(*v);
+#endif
                     parent_symbol->insert_after(
                             const_cast<xl::node::NodeIdentIFace*>(after_node),
                             *v); // TODO: fix-me!
@@ -56,7 +79,7 @@ bool EBNFChanges::apply()
     }
     if(!m_replacements.empty())
     {
-    	// NOTE: not necessarily "in order"
+        // NOTE: not necessarily "in order"
         for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
         {
             const xl::node::NodeIdentIFace* find_node = (*t).first;
@@ -70,6 +93,11 @@ bool EBNFChanges::apply()
                     dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
             if(parent_symbol)
             {
+#ifdef DEBUG_EBNF
+                std::cout << "REPLACE " << ptr_to_string(find_node) << " ==> "
+                        << ptr_to_string(replace_node) << std::endl;
+                //xl::mvc::MVCView::print_xml(replace_node);
+#endif
                 parent_symbol->replace(
                         const_cast<xl::node::NodeIdentIFace*>(find_node),
                         replace_node); // TODO: fix-me!
@@ -77,5 +105,8 @@ bool EBNFChanges::apply()
         }
         changed = true;
     }
+#ifdef DEBUG_EBNF
+    std::cout << "END APPLYING CHANGES" << std::endl << std::endl;
+#endif
     return changed;
 }

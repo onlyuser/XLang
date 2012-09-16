@@ -25,6 +25,29 @@
 #include <string> // std::string
 #include <map> // std::map
 
+//#define DEBUG_EBNF
+#ifdef DEBUG_EBNF
+    static std::string ptr_to_string(const void* x)
+    {
+        std::stringstream ss;
+        ss << '_' << x;
+        std::string s = ss.str();
+        return s;
+    }
+
+    static bool is_kleene_node(const xl::node::NodeIdentIFace* _node)
+    {
+        switch(_node->sym_id())
+        {
+        case '+':
+        case '*':
+        case '?':
+            return true;
+        }
+        return false;
+    }
+#endif
+
 #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
 //#define MAKE_SYMBOL(...)       xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
 #define MAKE_SYMBOL            xl::mvc::MVCModel::make_symbol
@@ -51,16 +74,15 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
     xl::node::NodeIdentIFace* result = root_sym->find_if([](const xl::node::NodeIdentIFace* _node) {
             return _node->original() == temp;
             });
-    if(!result)
+    if(result)
+        return result;
+    for(size_t i = 0; i < root_sym->size(); i++)
     {
-        for(size_t i = 0; i < root_sym->size(); i++)
-        {
-            result = find_clone_of_original_recursive((*root_sym)[i], original);
-            if(result)
-                return result;
-        }
+        result = find_clone_of_original_recursive((*root_sym)[i], original);
+        if(result)
+            return result;
     }
-    return result;
+    return NULL;
 }
 
 static void replace_node(
@@ -226,7 +248,9 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(action_string))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(
+                                                    " /* TODO: what goes here? */ " //action_string
+                                                    ))
                                             )
                                     )
                             )
@@ -334,9 +358,11 @@ static void enqueue_changes_for_kleene_closure(
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
     if(term_rule)
     {
-        std::cout << "(term_rule) <<<" << std::endl;
-        EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
+#ifdef DEBUG_EBNF
         std::cout << ">>> (term_rule)" << std::endl;
+        EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
+        std::cout << "<<< (term_rule)" << std::endl;
+#endif
         if(symbols_attach_loc_map)
             enqueue_add_to_symbols(
                     (*symbols_attach_loc_map)[lhs_value],
@@ -361,9 +387,11 @@ static void enqueue_changes_for_kleene_closure(
     }
     if(recursive_rule)
     {
-        std::cout << "(recursive_rule) <<<" << std::endl;
-        EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
+#ifdef DEBUG_EBNF
         std::cout << ">>> (recursive_rule)" << std::endl;
+        EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
+        std::cout << "<<< (recursive_rule)" << std::endl;
+#endif
         if(symbols_attach_loc_map)
             enqueue_add_to_symbols(
                     (*symbols_attach_loc_map)[lhs_value],
@@ -377,9 +405,11 @@ static void enqueue_changes_for_kleene_closure(
     xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
     if(stem_rule)
     {
-        std::cout << "(stem_rule) <<<" << std::endl;
-        EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
+#ifdef DEBUG_EBNF
         std::cout << ">>> (stem_rule)" << std::endl;
+        EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
+        std::cout << "<<< (stem_rule)" << std::endl;
+#endif
         if(replacements)
             (*replacements)[rule_node] = stem_rule;
     }
@@ -387,10 +417,16 @@ static void enqueue_changes_for_kleene_closure(
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
 {
+#ifdef DEBUG_EBNF
+    if(_node->sym_id() == ID_RULE || is_kleene_node(_node))
+        std::cout << '[';
+#endif
+    static bool entered_kleen_closure = false;
     bool more;
     switch(_node->sym_id())
     {
         case ID_GRAMMAR:
+            entered_kleen_closure = false;
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
             visit_next_child(_node);
@@ -499,13 +535,17 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '+':
         case '*':
         case '?':
-            if(m_changes)
-                enqueue_changes_for_kleene_closure(
-                        &m_changes->m_symbols_attach_loc_map,
-                        &m_changes->m_insertions_after,
-                        &m_changes->m_replacements,
-                        _node,
-                        m_tc);
+            if(!entered_kleen_closure)
+            {
+                if(m_changes)
+                    enqueue_changes_for_kleene_closure(
+                            &m_changes->m_symbols_attach_loc_map,
+                            &m_changes->m_insertions_after,
+                            &m_changes->m_replacements,
+                            _node,
+                            m_tc);
+                entered_kleen_closure = true;
+            }
             xl::visitor::DefaultTour::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
             break;
@@ -519,4 +559,13 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     (*_node)[0])->value();
             break;
     }
+#ifdef DEBUG_EBNF
+    if(_node->sym_id() == ID_RULE || is_kleene_node(_node))
+    {
+        std::cout << '<'
+                << _node->name() << "::"
+                << ptr_to_string(dynamic_cast<const xl::node::NodeIdentIFace*>(_node)) << '>';
+        std::cout << ']';
+    }
+#endif
 }
