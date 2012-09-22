@@ -22,6 +22,7 @@
 #include "XLangString.h" // xl::unescape
 #include <stdarg.h> // va_list
 #include <string> // std::string
+#include <vector> // std::vector
 #include <map> // std::map
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -53,6 +54,12 @@ node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, size_t
             node::SymbolNode(sym_id, size, ap);
     va_end(ap);
     return node;
+}
+
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, std::vector<node::NodeIdentIFace*>& vec)
+{
+    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
+            node::SymbolNode(sym_id, vec);
 }
 
 #ifdef TIXML_USE_TICPP

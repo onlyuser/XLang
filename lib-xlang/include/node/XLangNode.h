@@ -102,6 +102,7 @@ class SymbolNode
 {
 public:
     SymbolNode(uint32_t _sym_id, size_t _size, va_list ap);
+    SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec);
 
     // required
     NodeIdentIFace* operator[](uint32_t index) const

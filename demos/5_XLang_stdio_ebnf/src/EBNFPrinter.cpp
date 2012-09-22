@@ -39,10 +39,10 @@
     {
         switch(_node->sym_id())
         {
-        case '+':
-        case '*':
-        case '?':
-            return true;
+            case '+':
+            case '*':
+            case '?':
+                return true;
         }
         return false;
     }

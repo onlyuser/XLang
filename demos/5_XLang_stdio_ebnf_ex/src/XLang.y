@@ -180,8 +180,8 @@ program:
     ;
 
 program_0:
-      /* empty */         {}
-    | program_0 program_1 { $$->push_back($2); }
+      /* empty */         { $$ = new std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type>; }
+    | program_0 program_1 { $1->push_back($2); $$ = $1; }
     ;
 
 program_1:

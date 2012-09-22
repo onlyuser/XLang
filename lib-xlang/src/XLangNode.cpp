@@ -18,6 +18,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <sstream> // std::stringstream
+#include <vector> // std::vector
 #include <algorithm> // std::replace, std::find_if
 
 // prototype
@@ -69,6 +70,34 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     for(size_t i = 0; i<_size; i++)
     {
         NodeIdentIFace* child = va_arg(ap, NodeIdentIFace*);
+        if(child == SymbolNode::eol())
+            continue;
+        if(child && is_same_type(child))
+        {
+            SymbolNode* child_symbol = dynamic_cast<SymbolNode*>(child);
+            m_child_vec.insert(m_child_vec.end(),
+                    child_symbol->m_child_vec.begin(),
+                    child_symbol->m_child_vec.end());
+            for(auto p = child_symbol->m_child_vec.begin(); p != child_symbol->m_child_vec.end(); ++p)
+            {
+                if(*p)
+                    (*p)->set_parent(this);
+            }
+            continue;
+        }
+        m_child_vec.push_back(child);
+        if(child)
+            child->set_parent(this);
+    }
+}
+
+SymbolNode::SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec)
+    : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
+      m_visit_state(NULL)
+{
+    for(std::vector<NodeIdentIFace*>::iterator q = vec.begin(); q != vec.end(); q++)
+    {
+        NodeIdentIFace* child = *q;
         if(child == SymbolNode::eol())
             continue;
         if(child && is_same_type(child))

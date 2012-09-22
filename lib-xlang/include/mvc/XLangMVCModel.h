@@ -37,6 +37,7 @@ struct MVCModel
                 >(sym_id, value); // default case assumes no non-trivial dtor
     }
     static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, std::vector<node::NodeIdentIFace*>& vec);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 
