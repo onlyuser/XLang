@@ -41,6 +41,8 @@
 #define ERROR_SYM_ID_NOT_FOUND   "missing sym_id handler, most likely you forgot to register one"
 #define ERROR_SYM_NAME_NOT_FOUND "missing sym name handler, most likely you forgot to register one"
 
+typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
+
 // report error
 void _XLANG_error(const char* s)
 {
@@ -108,7 +110,8 @@ xl::TreeContext* &tree_context()
     xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
-    std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type>* symbol_vec_value; // node pointer
+    //sym_vec_t* symbol_vec_value;
+    void* symbol_vec_value;
 }
 
 // show detailed parse errors
@@ -143,8 +146,17 @@ root:
 // EBNF:
 //program:
 //      (
-//            statement ',' { /* AAA */ $$->push_back($1); }
-//      )* statement        { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, NULL, $2) : $2; }
+//            statement ',' {   /* AAA */ $$->push_back( /* AAA_2 */ $1 ); }
+//      )* statement        {   /* BBB */
+                                if($1)
+                                {
+                                    sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
+                                    v->push_back($2);
+                                    $$ = MAKE_SYMBOL(',', *v);
+                                }
+                                else
+                                    $$ = $2;
+                            }
 //    ;
 
 // EBNF-XML:
@@ -176,16 +188,28 @@ root:
 // EBNF-EXPANDED-AS-BNF:
 // [
 program:
-      program_0 statement { /* BBB */ $$ = $1 ? MAKE_SYMBOL(',', 2, NULL, $2) : $2; }
+      program_0 statement   {   /* BBB */
+                                if($1)
+                                {
+                                    sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
+                                    v->push_back($2);
+                                    $$ = MAKE_SYMBOL(',', *v);
+                                }
+                                else
+                                    $$ = $2;
+                            }
     ;
 
 program_0:
-      /* empty */         { $$ = new std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type>; }
-    | program_0 program_1 { $1->push_back($2); $$ = $1; }
+      /* empty */           { $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
+    | program_0 program_1   {
+                                /* AAA */ reinterpret_cast<sym_vec_t*>($1)->push_back($2);
+                                $$ = $1;
+                            }
     ;
 
 program_1:
-      statement ',' { /* AAA */ $$ = $1; }
+      statement ',' { $$ = /* AAA_2 */ $1; }
     ;
 // ]
 
