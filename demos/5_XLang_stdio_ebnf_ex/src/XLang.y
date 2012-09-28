@@ -148,15 +148,15 @@ root:
 //      (
 //            statement ',' {   /* AAA */ $$->push_back( /* AAA_2 */ $1 ); }
 //      )* statement        {   /* BBB */
-                                if($1)
-                                {
-                                    sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
-                                    v->push_back($2);
-                                    $$ = MAKE_SYMBOL(',', *v);
-                                }
-                                else
-                                    $$ = $2;
-                            }
+//                              if($1)
+//                              {
+//                                  sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
+//                                  v->push_back($2);
+//                                  $$ = MAKE_SYMBOL(',', *v);
+//                              }
+//                              else
+//                                  $$ = $2;
+//                          }
 //    ;
 
 // EBNF-XML:
