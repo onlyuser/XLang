@@ -146,7 +146,7 @@ root:
 // EBNF:
 //program:
 //      (
-//            statement ',' {   /* AAA */ $$->push_back( /* AAA_2 */ $1 ); }
+//            statement ',' { /* AAA */ $$ = $1; }
 //      )* statement        {
 //                              /* BBB */
 //                              if($1)
@@ -173,7 +173,7 @@ root:
 //                            <term type="char" value=','/>
 //                        </symbol>
 //                        <symbol type="action_block">
-//                            <term type="string" value=" /* AAA */ $$ = $1; "/>
+//                            <term type="string" value=" /* AAA */ ... "/>
 //                        </symbol>
 //                    </symbol>
 //                </symbol>
@@ -181,7 +181,7 @@ root:
 //            <term type="ident" value=statement/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//            <term type="string" value=" /* BBB */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -203,15 +203,12 @@ program:
     ;
 
 program_0:
-      /* empty */           { $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
-    | program_0 program_1   {
-                                /* AAA */ reinterpret_cast<sym_vec_t*>($1)->push_back($2);
-                                $$ = $1;
-                            }
+      /* empty */         { /* XXX */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
+    | program_0 program_1 { /* YYY */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
     ;
 
 program_1:
-      statement ',' { $$ = /* AAA_2 */ $1; }
+      statement ',' { /* AAA */ $$ = $1; }
     ;
 // ]
 
@@ -225,7 +222,7 @@ program_1:
 //            <term type="ident" value=statement/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* BBB */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//            <term type="string" value=" /* BBB */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -234,7 +231,7 @@ program_1:
 //    <symbol type="alts">
 //        <symbol type="alt">
 //            <symbol type="action_block">
-//                <term type="string" value="           $$ = NULL; "/>
+//                <term type="string" value=" /* XXX */ ... "/>
 //            </symbol>
 //        </symbol>
 //        <symbol type="alt">
@@ -243,7 +240,7 @@ program_1:
 //                <term type="ident" value=program_1/>
 //            </symbol>
 //            <symbol type="action_block">
-//                <term type="string" value=" /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+//                <term type="string" value=" /* YYY */ ... "/>
 //            </symbol>
 //        </symbol>
 //    </symbol>
@@ -256,7 +253,7 @@ program_1:
 //            <term type="char" value=','/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* AAA */ $$ = $1; "/>
+//            <term type="string" value=" /* AAA */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
