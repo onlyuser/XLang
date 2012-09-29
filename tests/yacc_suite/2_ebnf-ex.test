@@ -97,7 +97,7 @@ xl::TreeContext* &tree_context()
     return tc;
 }
 
-// EBNF:
+// EBNF-EXPANDED:
 typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
 
 %}
@@ -112,7 +112,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 
-    // EBNF:
+    // EBNF-EXPANDED:
     void* symbol_vec_value;
 }
 
@@ -126,7 +126,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
 %token<ident_value> ID_IDENT
 %type<symbol_value> program statement expression program_1 statement_0 statement_1
 
-// EBNF:
+// EBNF-EXPANDED:
 %type<symbol_vec_value> program_0
 
 %left '+' '-'
@@ -164,7 +164,7 @@ root:
 //                          }
 //    ;
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED:
 // [
 program:
       program_0 statement   {
@@ -204,7 +204,7 @@ program_1:
 //      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
 //    ;
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED:
 // [
 statement:
       statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }

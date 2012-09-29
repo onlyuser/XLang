@@ -49,7 +49,7 @@ void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-c
             std::cout << ">>> (iter #" << n << ")" << std::endl;
         #endif
         n++;
-    } while(changed); // repeat until it stabilizes
+    } while(changed); // repeat until stabilize
     #ifndef DEBUG_EBNF
         std::cout << captured_stdout;
     #endif
