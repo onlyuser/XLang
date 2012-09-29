@@ -209,8 +209,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
         std::string action_string, xl::TreeContext* tc)
 {
     //program_0:
-    //      /* empty */         {           $$ = NULL; }
-    //    | program_0 program_1 { /* ??? */ $$ = $1 ? MAKE_SYMBOL(',', 2, $1, $2) : $2; }
+    //      /* empty */         { /* AAA */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
+    //    | program_0 program_1 { /* BBB */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
     //    ;
     //
     //<symbol type="rule">
@@ -218,7 +218,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="action_block">
-    //                <term type="string" value="           $$ = NULL; "/>
+    //                <term type="string" value=" /* AAA */ ... "/>
     //            </symbol>
     //        </symbol>
     //        <symbol type="alt">
@@ -227,11 +227,14 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //                <term type="ident" value=program_1/>
     //            </symbol>
     //            <symbol type="action_block">
-    //                <term type="string" value=" /* ??? */ $$ = $1 ? MAKE_SYMBOL(\',\', 2, $1, $2) : $2; "/>
+    //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
     //</symbol>
+
+	std::string empty_case_action   = " $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; ";
+	std::string recurse_case_action = " reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; ";
 
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
@@ -239,7 +242,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = NULL; "))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(empty_case_action))
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -248,9 +251,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(
-                                                    " /* TODO: what goes here? */ " //action_string
-                                                    ))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(recurse_case_action))
                                             )
                                     )
                             )
@@ -262,8 +263,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
         xl::TreeContext* tc)
 {
     //statement_0:
-    //      /* empty */ { $$ = NULL; }
-    //    | statement_1 { $$ = $1; }
+    //      /* empty */ { /* AAA */ $$ = NULL; }
+    //    | statement_1 { /* BBB */ $$ = $1; }
     //    ;
     //
     //<symbol type="rule">
@@ -271,7 +272,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="action_block">
-    //                <term type="string" value=" $$ = NULL; "/>
+    //                <term type="string" value=" /* AAA */ ... "/>
     //            </symbol>
     //        </symbol>
     //        <symbol type="alt">
@@ -279,11 +280,14 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     //                <term type="ident" value=statement_1/>
     //            </symbol>
     //            <symbol type="action_block">
-    //                <term type="string" value=" $$ = $1; "/>
+    //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
     //</symbol>
+
+	std::string empty_case_action    = " $$ = NULL; ";
+	std::string optional_case_action = " $$ = $1; ";
 
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
@@ -291,7 +295,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = NULL; "))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(empty_case_action))
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -299,7 +303,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(" $$ = $1; "))
+                                            MAKE_TERM(ID_STRING, *tc->alloc_string(optional_case_action))
                                             )
                                     )
                             )
