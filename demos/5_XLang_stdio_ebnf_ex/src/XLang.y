@@ -41,8 +41,6 @@
 #define ERROR_SYM_ID_NOT_FOUND   "missing sym_id handler, most likely you forgot to register one"
 #define ERROR_SYM_NAME_NOT_FOUND "missing sym name handler, most likely you forgot to register one"
 
-typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
-
 // report error
 void _XLANG_error(const char* s)
 {
@@ -99,6 +97,8 @@ xl::TreeContext* &tree_context()
     return tc;
 }
 
+typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
+
 %}
 
 // type of yylval to be set by scanner actions
@@ -110,7 +110,6 @@ xl::TreeContext* &tree_context()
     xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
-    //sym_vec_t* symbol_vec_value;
     void* symbol_vec_value;
 }
 
@@ -203,8 +202,8 @@ program:
     ;
 
 program_0:
-      /* empty */         { /* XXX */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
-    | program_0 program_1 { /* YYY */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
+      /* empty */         { /* PPP */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
+    | program_0 program_1 { /* QQQ */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
     ;
 
 program_1:
@@ -231,7 +230,7 @@ program_1:
 //    <symbol type="alts">
 //        <symbol type="alt">
 //            <symbol type="action_block">
-//                <term type="string" value=" /* XXX */ ... "/>
+//                <term type="string" value=" /* PPP */ ... "/>
 //            </symbol>
 //        </symbol>
 //        <symbol type="alt">
@@ -240,7 +239,7 @@ program_1:
 //                <term type="ident" value=program_1/>
 //            </symbol>
 //            <symbol type="action_block">
-//                <term type="string" value=" /* YYY */ ... "/>
+//                <term type="string" value=" /* QQQ */ ... "/>
 //            </symbol>
 //        </symbol>
 //    </symbol>
@@ -286,7 +285,7 @@ program_1:
 //                            <term type="char" value='='/>
 //                        </symbol>
 //                        <symbol type="action_block">
-//                            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
+//                            <term type="string" value=" /* CCC */ ... "/>
 //                        </symbol>
 //                    </symbol>
 //                </symbol>
@@ -294,7 +293,7 @@ program_1:
 //            <term type="ident" value=expression/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+//            <term type="string" value=" /* DDD */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -306,8 +305,8 @@ statement:
     ;
 
 statement_0:
-      /* empty */ { $$ = NULL; }
-    | statement_1 { $$ = $1; }
+      /* empty */ { /* RRR */ $$ = NULL; }
+    | statement_1 { /* SSS */ $$ = $1; }
     ;
 
 statement_1:
@@ -325,7 +324,7 @@ statement_1:
 //            <term type="ident" value=expression/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* DDD */ $$ = $1 ? MAKE_SYMBOL(\'=\', 2, $1, $2) : $2; "/>
+//            <term type="string" value=" /* DDD */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -334,7 +333,7 @@ statement_1:
 //    <symbol type="alts">
 //        <symbol type="alt">
 //            <symbol type="action_block">
-//                <term type="string" value=" $$ = NULL; "/>
+//                <term type="string" value=" /* RRR */ ... "/>
 //            </symbol>
 //        </symbol>
 //        <symbol type="alt">
@@ -342,7 +341,7 @@ statement_1:
 //                <term type="ident" value=statement_1/>
 //            </symbol>
 //            <symbol type="action_block">
-//                <term type="string" value=" $$ = $1; "/>
+//                <term type="string" value=" /* SSS */ ... "/>
 //            </symbol>
 //        </symbol>
 //    </symbol>
@@ -355,7 +354,7 @@ statement_1:
 //            <term type="char" value='='/>
 //        </symbol>
 //        <symbol type="action_block">
-//            <term type="string" value=" /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); "/>
+//            <term type="string" value=" /* CCC */ ... "/>
 //        </symbol>
 //    </symbol>
 //</symbol>
