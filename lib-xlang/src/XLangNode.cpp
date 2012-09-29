@@ -59,7 +59,7 @@ NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
     TermNodeIFace<NodeIdentIFace::STRING> *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             TermNode<NodeIdentIFace::STRING>(m_sym_id, m_value);
-    _clone->set_original(/* original() ? original() :*/ this);
+    _clone->set_original(this);
     return _clone;
 }
 
@@ -185,7 +185,7 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
     va_list ap;
     SymbolNodeIFace *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
             SymbolNode(m_sym_id, 0, ap);
-    _clone->set_original(/* original() ? original() :*/ this);
+    _clone->set_original(this);
     for(auto p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {
         NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;

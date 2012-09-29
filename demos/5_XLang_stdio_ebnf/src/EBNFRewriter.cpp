@@ -21,7 +21,7 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <iostream> // std::cout
 
-#define DEBUG_EBNF
+//#define DEBUG_EBNF
 
 void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-const ast
 {
@@ -36,21 +36,21 @@ void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-c
         EBNFChanges changes(tc);
         EBNFPrinter v(tc, &changes);
         {
-			#ifdef DEBUG_EBNF
-				v.visit_any(ast); // visit while recording changes
-			#else
-				v.redirect_stdout();                  // begin capture stdout
-				v.visit_any(ast);                     // visit while recording changes
-				captured_stdout = v.restore_stdout(); // end capture stdout
-			#endif
+            #ifdef DEBUG_EBNF
+                v.visit_any(ast); // visit while recording changes
+            #else
+                v.redirect_stdout();                  // begin capture stdout
+                v.visit_any(ast);                     // visit while recording changes
+                captured_stdout = v.restore_stdout(); // end capture stdout
+            #endif
         }
         changed = changes.apply(); // apply changes
-		#ifdef DEBUG_EBNF
-        	std::cout << ">>> (iter #" << n << ")" << std::endl;
+        #ifdef DEBUG_EBNF
+            std::cout << ">>> (iter #" << n << ")" << std::endl;
         #endif
         n++;
     } while(changed); // repeat until it stabilizes
-	#ifndef DEBUG_EBNF
-		std::cout << captured_stdout;
-	#endif
+    #ifndef DEBUG_EBNF
+        std::cout << captured_stdout;
+    #endif
 }

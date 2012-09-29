@@ -233,8 +233,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    </symbol>
     //</symbol>
 
-	std::string empty_case_action   = " $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; ";
-	std::string recurse_case_action = " reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; ";
+    std::string empty_case_action   = " $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; ";
+    std::string recurse_case_action = " reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; ";
 
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
@@ -286,8 +286,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     //    </symbol>
     //</symbol>
 
-	std::string empty_case_action    = " $$ = NULL; ";
-	std::string optional_case_action = " $$ = $1; ";
+    std::string empty_case_action    = " $$ = NULL; ";
+    std::string optional_case_action = " $$ = $1; ";
 
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
