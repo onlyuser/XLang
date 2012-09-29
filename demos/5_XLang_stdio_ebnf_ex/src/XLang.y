@@ -365,11 +365,6 @@ statement_1:
 //</symbol>
 // ]
 
-// (rule
-//     ident
-//     (alt (terms ident char) action_block)
-// )
-
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
     | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
