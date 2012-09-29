@@ -474,12 +474,14 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     (*_node)[0])->value();
             std::cout << "%}";
+            m_changes->m_proto_block = _node;
             break;
         case ID_UNION_BLOCK:
             std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     (*_node)[0])->value();
             std::cout << '}';
+            m_changes->m_union_block = _node;
             break;
         case ID_SYMBOLS:
             do
