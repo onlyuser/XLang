@@ -97,6 +97,7 @@ xl::TreeContext* &tree_context()
     return tc;
 }
 
+// EBNF:
 typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
 
 %}
@@ -110,6 +111,8 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
     xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
+
+    // EBNF:
     void* symbol_vec_value;
 }
 
@@ -122,6 +125,8 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
 %type<symbol_value> program statement expression program_1 statement_0 statement_1
+
+// EBNF:
 %type<symbol_vec_value> program_0
 
 %left '+' '-'
