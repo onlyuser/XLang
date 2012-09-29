@@ -147,7 +147,8 @@ root:
 //program:
 //      (
 //            statement ',' {   /* AAA */ $$->push_back( /* AAA_2 */ $1 ); }
-//      )* statement        {   /* BBB */
+//      )* statement        {
+//                              /* BBB */
 //                              if($1)
 //                              {
 //                                  sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
@@ -188,7 +189,8 @@ root:
 // EBNF-EXPANDED-AS-BNF:
 // [
 program:
-      program_0 statement   {   /* BBB */
+      program_0 statement   {
+                                /* BBB */
                                 if($1)
                                 {
                                     sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
