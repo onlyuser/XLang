@@ -37,6 +37,7 @@ void EBNFChanges::reset()
 {
     m_symbols_attach_loc_map.clear();
     m_insertions_after.clear();
+    m_append_to.clear();
     m_replacements.clear();
 }
 

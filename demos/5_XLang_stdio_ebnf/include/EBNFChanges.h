@@ -26,8 +26,7 @@
 
 struct EBNFChanges
 {
-    EBNFChanges(xl::TreeContext* tc)
-    	: m_tc(tc), m_proto_block(NULL), m_union_block(NULL)
+    EBNFChanges(xl::TreeContext* tc) : m_tc(tc)
     {}
     void reset();
     bool apply();
@@ -37,8 +36,8 @@ private:
 public:
     std::map<std::string, const xl::node::NodeIdentIFace*> m_symbols_attach_loc_map;
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_insertions_after;
+    std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_append_to;
     std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_replacements;
-    const xl::node::NodeIdentIFace *m_proto_block, *m_union_block;
 };
 
 #endif

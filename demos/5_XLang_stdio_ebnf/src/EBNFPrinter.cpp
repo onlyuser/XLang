@@ -350,6 +350,7 @@ static void enqueue_add_to_symbols(
 static void enqueue_changes_for_kleene_closure(
         std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* append_to,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
         xl::TreeContext* tc)
@@ -426,6 +427,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         std::cout << '[';
 #endif
     static bool entered_kleen_closure = false;
+    static const xl::node::NodeIdentIFace *proto_block = NULL, *union_block = NULL;
     bool more;
     switch(_node->sym_id())
     {
@@ -474,14 +476,14 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     (*_node)[0])->value();
             std::cout << "%}";
-            m_changes->m_proto_block = _node;
+            proto_block = _node;
             break;
         case ID_UNION_BLOCK:
             std::cout << '{';
             std::cout << dynamic_cast<xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(
                     (*_node)[0])->value();
             std::cout << '}';
-            m_changes->m_union_block = _node;
+            union_block = _node;
             break;
         case ID_SYMBOLS:
             do
@@ -547,6 +549,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     enqueue_changes_for_kleene_closure(
                             &m_changes->m_symbols_attach_loc_map,
                             &m_changes->m_insertions_after,
+                            &m_changes->m_append_to,
                             &m_changes->m_replacements,
                             _node,
                             m_tc);
