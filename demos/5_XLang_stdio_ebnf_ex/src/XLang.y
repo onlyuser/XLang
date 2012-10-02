@@ -98,7 +98,7 @@ xl::TreeContext* &tree_context()
 }
 
 // EBNF:
-typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
+typedef std::vector<void*> ptr_vec_t;
 
 %}
 
@@ -113,7 +113,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 
     // EBNF:
-    void* symbol_vec_value;
+    void* program_0_t;
 }
 
 // show detailed parse errors
@@ -127,7 +127,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
 %type<symbol_value> program statement expression program_1 statement_0 statement_1
 
 // EBNF:
-%type<symbol_vec_value> program_0
+%type<program_0_t> program_0
 
 %left '+' '-'
 %left '*' '/'
@@ -155,9 +155,13 @@ root:
 //                              /* BBB */
 //                              if($1)
 //                              {
-//                                  sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
+//                                  ptr_vec_t* v = reinterpret_cast<ptr_vec_t*>($1);
 //                                  v->push_back($2);
-//                                  $$ = MAKE_SYMBOL(',', *v);
+//                                  $$ = MAKE_SYMBOL(',', 0);
+//                                  for(auto p = v->begin(); p != v->end(); p++)
+//                                      reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
+//                                              reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
+//                                  delete v;
 //                              }
 //                              else
 //                                  $$ = $2;
@@ -197,9 +201,13 @@ program:
                                 /* BBB */
                                 if($1)
                                 {
-                                    sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
+                                    ptr_vec_t* v = reinterpret_cast<ptr_vec_t*>($1);
                                     v->push_back($2);
-                                    $$ = MAKE_SYMBOL(',', *v);
+                                    $$ = MAKE_SYMBOL(',', 0);
+                                    for(auto p = v->begin(); p != v->end(); p++)
+                                        reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
+                                                reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
+                                    delete v;
                                 }
                                 else
                                     $$ = $2;
@@ -207,8 +215,8 @@ program:
     ;
 
 program_0:
-      /* empty */         { /* PPP */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
-    | program_0 program_1 { /* QQQ */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
+      /* empty */         { /* PPP */ $$ = new ptr_vec_t; }
+    | program_0 program_1 { /* QQQ */ reinterpret_cast<ptr_vec_t*>($1)->push_back($2); $$ = $1; }
     ;
 
 program_1:
