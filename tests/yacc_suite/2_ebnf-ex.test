@@ -98,7 +98,7 @@ xl::TreeContext* &tree_context()
 }
 
 // EBNF-EXPANDED:
-typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> sym_vec_t;
+typedef std::vector<void*> kleene_args_t;
 
 %}
 
@@ -113,7 +113,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 
     // EBNF-EXPANDED:
-    void* symbol_vec_value;
+    void* ptr_t;
 }
 
 // show detailed parse errors
@@ -127,7 +127,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
 %type<symbol_value> program statement expression program_1 statement_0 statement_1
 
 // EBNF-EXPANDED:
-%type<symbol_vec_value> program_0
+%type<ptr_t> program_0
 
 %left '+' '-'
 %left '*' '/'
@@ -153,14 +153,18 @@ root:
 //            statement ',' { /* AAA */ $$ = $1; }
 //      )* statement        {
 //                              /* BBB */
-//                              if($1)
+//                              auto v = reinterpret_cast<std::vector<void*>*>($1);
+//                              if(!v->empty())
 //                              {
-//                                  sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
 //                                  v->push_back($2);
-//                                  $$ = MAKE_SYMBOL(',', *v);
+//                                  $$ = MAKE_SYMBOL(',', 0);
+//                                  for(auto p = v->begin(); p != v->end(); p++)
+//                                      reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
+//                                              reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
 //                              }
 //                              else
 //                                  $$ = $2;
+//                              delete v;
 //                          }
 //    ;
 
@@ -169,20 +173,24 @@ root:
 program:
       program_0 statement   {
                                 /* BBB */
-                                if($1)
+                                auto v = reinterpret_cast<std::vector<void*>*>($1);
+                                if(!v->empty())
                                 {
-                                    sym_vec_t* v = reinterpret_cast<sym_vec_t*>($1);
                                     v->push_back($2);
-                                    $$ = MAKE_SYMBOL(',', *v);
+                                    $$ = MAKE_SYMBOL(',', 0);
+                                    for(auto p = v->begin(); p != v->end(); p++)
+                                        reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
+                                                reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
                                 }
                                 else
                                     $$ = $2;
+                                delete v;
                             }
     ;
 
 program_0:
-      /* empty */         { /* PPP */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
-    | program_0 program_1 { /* QQQ */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
+      /* empty */         { /* PPP */ $$ = new kleene_args_t; }
+    | program_0 program_1 { /* QQQ */ reinterpret_cast<kleene_args_t*>($1)->push_back($2); $$ = $1; }
     ;
 
 program_1:

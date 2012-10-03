@@ -97,8 +97,8 @@ xl::TreeContext* &tree_context()
     return tc;
 }
 
-// EBNF:
-typedef std::vector<void*> ptr_vec_t;
+// EBNF-EXPANDED:
+typedef std::vector<void*> kleene_args_t;
 
 %}
 
@@ -112,8 +112,8 @@ typedef std::vector<void*> ptr_vec_t;
     xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 
-    // EBNF:
-    void* program_0_t;
+    // EBNF-EXPANDED:
+    void* ptr_t;
 }
 
 // show detailed parse errors
@@ -126,8 +126,8 @@ typedef std::vector<void*> ptr_vec_t;
 %token<ident_value> ID_IDENT
 %type<symbol_value> program statement expression program_1 statement_0 statement_1
 
-// EBNF:
-%type<program_0_t> program_0
+// EBNF-EXPANDED:
+%type<ptr_t> program_0
 
 %left '+' '-'
 %left '*' '/'
@@ -153,18 +153,18 @@ root:
 //            statement ',' { /* AAA */ $$ = $1; }
 //      )* statement        {
 //                              /* BBB */
-//                              if($1)
+//                              auto v = reinterpret_cast<std::vector<void*>*>($1);
+//                              if(!v->empty())
 //                              {
-//                                  ptr_vec_t* v = reinterpret_cast<ptr_vec_t*>($1);
 //                                  v->push_back($2);
 //                                  $$ = MAKE_SYMBOL(',', 0);
 //                                  for(auto p = v->begin(); p != v->end(); p++)
 //                                      reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
 //                                              reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
-//                                  delete v;
 //                              }
 //                              else
 //                                  $$ = $2;
+//                              delete v;
 //                          }
 //    ;
 
@@ -194,29 +194,29 @@ root:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED:
 // [
 program:
       program_0 statement   {
                                 /* BBB */
-                                if($1)
+                                auto v = reinterpret_cast<std::vector<void*>*>($1);
+                                if(!v->empty())
                                 {
-                                    ptr_vec_t* v = reinterpret_cast<ptr_vec_t*>($1);
                                     v->push_back($2);
                                     $$ = MAKE_SYMBOL(',', 0);
                                     for(auto p = v->begin(); p != v->end(); p++)
                                         reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(
                                                 reinterpret_cast<xl::node::NodeIdentIFace*>(*p));
-                                    delete v;
                                 }
                                 else
                                     $$ = $2;
+                                delete v;
                             }
     ;
 
 program_0:
-      /* empty */         { /* PPP */ $$ = new ptr_vec_t; }
-    | program_0 program_1 { /* QQQ */ reinterpret_cast<ptr_vec_t*>($1)->push_back($2); $$ = $1; }
+      /* empty */         { /* PPP */ $$ = new kleene_args_t; }
+    | program_0 program_1 { /* QQQ */ reinterpret_cast<kleene_args_t*>($1)->push_back($2); $$ = $1; }
     ;
 
 program_1:
@@ -224,7 +224,7 @@ program_1:
     ;
 // ]
 
-// EBNF-EXPANDED-AS-BNF-XML:
+// EBNF-EXPANDED-XML:
 // [
 //<symbol type="rule">
 //    <term type="ident" value=program/>
@@ -311,7 +311,7 @@ program_1:
 //    </symbol>
 //</symbol>
 
-// EBNF-EXPANDED-AS-BNF:
+// EBNF-EXPANDED:
 // [
 statement:
       statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
@@ -327,7 +327,7 @@ statement_1:
     ;
 // ]
 
-// EBNF-EXPANDED-AS-BNF-XML:
+// EBNF-EXPANDED-XML:
 // [
 //<symbol type="rule">
 //    <term type="ident" value=statement/>
