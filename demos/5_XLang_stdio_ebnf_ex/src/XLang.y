@@ -165,7 +165,6 @@ root:
 //                              }
 //                              else
 //                                  $$ = $2;
-//                              delete v;
 //                          }
 //    ;
 
@@ -212,6 +211,8 @@ program:
                                 }
                                 else
                                     $$ = $2;
+
+                                // EBNF-EXPANDED:
                                 delete v;
                             }
     ;

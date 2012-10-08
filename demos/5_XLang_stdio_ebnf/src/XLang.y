@@ -152,12 +152,12 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        proto_block union_block symbols symbol
-        rules rule alts alt action_block terms term code
+        proto_block union_block // decl_stmts decl_stmt
+        symbols symbol rules rule alts alt action_block terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
-        ID_PROTO_BLOCK ID_UNION_BLOCK ID_SYMBOLS
-        ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
+        ID_PROTO_BLOCK ID_UNION_BLOCK // ID_DECL_STMTS ID_DECL_STMT
+        ID_SYMBOLS ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -219,6 +219,18 @@ union_block:
                         MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
             }
     ;
+
+//decl_stmts:
+//      /* empty */          { $$ = EOL; }
+//    | decl_stmts decl_stmt { $$ = MAKE_SYMBOL(ID_DECL_STMTS, 2, $1, $2); }
+//    ;
+//
+//decl_stmt:
+//    ID_IDENT ID_IDENT ';' {
+//              $$ = MAKE_SYMBOL(ID_DECL_STMT, 2,
+//                      MAKE_TERM(ID_IDENT, $1), MAKE_TERM(ID_IDENT, $2));
+//          }
+//    ;
 
 proto_block:
       ID_STRING {

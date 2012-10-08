@@ -49,8 +49,10 @@
 #endif
 
 #define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
-//#define MAKE_SYMBOL(...)       xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
-#define MAKE_SYMBOL            xl::mvc::MVCModel::make_symbol
+#if 0 // NOTE: macro recursion not allowed
+    #define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
+#endif
+#define MAKE_SYMBOL xl::mvc::MVCModel::make_symbol
 
 static std::string gen_name(std::string stem)
 {
