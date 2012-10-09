@@ -75,6 +75,8 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DECL_BRACE:   return "decl_brace";
         case ID_PROTO_BLOCK:  return "proto_block";
         case ID_UNION_BLOCK:  return "union_block";
+        //case ID_DECL_STMTS:   return "decl_stmts";
+        //case ID_DECL_STMT:    return "decl_stmt";
         case ID_SYMBOLS:      return "symbols";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
@@ -105,6 +107,8 @@ uint32_t name_to_id(std::string name)
     if(name == "decl_brace")   return ID_DECL_BRACE;
     if(name == "proto_block")  return ID_PROTO_BLOCK;
     if(name == "union_block")  return ID_UNION_BLOCK;
+    //if(name == "decl_stmts")   return ID_DECL_STMTS;
+    //if(name == "decl_stmt")    return ID_DECL_STMT;
     if(name == "symbols")      return ID_SYMBOLS;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
