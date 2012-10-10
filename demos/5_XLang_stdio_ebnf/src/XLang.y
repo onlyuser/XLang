@@ -75,8 +75,8 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DECL_BRACE:   return "decl_brace";
         case ID_PROTO_BLOCK:  return "proto_block";
         case ID_UNION_BLOCK:  return "union_block";
-        //case ID_DECL_STMTS:   return "decl_stmts";
-        //case ID_DECL_STMT:    return "decl_stmt";
+        case ID_DECL_STMTS:   return "decl_stmts";
+        case ID_DECL_STMT:    return "decl_stmt";
         case ID_SYMBOLS:      return "symbols";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
@@ -107,8 +107,8 @@ uint32_t name_to_id(std::string name)
     if(name == "decl_brace")   return ID_DECL_BRACE;
     if(name == "proto_block")  return ID_PROTO_BLOCK;
     if(name == "union_block")  return ID_UNION_BLOCK;
-    //if(name == "decl_stmts")   return ID_DECL_STMTS;
-    //if(name == "decl_stmt")    return ID_DECL_STMT;
+    if(name == "decl_stmts")   return ID_DECL_STMTS;
+    if(name == "decl_stmt")    return ID_DECL_STMT;
     if(name == "symbols")      return ID_SYMBOLS;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
@@ -156,11 +156,11 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        proto_block union_block // decl_stmts decl_stmt
+        proto_block union_block decl_stmts decl_stmt
         symbols symbol rules rule alts alt action_block terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
-        ID_PROTO_BLOCK ID_UNION_BLOCK // ID_DECL_STMTS ID_DECL_STMT
+        ID_PROTO_BLOCK ID_UNION_BLOCK ID_DECL_STMTS ID_DECL_STMT
         ID_SYMBOLS ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
@@ -190,9 +190,9 @@ definitions:
     ;
 
 definition:
-      '%' ID_IDENT               { $$ = MAKE_SYMBOL(ID_DECL, 1, MAKE_TERM(ID_IDENT, $2)); }
-    | '%' ID_IDENT symbols       { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | '%' ID_IDENT union_block   { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+      '%' ID_IDENT                     { $$ = MAKE_SYMBOL(ID_DECL, 1, MAKE_TERM(ID_IDENT, $2)); }
+    | '%' ID_IDENT symbols             { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | '%' ID_IDENT '{' union_block '}' { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $4); }
     | '%' ID_IDENT '=' ID_STRING {
                 $$ = MAKE_SYMBOL(ID_DECL_EQ, 2,
                         MAKE_TERM(ID_IDENT, $2),
@@ -218,23 +218,21 @@ symbol:
     ;
 
 union_block:
-      ID_STRING {
-                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_UNION_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
-            }
+      decl_stmts { $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1, $1); }
     ;
 
-//decl_stmts:
-//      /* empty */          { $$ = EOL; }
-//    | decl_stmts decl_stmt { $$ = MAKE_SYMBOL(ID_DECL_STMTS, 2, $1, $2); }
-//    ;
-//
-//decl_stmt:
-//    ID_IDENT ID_IDENT ';' {
-//              $$ = MAKE_SYMBOL(ID_DECL_STMT, 2,
-//                      MAKE_TERM(ID_IDENT, $1), MAKE_TERM(ID_IDENT, $2));
-//          }
-//    ;
+decl_stmts:
+      /* empty */          { $$ = EOL; }
+    | decl_stmts decl_stmt { $$ = MAKE_SYMBOL(ID_DECL_STMTS, 2, $1, $2); }
+    ;
+
+decl_stmt:
+    ID_IDENT ID_IDENT ';' {
+                $$ = MAKE_SYMBOL(ID_DECL_STMT, 2,
+                        MAKE_TERM(ID_IDENT, $1),
+                        MAKE_TERM(ID_IDENT, $2));
+          }
+    ;
 
 proto_block:
       ID_STRING {

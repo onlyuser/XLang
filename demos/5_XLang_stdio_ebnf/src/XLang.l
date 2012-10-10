@@ -60,6 +60,7 @@ alpha       [a-zA-Z]
 id          {alpha}|[_]
 ident       {id}+({digit}|{id})*
 ident_dash  {id}+({digit}|{id}|[-])*
+ident_fqn   {id}+({digit}|{id}|[:<>,*])*
 _int        {digit}+
 _float      {digit}*[.]{digit}+
 decl        [%][^%{}]
@@ -102,14 +103,15 @@ decl        [%][^%{}]
  /*==========================================================================*/
  /* DEFINITIONS SECTION */
 
-<INITIAL>[\{]          { yy_push_state(ST_UNION_BLOCK); }
-<ST_UNION_BLOCK>[^\}]* {
-                _XLANG_lval.string_value = tree_context()->alloc_string(
-                        xl::unescape(yytext)
-                        );
-                return ID_STRING;
+<INITIAL>[\{]               { yy_push_state(ST_UNION_BLOCK); return *yytext; }
+<ST_UNION_BLOCK>{ident_fqn} {
+                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_IDENT;
             }
-<ST_UNION_BLOCK>[\}]  { yy_pop_state(); }
+<ST_UNION_BLOCK>[;]   { return *yytext; }
+<ST_UNION_BLOCK>"/*"  { yy_push_state(ST_COMMENT_BLOCK); }
+<ST_UNION_BLOCK>"//"  { yy_push_state(ST_COMMENT_LINE); }
+<ST_UNION_BLOCK>[\}]  { yy_pop_state(); return *yytext; }
 <INITIAL>{decl}       { yyless(1); return *yytext; }
 <INITIAL>{ident_dash} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
