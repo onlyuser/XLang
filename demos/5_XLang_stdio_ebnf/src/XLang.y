@@ -77,6 +77,8 @@ std::string id_to_name(uint32_t sym_id)
         case ID_UNION_BLOCK:  return "union_block";
         case ID_DECL_STMTS:   return "decl_stmts";
         case ID_DECL_STMT:    return "decl_stmt";
+        case ID_DECL_CHUNKS:  return "decl_chunks";
+        case ID_DECL_CHUNK:   return "decl_chunk";
         case ID_SYMBOLS:      return "symbols";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
@@ -109,6 +111,8 @@ uint32_t name_to_id(std::string name)
     if(name == "union_block")  return ID_UNION_BLOCK;
     if(name == "decl_stmts")   return ID_DECL_STMTS;
     if(name == "decl_stmt")    return ID_DECL_STMT;
+    if(name == "decl_chunks")  return ID_DECL_CHUNKS;
+    if(name == "decl_chunk")   return ID_DECL_CHUNK;
     if(name == "symbols")      return ID_SYMBOLS;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
@@ -156,11 +160,11 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        proto_block union_block decl_stmts decl_stmt
+        proto_block union_block decl_stmts decl_stmt decl_chunks decl_chunk
         symbols symbol rules rule alts alt action_block terms term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
-        ID_PROTO_BLOCK ID_UNION_BLOCK ID_DECL_STMTS ID_DECL_STMT
+        ID_PROTO_BLOCK ID_UNION_BLOCK ID_DECL_STMTS ID_DECL_STMT ID_DECL_CHUNKS ID_DECL_CHUNK
         ID_SYMBOLS ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
@@ -227,11 +231,19 @@ decl_stmts:
     ;
 
 decl_stmt:
-    ID_IDENT ID_IDENT ';' {
-                $$ = MAKE_SYMBOL(ID_DECL_STMT, 2,
-                        MAKE_TERM(ID_IDENT, $1),
-                        MAKE_TERM(ID_IDENT, $2));
-          }
+    decl_chunks ';' { $$ = MAKE_SYMBOL(ID_DECL_STMT, 1, $1); }
+    ;
+
+decl_chunks:
+      /* empty */            { $$ = EOL; }
+    | decl_chunks decl_chunk { $$ = MAKE_SYMBOL(ID_DECL_CHUNKS, 2, $1, $2); }
+    ;
+
+decl_chunk:
+    ID_STRING {
+                $$ = MAKE_SYMBOL(ID_DECL_CHUNK, 1,
+                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+            }
     ;
 
 proto_block:

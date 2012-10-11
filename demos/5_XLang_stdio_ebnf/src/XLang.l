@@ -105,13 +105,14 @@ decl        [%][^%{}]
 
 <INITIAL>[\{]               { yy_push_state(ST_UNION_BLOCK); return *yytext; }
 <ST_UNION_BLOCK>{ident_fqn} {
-                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_IDENT;
+                _XLANG_lval.string_value = tree_context()->alloc_string(yytext);
+                return ID_STRING;
             }
 <ST_UNION_BLOCK>[;]   { return *yytext; }
 <ST_UNION_BLOCK>"/*"  { yy_push_state(ST_COMMENT_BLOCK); }
 <ST_UNION_BLOCK>"//"  { yy_push_state(ST_COMMENT_LINE); }
 <ST_UNION_BLOCK>[\}]  { yy_pop_state(); return *yytext; }
+<ST_UNION_BLOCK>{any} ;
 <INITIAL>{decl}       { yyless(1); return *yytext; }
 <INITIAL>{ident_dash} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
