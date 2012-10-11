@@ -231,7 +231,7 @@ decl_stmts:
     ;
 
 decl_stmt:
-    decl_chunks ';' { $$ = MAKE_SYMBOL(ID_DECL_STMT, 1, $1); }
+      decl_chunks ';' { $$ = MAKE_SYMBOL(ID_DECL_STMT, 1, $1); }
     ;
 
 decl_chunks:
