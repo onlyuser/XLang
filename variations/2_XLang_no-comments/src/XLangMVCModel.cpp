@@ -24,7 +24,7 @@
 #include <string> // std::string
 #include <vector> // std::vector
 #ifdef TIXML_USE_TICPP
-	#include <map> // std::map
+    #include <map> // std::map
 #endif
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -47,6 +47,16 @@ node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYP
             node::SymbolNode(sym_id, loc, size, ap);
     va_end(ap);
     return node;
+}
+
+template<>
+node::NodeIdentIFace* MVCModel::make_term<
+        node::TermInternalType<node::NodeIdentIFace::IDENT>::type
+        >(TreeContext* tc, uint32_t sym_id, YYLTYPE loc,
+                node::TermInternalType<node::NodeIdentIFace::IDENT>::type value)
+{
+    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
+            node::TermNode<node::NodeIdentIFace::IDENT>(sym_id, loc, value); // supports non-trivial dtor
 }
 
 #ifdef TIXML_USE_TICPP

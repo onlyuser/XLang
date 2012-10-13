@@ -31,7 +31,7 @@
         }
 
 #define PNEW_LOC(a) \
-        a, __FILE__, __LINE__
+        (a), __FILE__, __LINE__
 
 #define PNEW(a, ns, c) \
         PNEW_LOC(a), DTOR_CB(ns, c)

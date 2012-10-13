@@ -25,7 +25,7 @@
 #include <string> // std::string
 #include <vector> // std::vector
 #ifdef TIXML_USE_TICPP
-	#include <map> // std::map
+    #include <map> // std::map
 #endif
 
 #ifdef EXTERN_INCLUDE_PATH
@@ -48,6 +48,26 @@ node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYP
             node::SymbolNode(sym_id, loc, size, ap);
     va_end(ap);
     return node;
+}
+
+template<>
+node::NodeIdentIFace* MVCModel::make_term<
+        node::TermInternalType<node::NodeIdentIFace::STRING>::type
+        >(TreeContext* tc, uint32_t sym_id, YYLTYPE loc,
+                node::TermInternalType<node::NodeIdentIFace::STRING>::type value)
+{
+    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
+            node::TermNode<node::NodeIdentIFace::STRING>(sym_id, loc, value); // supports non-trivial dtor
+}
+
+template<>
+node::NodeIdentIFace* MVCModel::make_term<
+        node::TermInternalType<node::NodeIdentIFace::IDENT>::type
+        >(TreeContext* tc, uint32_t sym_id, YYLTYPE loc,
+                node::TermInternalType<node::NodeIdentIFace::IDENT>::type value)
+{
+    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
+            node::TermNode<node::NodeIdentIFace::IDENT>(sym_id, loc, value); // supports non-trivial dtor
 }
 
 #ifdef TIXML_USE_TICPP
@@ -73,8 +93,8 @@ static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::s
     if(type == "char")
         return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
-                		xl::unescape(value[0])
-                		));
+                        xl::unescape(value[0])
+                        ));
     if(type == "ident")
         return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(
