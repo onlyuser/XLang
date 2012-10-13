@@ -71,7 +71,7 @@ template<NodeIdentIFace::type_t>
 struct TermInternalType;
 template<> struct TermInternalType<NodeIdentIFace::INT>    { typedef long type; };
 template<> struct TermInternalType<NodeIdentIFace::FLOAT>  { typedef float32_t type; };
-template<> struct TermInternalType<NodeIdentIFace::STRING> { typedef std::string type; };
+template<> struct TermInternalType<NodeIdentIFace::STRING> { typedef std::string* type; };
 template<> struct TermInternalType<NodeIdentIFace::CHAR>   { typedef char type; };
 template<> struct TermInternalType<NodeIdentIFace::IDENT>  { typedef const std::string* type; };
 template<> struct TermInternalType<NodeIdentIFace::SYMBOL> { typedef NodeIdentIFace* type; };
@@ -80,7 +80,7 @@ template<class T>
 struct TermType;
 template<> struct TermType<long>               { enum { type = NodeIdentIFace::INT}; };
 template<> struct TermType<float32_t>          { enum { type = NodeIdentIFace::FLOAT}; };
-template<> struct TermType<std::string>        { enum { type = NodeIdentIFace::STRING}; };
+template<> struct TermType<std::string*>       { enum { type = NodeIdentIFace::STRING}; };
 template<> struct TermType<char>               { enum { type = NodeIdentIFace::CHAR}; };
 template<> struct TermType<const std::string*> { enum { type = NodeIdentIFace::IDENT}; };
 template<> struct TermType<NodeIdentIFace*>    { enum { type = NodeIdentIFace::SYMBOL}; };

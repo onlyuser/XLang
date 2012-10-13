@@ -158,7 +158,7 @@ statement:
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, @$, $1); }
     | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, @$, $1); }
-    | ID_STRING                      { $$ = MAKE_TERM(ID_STRING, @$, *$1); } // NOTE: asterisk..
+    | ID_STRING                      { $$ = MAKE_TERM(ID_STRING, @$, $1); }
     | ID_CHAR                        { $$ = MAKE_TERM(ID_CHAR, @$, $1); }
     | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, @$, $1); }
     | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, @$, 1, $2); }
@@ -195,14 +195,16 @@ void display_usage(bool verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << std::endl
                 << "Input control:" << std::endl
-                << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
+                << "  -i, --in-xml FILENAME (de-serialize from xml)" << std::endl
+                << "  -e, --expr EXPRESSION" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
                 << "  -d, --dot" << std::endl
-                << "  -m, --memory" << std::endl;
+                << "  -m, --memory" << std::endl
+                << "  -h, --help" << std::endl;
     }
     else
         std::cout << "Try `XLang --help\' for more information." << std::endl;

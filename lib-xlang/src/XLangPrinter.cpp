@@ -136,7 +136,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _
 void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
-            "\t\tlabel=\"" << xl::escape(_node->value()) << "\"," << std::endl <<
+            "\t\tlabel=\"" << xl::escape(*_node->value()) << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;

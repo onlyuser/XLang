@@ -141,12 +141,12 @@ xl::TreeContext* &tree_context()
 //
 %union
 {
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type     int_value;    // int value
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type   float_value;  // float value
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::STRING>::type* string_value; // string value
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::CHAR>::type    char_value;   // char value
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type   ident_value;  // symbol table index
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type  symbol_value; // node pointer
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type    int_value;    // int value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::STRING>::type string_value; // string value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::CHAR>::type   char_value;   // char value
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 }
 
 // show detailed parse errors
@@ -200,7 +200,7 @@ definition:
     | '%' ID_IDENT '=' ID_STRING {
                 $$ = MAKE_SYMBOL(ID_DECL_EQ, 2,
                         MAKE_TERM(ID_IDENT, $2),
-                        MAKE_TERM(ID_STRING, *$4)); // NOTE: asterisk..
+                        MAKE_TERM(ID_STRING, $4));
             }
     | '%' ID_IDENT '<' ID_IDENT '>' symbols {
                 $$ = MAKE_SYMBOL(ID_DECL_BRACE, 3,
@@ -242,14 +242,14 @@ decl_chunks:
 decl_chunk:
     ID_STRING {
                 $$ = MAKE_SYMBOL(ID_DECL_CHUNK, 1,
-                        MAKE_TERM(ID_STRING, *$1)); // NOTE: asterisk..
+                        MAKE_TERM(ID_STRING, $1));
             }
     ;
 
 proto_block:
       ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
+                        MAKE_TERM(ID_STRING, $1)) : NULL;
             }
     ;
 
@@ -280,7 +280,7 @@ action_block:
       /* empty */ { $$ = EOL; }
     | ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
-                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
+                        MAKE_TERM(ID_STRING, $1)) : NULL;
             }
     ;
 
@@ -292,7 +292,7 @@ terms:
 term:
       ID_INT       { $$ = MAKE_TERM(ID_INT, $1); }
     | ID_FLOAT     { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_STRING    { $$ = MAKE_TERM(ID_STRING, *$1); } // NOTE: asterisk..
+    | ID_STRING    { $$ = MAKE_TERM(ID_STRING, $1); }
     | ID_CHAR      { $$ = MAKE_TERM(ID_CHAR, $1); }
     | ID_IDENT     { $$ = MAKE_TERM(ID_IDENT, $1); }
     | term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }
@@ -307,7 +307,7 @@ term:
 code:
       ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_CODE, 1,
-                        MAKE_TERM(ID_STRING, *$1)) : NULL; // NOTE: asterisk..
+                        MAKE_TERM(ID_STRING, $1)) : NULL;
             }
     ;
 
@@ -337,7 +337,8 @@ void display_usage(bool verbose)
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
                 << "  -d, --dot" << std::endl
-                << "  -m, --memory" << std::endl;
+                << "  -m, --memory" << std::endl
+                << "  -h, --help" << std::endl;
     }
     else
         std::cout << "Try `XLang --help\' for more information." << std::endl;

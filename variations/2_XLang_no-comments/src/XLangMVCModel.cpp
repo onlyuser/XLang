@@ -22,6 +22,10 @@
 #include <stdarg.h> // va_list
 #include <string.h> // memset
 #include <string> // std::string
+#include <vector> // std::vector
+#ifdef TIXML_USE_TICPP
+	#include <map> // std::map
+#endif
 
 #ifdef EXTERN_INCLUDE_PATH
     #define TIXML_USE_TICPP
@@ -34,16 +38,6 @@
 #endif
 
 namespace xl { namespace mvc {
-
-template<>
-node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, std::string value)
-{
-    node::NodeIdentIFace* node = new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::TermNode<
-                    static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
-                    >(sym_id, loc, value);
-    return node;
-}
 
 node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, size_t size, ...)
 {

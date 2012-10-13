@@ -32,9 +32,9 @@ struct MVCModel
     template<class T>
     static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t sym_id, T value)
     {
-        return new (tc->alloc(), __FILE__, __LINE__) node::TermNode<
+        return new (PNEW_BASIC(tc->alloc())) node::TermNode<
                 static_cast<node::NodeIdentIFace::type_t>(node::TermType<T>::type)
-                >(sym_id, value); // default case assumes no non-trivial dtor
+                >(sym_id, value); // assumes trivial dtor
     }
     static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...);
     static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, std::vector<node::NodeIdentIFace*>& vec);

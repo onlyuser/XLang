@@ -285,15 +285,16 @@ void display_usage(bool verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << std::endl
                 << "Input control:" << std::endl
-                << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
-                << "  -f, --in-file=FILE (regular parse)" << std::endl
+                << "  -i, --in-xml FILENAME (de-serialize from xml)" << std::endl
+                << "  -f, --in-file FILENAME" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
                 << "  -d, --dot" << std::endl
-                << "  -m, --memory" << std::endl;
+                << "  -m, --memory" << std::endl
+                << "  -h, --help" << std::endl;
     }
     else
         std::cout << "Try `XLang --help\' for more information." << std::endl;

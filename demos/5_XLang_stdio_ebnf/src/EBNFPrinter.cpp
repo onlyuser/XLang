@@ -136,7 +136,10 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ide
                         dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(ident_node);
                 if(!string_term)
                     return "";
-                return string_term->value();
+                std::string* value_ptr = string_term->value();
+                if(!value_ptr)
+                    return "";
+                return *value_ptr;
             }
         default:
             return "";
@@ -244,7 +247,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(empty_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(empty_case_action))
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -253,7 +256,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(recurse_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(recurse_case_action))
                                             )
                                     )
                             )
@@ -297,7 +300,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(empty_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(empty_case_action))
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -305,7 +308,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, *tc->alloc_string(optional_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(optional_case_action))
                                             )
                                     )
                             )

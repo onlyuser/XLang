@@ -23,7 +23,9 @@
 #include <stdarg.h> // va_list
 #include <string> // std::string
 #include <vector> // std::vector
-#include <map> // std::map
+#ifdef TIXML_USE_TICPP
+	#include <map> // std::map
+#endif
 
 #ifdef EXTERN_INCLUDE_PATH
     #define TIXML_USE_TICPP
@@ -36,15 +38,6 @@
 #endif
 
 namespace xl { namespace mvc {
-
-template<>
-node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, std::string value)
-{
-    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::TermNode<
-                    static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
-                    >(sym_id, value);
-}
 
 node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...)
 {
@@ -67,16 +60,29 @@ static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::s
 {
     if(type == "int")
         return mvc::MVCModel::make_term(tc, name_to_id(type),
-                static_cast<long>(atoi(value.c_str())));
+                static_cast<node::TermInternalType<node::NodeIdentIFace::INT>::type>(
+                        atoi(value.c_str())
+                        ));
     if(type == "float")
         return mvc::MVCModel::make_term(tc, name_to_id(type),
-                static_cast<float32_t>(atof(value.c_str())));
-    if(type == "char")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), value[0]);
+                static_cast<node::TermInternalType<node::NodeIdentIFace::FLOAT>::type>(
+                        atof(value.c_str())
+                        ));
     if(type == "string")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), xl::unescape(value));
+        return mvc::MVCModel::make_term(tc, name_to_id(type),
+                static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
+                        tc->alloc_string(xl::unescape(value))
+                        ));
+    if(type == "char")
+        return mvc::MVCModel::make_term(tc, name_to_id(type),
+                static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
+                		xl::unescape(value[0])
+                		));
     if(type == "ident")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), tc->alloc_unique_string(value));
+        return mvc::MVCModel::make_term(tc, name_to_id(type),
+                static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(
+                        tc->alloc_unique_string(value)
+                        ));
     return NULL;
 }
 

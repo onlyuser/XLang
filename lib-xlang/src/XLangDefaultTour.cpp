@@ -40,7 +40,7 @@ void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* 
 
 void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
-    std::cout << '\"' << xl::escape(_node->value()) << '\"';
+    std::cout << '\"' << xl::escape(*_node->value()) << '\"';
 }
 
 void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)

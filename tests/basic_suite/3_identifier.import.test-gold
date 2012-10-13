@@ -1,5 +1,4 @@
 <symbol type="+">
-    <term type="int" value=1/>
     <term type="ident" value=qwe/>
-    <term type="float" value=3.14/>
+    <term type="ident" value=asd/>
 </symbol>

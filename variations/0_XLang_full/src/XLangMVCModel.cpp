@@ -19,9 +19,14 @@
 #include "XLangTreeContext.h" // TreeContext
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangType.h" // uint32_t
+#include "XLangString.h" // xl::unescape
 #include <stdarg.h> // va_list
 #include <string.h> // memset
 #include <string> // std::string
+#include <vector> // std::vector
+#ifdef TIXML_USE_TICPP
+	#include <map> // std::map
+#endif
 
 #ifdef EXTERN_INCLUDE_PATH
     #define TIXML_USE_TICPP
@@ -34,16 +39,6 @@
 #endif
 
 namespace xl { namespace mvc {
-
-template<>
-node::NodeIdentIFace* MVCModel::make_term<std::string>(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, std::string value)
-{
-    node::NodeIdentIFace* node = new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::TermNode<
-                    static_cast<node::NodeIdentIFace::type_t>(node::TermType<std::string>::type)
-                    >(sym_id, loc, value);
-    return node;
-}
 
 node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, size_t size, ...)
 {
@@ -72,10 +67,14 @@ static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::s
                         ));
     if(type == "string")
         return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
-                static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(value));
+                static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
+                        tc->alloc_string(xl::unescape(value))
+                        ));
     if(type == "char")
         return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
-                static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(value[0]));
+                static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
+                		xl::unescape(value[0])
+                		));
     if(type == "ident")
         return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(

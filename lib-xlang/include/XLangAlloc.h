@@ -35,6 +35,9 @@
 #define PNEW_EX(a, ns, c, f) \
         a, __FILE__, __LINE__, DTOR_CB_EX(ns, c, f)
 
+#define PNEW_BASIC(a) \
+        a, __FILE__, __LINE__
+
 namespace xl {
 
 class MemChunk

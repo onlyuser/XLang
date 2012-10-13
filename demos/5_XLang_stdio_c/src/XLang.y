@@ -606,7 +606,8 @@ void display_usage(bool verbose)
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl
                 << "  -d, --dot" << std::endl
-                << "  -m, --memory" << std::endl;
+                << "  -m, --memory" << std::endl
+                << "  -h, --help" << std::endl;
     }
     else
         std::cout << "Try `XLang --help\' for more information." << std::endl;

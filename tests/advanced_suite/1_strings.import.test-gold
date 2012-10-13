@@ -1,5 +1,4 @@
 <symbol type="+">
-    <term type="int" value=1/>
     <term type="string" value="qwe"/>
     <term type="char" value='x'/>
 </symbol>
