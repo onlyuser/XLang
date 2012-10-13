@@ -19,7 +19,6 @@
 #include "XLangTreeContext.h" // TreeContext
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangType.h" // uint32_t
-#include "XLangString.h" // xl::unescape
 #include <stdarg.h> // va_list
 #include <string> // std::string
 #include <vector> // std::vector
@@ -89,12 +88,12 @@ static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::s
     if(type == "string")
         return mvc::MVCModel::make_term(tc, name_to_id(type),
                 static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
-                        tc->alloc_string(xl::unescape(value))
+                        tc->alloc_string(value)
                         ));
     if(type == "char")
         return mvc::MVCModel::make_term(tc, name_to_id(type),
                 static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
-                        xl::unescape(value[0])
+                        value[0]
                         ));
     if(type == "ident")
         return mvc::MVCModel::make_term(tc, name_to_id(type),
