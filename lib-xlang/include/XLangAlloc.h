@@ -30,13 +30,13 @@
         reinterpret_cast<ns c*>(x)->~f();  \
         }
 
-#define PNEW(a, ns, c) \
-        a, __FILE__, __LINE__, DTOR_CB(ns, c)
-#define PNEW_EX(a, ns, c, f) \
-        a, __FILE__, __LINE__, DTOR_CB_EX(ns, c, f)
-
-#define PNEW_BASIC(a) \
+#define PNEW_LOC(a) \
         a, __FILE__, __LINE__
+
+#define PNEW(a, ns, c) \
+        PNEW_LOC(a), DTOR_CB(ns, c)
+#define PNEW_EX(a, ns, c, f) \
+        PNEW_LOC(a), DTOR_CB_EX(ns, c, f)
 
 namespace xl {
 

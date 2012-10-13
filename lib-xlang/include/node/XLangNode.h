@@ -88,7 +88,7 @@ public:
     }
     NodeIdentIFace* clone(TreeContext* tc) const
     {
-        return new (PNEW_BASIC(tc->alloc()))
+        return new (PNEW_LOC(tc->alloc()))
                 TermNode<_type>(m_sym_id, m_value); // assumes trivial dtor
     }
 

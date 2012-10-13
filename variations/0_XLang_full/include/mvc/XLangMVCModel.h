@@ -33,7 +33,7 @@ struct MVCModel
     template<class T>
     static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, T value)
     {
-        return new (PNEW_BASIC(tc->alloc())) node::TermNode<
+        return new (PNEW_LOC(tc->alloc())) node::TermNode<
                 static_cast<node::NodeIdentIFace::type_t>(node::TermType<T>::type)
                 >(sym_id, loc, value); // assumes trivial dtor
     }
