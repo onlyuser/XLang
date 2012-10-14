@@ -20,6 +20,9 @@
 
 %{
 
+// EBNF-EXPANDED:
+#include <vector> // std::vector
+
 #include "XLang.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
@@ -97,9 +100,6 @@ xl::TreeContext* &tree_context()
     return tc;
 }
 
-// EBNF-EXPANDED:
-typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type> program_0_t;
-
 %}
 
 // type of yylval to be set by scanner actions
@@ -113,7 +113,7 @@ typedef std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 
     // EBNF-EXPANDED:
-    void* symbol_value_vec;
+    std::vector<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type>* symbol_value_vec;
 }
 
 // show detailed parse errors
@@ -151,21 +151,22 @@ root:
 //program:
 //      (
 //            statement ',' { /* AAA */ $$ = $1; }
-//      )* statement        {
-//                              /* BBB */
-//                              auto v = reinterpret_cast<std::vector<
-//                                      xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
-//                                      >*>($1);
-//                              if(!v->empty())
-//                              {
-//                                  v->push_back($2);
-//                                  $$ = MAKE_SYMBOL(',', 0);
-//                                  for(auto p = v->begin(); p != v->end(); p++)
-//                                      reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(*p);
-//                              }
-//                              else
-//                                  $$ = $2;
-//                          }
+//      )* statement {
+//              /* BBB */
+//              if(!$1->empty())
+//              {
+//                  $1->push_back($2);
+//                  auto symbol_node = MAKE_SYMBOL(',', 0);
+//                  for(auto p = $1->begin(); p != $1->end(); p++)
+//                      symbol_node->push_back(*p);
+//                  $$ = symbol_node;
+//              }
+//              else
+//                  $$ = $2;
+//
+//              // EBNF-EXPANDED:
+//              delete $1;
+//          }
 //    ;
 
 // EBNF-XML:
@@ -197,29 +198,32 @@ root:
 // EBNF-EXPANDED:
 // [
 program:
-      program_0 statement   {
-                                /* BBB */
-                                auto v = reinterpret_cast<std::vector<
-                                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
-                                        >*>($1);
-                                if(!v->empty())
-                                {
-                                    v->push_back($2);
-                                    $$ = MAKE_SYMBOL(',', 0);
-                                    for(auto p = v->begin(); p != v->end(); p++)
-                                        reinterpret_cast<xl::node::SymbolNodeIFace*>($$)->push_back(*p);
-                                }
-                                else
-                                    $$ = $2;
+      program_0 statement {
+                /* BBB */
+                if(!$1->empty())
+                {
+                    $1->push_back($2);
+                    auto symbol_node = MAKE_SYMBOL(',', 0);
+                    for(auto p = $1->begin(); p != $1->end(); p++)
+                        symbol_node->push_back(*p);
+                    $$ = symbol_node;
+                }
+                else
+                    $$ = $2;
 
-                                // EBNF-EXPANDED:
-                                delete v;
-                            }
+                // EBNF-EXPANDED:
+                delete $1;
+            }
     ;
 
 program_0:
-      /* empty */         { /* PPP */ $$ = new program_0_t; }
-    | program_0 program_1 { /* QQQ */ reinterpret_cast<program_0_t*>($1)->push_back($2); $$ = $1; }
+      /* empty */ {
+                /* PPP */
+                $$ = new std::vector<
+                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
+                        >;
+            }
+    | program_0 program_1 { /* QQQ */ $1->push_back($2); $$ = $1; }
     ;
 
 program_1:

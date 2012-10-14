@@ -22,6 +22,7 @@
 %{
 
 #include "XLang.h" // node::NodeIdentIFace
+#include <vector> // std::vector
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include <stdlib.h> // atoi
 
