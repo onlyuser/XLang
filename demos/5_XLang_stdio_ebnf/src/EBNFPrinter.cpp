@@ -213,10 +213,15 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
         std::string action_string, xl::TreeContext* tc)
 {
-    //program_0:
-    //      /* empty */         { /* AAA */ $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; }
-    //    | program_0 program_1 { /* BBB */ reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; }
-    //    ;
+	//program_0:
+	//      /* empty */ {
+	//                /* AAA */
+	//                $$ = new std::vector<
+	//                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
+	//                        >;
+	//            }
+	//    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
+	//    ;
     //
     //<symbol type="rule">
     //    <term type="ident" value=program_0/>
@@ -238,8 +243,10 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    </symbol>
     //</symbol>
 
-    std::string empty_case_action   = " $$ = new (PNEW(tree_context()->alloc(), , sym_vec_t)) sym_vec_t; ";
-    std::string recurse_case_action = " reinterpret_cast<sym_vec_t*>($1)->push_back($2); $$ = $1; ";
+    std::string empty_case_action = " $$ = new std::vector<"
+    		"xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type"
+    		">; ";
+    std::string recurse_case_action = " $1->push_back($2); $$ = $1; ";
 
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
