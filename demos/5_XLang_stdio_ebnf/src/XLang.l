@@ -144,9 +144,9 @@ decl        [%][^%{}]
                     reset_ss(buf());
                 yy_push_state(ST_ACTION_BLOCK);
             }
-<ST_ACTION_BLOCK>[\{] { buf() << yytext; yy_push_state(ST_ACTION_BLOCK); }
+<ST_ACTION_BLOCK>[\{] { yy_push_state(ST_ACTION_BLOCK); }
 <ST_ACTION_BLOCK>[\}] {
-                yy_pop_state(); buf() << yytext;
+                yy_pop_state();
                 if(TOP_STATE == INITIAL)
                 {
                     _XLANG_lval.string_value = tree_context()->alloc_string(buf().str());

@@ -220,7 +220,7 @@ program_0:
       /* empty */ {
                 /* PPP */
                 $$ = new std::vector<
-                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
+                        /* PPP_2 */ xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
                         >;
             }
     | program_0 program_1 { /* QQQ */ $1->push_back($2); $$ = $1; }
