@@ -27,7 +27,7 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
-#include "EBNFRewriter.h" // ebnf2bnf
+#include "EBNFRewriter.h" // ebnf_to_bnf
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string
@@ -80,6 +80,7 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DECL_CHUNKS:  return "decl_chunks";
         case ID_DECL_CHUNK:   return "decl_chunk";
         case ID_SYMBOLS:      return "symbols";
+        case ID_SYMBOL:       return "symbol";
         case ID_RULES:        return "rules";
         case ID_RULE:         return "rule";
         case ID_ALTS:         return "alts";
@@ -114,6 +115,7 @@ uint32_t name_to_id(std::string name)
     if(name == "decl_chunks")  return ID_DECL_CHUNKS;
     if(name == "decl_chunk")   return ID_DECL_CHUNK;
     if(name == "symbols")      return ID_SYMBOLS;
+    if(name == "symbol")       return ID_SYMBOL;
     if(name == "rules")        return ID_RULES;
     if(name == "rule")         return ID_RULE;
     if(name == "alts")         return ID_ALTS;
@@ -165,7 +167,7 @@ xl::TreeContext* &tree_context()
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
         ID_PROTO_BLOCK ID_UNION_BLOCK ID_DECL_STMTS ID_DECL_STMT ID_DECL_CHUNKS ID_DECL_CHUNK
-        ID_SYMBOLS ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
+        ID_SYMBOLS ID_SYMBOL ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -217,8 +219,8 @@ symbols:
     ;
 
 symbol:
-      ID_IDENT { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | ID_CHAR  { $$ = MAKE_TERM(ID_CHAR, $1); }
+      ID_IDENT { $$ = MAKE_SYMBOL(ID_SYMBOL, 1, MAKE_TERM(ID_IDENT, $1)); }
+    | ID_CHAR  { $$ = MAKE_SYMBOL(ID_SYMBOL, 1, MAKE_TERM(ID_CHAR, $1)); }
     ;
 
 union_block:
@@ -439,7 +441,7 @@ void export_ast(args_t &args, xl::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
-        case args_t::MODE_YACC:  ebnf2bnf(tree_context(), ast); break;
+        case args_t::MODE_YACC:  ebnf_to_bnf(tree_context(), ast); break;
         case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
         case args_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;

@@ -214,15 +214,15 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
         std::string vector_inner_type, xl::TreeContext* tc)
 {
-	//program_0:
-	//      /* empty */ {
-	//                /* AAA */
-	//                $$ = new std::vector<
-	//                        /* AAA_2 */ xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
-	//                        >;
-	//            }
-	//    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
-	//    ;
+    //program_0:
+    //      /* empty */ {
+    //                /* AAA */
+    //                $$ = new std::vector<
+    //                        /* AAA_2 */ xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
+    //                        >;
+    //            }
+    //    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
+    //    ;
     //
     //<symbol type="rule">
     //    <term type="ident" value=program_0/>
@@ -364,6 +364,8 @@ static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* append_to,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
+        std::map<std::string, std::string>*                                                 union_var_to_type,
+        std::map<std::string, std::string>*                                                 token_var_to_type,
         xl::TreeContext* tc)
 {
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
@@ -439,7 +441,10 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
 #endif
     static bool entered_kleen_closure = false;
     static const xl::node::NodeIdentIFace *proto_block = NULL, *union_block = NULL;
-    static std::vector<std::string> chunk_vec;
+    static std::vector<std::string> decl_chunk_vec;
+    static std::vector<std::string> symbols_vec;
+    static std::map<std::string, std::string> union_var_to_type;
+    static std::map<std::string, std::string> token_var_to_type;
     bool more;
     switch(_node->sym_id())
     {
@@ -478,12 +483,25 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             break;
         case ID_DECL_BRACE:
-            std::cout << '%';
-            visit_next_child(_node);
-            std::cout << '<';
-            visit_next_child(_node);
-            std::cout << "> ";
-            visit_next_child(_node);
+            {
+                std::string token_type;
+                std::cout << '%';
+                visit_next_child(_node);
+                {
+                    std::cout << '<';
+                    xl::node::NodeIdentIFace* child = NULL;
+                    visit_next_child(_node, &child);
+                    if(child)
+                        token_type = get_string_from_term_node(child);
+                    std::cout << "> ";
+                }
+                visit_next_child(_node);
+                for(auto p = symbols_vec.begin(); p != symbols_vec.end(); p++)
+                {
+                    std::string token_var = *p;
+                    token_var_to_type[token_var] = token_type;
+                }
+            }
             break;
         case ID_PROTO_BLOCK:
             std::cout << "%{";
@@ -507,11 +525,19 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             } while(more);
             break;
         case ID_DECL_STMT:
-        	chunk_vec.clear();
             visit_next_child(_node);
             std::cout << ';';
+            if(!decl_chunk_vec.empty())
+            {
+                std::string union_type;
+                for(size_t i = 0; i<decl_chunk_vec.size()-1; i++)
+                    union_type.append(decl_chunk_vec[i]);
+                std::string union_var = decl_chunk_vec[decl_chunk_vec.size()-1];
+                union_var_to_type[union_var] = union_type;
+            }
             break;
         case ID_DECL_CHUNKS:
+            decl_chunk_vec.clear();
             do
             {
                 more = visit_next_child(_node);
@@ -520,26 +546,32 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             } while(more);
             break;
         case ID_DECL_CHUNK:
-			{
-				std::string s = get_string_from_term_node((*_node)[0]);
-				std::cout << s;
-				chunk_vec.push_back(s);
-			}
+            {
+                std::string s = get_string_from_term_node((*_node)[0]);
+                std::cout << s;
+                decl_chunk_vec.push_back(s);
+            }
             break;
         case ID_SYMBOLS:
+            symbols_vec.clear();
             do
             {
-                xl::node::NodeIdentIFace* child = NULL;
-                more = visit_next_child(_node, &child);
-                if(child)
-                {
-                    std::string s = get_string_from_term_node(child);
-                    if(!s.empty() && m_changes)
-                        m_changes->m_symbols_attach_loc_map[s] = _node;
-                }
+                more = visit_next_child(_node);
                 if(more)
                     std::cout << ' ';
             } while(more);
+            break;
+        case ID_SYMBOL:
+            {
+                std::string s = get_string_from_term_node((*_node)[0]);
+                std::cout << s;
+                if(!s.empty())
+                {
+                    if(m_changes)
+                        m_changes->m_symbols_attach_loc_map[s] = _node;
+                    symbols_vec.push_back(s);
+                }
+            }
             break;
         case ID_RULES:
             do
@@ -592,6 +624,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             &m_changes->m_append_to,
                             &m_changes->m_replacements,
                             _node,
+                            &union_var_to_type,
+                            &token_var_to_type,
                             m_tc);
                 entered_kleen_closure = true;
             }

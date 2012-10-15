@@ -23,7 +23,7 @@
 
 //#define DEBUG_EBNF
 
-void ebnf2bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-const ast
+void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-const ast
 {
     std::string captured_stdout;
     bool changed = false;
