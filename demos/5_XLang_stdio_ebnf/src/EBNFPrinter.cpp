@@ -359,13 +359,13 @@ static void enqueue_add_to_symbols(
 }
 
 static void enqueue_changes_for_kleene_closure(
-        std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* append_to,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
-        std::map<std::string, std::string>*                                                 union_var_to_type,
-        std::map<std::string, std::string>*                                                 token_var_to_type,
+        std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
+        std::map<std::string, std::string>*                                              union_var_to_type,
+        std::map<std::string, std::string>*                                              token_var_to_type,
         xl::TreeContext* tc)
 {
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
@@ -441,10 +441,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
 #endif
     static bool entered_kleen_closure = false;
     static const xl::node::NodeIdentIFace *proto_block = NULL, *union_block = NULL;
-    static std::vector<std::string> decl_chunk_vec;
-    static std::vector<std::string> symbols_vec;
+    static std::map<std::string, const xl::node::NodeIdentIFace*> symbols_attach_loc_map;
     static std::map<std::string, std::string> union_var_to_type;
     static std::map<std::string, std::string> token_var_to_type;
+    static std::vector<std::string> decl_chunk_vec;
+    static std::vector<std::string> symbols_vec;
     bool more;
     switch(_node->sym_id())
     {
@@ -452,6 +453,9 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             entered_kleen_closure = false;
             proto_block = NULL;
             union_block = NULL;
+            symbols_attach_loc_map.clear();
+            union_var_to_type.clear();
+            token_var_to_type.clear();
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
             visit_next_child(_node);
@@ -567,8 +571,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 std::cout << s;
                 if(!s.empty())
                 {
-                    if(m_changes)
-                        m_changes->m_symbols_attach_loc_map[s] = _node;
+                    symbols_attach_loc_map[s] = _node;
                     symbols_vec.push_back(s);
                 }
             }
@@ -619,11 +622,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             {
                 if(m_changes)
                     enqueue_changes_for_kleene_closure(
-                            &m_changes->m_symbols_attach_loc_map,
                             &m_changes->m_insertions_after,
                             &m_changes->m_append_to,
                             &m_changes->m_replacements,
                             _node,
+                            &symbols_attach_loc_map,
                             &union_var_to_type,
                             &token_var_to_type,
                             m_tc);
