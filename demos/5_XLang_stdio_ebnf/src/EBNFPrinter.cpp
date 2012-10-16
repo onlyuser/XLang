@@ -501,10 +501,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 }
                 visit_next_child(_node);
                 for(auto p = symbols_vec.begin(); p != symbols_vec.end(); p++)
-                {
-                    std::string token_var = *p;
-                    token_var_to_type[token_var] = token_type;
-                }
+                    token_var_to_type[*p] = token_type;
             }
             break;
         case ID_PROTO_BLOCK:
