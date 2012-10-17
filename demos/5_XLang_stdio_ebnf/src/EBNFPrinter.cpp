@@ -334,6 +334,33 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
+// inserted to front of proto_block
+static std::string create_new_include_header()
+{
+	return "#include <vector>";
+}
+
+// appended to back of union_block
+static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name)
+{
+	return NULL;
+}
+
+// appended to back of definitions
+static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
+		std::string type_name, std::vector<std::string> &token_vec)
+{
+	return NULL;
+}
+
+// appended to back of action_block for kleene closure, with position referring to kleene closure
+static std::string create_new_delete_vector(int position)
+{
+	std::stringstream ss;
+	ss << "delete $" << position << ";";
+	return ss.str();
+}
+
 static void enqueue_add_to_symbols(
         const xl::node::NodeIdentIFace* symbols_attach_loc,
         std::string after_name,
