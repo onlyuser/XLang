@@ -337,28 +337,53 @@ static xl::node::NodeIdentIFace* make_term_rule(
 // inserted to front of proto_block
 static std::string create_new_include_header()
 {
-	return "#include <vector>";
+    return "#include <vector>";
 }
 
 // appended to back of union_block
 static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name)
 {
-	return NULL;
+    //std::vector< /* AAA */ type>* /* BBB */ type_name;
+    //
+    //<symbol type="decl_stmt">
+    //    <symbol type="decl_chunks">
+    //        <symbol type="decl_chunk">
+    //            <term type="string" value="std::vector< /* AAA */ type>*"/>
+    //        </symbol>
+    //        <symbol type="decl_chunk">
+    //            <term type="string" value=" /* BBB */ type_name"/>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    return NULL;
 }
 
 // appended to back of definitions
 static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
-		std::string type_name, std::vector<std::string> &token_vec)
+        std::string type_name, std::vector<std::string> &token_vec)
 {
-	return NULL;
+    //%type</* AAA */ type_name> /* BBB */ token_vec
+    //
+    //<symbol type="decl_brace">
+    //    <term type="ident" value=type/>
+    //    <term type="ident" value= /* AAA */ type_name/>
+    //    <symbol type="symbols">
+    //        <symbol type="symbol">
+    //            <term type="ident" value= /* BBB */ token_vec/>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    return NULL;
 }
 
 // appended to back of action_block for kleene closure, with position referring to kleene closure
 static std::string create_new_delete_vector(int position)
 {
-	std::stringstream ss;
-	ss << "delete $" << position << ";";
-	return ss.str();
+    std::stringstream ss;
+    ss << "delete $" << position << ";";
+    return ss.str();
 }
 
 static void enqueue_add_to_symbols(
@@ -393,7 +418,7 @@ static void enqueue_changes_for_kleene_closure(
         std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
         std::map<std::string, std::string>*                                              union_var_to_type,
         std::map<std::string, std::string>*                                              token_var_to_type,
-        xl::TreeContext* 																 tc)
+        xl::TreeContext*                                                                  tc)
 {
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
