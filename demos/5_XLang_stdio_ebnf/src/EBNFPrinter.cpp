@@ -244,16 +244,16 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    </symbol>
     //</symbol>
 
-    std::string empty_case_action = " $$ = new std::vector<" + vector_inner_type + ">; ";
-    std::string recurse_case_action = " $1->push_back($2); $$ = $1; ";
-
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(empty_case_action))
+                                            MAKE_TERM(ID_STRING,
+                                                    tc->alloc_string(" $$ = new std::vector<"
+                                                            + vector_inner_type + ">; ")
+                                                    )
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -262,7 +262,9 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(recurse_case_action))
+                                            MAKE_TERM(ID_STRING,
+                                                    tc->alloc_string(" $1->push_back($2); $$ = $1; ")
+                                                    )
                                             )
                                     )
                             )
@@ -297,16 +299,13 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     //    </symbol>
     //</symbol>
 
-    std::string empty_case_action = " $$ = NULL; ";
-    std::string optional_case_action = " $$ = $1; ";
-
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
                     MAKE_SYMBOL(tc, ID_ALTS, 2,
                             MAKE_SYMBOL(tc, ID_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(empty_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = NULL; "))
                                             )
                                     ),
                             MAKE_SYMBOL(tc, ID_ALT, 2,
@@ -314,7 +313,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
                                     MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(optional_case_action))
+                                            MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
                                             )
                                     )
                             )
@@ -341,7 +340,8 @@ static std::string create_new_include_header()
 }
 
 // appended to back of union_block
-static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name)
+static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name,
+        xl::TreeContext* tc)
 {
     //std::vector< /* AAA */ type>* /* BBB */ type_name;
     //
@@ -356,12 +356,24 @@ static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::st
     //    </symbol>
     //</symbol>
 
-    return NULL;
+    xl::node::NodeIdentIFace* node =
+            MAKE_SYMBOL(tc, ID_DECL_STMT, 1,
+                    MAKE_SYMBOL(tc, ID_DECL_CHUNKS, 2,
+                            MAKE_SYMBOL(tc, ID_DECL_CHUNK, 1,
+                                    MAKE_TERM(ID_STRING, tc->alloc_string("std::vector<" + type + ">"))
+                                    ),
+                            MAKE_SYMBOL(tc, ID_DECL_CHUNK, 1,
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(type_name))
+                                    )
+                            )
+                    );
+    return node;
 }
 
 // appended to back of definitions
 static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
-        std::string type_name, std::vector<std::string> &token_vec)
+        std::string type_name, std::vector<std::string> &token_vec,
+        xl::TreeContext* tc)
 {
     //%type</* AAA */ type_name> /* BBB */ token_vec
     //
@@ -375,7 +387,26 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
     //    </symbol>
     //</symbol>
 
-    return NULL;
+    std::string exploded_tokens;
+    for(auto p = token_vec.begin(); p != token_vec.end(); p++)
+    {
+        if((p+1) != token_vec.end())
+            exploded_tokens.append(*p + ", ");
+        else
+            exploded_tokens.append(*p);
+    }
+
+    xl::node::NodeIdentIFace* node =
+            MAKE_SYMBOL(tc, ID_DECL_BRACE, 3,
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(type_name)),
+                    MAKE_SYMBOL(tc, ID_SYMBOLS, 1,
+                            MAKE_SYMBOL(tc, ID_SYMBOL, 1,
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
+                                    )
+                            )
+                    );
+    return node;
 }
 
 // appended to back of action_block for kleene closure, with position referring to kleene closure
