@@ -48,10 +48,10 @@ bool EBNFChanges::apply()
     bool changed = false;
     if(!m_insertions_after.empty())
     {
-        // NOTE: not necessarily "in order"
-        for(auto u = m_insertions_after.begin(); u != m_insertions_after.end(); ++u)
+        // NOTE: traversal not "in order"
+        for(auto p = m_insertions_after.begin(); p != m_insertions_after.end(); ++p)
         {
-            const xl::node::NodeIdentIFace* after_node = (*u).first;
+            const xl::node::NodeIdentIFace* after_node = (*p).first;
             if(!after_node)
                 continue;
             xl::node::NodeIdentIFace* parent_node = after_node->parent();
@@ -61,17 +61,17 @@ bool EBNFChanges::apply()
                     dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
             if(parent_symbol)
             {
-                std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*u).second;
-                for(auto v = insert_after_list.begin(); v != insert_after_list.end(); ++v)
+                std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*p).second;
+                for(auto q = insert_after_list.begin(); q != insert_after_list.end(); ++q)
                 {
 #ifdef DEBUG_EBNF
                     std::cout << "INSERT_AFTER " << ptr_to_string(after_node) << " ==> "
-                            << ptr_to_string(*v) << std::endl;
-                    //xl::mvc::MVCView::print_xml(*v);
+                            << ptr_to_string(*q) << std::endl;
+                    //xl::mvc::MVCView::print_xml(*q);
 #endif
                     parent_symbol->insert_after(
-                            const_cast<xl::node::NodeIdentIFace*>(after_node),
-                            *v); // TODO: fix-me!
+                            const_cast<xl::node::NodeIdentIFace*>(after_node), // TODO: fix-me!
+                            *q);
                 }
             }
         }
@@ -79,11 +79,11 @@ bool EBNFChanges::apply()
     }
     if(!m_replacements.empty())
     {
-        // NOTE: not necessarily "in order"
-        for(auto t = m_replacements.begin(); t != m_replacements.end(); ++t)
+        // NOTE: traversal not "in order"
+        for(auto r = m_replacements.begin(); r != m_replacements.end(); ++r)
         {
-            const xl::node::NodeIdentIFace* find_node = (*t).first;
-            xl::node::NodeIdentIFace* replace_node = (*t).second;
+            const xl::node::NodeIdentIFace* find_node = (*r).first;
+            xl::node::NodeIdentIFace* replace_node = (*r).second;
             if(!find_node)
                 continue;
             xl::node::NodeIdentIFace* parent_node = find_node->parent();
@@ -99,8 +99,8 @@ bool EBNFChanges::apply()
                 //xl::mvc::MVCView::print_xml(replace_node);
 #endif
                 parent_symbol->replace(
-                        const_cast<xl::node::NodeIdentIFace*>(find_node),
-                        replace_node); // TODO: fix-me!
+                        const_cast<xl::node::NodeIdentIFace*>(find_node), // TODO: fix-me!
+                        replace_node);
             }
         }
         changed = true;
