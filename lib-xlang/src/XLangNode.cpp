@@ -135,14 +135,14 @@ void SymbolNode::push_front(NodeIdentIFace* _node)
     _node->set_parent(this);
 }
 
-void SymbolNode::insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node)
+void SymbolNode::insert_after(NodeIdentIFace* insert_after_node, NodeIdentIFace* new_node)
 {
-    auto p = std::find(m_child_vec.begin(), m_child_vec.end(), after_node);
+    auto p = std::find(m_child_vec.begin(), m_child_vec.end(), insert_after_node);
     if(p == m_child_vec.end())
         return;
     p++;
-    m_child_vec.insert(p, _node);
-    _node->set_parent(this);
+    m_child_vec.insert(p, new_node);
+    new_node->set_parent(this);
 }
 
 void SymbolNode::remove(NodeIdentIFace* _node)
@@ -156,17 +156,17 @@ void SymbolNode::remove(NodeIdentIFace* _node)
     _node->set_parent(NULL);
 }
 
-void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
+void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
 {
     if(!find_node)
         return;
     auto p = std::find(m_child_vec.begin(), m_child_vec.end(), find_node);
     if(p == m_child_vec.end())
         return;
-    std::replace(p, m_child_vec.end(), find_node, replace_node);
+    std::replace(p, m_child_vec.end(), find_node, replacement_node);
     find_node->set_parent(NULL);
-    if(replace_node)
-        replace_node->set_parent(this);
+    if(replacement_node)
+        replacement_node->set_parent(this);
 }
 
 NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) const

@@ -34,9 +34,11 @@ struct EBNFChanges
 private:
     xl::TreeContext* m_tc;
 public:
-    std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_insertions_after;
-    std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_append_to;
-    std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_replacements;
+    std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_insertions_after;
+    std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_appends_to_back;
+    std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_appends_to_back;
+    std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_insertions_to_front;
+    std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_node_replacements;
 };
 
 #endif

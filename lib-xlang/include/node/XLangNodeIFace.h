@@ -107,11 +107,11 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void push_front(NodeIdentIFace* _node)
     {}
-    virtual void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node)
+    virtual void insert_after(NodeIdentIFace* insert_after_node, NodeIdentIFace* new_node)
     {}
     virtual void remove(NodeIdentIFace* _node)
     {}
-    virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node)
+    virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
     {}
     virtual NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const
     {

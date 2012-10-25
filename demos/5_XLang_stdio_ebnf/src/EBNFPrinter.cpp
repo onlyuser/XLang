@@ -333,13 +333,13 @@ static xl::node::NodeIdentIFace* make_term_rule(
             alt_node->clone(tc));
 }
 
-// inserted to front of proto_block
+// string to be inserted to front of proto_block's string value
 static std::string create_new_include_header()
 {
     return "#include <vector>";
 }
 
-// appended to back of union_block
+// node to be appended to back of union_block
 static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name,
         xl::TreeContext* tc)
 {
@@ -370,7 +370,7 @@ static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::st
     return node;
 }
 
-// appended to back of definitions
+// node to be appended to back of definitions block
 static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
         std::string type_name, std::vector<std::string> &token_vec,
         xl::TreeContext* tc)
@@ -409,7 +409,7 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
     return node;
 }
 
-// appended to back of action_block for kleene closure, with position referring to kleene closure
+// string to be appended to back of kleene closure action_block's string value
 static std::string create_new_delete_vector(int position)
 {
     std::stringstream ss;
@@ -442,14 +442,16 @@ static void enqueue_add_to_symbols(
 }
 
 static void enqueue_changes_for_kleene_closure(
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* append_to,
-        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            replacements,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
+        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*                  string_appends_to_back,
+        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*                  string_insertions_to_front,
+        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            node_replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
         std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
         std::map<std::string, std::string>*                                              union_var_to_type,
         std::map<std::string, std::string>*                                              token_var_to_type,
-        xl::TreeContext*                                                                  tc)
+        xl::TreeContext*                                                                 tc)
 {
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
@@ -469,10 +471,10 @@ static void enqueue_changes_for_kleene_closure(
                     (*symbols_attach_loc_map)[lhs_value],
                     lhs_value,
                     name2,
-                    insertions_after,
+                    node_insertions_after,
                     tc);
-        if(insertions_after)
-            (*insertions_after)[rule_node].push_back(term_rule);
+        if(node_insertions_after)
+            (*node_insertions_after)[rule_node].push_back(term_rule);
     }
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
@@ -498,10 +500,10 @@ static void enqueue_changes_for_kleene_closure(
                     (*symbols_attach_loc_map)[lhs_value],
                     lhs_value,
                     name1,
-                    insertions_after,
+                    node_insertions_after,
                     tc);
-        if(insertions_after)
-            (*insertions_after)[rule_node].push_back(recursive_rule);
+        if(node_insertions_after)
+            (*node_insertions_after)[rule_node].push_back(recursive_rule);
     }
     xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
     if(stem_rule)
@@ -511,8 +513,8 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
         std::cout << "<<< (stem_rule)" << std::endl;
 #endif
-        if(replacements)
-            (*replacements)[rule_node] = stem_rule;
+        if(node_replacements)
+            (*node_replacements)[rule_node] = stem_rule;
     }
 }
 
@@ -700,9 +702,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             {
                 if(m_changes)
                     enqueue_changes_for_kleene_closure(
-                            &m_changes->m_insertions_after,
-                            &m_changes->m_append_to,
-                            &m_changes->m_replacements,
+                            &m_changes->m_node_insertions_after,
+                            &m_changes->m_node_appends_to_back,
+                            &m_changes->m_string_appends_to_back,
+                            &m_changes->m_string_insertions_to_front,
+                            &m_changes->m_node_replacements,
                             _node,
                             &symbols_attach_loc_map,
                             &union_var_to_type,
