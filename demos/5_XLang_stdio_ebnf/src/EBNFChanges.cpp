@@ -69,7 +69,7 @@ bool EBNFChanges::apply()
                 {
                     xl::node::NodeIdentIFace* new_node = *q;
 #ifdef DEBUG_EBNF
-                    std::cout << "INSERT_AFTER " << ptr_to_string(insert_after_node) << " ==> "
+                    std::cout << "NODE_INSERT_AFTER " << ptr_to_string(insert_after_node) << " ==> "
                             << ptr_to_string(new_node) << std::endl;
                     //xl::mvc::MVCView::print_xml(new_node);
 #endif
@@ -97,6 +97,11 @@ bool EBNFChanges::apply()
                 for(auto j = append_to_list.begin(); j != append_to_list.end(); ++j)
                 {
                     xl::node::NodeIdentIFace* new_node = *j;
+#ifdef DEBUG_EBNF
+                    std::cout << "NODE_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+                            << ptr_to_string(new_node) << std::endl;
+                    //xl::mvc::MVCView::print_xml(new_node);
+#endif
                     const_cast<xl::node::SymbolNodeIFace*>( // TODO: fix-me!
                             append_to_symbol
                             )->push_back(new_node);
@@ -121,6 +126,11 @@ bool EBNFChanges::apply()
                 for(auto v = append_to_list.begin(); v != append_to_list.end(); ++v)
                 {
                     std::string s = *v;
+#ifdef DEBUG_EBNF
+                    std::cout << "STRING_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+                            << '\"' << s << '\"' << std::endl;
+                    //xl::mvc::MVCView::print_xml(append_to_node);
+#endif
                     std::string &s_lvalue =
                             *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
                                     append_to_term
@@ -147,11 +157,17 @@ bool EBNFChanges::apply()
                 for(auto v = append_to_list.begin(); v != append_to_list.end(); ++v)
                 {
                     std::string s = *v;
+#ifdef DEBUG_EBNF
+                    std::cout << "STRING_INSERT_FRONT " << ptr_to_string(append_to_node) << " ==> "
+                            << '\"' << s << '\"' << std::endl;
+                    //xl::mvc::MVCView::print_xml(append_to_node);
+#endif
                     std::string &s_lvalue =
                             *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
                                     append_to_term
                                     )->value();
-                    s_lvalue.insert(0, s);
+                    s_lvalue.insert(0, "\n");
+                    s_lvalue.insert(1, s);
                 }
             }
         }
@@ -174,9 +190,9 @@ bool EBNFChanges::apply()
             {
                 xl::node::NodeIdentIFace* replacement_node = (*r).second;
 #ifdef DEBUG_EBNF
-                std::cout << "REPLACE " << ptr_to_string(find_node) << " ==> "
+                std::cout << "NODE_REPLACE " << ptr_to_string(find_node) << " ==> "
                         << ptr_to_string(replacement_node) << std::endl;
-                //xl::mvc::MVCView::print_xml(replace_node);
+                //xl::mvc::MVCView::print_xml(replacement_node);
 #endif
                 parent_symbol->replace(
                         const_cast<xl::node::NodeIdentIFace*>(find_node), // TODO: fix-me!

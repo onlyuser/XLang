@@ -444,17 +444,56 @@ static void enqueue_add_to_symbols(
 static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*                  string_appends_to_back,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*                  string_insertions_to_front,
+        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_appends_to_back,
+        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            node_replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
+        const xl::node::NodeIdentIFace*                                                  proto_block,
+        const xl::node::NodeIdentIFace*                                                  union_block,
         std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
         std::map<std::string, std::string>*                                              union_var_to_type,
         std::map<std::string, std::string>*                                              token_var_to_type,
         xl::TreeContext*                                                                 tc)
 {
+    if(string_insertions_to_front)
+    {
+        const xl::node::SymbolNodeIFace* proto_block_symbol =
+                dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block);
+        if(proto_block_symbol)
+        {
+            const xl::node::NodeIdentIFace* term_node = (*proto_block_symbol)[0];
+            if(term_node)
+            {
+                std::string proto_block_string = get_string_from_term_node(term_node);
+                std::string include_header_string = create_new_include_header();
+                if(!s.empty())
+                {
+                    if(proto_block_string.find(include_header_string) == std::string::npos)
+                        (*string_insertions_to_front)[term_node].push_back(include_header_string);
+                }
+            }
+        }
+    }
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
+    if(node_appends_to_back)
+    {
+        const xl::node::SymbolNodeIFace* union_block_symbol =
+                dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block);
+        if(union_block_symbol)
+        {
+            const xl::node::NodeIdentIFace* term_node = (*union_block_symbol)[0];
+            if(term_node)
+            {
+                std::string type = "QWE";
+                std::string type_name = "ASD";
+                xl::node::NodeIdentIFace* union_type_node = create_new_union_type(type, type_name, tc);
+                if(union_type_node)
+                    (*node_appends_to_back)[term_node].push_back(
+                            union_type_node); // NOTE: need to check duplicate before append
+            }
+        }
+    }
     std::string name1 = gen_name(lhs_value);
     std::string name2 = gen_name(lhs_value);
     const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
@@ -588,16 +627,16 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             }
             break;
         case ID_PROTO_BLOCK:
+            proto_block = _node;
             std::cout << "%{";
             std::cout << get_string_from_term_node((*_node)[0]);
             std::cout << "%}";
-            proto_block = _node;
             break;
         case ID_UNION_BLOCK:
+            union_block = _node;
             std::cout << std::endl << '{' << std::endl;
             visit_next_child(_node);
             std::cout << std::endl << '}';
-            union_block = _node;
             break;
         case ID_DECL_STMTS:
             do
@@ -708,6 +747,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             &m_changes->m_string_insertions_to_front,
                             &m_changes->m_node_replacements,
                             _node,
+                            proto_block,
+                            union_block,
                             &symbols_attach_loc_map,
                             &union_var_to_type,
                             &token_var_to_type,
