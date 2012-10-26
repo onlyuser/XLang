@@ -466,7 +466,7 @@ static void enqueue_changes_for_kleene_closure(
             {
                 std::string proto_block_string = get_string_from_term_node(term_node);
                 std::string include_header_string = create_new_include_header();
-                if(!s.empty())
+                if(!include_header_string.empty())
                 {
                     if(proto_block_string.find(include_header_string) == std::string::npos)
                         (*string_insertions_to_front)[term_node].push_back(include_header_string);
