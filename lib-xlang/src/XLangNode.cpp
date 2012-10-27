@@ -51,7 +51,7 @@ void Node::detach()
     xl::node::SymbolNodeIFace* parent_symbol =
             dynamic_cast<xl::node::SymbolNodeIFace*>(m_parent);
     if(parent_symbol)
-        parent_symbol->remove(this);
+        parent_symbol->remove_first(this);
 }
 
 template<>
@@ -121,18 +121,16 @@ SymbolNode::SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec)
 
 void SymbolNode::push_back(NodeIdentIFace* _node)
 {
-    if(!_node)
-        return;
     m_child_vec.push_back(_node);
-    _node->set_parent(this);
+    if(_node)
+        _node->set_parent(this);
 }
 
 void SymbolNode::push_front(NodeIdentIFace* _node)
 {
-    if(!_node)
-        return;
     m_child_vec.insert(m_child_vec.begin(), _node);
-    _node->set_parent(this);
+    if(_node)
+        _node->set_parent(this);
 }
 
 void SymbolNode::insert_after(NodeIdentIFace* insert_after_node, NodeIdentIFace* new_node)
@@ -145,26 +143,24 @@ void SymbolNode::insert_after(NodeIdentIFace* insert_after_node, NodeIdentIFace*
     new_node->set_parent(this);
 }
 
-void SymbolNode::remove(NodeIdentIFace* _node)
+void SymbolNode::remove_first(NodeIdentIFace* _node)
 {
-    if(!_node)
-        return;
     auto p = std::find(m_child_vec.begin(), m_child_vec.end(), _node);
     if(p == m_child_vec.end())
         return;
     m_child_vec.erase(std::remove(p, m_child_vec.end(), _node), m_child_vec.end());
-    _node->set_parent(NULL);
+    if(_node)
+        _node->set_parent(NULL);
 }
 
-void SymbolNode::replace(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
+void SymbolNode::replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
 {
-    if(!find_node)
-        return;
     auto p = std::find(m_child_vec.begin(), m_child_vec.end(), find_node);
     if(p == m_child_vec.end())
         return;
     std::replace(p, m_child_vec.end(), find_node, replacement_node);
-    find_node->set_parent(NULL);
+    if(find_node)
+        find_node->set_parent(NULL);
     if(replacement_node)
         replacement_node->set_parent(this);
 }

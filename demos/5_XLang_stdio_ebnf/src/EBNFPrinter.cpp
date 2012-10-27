@@ -69,19 +69,19 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
 {
     if(!root || !original)
         return NULL;
-    const xl::node::SymbolNodeIFace* root_sym = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
-    if(!root_sym)
+    auto root_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
+    if(!root_symbol)
         return NULL;
     static const xl::node::NodeIdentIFace* temp; // NOTE: must be static for compile-time closure!
     temp = original; // NOTE: do not combine with previous line! -- must assign every time
-    xl::node::NodeIdentIFace* result = root_sym->find_if([](const xl::node::NodeIdentIFace* _node) {
+    xl::node::NodeIdentIFace* result = root_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
             return _node->original() == temp;
             });
     if(result)
         return result;
-    for(size_t i = 0; i < root_sym->size(); i++)
+    for(size_t i = 0; i < root_symbol->size(); i++)
     {
-        result = find_clone_of_original_recursive((*root_sym)[i], original);
+        result = find_clone_of_original_recursive((*root_symbol)[i], original);
         if(result)
             return result;
     }
@@ -94,11 +94,11 @@ static void replace_node(
 {
     if(!find_node)
         return;
-    xl::node::SymbolNodeIFace* parent =
+    auto parent_symbol =
             dynamic_cast<xl::node::SymbolNodeIFace*>(find_node->parent());
-    if(parent)
+    if(parent_symbol)
     {
-        parent->replace(
+        parent_symbol->replace_first(
                 const_cast<xl::node::NodeIdentIFace*>(find_node),
                 const_cast<xl::node::NodeIdentIFace*>(replace_node));
     }
@@ -122,7 +122,7 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ter
     {
         case xl::node::NodeIdentIFace::IDENT:
             {
-                const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* ident_term =
+                auto ident_term =
                         dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(term_node);
                 if(!ident_term)
                     return "";
@@ -133,7 +133,7 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ter
             }
         case xl::node::NodeIdentIFace::STRING:
             {
-                const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* string_term =
+                auto string_term =
                         dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(term_node);
                 if(!string_term)
                     return "";
@@ -147,33 +147,63 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ter
     }
 }
 
-// kleene_node --> paren_node --> alt_node
-static const xl::node::NodeIdentIFace* get_alt_node_from_kleene_node(
+// kleene_node --> paren_node --> alts_node
+static const xl::node::NodeIdentIFace* get_alts_node_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
+    //<symbol type="*">            // <-- kleene_node
+    //    <symbol type="(">        // <-- paren_node
+    //        <symbol type="alts"> // <-- alts_node
+    //            <!-- ... -->
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
     if(!kleene_node)
         return NULL;
-    xl::node::NodeIdentIFace* paren_node =
-            (*dynamic_cast<const xl::node::SymbolNodeIFace*>(kleene_node))[0];
+    auto kleene_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(kleene_node);
+    if(!kleene_symbol)
+        return NULL;
+    xl::node::NodeIdentIFace* paren_node = (*kleene_symbol)[0];
     if(!paren_node)
         return NULL;
-    return (*dynamic_cast<xl::node::SymbolNodeIFace*>(paren_node))[0];
+    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
+    if(!paren_symbol)
+        return NULL;
+    return (*paren_symbol)[0];
 }
 
 // kleene_node --> alt_node (up) --> action_node
 static std::string get_action_string_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
+    //<symbol type="alt"> // <-- alt_node
+    //    <symbol type="terms">
+    //        <symbol type="*"> // <-- kleene_node
+    //            <!-- ... -->
+    //        </symbol>
+    //        <term type="ident" value=statement/>
+    //    </symbol>
+    //    <symbol type="action_block"> // <-- action_node
+    //        <term type="string" value=" /* BBB */ ... "/>
+    //    </symbol>
+    //</symbol>
+
     if(!kleene_node)
         return NULL;
     const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_ALT, kleene_node);
     if(!alt_node)
         return NULL;
-    xl::node::NodeIdentIFace* action_node = (*dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node))[1];
+    auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
+    if(!alt_symbol)
+        return NULL;
+    xl::node::NodeIdentIFace* action_node = (*alt_symbol)[1];
     if(!action_node)
         return NULL;
-    xl::node::NodeIdentIFace* action_string_node =
-            (*dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node))[0];
+    auto action_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node);
+    if(!action_symbol)
+        return NULL;
+    xl::node::NodeIdentIFace* action_string_node = (*action_symbol)[0];
     return get_string_from_term_node(action_string_node);
 }
 
@@ -181,8 +211,10 @@ static std::string get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* 
 {
     if(!rule_node)
         return "";
-    xl::node::NodeIdentIFace* lhs_node =
-            (*dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node))[0];
+    auto rule_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node);
+    if(!rule_symbol)
+        return "";
+    xl::node::NodeIdentIFace* lhs_node = (*rule_symbol)[0];
     if(!lhs_node)
         return "";
     return get_string_from_term_node(lhs_node);
@@ -194,6 +226,41 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         const xl::node::NodeIdentIFace* kleene_node,
         xl::TreeContext* tc)
 {
+    //program:
+    //      (
+    //            statement ',' { /* AAA */ $$ = $1; }
+    //      )* statement { /* BBB */ ... }
+    //    ;
+    //
+    //<symbol type="rule">
+    //    <term type="ident" value=program/>
+    //    <symbol type="alts">
+    //        <symbol type="alt">
+    //            <symbol type="terms">
+    //                <symbol type="*"> // <-- kleene_node
+    //                    <symbol type="(">
+    //                        <symbol type="alts">
+    //                            <symbol type="alt">
+    //                                <symbol type="terms">
+    //                                    <term type="ident" value=statement/>
+    //                                    <term type="char" value=','/>
+    //                                </symbol>
+    //                                <symbol type="action_block">
+    //                                    <term type="string" value=" /* AAA */ $$ = $1; "/>
+    //                                </symbol>
+    //                            </symbol>
+    //                        </symbol>
+    //                    </symbol>
+    //                </symbol>
+    //                <term type="ident" value=statement/>
+    //            </symbol>
+    //            <symbol type="action_block">
+    //                <term type="string" value=" /* BBB */ ... "/>
+    //            </symbol>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
     if(!rule_node || !kleene_node)
         return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
@@ -218,7 +285,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //      /* empty */ {
     //                /* AAA */
     //                $$ = new std::vector<
-    //                        /* AAA_2 */ xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
+    //                        /* vector_inner_type */
+    //                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
     //                        >;
     //            }
     //    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
@@ -343,15 +411,15 @@ static std::string create_new_include_header()
 static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name,
         xl::TreeContext* tc)
 {
-    //std::vector< /* AAA */ type>* /* BBB */ type_name;
+    //std::vector< /* AAA */ type >* /* BBB */ type_name;
     //
     //<symbol type="decl_stmt">
     //    <symbol type="decl_chunks">
     //        <symbol type="decl_chunk">
-    //            <term type="string" value="std::vector< /* AAA */ type>*"/>
+    //            <term type="string" value="std::vector< /* AAA */ type >*"/>
     //        </symbol>
     //        <symbol type="decl_chunk">
-    //            <term type="string" value=" /* BBB */ type_name"/>
+    //            <term type="string" value=" /* BBB */ type_name "/>
     //        </symbol>
     //    </symbol>
     //</symbol>
@@ -375,14 +443,14 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
         std::string type_name, std::vector<std::string> &token_vec,
         xl::TreeContext* tc)
 {
-    //%type</* AAA */ type_name> /* BBB */ token_vec
+    //%type< /* AAA */ type_name > /* BBB */ token_vec
     //
     //<symbol type="decl_brace">
     //    <term type="ident" value=type/>
-    //    <term type="ident" value= /* AAA */ type_name/>
+    //    <term type="ident" value= /* AAA */ type_name />
     //    <symbol type="symbols">
     //        <symbol type="symbol">
-    //            <term type="ident" value= /* BBB */ token_vec/>
+    //            <term type="ident" value= /* BBB */ token_vec />
     //        </symbol>
     //    </symbol>
     //</symbol>
@@ -426,7 +494,7 @@ static void enqueue_add_to_symbols(
 {
     if(!symbols_attach_loc)
         return;
-    xl::node::SymbolNodeIFace* symbols_attach_loc_symbol =
+    auto symbols_attach_loc_symbol =
             const_cast<xl::node::SymbolNodeIFace*>(
                     dynamic_cast<const xl::node::SymbolNodeIFace*>(symbols_attach_loc));
     if(!symbols_attach_loc_symbol)
@@ -457,8 +525,7 @@ static void enqueue_changes_for_kleene_closure(
 {
     if(string_insertions_to_front)
     {
-        const xl::node::SymbolNodeIFace* proto_block_symbol =
-                dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block);
+        auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block);
         if(proto_block_symbol)
         {
             const xl::node::NodeIdentIFace* term_node = (*proto_block_symbol)[0];
@@ -478,26 +545,25 @@ static void enqueue_changes_for_kleene_closure(
     std::string lhs_value = get_lhs_value_from_rule_node(rule_node);
     if(node_appends_to_back)
     {
-        const xl::node::SymbolNodeIFace* union_block_symbol =
-                dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block);
+        auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block);
         if(union_block_symbol)
         {
-            const xl::node::NodeIdentIFace* term_node = (*union_block_symbol)[0];
-            if(term_node)
+            const xl::node::NodeIdentIFace* decl_stmts_node = (*union_block_symbol)[0];
+            if(decl_stmts_node)
             {
                 std::string type = "QWE";
                 std::string type_name = "ASD";
                 xl::node::NodeIdentIFace* union_type_node = create_new_union_type(type, type_name, tc);
                 if(union_type_node)
-                    (*node_appends_to_back)[term_node].push_back(
-                            union_type_node); // NOTE: need to check duplicate before append
+                    (*node_appends_to_back)[decl_stmts_node].push_back(
+                            union_type_node); // NOTE: should check duplicate before append
             }
         }
     }
     std::string name1 = gen_name(lhs_value);
     std::string name2 = gen_name(lhs_value);
-    const xl::node::NodeIdentIFace* alt_node = get_alt_node_from_kleene_node(kleene_node);
-    xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alt_node, tc);
+    const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
+    xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
     if(term_rule)
     {
 #ifdef DEBUG_EBNF

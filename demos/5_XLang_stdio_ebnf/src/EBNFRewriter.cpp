@@ -39,9 +39,9 @@ void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: no
             #ifdef DEBUG_EBNF
                 v.visit_any(ast); // visit while recording changes
             #else
-                v.redirect_stdout();                  // begin capture stdout
-                v.visit_any(ast);                     // visit while recording changes
-                captured_stdout = v.restore_stdout(); // end capture stdout
+                v.begin_redirect_stdout();                 // begin capture stdout
+                v.visit_any(ast);                          // visit while recording changes
+                captured_stdout = v.end_redirect_stdout(); // end capture stdout
             #endif
         }
         changed = changes.apply(); // apply changes

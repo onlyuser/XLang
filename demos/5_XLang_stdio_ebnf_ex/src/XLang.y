@@ -170,27 +170,31 @@ root:
 //    ;
 
 // EBNF-XML:
-//<symbol type="rule">                    // <-- rule_node
-//    <term type="ident" value=program/>  // <-- lhs body
-//    <symbol type="alt">                 // <-- rhs body
-//        <symbol type="terms">
-//            <symbol type="*">           // <-- isolate this part as "program_0"
-//                <symbol type="(">       // <-- paren_node
-//                    <symbol type="alt"> // <-- alt_node
-//                        <symbol type="terms">
-//                            <term type="ident" value=statement/>
-//                            <term type="char" value=','/>
-//                        </symbol>
-//                        <symbol type="action_block">
-//                            <term type="string" value=" /* AAA */ ... "/>
+//<symbol type="rule">                   // <-- rule_node
+//    <term type="ident" value=program/> // <-- lhs body
+//    <symbol type="alts">               // <-- rhs body
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <symbol type="*">            // <-- isolate this part as "program_0"
+//                    <symbol type="(">        // <-- paren_node
+//                        <symbol type="alts"> // <-- alts_node
+//                            <symbol type="alt">
+//                                <symbol type="terms">
+//                                    <term type="ident" value=statement/>
+//                                    <term type="char" value=','/>
+//                                </symbol>
+//                                <symbol type="action_block">
+//                                    <term type="string" value=" /* AAA */ ... "/>
+//                                </symbol>
+//                            </symbol>
 //                        </symbol>
 //                    </symbol>
 //                </symbol>
+//                <term type="ident" value=statement/>
 //            </symbol>
-//            <term type="ident" value=statement/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* BBB */ ... "/>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* BBB */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -235,13 +239,15 @@ program_1:
 // [
 //<symbol type="rule">
 //    <term type="ident" value=program/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=program_0/> // <-- replaced kleene closure '*'
-//            <term type="ident" value=statement/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* BBB */ ... "/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=program_0/> // <-- replaced kleene closure '*'
+//                <term type="ident" value=statement/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* BBB */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -266,13 +272,15 @@ program_1:
 //</symbol>
 //<symbol type="rule">
 //    <term type="ident" value=program_1/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=statement/>
-//            <term type="char" value=','/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* AAA */ ... "/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=statement/>
+//                <term type="char" value=','/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* AAA */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -295,25 +303,29 @@ program_1:
 // EBNF-XML:
 //<symbol type="rule">                     // <-- rule_node
 //    <term type="ident" value=statement/> // <-- lhs body
-//    <symbol type="alt">                  // <-- rhs body
-//        <symbol type="terms">
-//            <symbol type="?">            // <-- isolate this part as "statement_0"
-//                <symbol type="(">        // <-- paren_node
-//                    <symbol type="alt">  // <-- alt_node
-//                        <symbol type="terms">
-//                            <term type="ident" value=ID_IDENT/>
-//                            <term type="char" value='='/>
-//                        </symbol>
-//                        <symbol type="action_block">
-//                            <term type="string" value=" /* CCC */ ... "/>
+//    <symbol type="alts">                 // <-- rhs body
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <symbol type="?">            // <-- isolate this part as "statement_0"
+//                    <symbol type="(">        // <-- paren_node
+//                        <symbol type="alts"> // <-- alts_node
+//                            <symbol type="alt">
+//                                <symbol type="terms">
+//                                    <term type="ident" value=ID_IDENT/>
+//                                    <term type="char" value='='/>
+//                                </symbol>
+//                                <symbol type="action_block">
+//                                    <term type="string" value=" /* CCC */ ... "/>
+//                                </symbol>
+//                            </symbol>
 //                        </symbol>
 //                    </symbol>
 //                </symbol>
+//                <term type="ident" value=expression/>
 //            </symbol>
-//            <term type="ident" value=expression/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* DDD */ ... "/>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* DDD */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -338,13 +350,15 @@ statement_1:
 // [
 //<symbol type="rule">
 //    <term type="ident" value=statement/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=statement_0/> // <-- replaced kleene closure '?'
-//            <term type="ident" value=expression/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* DDD */ ... "/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=statement_0/> // <-- replaced kleene closure '?'
+//                <term type="ident" value=expression/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* DDD */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>
@@ -368,13 +382,15 @@ statement_1:
 //</symbol>
 //<symbol type="rule">
 //    <term type="ident" value=statement_1/>
-//    <symbol type="alt">
-//        <symbol type="terms">
-//            <term type="ident" value=ID_IDENT/>
-//            <term type="char" value='='/>
-//        </symbol>
-//        <symbol type="action_block">
-//            <term type="string" value=" /* CCC */ ... "/>
+//    <symbol type="alts">
+//        <symbol type="alt">
+//            <symbol type="terms">
+//                <term type="ident" value=ID_IDENT/>
+//                <term type="char" value='='/>
+//            </symbol>
+//            <symbol type="action_block">
+//                <term type="string" value=" /* CCC */ ... "/>
+//            </symbol>
 //        </symbol>
 //    </symbol>
 //</symbol>

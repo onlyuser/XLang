@@ -119,8 +119,8 @@ public:
     void push_back(NodeIdentIFace* _node);
     void push_front(NodeIdentIFace* _node);
     void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node);
-    void remove(NodeIdentIFace* _node);
-    void replace(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
+    void remove_first(NodeIdentIFace* _node);
+    void replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
     NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;
 
     // built-in

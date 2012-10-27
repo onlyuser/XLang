@@ -109,9 +109,9 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void insert_after(NodeIdentIFace* insert_after_node, NodeIdentIFace* new_node)
     {}
-    virtual void remove(NodeIdentIFace* _node)
+    virtual void remove_first(NodeIdentIFace* _node)
     {}
-    virtual void replace(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
+    virtual void replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
     {}
     virtual NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const
     {

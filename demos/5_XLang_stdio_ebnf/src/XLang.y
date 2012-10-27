@@ -279,8 +279,7 @@ alt:
     ;
 
 action_block:
-      /* empty */ { $$ = EOL; }
-    | ID_STRING   {
+      ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, $1)) : NULL;
             }

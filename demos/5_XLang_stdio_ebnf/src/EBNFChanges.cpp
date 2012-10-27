@@ -194,7 +194,7 @@ bool EBNFChanges::apply()
                         << ptr_to_string(replacement_node) << std::endl;
                 //xl::mvc::MVCView::print_xml(replacement_node);
 #endif
-                parent_symbol->replace(
+                parent_symbol->replace_first(
                         const_cast<xl::node::NodeIdentIFace*>(find_node), // TODO: fix-me!
                         replacement_node);
             }

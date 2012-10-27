@@ -43,8 +43,8 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
     virtual void visit_any(const node::NodeIdentIFace* unknown);
 
     // redirect stdout
-    void redirect_stdout();
-    std::string restore_stdout();
+    void begin_redirect_stdout();
+    std::string end_redirect_stdout();
 
 protected:
     // redirect stdout
