@@ -166,8 +166,7 @@ bool EBNFChanges::apply()
                             *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
                                     append_to_term
                                     )->value();
-                    s_lvalue.insert(0, "\n");
-                    s_lvalue.insert(1, s);
+                    s_lvalue.insert(0, s);
                 }
             }
         }

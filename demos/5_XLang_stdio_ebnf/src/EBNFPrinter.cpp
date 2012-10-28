@@ -63,6 +63,11 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
+static std::string gen_vec_name(std::string stem)
+{
+    return stem + "_vec";
+}
+
 static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
         const xl::node::NodeIdentIFace* root,
         const xl::node::NodeIdentIFace* original)
@@ -126,7 +131,7 @@ static std::string* get_string_ptr_from_term_node(const xl::node::NodeIdentIFace
                         dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(term_node);
                 if(!ident_term)
                     return NULL;
-                return const_cast<std::string*>(ident_term->value());
+                return const_cast<std::string*>(ident_term->value()); // TODO: fix-me!
             }
         case xl::node::NodeIdentIFace::STRING:
             {
@@ -269,14 +274,32 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
     xl::node::NodeIdentIFace* kleene_node_copy =
             find_clone_of_original_recursive(rule_node_copy, kleene_node);
-    xl::node::NodeIdentIFace* replacement_node =
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
     std::string* action_string_ptr = get_action_string_from_kleene_node(kleene_node_copy);
     if(action_string_ptr)
     {
-        std::string s = create_new_delete_vector(1); // NOTE: fix-me!
-        action_string_ptr->append(s + "\n");
+        int position = 1;
+        xl::node::NodeIdentIFace* kleene_parent_node = kleene_node->parent();
+        if(kleene_parent_node)
+        {
+            xl::node::SymbolNodeIFace* kleene_parent_symbol =
+                    dynamic_cast<xl::node::SymbolNodeIFace*>(kleene_parent_node);
+            if(kleene_parent_symbol)
+            {
+                for(auto i = 0; i<kleene_parent_symbol->size(); i++)
+                {
+                    if((*kleene_parent_symbol)[i] == kleene_node)
+                    {
+                        position = i+1;
+                        break;
+                    }
+                }
+            }
+        }
+        std::string s = create_new_delete_vector(position); // NOTE: fix-me!
+        action_string_ptr->append(s);
     }
+    xl::node::NodeIdentIFace* replacement_node =
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
     replace_node(kleene_node_copy, replacement_node);
     return rule_node_copy;
 }
@@ -556,6 +579,10 @@ static void enqueue_changes_for_kleene_closure(
     if(!lhs_value_ptr)
         return;
     std::string lhs_value = *lhs_value_ptr;
+    std::string rule_type_name = (*token_var_to_type)[lhs_value];
+    std::string rule_type = (*union_var_to_type)[rule_type_name];
+    std::string name1 = gen_name(lhs_value);
+    std::string name2 = gen_name(lhs_value);
     if(node_appends_to_back)
     {
         auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
@@ -564,8 +591,8 @@ static void enqueue_changes_for_kleene_closure(
             const xl::node::NodeIdentIFace* decl_stmts_node = (*union_block_symbol)[0];
             if(decl_stmts_node)
             {
-                std::string type = "QWE";
-                std::string type_name = "ASD";
+                std::string type = rule_type;
+                std::string type_name = gen_vec_name(rule_type_name);
                 xl::node::NodeIdentIFace* union_type_node = create_new_union_type(type, type_name, tc);
                 if(union_type_node)
                     (*node_appends_to_back)[decl_stmts_node].push_back(
@@ -575,19 +602,15 @@ static void enqueue_changes_for_kleene_closure(
         auto definitions_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(definitions_node);
         if(definitions_symbol)
         {
-            std::string type_name = "AAA";
+            std::string type_name = gen_vec_name(rule_type_name);
             std::vector<std::string> token_vec;
-            token_vec.push_back("A");
-            token_vec.push_back("B");
-            token_vec.push_back("C");
+            token_vec.push_back(name1);
             xl::node::NodeIdentIFace* tokens_of_union_type =
                     create_new_tokens_of_union_type(type_name, token_vec, tc);
             (*node_appends_to_back)[definitions_symbol].push_back(
                     tokens_of_union_type); // NOTE: should check duplicate before append
         }
     }
-    std::string name1 = gen_name(lhs_value);
-    std::string name2 = gen_name(lhs_value);
     const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
     if(term_rule)
@@ -597,6 +620,7 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
         std::cout << "<<< (term_rule)" << std::endl;
 #endif
+        // NOTE: bug somewhere around here.. symbols never attached
         if(symbols_attach_loc_map)
             enqueue_add_to_symbols(
                     (*symbols_attach_loc_map)[lhs_value],
@@ -629,13 +653,14 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
         std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
-        if(symbols_attach_loc_map)
-            enqueue_add_to_symbols(
-                    (*symbols_attach_loc_map)[lhs_value],
-                    lhs_value,
-                    name1,
-                    node_insertions_after,
-                    tc);
+        // NOTE: disabled intentionally. new union type created.
+//        if(symbols_attach_loc_map)
+//            enqueue_add_to_symbols(
+//                    (*symbols_attach_loc_map)[lhs_value],
+//                    lhs_value,
+//                    name1,
+//                    node_insertions_after,
+//                    tc);
         if(node_insertions_after)
             (*node_insertions_after)[rule_node].push_back(recursive_rule);
     }
