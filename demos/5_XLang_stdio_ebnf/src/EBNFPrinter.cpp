@@ -21,6 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "node/XLangNode.h" // node::Node
 #include "XLangTreeContext.h" // TreeContext
+#include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 #include <string> // std::string
 #include <vector> // std::vector
@@ -95,7 +96,7 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
 
 static void replace_node(
         const xl::node::NodeIdentIFace* find_node,
-        const xl::node::NodeIdentIFace* replace_node)
+        const xl::node::NodeIdentIFace* replacement_node)
 {
     if(!find_node)
         return;
@@ -105,7 +106,7 @@ static void replace_node(
     {
         parent_symbol->replace_first(
                 const_cast<xl::node::NodeIdentIFace*>(find_node),
-                const_cast<xl::node::NodeIdentIFace*>(replace_node));
+                const_cast<xl::node::NodeIdentIFace*>(replacement_node));
     }
 }
 
@@ -148,6 +149,14 @@ static std::string* get_string_ptr_from_term_node(const xl::node::NodeIdentIFace
 
 static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* term_node)
 {
+    if(term_node->type() == xl::node::NodeIdentIFace::CHAR)
+    {
+        auto char_term =
+                dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>*>(term_node);
+        std::stringstream ss;
+        ss << '\'' << xl::escape(char_term->value()) << '\'';
+        return ss.str();
+    }
     std::string* string_ptr = get_string_ptr_from_term_node(term_node);
     if(!string_ptr)
         return "";
@@ -214,17 +223,20 @@ static std::string* get_action_string_from_kleene_node(
     return get_string_ptr_from_term_node(action_string_node);
 }
 
-static std::string* get_lhs_value_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
+static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
 {
     if(!rule_node)
-        return NULL;
+        return "";
     auto rule_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node);
     if(!rule_symbol)
-        return NULL;
+        return "";
     xl::node::NodeIdentIFace* lhs_node = (*rule_symbol)[0];
     if(!lhs_node)
-        return NULL;
-    return get_string_ptr_from_term_node(lhs_node);
+        return "";
+    std::string* lhs_value_ptr = get_string_ptr_from_term_node(lhs_node);
+    if(!lhs_value_ptr)
+        return "";
+    return *lhs_value_ptr;
 }
 
 static std::string create_new_delete_vector(int position);
@@ -285,7 +297,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                     dynamic_cast<xl::node::SymbolNodeIFace*>(kleene_parent_node);
             if(kleene_parent_symbol)
             {
-                for(auto i = 0; i<kleene_parent_symbol->size(); i++)
+                for(size_t i = 0; i<kleene_parent_symbol->size(); i++)
                 {
                     if((*kleene_parent_symbol)[i] == kleene_node)
                     {
@@ -295,7 +307,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                 }
             }
         }
-        std::string s = create_new_delete_vector(position); // NOTE: fix-me!
+        std::string s = create_new_delete_vector(position);
         action_string_ptr->append(s);
     }
     xl::node::NodeIdentIFace* replacement_node =
@@ -517,30 +529,6 @@ static std::string create_new_delete_vector(int position)
     return ss.str();
 }
 
-static void enqueue_add_to_symbols(
-        const xl::node::NodeIdentIFace* symbols_attach_loc,
-        std::string after_name,
-        std::string name,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* insertions_after,
-        xl::TreeContext* tc)
-{
-    if(!symbols_attach_loc)
-        return;
-    auto symbols_attach_loc_symbol =
-            const_cast<xl::node::SymbolNodeIFace*>(
-                    dynamic_cast<const xl::node::SymbolNodeIFace*>(symbols_attach_loc));
-    if(!symbols_attach_loc_symbol)
-        return;
-    static std::string temp; // NOTE: must be static for compile-time closure!
-    temp = after_name; // NOTE: do not combine with previous line! -- must assign every time
-    xl::node::NodeIdentIFace* result =
-            symbols_attach_loc_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
-                    return get_string_from_term_node(_node) == temp;
-                    });
-    if(result)
-        (*insertions_after)[result].push_back(MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)));
-}
-
 static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
@@ -551,7 +539,7 @@ static void enqueue_changes_for_kleene_closure(
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
-        std::map<std::string, const xl::node::NodeIdentIFace*>*                          symbols_attach_loc_map,
+        std::map<std::string, const xl::node::NodeIdentIFace*>*                          string_to_symbol_map,
         std::map<std::string, std::string>*                                              union_var_to_type,
         std::map<std::string, std::string>*                                              token_var_to_type,
         xl::TreeContext*                                                                 tc)
@@ -575,14 +563,11 @@ static void enqueue_changes_for_kleene_closure(
         }
     }
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
-    std::string* lhs_value_ptr = get_lhs_value_from_rule_node(rule_node);
-    if(!lhs_value_ptr)
-        return;
-    std::string lhs_value = *lhs_value_ptr;
-    std::string rule_type_name = (*token_var_to_type)[lhs_value];
+    std::string rule_name = get_rule_name_from_rule_node(rule_node);
+    std::string rule_type_name = (*token_var_to_type)[rule_name];
     std::string rule_type = (*union_var_to_type)[rule_type_name];
-    std::string name1 = gen_name(lhs_value);
-    std::string name2 = gen_name(lhs_value);
+    std::string name1 = gen_name(rule_name);
+    std::string name2 = gen_name(rule_name);
     if(node_appends_to_back)
     {
         auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
@@ -595,8 +580,17 @@ static void enqueue_changes_for_kleene_closure(
                 std::string type_name = gen_vec_name(rule_type_name);
                 xl::node::NodeIdentIFace* union_type_node = create_new_union_type(type, type_name, tc);
                 if(union_type_node)
-                    (*node_appends_to_back)[decl_stmts_node].push_back(
-                            union_type_node); // NOTE: should check duplicate before append
+                {
+//                    bool found_match = false;
+//                    for(auto p = node_appends_to_back->begin(); p != node_appends_to_back->end(); p++)
+//                    {
+//                        if((*p).first->compare(decl_stmts_node))
+//                            found_match = true;
+//                    }
+//                    if(!found_match)
+                        (*node_appends_to_back)[decl_stmts_node].push_back(
+                                union_type_node); // NOTE: should check duplicate before append
+                }
             }
         }
         auto definitions_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(definitions_node);
@@ -607,8 +601,15 @@ static void enqueue_changes_for_kleene_closure(
             token_vec.push_back(name1);
             xl::node::NodeIdentIFace* tokens_of_union_type =
                     create_new_tokens_of_union_type(type_name, token_vec, tc);
-            (*node_appends_to_back)[definitions_symbol].push_back(
-                    tokens_of_union_type); // NOTE: should check duplicate before append
+//            bool found_match = false;
+//            for(auto p = node_appends_to_back->begin(); p != node_appends_to_back->end(); p++)
+//            {
+//                if((*p).first->compare(definitions_symbol))
+//                    found_match = true;
+//            }
+//            if(!found_match)
+                (*node_appends_to_back)[definitions_symbol].push_back(
+                        tokens_of_union_type); // NOTE: should check duplicate before append
         }
     }
     const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
@@ -620,14 +621,12 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
         std::cout << "<<< (term_rule)" << std::endl;
 #endif
-        // NOTE: bug somewhere around here.. symbols never attached
-        if(symbols_attach_loc_map)
-            enqueue_add_to_symbols(
-                    (*symbols_attach_loc_map)[lhs_value],
-                    lhs_value,
-                    name2,
-                    node_insertions_after,
-                    tc);
+        if(string_to_symbol_map)
+            (*node_insertions_after)[(*string_to_symbol_map)[rule_name]].push_back(
+                    MAKE_SYMBOL(tc, ID_SYMBOL, 1,
+                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                            )
+                    );
         if(node_insertions_after)
             (*node_insertions_after)[rule_node].push_back(term_rule);
     }
@@ -653,14 +652,6 @@ static void enqueue_changes_for_kleene_closure(
         EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
         std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
-        // NOTE: disabled intentionally. new union type created.
-//        if(symbols_attach_loc_map)
-//            enqueue_add_to_symbols(
-//                    (*symbols_attach_loc_map)[lhs_value],
-//                    lhs_value,
-//                    name1,
-//                    node_insertions_after,
-//                    tc);
         if(node_insertions_after)
             (*node_insertions_after)[rule_node].push_back(recursive_rule);
     }
@@ -686,7 +677,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     static bool entered_kleene_closure = false;
     static const xl::node::NodeIdentIFace *proto_block_node = NULL, *union_block_node = NULL,
             *definitions_node = NULL;
-    static std::map<std::string, const xl::node::NodeIdentIFace*> symbols_attach_loc_map;
+    static std::map<std::string, const xl::node::NodeIdentIFace*> string_to_symbol_map;
     static std::map<std::string, std::string> union_var_to_type, token_var_to_type;
     static std::vector<std::string> decl_chunk_vec, symbols_vec;
     bool more;
@@ -697,7 +688,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             proto_block_node = NULL;
             union_block_node = NULL;
             definitions_node = NULL;
-            symbols_attach_loc_map.clear();
+            string_to_symbol_map.clear();
             union_var_to_type.clear();
             token_var_to_type.clear();
             visit_next_child(_node);
@@ -813,7 +804,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 std::cout << s;
                 if(!s.empty())
                 {
-                    symbols_attach_loc_map[s] = _node;
+                    string_to_symbol_map[s] = _node;
                     symbols_vec.push_back(s);
                 }
             }
@@ -873,7 +864,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             proto_block_node,
                             union_block_node,
                             definitions_node,
-                            &symbols_attach_loc_map,
+                            &string_to_symbol_map,
                             &union_var_to_type,
                             &token_var_to_type,
                             m_tc);

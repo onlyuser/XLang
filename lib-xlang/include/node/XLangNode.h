@@ -91,6 +91,12 @@ public:
         return new (PNEW_LOC(tc->alloc()))
                 TermNode<_type>(m_sym_id, m_value); // assumes trivial dtor
     }
+    bool compare(const NodeIdentIFace* _node) const
+    {
+        if(!is_same_type(_node))
+            return false;
+        return m_value == dynamic_cast<const TermNode<_type>*>(_node)->value();
+    }
 
 private:
     typename TermInternalType<_type>::type m_value;
@@ -116,6 +122,29 @@ public:
 
     // optional
     NodeIdentIFace* clone(TreeContext* tc) const;
+    bool compare(const NodeIdentIFace* _node) const // TODO: fix-me!
+    {
+        if(!is_same_type(_node))
+            return false;
+        auto symbol_node = dynamic_cast<const SymbolNode*>(_node);
+        if(m_child_vec.size() != symbol_node->size())
+            return false;
+        for(size_t i = 0; i<m_child_vec.size(); i++)
+        {
+            if(!m_child_vec[i]->compare(const_cast<const NodeIdentIFace*>((*symbol_node)[i])))
+                return false;
+        }
+        return true;
+    }
+    NodeIdentIFace* find(const NodeIdentIFace* _node) const // TODO: fix-me!
+    {
+        for(auto p = m_child_vec.begin(); p != m_child_vec.end(); p++)
+        {
+            if((*p)->compare(_node))
+                return (*p);
+        }
+        return NULL;
+    }
     void push_back(NodeIdentIFace* _node);
     void push_front(NodeIdentIFace* _node);
     void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node);

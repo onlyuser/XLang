@@ -49,6 +49,10 @@ struct NodeIdentIFace
     {
         return NULL;
     }
+    virtual bool compare(const NodeIdentIFace* _node) const // TODO: fix-me!
+    {
+        return false;
+    }
     virtual void set_original(const NodeIdentIFace* original)
     {}
     virtual const NodeIdentIFace* original() const
