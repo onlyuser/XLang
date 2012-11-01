@@ -576,9 +576,8 @@ static void enqueue_changes_for_kleene_closure(
             const xl::node::NodeIdentIFace* decl_stmts_node = (*union_block_symbol)[0];
             if(decl_stmts_node)
             {
-                std::string type = rule_type;
                 std::string type_name = gen_vec_name(rule_type_name);
-                xl::node::NodeIdentIFace* union_type_node = create_new_union_type(type, type_name, tc);
+                xl::node::NodeIdentIFace* union_type_node = create_new_union_type(rule_type, type_name, tc);
                 if(union_type_node)
                 {
 //                    bool found_match = false;
@@ -640,7 +639,7 @@ static void enqueue_changes_for_kleene_closure(
                 if(!action_string_ptr)
                     break;
                 std::string action_string = *action_string_ptr;
-                recursive_rule = make_recursive_rule_star(name1, name2, "", tc);
+                recursive_rule = make_recursive_rule_star(name1, name2, rule_type, tc);
                 break;
             }
         case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
