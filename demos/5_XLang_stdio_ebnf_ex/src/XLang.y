@@ -346,6 +346,18 @@ statement_1:
     ;
 // ]
 
+// // EBNF-EXPANDED (without conflict):
+// // [
+// statement:
+//       statement_1 expression { /* DDD_1 */ $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+//     | expression             { /* DDD_2 */ $$ = $1; }
+//     ;
+//
+// statement_1:
+//       ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+//     ;
+// // ]
+
 // EBNF-EXPANDED-XML:
 // [
 //<symbol type="rule">
@@ -399,7 +411,7 @@ statement_1:
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
     | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
+    //| ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); } // <== causes conflict
     | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
     | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
     | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
