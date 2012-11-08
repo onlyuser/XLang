@@ -334,7 +334,7 @@ statement:
     ;
 
 statement_0:
-      /* empty */ { /* RRR */ $$ = NULL; } // <== causes shift-reduce conflict
+      /* empty */ { /* RRR */ $$ = NULL; } // <== shift-reduce conflict
     | statement_1 { /* SSS */ $$ = $1; }
     ;
 
@@ -408,7 +408,7 @@ statement_1:
 expression:
       ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
     | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); } // <== causes conflict
+    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); } // <== shift-reduce conflict
     | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
     | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
     | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
