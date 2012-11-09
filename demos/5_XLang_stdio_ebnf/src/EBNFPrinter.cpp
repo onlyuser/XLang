@@ -576,19 +576,19 @@ static void enqueue_changes_for_kleene_closure(
             const xl::node::NodeIdentIFace* decl_stmts_node = (*union_block_symbol)[0];
             if(decl_stmts_node)
             {
-                std::string type_name = gen_vec_name(rule_type_name);
-                xl::node::NodeIdentIFace* union_type_node = create_new_union_type(rule_type, type_name, tc);
-                if(union_type_node)
+                auto decl_stmts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(decl_stmts_node);
+                if(decl_stmts_symbol)
                 {
-//                    bool found_match = false;
-//                    for(auto p = node_appends_to_back->begin(); p != node_appends_to_back->end(); p++)
-//                    {
-//                        if((*p).first->compare(decl_stmts_node))
-//                            found_match = true;
-//                    }
-//                    if(!found_match)
-                        (*node_appends_to_back)[decl_stmts_node].push_back(
-                                union_type_node); // NOTE: should check duplicate before append
+                    std::string type_name = gen_vec_name(rule_type_name);
+                    xl::node::NodeIdentIFace* union_type_node = create_new_union_type(rule_type, type_name, tc);
+                    if(union_type_node)
+                    {
+                        if(!decl_stmts_symbol->find(union_type_node))
+                        {
+                            (*node_appends_to_back)[decl_stmts_symbol].push_back(
+                                    union_type_node);
+                        }
+                    }
                 }
             }
         }
@@ -600,15 +600,11 @@ static void enqueue_changes_for_kleene_closure(
             token_vec.push_back(name1);
             xl::node::NodeIdentIFace* tokens_of_union_type =
                     create_new_tokens_of_union_type(type_name, token_vec, tc);
-//            bool found_match = false;
-//            for(auto p = node_appends_to_back->begin(); p != node_appends_to_back->end(); p++)
-//            {
-//                if((*p).first->compare(definitions_symbol))
-//                    found_match = true;
-//            }
-//            if(!found_match)
+            if(!definitions_symbol->find(tokens_of_union_type))
+            {
                 (*node_appends_to_back)[definitions_symbol].push_back(
-                        tokens_of_union_type); // NOTE: should check duplicate before append
+                        tokens_of_union_type);
+            }
         }
     }
     const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);

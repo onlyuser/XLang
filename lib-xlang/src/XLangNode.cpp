@@ -63,6 +63,14 @@ NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
     return _clone;
 }
 
+template<>
+bool TermNode<NodeIdentIFace::STRING>::compare(const NodeIdentIFace* _node) const
+{
+    if(!is_same_type(_node))
+        return false;
+    return *m_value == *dynamic_cast<const TermNode<NodeIdentIFace::STRING>*>(_node)->value();
+}
+
 SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
@@ -117,6 +125,22 @@ SymbolNode::SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec)
         if(child)
             child->set_parent(this);
     }
+}
+
+NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
+{
+    va_list ap;
+    SymbolNodeIFace *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
+            SymbolNode(m_sym_id, 0, ap);
+    _clone->set_original(this);
+    for(auto p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
+    {
+        NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;
+        _clone->push_back(child_clone);
+        if(child_clone)
+            child_clone->set_parent(_clone);
+    }
+    return _clone;
 }
 
 void SymbolNode::push_back(NodeIdentIFace* _node)
@@ -174,22 +198,6 @@ NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) c
         return NULL;
     int index = std::distance(m_child_vec.begin(), p);
     return m_child_vec[index];
-}
-
-NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
-{
-    va_list ap;
-    SymbolNodeIFace *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
-            SymbolNode(m_sym_id, 0, ap);
-    _clone->set_original(this);
-    for(auto p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
-    {
-        NodeIdentIFace *child_clone = (*p) ? (*p)->clone(tc) : NULL;
-        _clone->push_back(child_clone);
-        if(child_clone)
-            child_clone->set_parent(_clone);
-    }
-    return _clone;
 }
 
 } }

@@ -49,7 +49,7 @@ struct NodeIdentIFace
     {
         return NULL;
     }
-    virtual bool compare(const NodeIdentIFace* _node) const // TODO: fix-me!
+    virtual bool compare(const NodeIdentIFace* _node) const
     {
         return false;
     }
@@ -107,6 +107,10 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     virtual size_t size() const = 0;
 
     // optional
+    virtual NodeIdentIFace* find(const NodeIdentIFace* _node) const
+    {
+        return NULL;
+    }
     virtual void push_back(NodeIdentIFace* _node)
     {}
     virtual void push_front(NodeIdentIFace* _node)

@@ -122,7 +122,7 @@ public:
 
     // optional
     NodeIdentIFace* clone(TreeContext* tc) const;
-    bool compare(const NodeIdentIFace* _node) const // TODO: fix-me!
+    bool compare(const NodeIdentIFace* _node) const
     {
         if(!is_same_type(_node))
             return false;
@@ -136,7 +136,7 @@ public:
         }
         return true;
     }
-    NodeIdentIFace* find(const NodeIdentIFace* _node) const // TODO: fix-me!
+    NodeIdentIFace* find(const NodeIdentIFace* _node) const
     {
         for(auto p = m_child_vec.begin(); p != m_child_vec.end(); p++)
         {
