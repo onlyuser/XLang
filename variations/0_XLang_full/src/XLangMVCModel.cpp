@@ -23,15 +23,13 @@
 #include <string.h> // memset
 #include <string> // std::string
 #include <vector> // std::vector
-#ifdef TIXML_USE_TICPP
-    #include <map> // std::map
-#endif
 
 #ifdef EXTERN_INCLUDE_PATH
     #define TIXML_USE_TICPP
 #endif
 #ifdef TIXML_USE_TICPP
     #include "ticpp/ticpp.h"
+    #include <map> // std::map
 
     // prototype
     extern uint32_t name_to_id(std::string name);

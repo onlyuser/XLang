@@ -19,9 +19,7 @@
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
-#ifdef EXTERN_INCLUDE_PATH
-    #define USE_COROUTINE
-#endif
+#define USE_COROUTINE
 #ifdef USE_COROUTINE
     #include "coroutine/coroutine_cpp.h"
 #endif
