@@ -207,7 +207,7 @@ static std::string* get_action_string_from_kleene_node(
 
     if(!kleene_node)
         return NULL;
-    const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_ALT, kleene_node);
+    const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_RULE_ALT, kleene_node);
     if(!alt_node)
         return NULL;
     auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
@@ -359,21 +359,21 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                    MAKE_SYMBOL(tc, ID_ALTS, 2,
-                            MAKE_SYMBOL(tc, ID_ALT, 1,
-                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING,
                                                     tc->alloc_string(" $$ = new std::vector<"
                                                             + vector_inner_type + ">; ")
                                                     )
                                             )
                                     ),
-                            MAKE_SYMBOL(tc, ID_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_TERMS, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
-                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING,
                                                     tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
                                                     )
@@ -414,17 +414,17 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_RULE, 2,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                    MAKE_SYMBOL(tc, ID_ALTS, 2,
-                            MAKE_SYMBOL(tc, ID_ALT, 1,
-                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = NULL; "))
                                             )
                                     ),
-                            MAKE_SYMBOL(tc, ID_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_TERMS, 1,
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
                                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                             ),
-                                    MAKE_SYMBOL(tc, ID_ACTION_BLOCK, 1,
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
                                             )
                                     )
@@ -471,12 +471,12 @@ static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::st
     //</symbol>
 
     xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_DECL_STMT, 1,
-                    MAKE_SYMBOL(tc, ID_DECL_CHUNKS, 2,
-                            MAKE_SYMBOL(tc, ID_DECL_CHUNK, 1,
+            MAKE_SYMBOL(tc, ID_UNION_TYPE, 1,
+                    MAKE_SYMBOL(tc, ID_UNION_TERMS, 2,
+                            MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string("std::vector<" + type + ">"))
                                     ),
-                            MAKE_SYMBOL(tc, ID_DECL_CHUNK, 1,
+                            MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string(type_name))
                                     )
                             )
@@ -513,11 +513,11 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
     }
 
     xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_DECL_BRACE, 3,
+            MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(type_name)),
-                    MAKE_SYMBOL(tc, ID_SYMBOLS, 1,
-                            MAKE_SYMBOL(tc, ID_SYMBOL, 1,
+                    MAKE_SYMBOL(tc, ID_DEF_SYMBOLS, 1,
+                            MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
                                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
                                     )
                             )
@@ -552,7 +552,7 @@ static void add_term_rule(
 #endif
         if(rule_definition_node)
             (*node_insertions_after)[rule_definition_node].push_back(
-                    MAKE_SYMBOL(tc, ID_SYMBOL, 1,
+                    MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                             )
                     );
@@ -661,18 +661,18 @@ static void enqueue_changes_for_kleene_closure(
         auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
         if(union_block_symbol)
         {
-            const xl::node::NodeIdentIFace* decl_stmts_node = (*union_block_symbol)[0];
-            if(decl_stmts_node)
+            const xl::node::NodeIdentIFace* union_members_node = (*union_block_symbol)[0];
+            if(union_members_node)
             {
-                auto decl_stmts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(decl_stmts_node);
-                if(decl_stmts_symbol)
+                auto union_members_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_members_node);
+                if(union_members_symbol)
                 {
                     std::string type_name = gen_vec_name(rule_type_name);
                     xl::node::NodeIdentIFace* union_type_node = create_new_union_type(rule_type, type_name, tc);
                     if(union_type_node)
                     {
-                        if(!decl_stmts_symbol->find(union_type_node))
-                            (*node_appends_to_back)[decl_stmts_symbol].push_back(union_type_node);
+                        if(!union_members_symbol->find(union_type_node))
+                            (*node_appends_to_back)[union_members_symbol].push_back(union_type_node);
                     }
                 }
             }
@@ -751,7 +751,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << std::endl;
             } while(more);
             break;
-        case ID_DECL:
+        case ID_DEFINITION:
             std::cout << '%';
             more = visit_next_child(_node);
             if(more)
@@ -760,13 +760,13 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 visit_next_child(_node);
             }
             break;
-        case ID_DECL_EQ:
+        case ID_DEF_EQ:
             std::cout << '%';
             visit_next_child(_node);
             std::cout << '=';
             visit_next_child(_node);
             break;
-        case ID_DECL_BRACE:
+        case ID_DEF_BRACE:
             {
                 std::string token_type;
                 std::cout << '%';
@@ -784,7 +784,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     token_var_to_type_map[*p] = token_type;
             }
             break;
-        case ID_PROTO_BLOCK:
+        case ID_DEF_PROTO_BLOCK:
             proto_block_node = _node;
             std::cout << "%{";
             std::cout << get_string_from_term_node((*_node)[0]);
@@ -796,7 +796,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << std::endl << '}';
             break;
-        case ID_DECL_STMTS:
+        case ID_UNION_TYPES:
             do
             {
                 std::cout << '\t';
@@ -805,7 +805,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << std::endl;
             } while(more);
             break;
-        case ID_DECL_STMT:
+        case ID_UNION_TYPE:
             visit_next_child(_node);
             std::cout << ';';
             if(!decl_chunk_vec.empty())
@@ -817,7 +817,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 union_var_to_type_map[union_var] = union_type;
             }
             break;
-        case ID_DECL_CHUNKS:
+        case ID_UNION_TERMS:
             decl_chunk_vec.clear();
             do
             {
@@ -826,14 +826,14 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << ' ';
             } while(more);
             break;
-        case ID_DECL_CHUNK:
+        case ID_UNION_TERM:
             {
                 std::string s = get_string_from_term_node((*_node)[0]);
                 std::cout << s;
                 decl_chunk_vec.push_back(s);
             }
             break;
-        case ID_SYMBOLS:
+        case ID_DEF_SYMBOLS:
             symbols_vec.clear();
             do
             {
@@ -842,7 +842,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << ' ';
             } while(more);
             break;
-        case ID_SYMBOL:
+        case ID_DEF_SYMBOL:
             {
                 std::string s = get_string_from_term_node((*_node)[0]);
                 std::cout << s;
@@ -867,7 +867,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << ';';
             break;
-        case ID_ALTS:
+        case ID_RULE_ALTS:
             do
             {
                 more = visit_next_child(_node);
@@ -875,16 +875,16 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << std::endl << "\t| ";
             } while(more);
             break;
-        case ID_ALT:
+        case ID_RULE_ALT:
             if(visit_next_child(_node))
                 visit_next_child(_node);
             break;
-        case ID_ACTION_BLOCK:
+        case ID_RULE_ACTION_BLOCK:
             std::cout << " {";
             std::cout << get_string_from_term_node((*_node)[0]);
             std::cout << '}';
             break;
-        case ID_TERMS:
+        case ID_RULE_TERMS:
             do
             {
                 more = visit_next_child(_node);

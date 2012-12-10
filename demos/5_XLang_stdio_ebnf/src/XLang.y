@@ -3,7 +3,7 @@
 // Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
+// it under the rule_terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
@@ -68,65 +68,65 @@ std::string id_to_name(uint32_t sym_id)
         return _id_to_name[index];
     switch(sym_id)
     {
-        case ID_GRAMMAR:      return "grammar";
-        case ID_DEFINITIONS:  return "definitions";
-        case ID_DECL:         return "decl";
-        case ID_DECL_EQ:      return "decl_eq";
-        case ID_DECL_BRACE:   return "decl_brace";
-        case ID_PROTO_BLOCK:  return "proto_block";
-        case ID_UNION_BLOCK:  return "union_block";
-        case ID_DECL_STMTS:   return "decl_stmts";
-        case ID_DECL_STMT:    return "decl_stmt";
-        case ID_DECL_CHUNKS:  return "decl_chunks";
-        case ID_DECL_CHUNK:   return "decl_chunk";
-        case ID_SYMBOLS:      return "symbols";
-        case ID_SYMBOL:       return "symbol";
-        case ID_RULES:        return "rules";
-        case ID_RULE:         return "rule";
-        case ID_ALTS:         return "alts";
-        case ID_ALT:          return "alt";
-        case ID_ACTION_BLOCK: return "action_block";
-        case ID_TERMS:        return "terms";
-        case ID_CODE:         return "code";
-        case '+':             return "+";
-        case '*':             return "*";
-        case '?':             return "?";
-        case '(':             return "(";
+        case ID_GRAMMAR:           return "grammar";
+        case ID_DEFINITIONS:       return "definitions";
+        case ID_DEFINITION:        return "definition";
+        case ID_DEF_EQ:            return "def_eq";
+        case ID_DEF_BRACE:         return "def_brace";
+        case ID_DEF_PROTO_BLOCK:   return "def_proto_block";
+        case ID_UNION_BLOCK:       return "union_block";
+        case ID_UNION_TYPES:       return "union_types";
+        case ID_UNION_TYPE:        return "union_type";
+        case ID_UNION_TERMS:       return "union_terms";
+        case ID_UNION_TERM:        return "union_term";
+        case ID_DEF_SYMBOLS:       return "def_symbols";
+        case ID_DEF_SYMBOL:        return "def_symbol";
+        case ID_RULES:             return "rules";
+        case ID_RULE:              return "rule";
+        case ID_RULE_ALTS:         return "rule_alts";
+        case ID_RULE_ALT:          return "rule_alt";
+        case ID_RULE_ACTION_BLOCK: return "rule_action_block";
+        case ID_RULE_TERMS:        return "rule_terms";
+        case ID_CODE:              return "code";
+        case '+':                  return "+";
+        case '*':                  return "*";
+        case '?':                  return "?";
+        case '(':                  return "(";
     }
     throw ERROR_SYM_ID_NOT_FOUND;
     return "";
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "int")          return ID_INT;
-    if(name == "float")        return ID_FLOAT;
-    if(name == "string")       return ID_STRING;
-    if(name == "char")         return ID_CHAR;
-    if(name == "ident")        return ID_IDENT;
-    if(name == "grammar")      return ID_GRAMMAR;
-    if(name == "definitions")  return ID_DEFINITIONS;
-    if(name == "decl")         return ID_DECL;
-    if(name == "decl_eq")      return ID_DECL_EQ;
-    if(name == "decl_brace")   return ID_DECL_BRACE;
-    if(name == "proto_block")  return ID_PROTO_BLOCK;
-    if(name == "union_block")  return ID_UNION_BLOCK;
-    if(name == "decl_stmts")   return ID_DECL_STMTS;
-    if(name == "decl_stmt")    return ID_DECL_STMT;
-    if(name == "decl_chunks")  return ID_DECL_CHUNKS;
-    if(name == "decl_chunk")   return ID_DECL_CHUNK;
-    if(name == "symbols")      return ID_SYMBOLS;
-    if(name == "symbol")       return ID_SYMBOL;
-    if(name == "rules")        return ID_RULES;
-    if(name == "rule")         return ID_RULE;
-    if(name == "alts")         return ID_ALTS;
-    if(name == "alt")          return ID_ALT;
-    if(name == "action_block") return ID_ACTION_BLOCK;
-    if(name == "terms")        return ID_TERMS;
-    if(name == "code")         return ID_CODE;
-    if(name == "+")            return '+';
-    if(name == "*")            return '*';
-    if(name == "?")            return '?';
-    if(name == "(")            return '(';
+    if(name == "int")               return ID_INT;
+    if(name == "float")             return ID_FLOAT;
+    if(name == "string")            return ID_STRING;
+    if(name == "char")              return ID_CHAR;
+    if(name == "ident")             return ID_IDENT;
+    if(name == "grammar")           return ID_GRAMMAR;
+    if(name == "definitions")       return ID_DEFINITIONS;
+    if(name == "definition")        return ID_DEFINITION;
+    if(name == "def_eq")            return ID_DEF_EQ;
+    if(name == "def_brace")         return ID_DEF_BRACE;
+    if(name == "def_proto_block")   return ID_DEF_PROTO_BLOCK;
+    if(name == "union_block")       return ID_UNION_BLOCK;
+    if(name == "union_types")       return ID_UNION_TYPES;
+    if(name == "union_type")        return ID_UNION_TYPE;
+    if(name == "union_terms")       return ID_UNION_TERMS;
+    if(name == "union_term")        return ID_UNION_TERM;
+    if(name == "def_symbols")       return ID_DEF_SYMBOLS;
+    if(name == "def_symbol")        return ID_DEF_SYMBOL;
+    if(name == "rules")             return ID_RULES;
+    if(name == "rule")              return ID_RULE;
+    if(name == "rule_alts")         return ID_RULE_ALTS;
+    if(name == "rule_alt")          return ID_RULE_ALT;
+    if(name == "rule_action_block") return ID_RULE_ACTION_BLOCK;
+    if(name == "rule_terms")        return ID_RULE_TERMS;
+    if(name == "code")              return ID_CODE;
+    if(name == "+")                 return '+';
+    if(name == "*")                 return '*';
+    if(name == "?")                 return '?';
+    if(name == "(")                 return '(';
     throw ERROR_SYM_NAME_NOT_FOUND;
     return 0;
 }
@@ -147,7 +147,7 @@ xl::TreeContext* &tree_context()
     xl::node::TermInternalType<xl::node::NodeIdentIFace::FLOAT>::type  float_value;  // float value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::STRING>::type string_value; // string value
     xl::node::TermInternalType<xl::node::NodeIdentIFace::CHAR>::type   char_value;   // char value
-    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // symbol table index
+    xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type  ident_value;  // def_symbol table index
     xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type symbol_value; // node pointer
 }
 
@@ -162,12 +162,12 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        proto_block union_block decl_stmts decl_stmt decl_chunks decl_chunk
-        symbols symbol rules rule alts alt action_block terms term code
+        def_proto_block union_block union_types union_type union_terms union_term
+        def_symbols def_symbol rules rule rule_alts rule_alt rule_action_block rule_terms rule_term code
 
-%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DECL ID_DECL_EQ ID_DECL_BRACE
-        ID_PROTO_BLOCK ID_UNION_BLOCK ID_DECL_STMTS ID_DECL_STMT ID_DECL_CHUNKS ID_DECL_CHUNK
-        ID_SYMBOLS ID_SYMBOL ID_RULES ID_RULE ID_ALTS ID_ALT ID_ACTION_BLOCK ID_TERMS ID_FENCE ID_CODE
+%nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_DEF_EQ ID_DEF_BRACE
+        ID_DEF_PROTO_BLOCK ID_UNION_BLOCK ID_UNION_TYPES ID_UNION_TYPE ID_UNION_TERMS ID_UNION_TERM
+        ID_DEF_SYMBOLS ID_DEF_SYMBOL ID_RULES ID_RULE ID_RULE_ALTS ID_RULE_ALT ID_RULE_ACTION_BLOCK ID_RULE_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
 %nonassoc '+' '*' '?'
@@ -196,61 +196,61 @@ definitions:
     ;
 
 definition:
-      '%' ID_IDENT                     { $$ = MAKE_SYMBOL(ID_DECL, 1, MAKE_TERM(ID_IDENT, $2)); }
-    | '%' ID_IDENT symbols             { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | '%' ID_IDENT '{' union_block '}' { $$ = MAKE_SYMBOL(ID_DECL, 2, MAKE_TERM(ID_IDENT, $2), $4); }
+      '%' ID_IDENT                     { $$ = MAKE_SYMBOL(ID_DEFINITION, 1, MAKE_TERM(ID_IDENT, $2)); }
+    | '%' ID_IDENT def_symbols         { $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | '%' ID_IDENT '{' union_block '}' { $$ = MAKE_SYMBOL(ID_DEFINITION, 2, MAKE_TERM(ID_IDENT, $2), $4); }
     | '%' ID_IDENT '=' ID_STRING {
-                $$ = MAKE_SYMBOL(ID_DECL_EQ, 2,
+                $$ = MAKE_SYMBOL(ID_DEF_EQ, 2,
                         MAKE_TERM(ID_IDENT, $2),
                         MAKE_TERM(ID_STRING, $4));
             }
-    | '%' ID_IDENT '<' ID_IDENT '>' symbols {
-                $$ = MAKE_SYMBOL(ID_DECL_BRACE, 3,
+    | '%' ID_IDENT '<' ID_IDENT '>' def_symbols {
+                $$ = MAKE_SYMBOL(ID_DEF_BRACE, 3,
                         MAKE_TERM(ID_IDENT, $2),
                         MAKE_TERM(ID_IDENT, $4),
                         $6);
             }
-    | proto_block { $$ = $1; }
+    | def_proto_block { $$ = $1; }
     ;
 
-symbols:
-      symbol         { $$ = MAKE_SYMBOL(ID_SYMBOLS, 1, $1); }
-    | symbols symbol { $$ = MAKE_SYMBOL(ID_SYMBOLS, 2, $1, $2); }
+def_symbols:
+      def_symbol             { $$ = MAKE_SYMBOL(ID_DEF_SYMBOLS, 1, $1); }
+    | def_symbols def_symbol { $$ = MAKE_SYMBOL(ID_DEF_SYMBOLS, 2, $1, $2); }
     ;
 
-symbol:
-      ID_IDENT { $$ = MAKE_SYMBOL(ID_SYMBOL, 1, MAKE_TERM(ID_IDENT, $1)); }
-    | ID_CHAR  { $$ = MAKE_SYMBOL(ID_SYMBOL, 1, MAKE_TERM(ID_CHAR, $1)); }
+def_symbol:
+      ID_IDENT { $$ = MAKE_SYMBOL(ID_DEF_SYMBOL, 1, MAKE_TERM(ID_IDENT, $1)); }
+    | ID_CHAR  { $$ = MAKE_SYMBOL(ID_DEF_SYMBOL, 1, MAKE_TERM(ID_CHAR, $1)); }
     ;
 
 union_block:
-      decl_stmts { $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1, $1); }
+      union_types { $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1, $1); }
     ;
 
-decl_stmts:
-      /* empty */          { $$ = EOL; }
-    | decl_stmts decl_stmt { $$ = MAKE_SYMBOL(ID_DECL_STMTS, 2, $1, $2); }
-    ;
-
-decl_stmt:
-      decl_chunks ';' { $$ = MAKE_SYMBOL(ID_DECL_STMT, 1, $1); }
-    ;
-
-decl_chunks:
+union_types:
       /* empty */            { $$ = EOL; }
-    | decl_chunks decl_chunk { $$ = MAKE_SYMBOL(ID_DECL_CHUNKS, 2, $1, $2); }
+    | union_types union_type { $$ = MAKE_SYMBOL(ID_UNION_TYPES, 2, $1, $2); }
     ;
 
-decl_chunk:
+union_type:
+      union_terms ';' { $$ = MAKE_SYMBOL(ID_UNION_TYPE, 1, $1); }
+    ;
+
+union_terms:
+      /* empty */            { $$ = EOL; }
+    | union_terms union_term { $$ = MAKE_SYMBOL(ID_UNION_TERMS, 2, $1, $2); }
+    ;
+
+union_term:
       ID_STRING {
-                $$ = MAKE_SYMBOL(ID_DECL_CHUNK, 1,
+                $$ = MAKE_SYMBOL(ID_UNION_TERM, 1,
                         MAKE_TERM(ID_STRING, $1));
             }
     ;
 
-proto_block:
+def_proto_block:
       ID_STRING {
-                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_PROTO_BLOCK, 1,
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_DEF_PROTO_BLOCK, 1,
                         MAKE_TERM(ID_STRING, $1)) : NULL;
             }
     ;
@@ -264,42 +264,42 @@ rules:
     ;
 
 rule:
-      ID_IDENT ':' alts ';' {
+      ID_IDENT ':' rule_alts ';' {
                 $$ = MAKE_SYMBOL(ID_RULE, 2, MAKE_TERM(ID_IDENT, $1), $3);
             }
     ;
 
-alts:
-      alt          { $$ = MAKE_SYMBOL(ID_ALTS, 1, $1); }
-    | alts '|' alt { $$ = MAKE_SYMBOL(ID_ALTS, 2, $1, $3); }
+rule_alts:
+      rule_alt               { $$ = MAKE_SYMBOL(ID_RULE_ALTS, 1, $1); }
+    | rule_alts '|' rule_alt { $$ = MAKE_SYMBOL(ID_RULE_ALTS, 2, $1, $3); }
     ;
 
-alt:
-      terms action_block { $$ = MAKE_SYMBOL(ID_ALT, 2, $1, $2); }
+rule_alt:
+      rule_terms rule_action_block { $$ = MAKE_SYMBOL(ID_RULE_ALT, 2, $1, $2); }
     ;
 
-action_block:
+rule_action_block:
       ID_STRING {
-                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_ACTION_BLOCK, 1,
+                $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_RULE_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, $1)) : NULL;
             }
     ;
 
-terms:
+rule_terms:
       /* empty */ { $$ = EOL; }
-    | terms term  { $$ = MAKE_SYMBOL(ID_TERMS, 2, $1, $2); }
+    | rule_terms rule_term  { $$ = MAKE_SYMBOL(ID_RULE_TERMS, 2, $1, $2); }
     ;
 
-term:
-      ID_INT       { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT     { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_STRING    { $$ = MAKE_TERM(ID_STRING, $1); }
-    | ID_CHAR      { $$ = MAKE_TERM(ID_CHAR, $1); }
-    | ID_IDENT     { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }
-    | term '*'     { $$ = MAKE_SYMBOL('*', 1, $1); }
-    | term '?'     { $$ = MAKE_SYMBOL('?', 1, $1); }
-    | '(' alts ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
+rule_term:
+      ID_INT            { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT          { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_STRING         { $$ = MAKE_TERM(ID_STRING, $1); }
+    | ID_CHAR           { $$ = MAKE_TERM(ID_CHAR, $1); }
+    | ID_IDENT          { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | rule_term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }
+    | rule_term '*'     { $$ = MAKE_SYMBOL('*', 1, $1); }
+    | rule_term '?'     { $$ = MAKE_SYMBOL('?', 1, $1); }
+    | '(' rule_alts ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
     ;
 
 //=============================================================================
