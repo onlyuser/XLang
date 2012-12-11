@@ -75,8 +75,8 @@ std::string id_to_name(uint32_t sym_id)
         case ID_DEF_BRACE:         return "def_brace";
         case ID_DEF_PROTO_BLOCK:   return "def_proto_block";
         case ID_UNION_BLOCK:       return "union_block";
-        case ID_UNION_TYPES:       return "union_types";
-        case ID_UNION_TYPE:        return "union_type";
+        case ID_UNION_MEMBERS:     return "union_members";
+        case ID_UNION_MEMBER:      return "union_member";
         case ID_UNION_TERMS:       return "union_terms";
         case ID_UNION_TERM:        return "union_term";
         case ID_DEF_SYMBOLS:       return "def_symbols";
@@ -110,8 +110,8 @@ uint32_t name_to_id(std::string name)
     if(name == "def_brace")         return ID_DEF_BRACE;
     if(name == "def_proto_block")   return ID_DEF_PROTO_BLOCK;
     if(name == "union_block")       return ID_UNION_BLOCK;
-    if(name == "union_types")       return ID_UNION_TYPES;
-    if(name == "union_type")        return ID_UNION_TYPE;
+    if(name == "union_members")     return ID_UNION_MEMBERS;
+    if(name == "union_member")      return ID_UNION_MEMBER;
     if(name == "union_terms")       return ID_UNION_TERMS;
     if(name == "union_term")        return ID_UNION_TERM;
     if(name == "def_symbols")       return ID_DEF_SYMBOLS;
@@ -162,11 +162,11 @@ xl::TreeContext* &tree_context()
 %token<char_value>   ID_CHAR
 %token<ident_value>  ID_IDENT
 %type<symbol_value>  grammar definitions definition
-        def_proto_block union_block union_types union_type union_terms union_term
+        def_proto_block union_block union_members union_member union_terms union_term
         def_symbols def_symbol rules rule rule_alts rule_alt rule_action_block rule_terms rule_term code
 
 %nonassoc ID_GRAMMAR ID_DEFINITIONS ID_DEFINITION ID_DEF_EQ ID_DEF_BRACE
-        ID_DEF_PROTO_BLOCK ID_UNION_BLOCK ID_UNION_TYPES ID_UNION_TYPE ID_UNION_TERMS ID_UNION_TERM
+        ID_DEF_PROTO_BLOCK ID_UNION_BLOCK ID_UNION_MEMBERS ID_UNION_MEMBER ID_UNION_TERMS ID_UNION_TERM
         ID_DEF_SYMBOLS ID_DEF_SYMBOL ID_RULES ID_RULE ID_RULE_ALTS ID_RULE_ALT ID_RULE_ACTION_BLOCK ID_RULE_TERMS ID_FENCE ID_CODE
 %nonassoc ':'
 %nonassoc '|' '(' ';'
@@ -224,16 +224,16 @@ def_symbol:
     ;
 
 union_block:
-      union_types { $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1, $1); }
+      union_members { $$ = MAKE_SYMBOL(ID_UNION_BLOCK, 1, $1); }
     ;
 
-union_types:
-      /* empty */            { $$ = EOL; }
-    | union_types union_type { $$ = MAKE_SYMBOL(ID_UNION_TYPES, 2, $1, $2); }
+union_members:
+      /* empty */                { $$ = EOL; }
+    | union_members union_member { $$ = MAKE_SYMBOL(ID_UNION_MEMBERS, 2, $1, $2); }
     ;
 
-union_type:
-      union_terms ';' { $$ = MAKE_SYMBOL(ID_UNION_TYPE, 1, $1); }
+union_member:
+      union_terms ';' { $$ = MAKE_SYMBOL(ID_UNION_MEMBER, 1, $1); }
     ;
 
 union_terms:
@@ -286,8 +286,8 @@ rule_action_block:
     ;
 
 rule_terms:
-      /* empty */ { $$ = EOL; }
-    | rule_terms rule_term  { $$ = MAKE_SYMBOL(ID_RULE_TERMS, 2, $1, $2); }
+      /* empty */          { $$ = EOL; }
+    | rule_terms rule_term { $$ = MAKE_SYMBOL(ID_RULE_TERMS, 2, $1, $2); }
     ;
 
 rule_term:

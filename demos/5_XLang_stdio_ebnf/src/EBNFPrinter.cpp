@@ -239,7 +239,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     return *lhs_value_ptr;
 }
 
-static std::string create_new_delete_vector(int position);
+static std::string create_new_delete_vector_stmt(int position);
 static xl::node::NodeIdentIFace* make_stem_rule(
         std::string name,
         const xl::node::NodeIdentIFace* rule_node,
@@ -307,8 +307,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                 }
             }
         }
-        std::string s = create_new_delete_vector(position);
-        action_string_ptr->append(s);
+        action_string_ptr->append(create_new_delete_vector_stmt(position));
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
@@ -446,17 +445,17 @@ static xl::node::NodeIdentIFace* make_term_rule(
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string create_new_include_header()
+static std::string create_new_include_header_stmt()
 {
     return "#include <vector>";
 }
 
 // node to be appended to back of union_block_node
-static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::string type_name,
-        xl::TreeContext* tc)
+static xl::node::NodeIdentIFace* create_new_union_member_node(
+        std::string type, std::string _type_name, xl::TreeContext* tc)
 {
     // STRING:
-    //std::vector< /* AAA */ type >* /* BBB */ type_name;
+    //std::vector< /* AAA */ type >* /* BBB */ _type_name;
     //
     // XML:
     //<symbol type="decl_stmt">
@@ -465,19 +464,19 @@ static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::st
     //            <term type="string" value="std::vector< /* AAA */ type >*"/>
     //        </symbol>
     //        <symbol type="decl_chunk">
-    //            <term type="string" value=" /* BBB */ type_name "/>
+    //            <term type="string" value=" /* BBB */ _type_name "/>
     //        </symbol>
     //    </symbol>
     //</symbol>
 
     xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_UNION_TYPE, 1,
+            MAKE_SYMBOL(tc, ID_UNION_MEMBER, 1,
                     MAKE_SYMBOL(tc, ID_UNION_TERMS, 2,
                             MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string("std::vector<" + type + ">"))
                                     ),
                             MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string(type_name))
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(_type_name))
                                     )
                             )
                     );
@@ -485,17 +484,16 @@ static xl::node::NodeIdentIFace* create_new_union_type(std::string type, std::st
 }
 
 // node to be appended to back of definitions block
-static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
-        std::string type_name, std::vector<std::string> &token_vec,
-        xl::TreeContext* tc)
+static xl::node::NodeIdentIFace* create_new_def_brace_node(
+        std::string _type_name, std::vector<std::string> &token_vec, xl::TreeContext* tc)
 {
     // STRING:
-    //%type< /* AAA */ type_name > /* BBB */ token_vec
+    //%type< /* AAA */ _type_name > /* BBB */ token_vec
     //
     // XML:
     //<symbol type="decl_brace">
     //    <term type="ident" value=type/>
-    //    <term type="ident" value= /* AAA */ type_name />
+    //    <term type="ident" value= /* AAA */ _type_name />
     //    <symbol type="symbols">
     //        <symbol type="symbol">
     //            <term type="ident" value= /* BBB */ token_vec />
@@ -515,7 +513,7 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(type_name)),
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(_type_name)),
                     MAKE_SYMBOL(tc, ID_DEF_SYMBOLS, 1,
                             MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
                                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
@@ -526,7 +524,7 @@ static xl::node::NodeIdentIFace* create_new_tokens_of_union_type(
 }
 
 // string to be appended to back of kleene closure action_block's string value
-static std::string create_new_delete_vector(int position)
+static std::string create_new_delete_vector_stmt(int position)
 {
     std::stringstream ss;
     ss << "delete $" << position << ";";
@@ -624,12 +622,12 @@ static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            node_replacements,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
+        const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
-        const xl::node::NodeIdentIFace*                                                  definitions_node,
-        std::map<std::string, const xl::node::NodeIdentIFace*>*                          string_to_symbol_map,
-        std::map<std::string, std::string>*                                              union_var_to_type_map,
-        std::map<std::string, std::string>*                                              token_var_to_type_map,
+        std::map<std::string, const xl::node::NodeIdentIFace*>*                          def_symbol_name_to_symbol,
+        std::map<std::string, std::string>*                                              union_typename_to_type,
+        std::map<std::string, std::string>*                                              def_symbol_name_to_union_typename,
         xl::TreeContext*                                                                 tc)
 {
     if(string_insertions_to_front)
@@ -641,19 +639,16 @@ static void enqueue_changes_for_kleene_closure(
             if(term_node)
             {
                 std::string proto_block_string = get_string_from_term_node(term_node);
-                std::string include_header_string = create_new_include_header();
-                if(!include_header_string.empty())
-                {
-                    if(proto_block_string.find(include_header_string) == std::string::npos)
-                        (*string_insertions_to_front)[term_node].push_back(include_header_string);
-                }
+                std::string include_header_stmt = create_new_include_header_stmt();
+                if(proto_block_string.find(include_header_stmt) == std::string::npos)
+                    (*string_insertions_to_front)[term_node].push_back(include_header_stmt);
             }
         }
     }
     const xl::node::NodeIdentIFace* rule_node = get_ancestor_node(ID_RULE, kleene_node);
     std::string rule_name = get_rule_name_from_rule_node(rule_node);
-    std::string rule_type_name = (*token_var_to_type_map)[rule_name];
-    std::string rule_type = (*union_var_to_type_map)[rule_type_name];
+    std::string rule_typename = (*def_symbol_name_to_union_typename)[rule_name];
+    std::string rule_type = (*union_typename_to_type)[rule_typename];
     std::string name1 = gen_name(rule_name);
     std::string name2 = gen_name(rule_name);
     if(node_appends_to_back)
@@ -667,12 +662,12 @@ static void enqueue_changes_for_kleene_closure(
                 auto union_members_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_members_node);
                 if(union_members_symbol)
                 {
-                    std::string type_name = gen_vec_name(rule_type_name);
-                    xl::node::NodeIdentIFace* union_type_node = create_new_union_type(rule_type, type_name, tc);
-                    if(union_type_node)
+                    xl::node::NodeIdentIFace* union_member_node =
+                            create_new_union_member_node(rule_type, gen_vec_name(rule_typename), tc);
+                    if(union_member_node)
                     {
-                        if(!union_members_symbol->find(union_type_node))
-                            (*node_appends_to_back)[union_members_symbol].push_back(union_type_node);
+                        if(!union_members_symbol->find(union_member_node))
+                            (*node_appends_to_back)[union_members_symbol].push_back(union_member_node);
                     }
                 }
             }
@@ -680,16 +675,15 @@ static void enqueue_changes_for_kleene_closure(
         auto definitions_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(definitions_node);
         if(definitions_symbol)
         {
-            std::string type_name = gen_vec_name(rule_type_name);
             std::vector<std::string> token_vec;
             token_vec.push_back(name1);
-            xl::node::NodeIdentIFace* tokens_of_union_type =
-                    create_new_tokens_of_union_type(type_name, token_vec, tc);
-            if(!definitions_symbol->find(tokens_of_union_type))
-                (*node_appends_to_back)[definitions_symbol].push_back(tokens_of_union_type);
+            xl::node::NodeIdentIFace* def_brace_node =
+                    create_new_def_brace_node(gen_vec_name(rule_typename), token_vec, tc);
+            if(!definitions_symbol->find(def_brace_node))
+                (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
         }
     }
-    const xl::node::NodeIdentIFace* rule_definition_node = (*string_to_symbol_map)[rule_name];
+    const xl::node::NodeIdentIFace* rule_definition_node = (*def_symbol_name_to_symbol)[rule_name];
     add_term_rule(
             node_insertions_after,
             name2,
@@ -719,22 +713,24 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         std::cout << '[';
 #endif
     static bool entered_kleene_closure = false;
-    static const xl::node::NodeIdentIFace *proto_block_node = NULL, *union_block_node = NULL,
-            *definitions_node = NULL;
-    static std::map<std::string, const xl::node::NodeIdentIFace*> string_to_symbol_map;
-    static std::map<std::string, std::string> union_var_to_type_map, token_var_to_type_map;
-    static std::vector<std::string> decl_chunk_vec, symbols_vec;
+    static const xl::node::NodeIdentIFace *definitions_node = NULL, *proto_block_node = NULL,
+            *union_block_node = NULL;
+    static std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_symbol;
+    static std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
+    static std::vector<std::string> union_term_names, def_symbol_names;
     bool more;
     switch(_node->sym_id())
     {
         case ID_GRAMMAR:
-            entered_kleene_closure = false;
-            proto_block_node = NULL;
-            union_block_node = NULL;
-            definitions_node = NULL;
-            string_to_symbol_map.clear();
-            union_var_to_type_map.clear();
-            token_var_to_type_map.clear();
+            {
+                entered_kleene_closure = false;
+                definitions_node = NULL;
+                proto_block_node = NULL;
+                union_block_node = NULL;
+                def_symbol_name_to_symbol.clear();
+                union_typename_to_type.clear();
+                def_symbol_name_to_union_typename.clear();
+            }
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
             visit_next_child(_node);
@@ -768,7 +764,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEF_BRACE:
             {
-                std::string token_type;
+                std::string union_typename;
                 std::cout << '%';
                 visit_next_child(_node);
                 {
@@ -776,12 +772,12 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     xl::node::NodeIdentIFace* child = NULL;
                     visit_next_child(_node, &child);
                     if(child)
-                        token_type = get_string_from_term_node(child);
+                        union_typename = get_string_from_term_node(child);
                     std::cout << "> ";
                 }
                 visit_next_child(_node);
-                for(auto p = symbols_vec.begin(); p != symbols_vec.end(); p++)
-                    token_var_to_type_map[*p] = token_type;
+                for(auto p = def_symbol_names.begin(); p != def_symbol_names.end(); p++)
+                    def_symbol_name_to_union_typename[*p] = union_typename;
             }
             break;
         case ID_DEF_PROTO_BLOCK:
@@ -796,7 +792,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             visit_next_child(_node);
             std::cout << std::endl << '}';
             break;
-        case ID_UNION_TYPES:
+        case ID_UNION_MEMBERS:
             do
             {
                 std::cout << '\t';
@@ -805,36 +801,36 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     std::cout << std::endl;
             } while(more);
             break;
-        case ID_UNION_TYPE:
+        case ID_UNION_MEMBER:
             visit_next_child(_node);
             std::cout << ';';
-            if(!decl_chunk_vec.empty())
-            {
-                std::string union_type;
-                for(size_t i = 0; i<decl_chunk_vec.size()-1; i++)
-                    union_type.append(decl_chunk_vec[i]);
-                std::string union_var = decl_chunk_vec[decl_chunk_vec.size()-1];
-                union_var_to_type_map[union_var] = union_type;
-            }
             break;
         case ID_UNION_TERMS:
-            decl_chunk_vec.clear();
+            union_term_names.clear();
             do
             {
                 more = visit_next_child(_node);
                 if(more)
                     std::cout << ' ';
             } while(more);
+            if(!union_term_names.empty())
+            {
+                std::string union_type;
+                for(size_t i = 0; i<union_term_names.size()-1; i++)
+                    union_type.append(union_term_names[i]);
+                std::string union_typename = union_term_names[union_term_names.size()-1];
+                union_typename_to_type[union_typename] = union_type;
+            }
             break;
         case ID_UNION_TERM:
             {
-                std::string s = get_string_from_term_node((*_node)[0]);
-                std::cout << s;
-                decl_chunk_vec.push_back(s);
+                std::string name = get_string_from_term_node((*_node)[0]);
+                std::cout << name;
+                union_term_names.push_back(name);
             }
             break;
         case ID_DEF_SYMBOLS:
-            symbols_vec.clear();
+            def_symbol_names.clear();
             do
             {
                 more = visit_next_child(_node);
@@ -844,12 +840,12 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEF_SYMBOL:
             {
-                std::string s = get_string_from_term_node((*_node)[0]);
-                std::cout << s;
-                if(!s.empty())
+                std::string symbol_name = get_string_from_term_node((*_node)[0]);
+                std::cout << symbol_name;
+                if(!symbol_name.empty())
                 {
-                    string_to_symbol_map[s] = _node;
-                    symbols_vec.push_back(s);
+                    def_symbol_name_to_symbol[symbol_name] = _node;
+                    def_symbol_names.push_back(symbol_name);
                 }
             }
             break;
@@ -905,12 +901,12 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             &m_changes->m_string_insertions_to_front,
                             &m_changes->m_node_replacements,
                             _node,
+                            definitions_node,
                             proto_block_node,
                             union_block_node,
-                            definitions_node,
-                            &string_to_symbol_map,
-                            &union_var_to_type_map,
-                            &token_var_to_type_map,
+                            &def_symbol_name_to_symbol,
+                            &union_typename_to_type,
+                            &def_symbol_name_to_union_typename,
                             m_tc);
                 entered_kleene_closure = true;
             }
