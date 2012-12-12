@@ -169,6 +169,7 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ter
 static const xl::node::NodeIdentIFace* get_alts_node_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
+    // XML:
     //<symbol type="*">            // <-- kleene_node
     //    <symbol type="(">        // <-- paren_node
     //        <symbol type="alts"> // <-- alts_node
@@ -195,6 +196,7 @@ static const xl::node::NodeIdentIFace* get_alts_node_from_kleene_node(
 static std::string* get_action_string_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
+    // XML:
     //<symbol type="alt"> // <-- alt_node
     //    <symbol type="terms">
     //        <symbol type="*"> // <-- kleene_node
@@ -248,12 +250,14 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         const xl::node::NodeIdentIFace* kleene_node,
         xl::TreeContext* tc)
 {
+    // STRING:
     //program:
     //      (
     //            statement ',' { /* AAA */ $$ = $1; }
     //      )* statement { /* BBB */ ... }
     //    ;
     //
+    // XML:
     //<symbol type="rule">
     //    <term type="ident" value=program/>
     //    <symbol type="alts">
@@ -326,6 +330,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
         std::string vector_inner_type, xl::TreeContext* tc)
 {
+    // STRING:
     //program_0:
     //      /* empty */ {
     //                /* AAA */
@@ -337,6 +342,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
     //    ;
     //
+    // XML:
     //<symbol type="rule">
     //    <term type="ident" value=program_0/>
     //    <symbol type="alts">
@@ -388,11 +394,13 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
 static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1, std::string name2,
         xl::TreeContext* tc)
 {
+    // STRING:
     //statement_0:
     //      /* empty */ { /* AAA */ $$ = NULL; }
     //    | statement_1 { /* BBB */ $$ = $1; }
     //    ;
     //
+    // XML:
     //<symbol type="rule">
     //    <term type="ident" value=statement_0/>
     //    <symbol type="alts">
@@ -525,16 +533,16 @@ static xl::node::NodeIdentIFace* make_new_def_brace_node(
     return node;
 }
 
-// node to be..
+// node to be inserted right after kleene closure's rule's definition symbol
 static xl::node::NodeIdentIFace* make_new_def_symbol(
         std::string name, xl::TreeContext* tc)
 {
     // STRING:
-    // name
+    //name
     //
     // XML:
     //<symbol type="symbol">
-    //    <term type="ident" value=name/>
+    //    <term type="ident" value= name />
     //</symbol>
 
     xl::node::NodeIdentIFace* node =
@@ -543,6 +551,7 @@ static xl::node::NodeIdentIFace* make_new_def_symbol(
                     );
     return node;
 }
+
 // string to be appended to back of kleene closure action_block's string value
 static std::string gen_new_delete_vector_stmt(int position)
 {
@@ -616,6 +625,18 @@ static void add_def_brace(
         (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
 }
 
+static void add_def_symbol(
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
+        std::string                                                                      name2,
+        const xl::node::NodeIdentIFace*                                                  rule_def_symbol_node,
+        xl::TreeContext*                                                                 tc)
+{
+    if(!node_insertions_after)
+        return;
+    xl::node::NodeIdentIFace* def_symbol_node = make_new_def_symbol(name2, tc);
+    (*node_insertions_after)[rule_def_symbol_node].push_back(def_symbol_node);
+}
+
 static void add_term_rule(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::string                                                                      name2,
@@ -637,8 +658,11 @@ static void add_term_rule(
 #endif
     (*node_insertions_after)[rule_node].push_back(term_rule);
 
-    xl::node::NodeIdentIFace* def_symbol_node = make_new_def_symbol(name2, tc);
-    (*node_insertions_after)[rule_def_symbol_node].push_back(def_symbol_node);
+    add_def_symbol(
+            node_insertions_after,
+            name2,
+            rule_def_symbol_node,
+            tc);
 }
 
 static void add_recursive_rule(
