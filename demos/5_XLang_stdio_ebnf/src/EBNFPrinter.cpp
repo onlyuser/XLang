@@ -56,6 +56,8 @@
 #endif
 #define MAKE_SYMBOL xl::mvc::MVCModel::make_symbol
 
+#define CHILD_OF(x) ((*x)[0])
+
 static std::string gen_name(std::string stem)
 {
     static std::map<std::string, int> tally_map;
@@ -180,13 +182,13 @@ static const xl::node::NodeIdentIFace* get_alts_node_from_kleene_node(
     auto kleene_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(kleene_node);
     if(!kleene_symbol)
         return NULL;
-    xl::node::NodeIdentIFace* paren_node = (*kleene_symbol)[0];
+    xl::node::NodeIdentIFace* paren_node = CHILD_OF(kleene_symbol);
     if(!paren_node)
         return NULL;
     auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
     if(!paren_symbol)
         return NULL;
-    return (*paren_symbol)[0];
+    return CHILD_OF(paren_symbol);
 }
 
 // kleene_node --> alt_node (up) --> action_node
@@ -219,7 +221,7 @@ static std::string* get_action_string_from_kleene_node(
     auto action_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node);
     if(!action_symbol)
         return NULL;
-    xl::node::NodeIdentIFace* action_string_node = (*action_symbol)[0];
+    xl::node::NodeIdentIFace* action_string_node = CHILD_OF(action_symbol);
     return get_string_ptr_from_term_node(action_string_node);
 }
 
@@ -230,7 +232,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     auto rule_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node);
     if(!rule_symbol)
         return "";
-    xl::node::NodeIdentIFace* lhs_node = (*rule_symbol)[0];
+    xl::node::NodeIdentIFace* lhs_node = CHILD_OF(rule_symbol);
     if(!lhs_node)
         return "";
     std::string* lhs_value_ptr = get_string_ptr_from_term_node(lhs_node);
@@ -239,7 +241,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     return *lhs_value_ptr;
 }
 
-static std::string create_new_delete_vector_stmt(int position);
+static std::string gen_new_delete_vector_stmt(int position);
 static xl::node::NodeIdentIFace* make_stem_rule(
         std::string name,
         const xl::node::NodeIdentIFace* rule_node,
@@ -307,7 +309,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                 }
             }
         }
-        action_string_ptr->append(create_new_delete_vector_stmt(position));
+        action_string_ptr->append(gen_new_delete_vector_stmt(position));
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
@@ -445,13 +447,13 @@ static xl::node::NodeIdentIFace* make_term_rule(
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string create_new_include_header_stmt()
+static std::string gen_new_include_header_stmt()
 {
     return "#include <vector>";
 }
 
 // node to be appended to back of union_block_node
-static xl::node::NodeIdentIFace* create_new_union_member_node(
+static xl::node::NodeIdentIFace* make_new_union_member_node(
         std::string type, std::string _type_name, xl::TreeContext* tc)
 {
     // STRING:
@@ -484,7 +486,7 @@ static xl::node::NodeIdentIFace* create_new_union_member_node(
 }
 
 // node to be appended to back of definitions block
-static xl::node::NodeIdentIFace* create_new_def_brace_node(
+static xl::node::NodeIdentIFace* make_new_def_brace_node(
         std::string _type_name, std::vector<std::string> &token_vec, xl::TreeContext* tc)
 {
     // STRING:
@@ -524,7 +526,7 @@ static xl::node::NodeIdentIFace* create_new_def_brace_node(
 }
 
 // string to be appended to back of kleene closure action_block's string value
-static std::string create_new_delete_vector_stmt(int position)
+static std::string gen_new_delete_vector_stmt(int position)
 {
     std::stringstream ss;
     ss << "delete $" << position << ";";
@@ -635,11 +637,11 @@ static void enqueue_changes_for_kleene_closure(
         auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
         if(proto_block_symbol)
         {
-            const xl::node::NodeIdentIFace* term_node = (*proto_block_symbol)[0];
+            const xl::node::NodeIdentIFace* term_node = CHILD_OF(proto_block_symbol);
             if(term_node)
             {
                 std::string proto_block_string = get_string_from_term_node(term_node);
-                std::string include_header_stmt = create_new_include_header_stmt();
+                std::string include_header_stmt = gen_new_include_header_stmt();
                 if(proto_block_string.find(include_header_stmt) == std::string::npos)
                     (*string_insertions_to_front)[term_node].push_back(include_header_stmt);
             }
@@ -656,14 +658,14 @@ static void enqueue_changes_for_kleene_closure(
         auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
         if(union_block_symbol)
         {
-            const xl::node::NodeIdentIFace* union_members_node = (*union_block_symbol)[0];
+            const xl::node::NodeIdentIFace* union_members_node = CHILD_OF(union_block_symbol);
             if(union_members_node)
             {
                 auto union_members_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_members_node);
                 if(union_members_symbol)
                 {
                     xl::node::NodeIdentIFace* union_member_node =
-                            create_new_union_member_node(rule_type, gen_vec_name(rule_typename), tc);
+                            make_new_union_member_node(rule_type, gen_vec_name(rule_typename), tc);
                     if(union_member_node)
                     {
                         if(!union_members_symbol->find(union_member_node))
@@ -678,7 +680,7 @@ static void enqueue_changes_for_kleene_closure(
             std::vector<std::string> token_vec;
             token_vec.push_back(name1);
             xl::node::NodeIdentIFace* def_brace_node =
-                    create_new_def_brace_node(gen_vec_name(rule_typename), token_vec, tc);
+                    make_new_def_brace_node(gen_vec_name(rule_typename), token_vec, tc);
             if(!definitions_symbol->find(def_brace_node))
                 (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
         }
@@ -783,7 +785,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_DEF_PROTO_BLOCK:
             proto_block_node = _node;
             std::cout << "%{";
-            std::cout << get_string_from_term_node((*_node)[0]);
+            std::cout << get_string_from_term_node(CHILD_OF(_node));
             std::cout << "%}";
             break;
         case ID_UNION_BLOCK:
@@ -824,7 +826,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_UNION_TERM:
             {
-                std::string name = get_string_from_term_node((*_node)[0]);
+                std::string name = get_string_from_term_node(CHILD_OF(_node));
                 std::cout << name;
                 union_term_names.push_back(name);
             }
@@ -840,7 +842,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEF_SYMBOL:
             {
-                std::string symbol_name = get_string_from_term_node((*_node)[0]);
+                std::string symbol_name = get_string_from_term_node(CHILD_OF(_node));
                 std::cout << symbol_name;
                 if(!symbol_name.empty())
                 {
@@ -877,7 +879,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_RULE_ACTION_BLOCK:
             std::cout << " {";
-            std::cout << get_string_from_term_node((*_node)[0]);
+            std::cout << get_string_from_term_node(CHILD_OF(_node));
             std::cout << '}';
             break;
         case ID_RULE_TERMS:
@@ -919,7 +921,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << ')';
             break;
         case ID_CODE:
-            std::cout << get_string_from_term_node((*_node)[0]);
+            std::cout << get_string_from_term_node(CHILD_OF(_node));
             break;
     }
 #ifdef DEBUG_EBNF
