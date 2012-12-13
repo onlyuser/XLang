@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EBNF_CHANGES_H_
-#define EBNF_CHANGES_H_
+#ifndef TREE_CHANGES_H_
+#define TREE_CHANGES_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
@@ -24,9 +24,9 @@
 #include <list> // std::list
 #include <map> // std::map
 
-struct EBNFChanges
+struct TreeChanges
 {
-    EBNFChanges(xl::TreeContext* tc) : m_tc(tc)
+    TreeChanges(xl::TreeContext* tc) : m_tc(tc)
     {}
     void reset();
     bool apply();

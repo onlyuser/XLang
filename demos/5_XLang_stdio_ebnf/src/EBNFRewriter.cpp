@@ -33,7 +33,7 @@ void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: no
         #ifdef DEBUG_EBNF
             std::cout << "(iter #" << n << ") <<<" << std::endl;
         #endif
-        EBNFChanges changes(tc);
+        TreeChanges changes(tc);
         EBNFPrinter v(tc, &changes);
         {
             #ifdef DEBUG_EBNF

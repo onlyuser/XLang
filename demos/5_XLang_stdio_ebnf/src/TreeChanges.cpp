@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "EBNFChanges.h" // EBNFChanges
+#include "TreeChanges.h" // TreeChanges
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "node/XLangNode.h"
 
@@ -34,7 +34,7 @@
     }
 #endif
 
-void EBNFChanges::reset()
+void TreeChanges::reset()
 {
     m_node_insertions_after.clear();
     m_node_appends_to_back.clear();
@@ -43,7 +43,7 @@ void EBNFChanges::reset()
     m_node_replacements.clear();
 }
 
-bool EBNFChanges::apply()
+bool TreeChanges::apply()
 {
 #ifdef DEBUG_EBNF
     std::cout << "BEGIN APPLYING CHANGES" << std::endl;

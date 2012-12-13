@@ -21,19 +21,19 @@
 #include "node/XLangNodeIFace.h" // node::SymbolNodeIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 #include "XLangTreeContext.h" // TreeContext
-#include "EBNFChanges.h" // EBNFChanges
+#include "TreeChanges.h" // TreeChanges
 
 class EBNFPrinter : public xl::visitor::DefaultTour
 {
 public:
-    EBNFPrinter(xl::TreeContext* tc, EBNFChanges* changes = NULL)
+    EBNFPrinter(xl::TreeContext* tc, TreeChanges* changes = NULL)
         : m_tc(tc), m_changes(changes)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
 
 private:
     xl::TreeContext* m_tc;
-    EBNFChanges* m_changes;
+    TreeChanges* m_changes;
 };
 
 #endif
