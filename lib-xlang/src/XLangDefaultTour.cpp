@@ -156,18 +156,4 @@ void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
     }
 }
 
-void DefaultTour::begin_redirect_stdout()
-{
-    m_prev_stream_buf = std::cout.rdbuf(m_cout_buf.rdbuf());
-}
-
-std::string DefaultTour::end_redirect_stdout()
-{
-    std::string s = m_cout_buf.str();
-    std::cout.rdbuf(m_prev_stream_buf);
-    m_cout_buf.str(std::string());
-    m_cout_buf.clear();
-    return s;
-}
-
 } }

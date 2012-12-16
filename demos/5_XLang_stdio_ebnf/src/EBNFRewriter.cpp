@@ -23,6 +23,23 @@
 
 //#define DEBUG_EBNF
 
+static std::stringstream _cout_buf;
+static std::streambuf* _prev_stream_buf;
+
+static void _begin_redirect_stdout()
+{
+    _prev_stream_buf = std::cout.rdbuf(_cout_buf.rdbuf());
+}
+
+static std::string _end_redirect_stdout()
+{
+    std::string s = _cout_buf.str();
+    std::cout.rdbuf(_prev_stream_buf);
+    _cout_buf.str(std::string());
+    _cout_buf.clear();
+    return s;
+}
+
 void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-const ast
 {
     std::string captured_stdout;
@@ -39,9 +56,9 @@ void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: no
             #ifdef DEBUG_EBNF
                 v.visit_any(ast); // visit while recording changes
             #else
-                v.begin_redirect_stdout();                 // begin capture stdout
-                v.visit_any(ast);                          // visit while recording changes
-                captured_stdout = v.end_redirect_stdout(); // end capture stdout
+                _begin_redirect_stdout();                 // begin capture stdout
+                v.visit_any(ast);                         // visit while recording changes
+                captured_stdout = _end_redirect_stdout(); // end capture stdout
             #endif
         }
         changed = changes.apply(); // apply changes

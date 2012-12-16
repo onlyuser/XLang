@@ -41,15 +41,6 @@ struct DefaultTour : public Visitor<const node::NodeIdentIFace>
     virtual void abort_visitation(const node::SymbolNodeIFace* _node);
     virtual void visit(const node::SymbolNodeIFace* _node);
     virtual void visit_any(const node::NodeIdentIFace* unknown);
-
-    // redirect stdout
-    void begin_redirect_stdout();
-    std::string end_redirect_stdout();
-
-protected:
-    // redirect stdout
-    std::stringstream m_cout_buf;
-    std::streambuf* m_prev_stream_buf;
 };
 
 } }
