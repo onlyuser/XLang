@@ -15,10 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "EBNFRewriter.h" // EBNFRewriter
-#include "EBNFPrinter.h" // EBNFPrinter
+#include "TreeRewriter.h" // TreeRewriter
+#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
+#include "TreeChanges.h" // TreeChanges
+#include "SetTreeChangesIFace.h" // SetTreeChangesIFace
 #include <iostream> // std::cout
 
 //#define DEBUG_EBNF
@@ -40,7 +42,10 @@ static std::string _end_redirect_stdout()
     return s;
 }
 
-void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: non-const ast
+void rewrite_tree_until_stable(
+        xl::node::NodeIdentIFace* ast, // NOTE: non-const ast
+        xl::visitor::DefaultTour* v,
+        xl::TreeContext* tc)
 {
     std::string captured_stdout;
     bool changed = false;
@@ -51,13 +56,13 @@ void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast) // NOTE: no
             std::cout << "(iter #" << n << ") <<<" << std::endl;
         #endif
         TreeChanges changes(tc);
-        EBNFPrinter v(tc, &changes);
+        dynamic_cast<SetTreeChangesIFace*>(v)->setTreeChanges(&changes);
         {
             #ifdef DEBUG_EBNF
-                v.visit_any(ast); // visit while recording changes
+                v->visit_any(ast); // visit while recording changes
             #else
                 _begin_redirect_stdout();                 // begin capture stdout
-                v.visit_any(ast);                         // visit while recording changes
+                v->visit_any(ast);                        // visit while recording changes
                 captured_stdout = _end_redirect_stdout(); // end capture stdout
             #endif
         }

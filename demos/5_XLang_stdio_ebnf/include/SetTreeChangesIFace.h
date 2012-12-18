@@ -15,30 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EBNF_PRINTER_H_
-#define EBNF_PRINTER_H_
+#ifndef SET_TREE_CHANGES_IFACE_H_
+#define SET_TREE_CHANGES_IFACE_H_
 
-#include "node/XLangNodeIFace.h" // node::SymbolNodeIFace
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
-#include "XLangTreeContext.h" // TreeContext
-#include "TreeChanges.h" // TreeChanges
-#include "SetTreeChangesIFace.h" // SetTreeChangesIFace
-
-class EBNFPrinter : public xl::visitor::DefaultTour, public SetTreeChangesIFace
+class TreeChanges;
+class SetTreeChangesIFace
 {
 public:
-    EBNFPrinter(xl::TreeContext* tc)
-        : m_tc(tc), m_changes(NULL)
+    virtual ~SetTreeChangesIFace()
     {}
-    void visit(const xl::node::SymbolNodeIFace* _node);
-    void setTreeChanges(TreeChanges* changes)
-    {
-        m_changes = changes;
-    }
-
-private:
-    xl::TreeContext* m_tc;
-    TreeChanges* m_changes;
+    virtual void setTreeChanges(TreeChanges* changes) = 0;
 };
 
 #endif

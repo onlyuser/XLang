@@ -27,7 +27,8 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
-#include "EBNFRewriter.h" // ebnf_to_bnf
+#include "TreeRewriter.h" // ebnf_to_bnf
+#include "EBNFPrinter.h" // EBNFPrinter
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string
@@ -440,7 +441,12 @@ void export_ast(args_t &args, xl::node::NodeIdentIFace* ast)
 {
     switch(args.mode)
     {
-        case args_t::MODE_YACC:  ebnf_to_bnf(tree_context(), ast); break;
+        case args_t::MODE_YACC:
+            {
+                EBNFPrinter v(tree_context());
+                rewrite_tree_until_stable(ast, &v, tree_context());
+            }
+            break;
         case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
         case args_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
         case args_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;

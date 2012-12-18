@@ -15,12 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EBNF_REWRITER_H_
-#define EBNF_REWRITER_H_
+#ifndef TREE_REWRITER_H_
+#define TREE_REWRITER_H_
 
+#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 
-void ebnf_to_bnf(xl::TreeContext* tc, xl::node::NodeIdentIFace* ast);
+void rewrite_tree_until_stable(
+        xl::node::NodeIdentIFace* ast,
+        xl::visitor::DefaultTour* v,
+        xl::TreeContext* tc);
 
 #endif
