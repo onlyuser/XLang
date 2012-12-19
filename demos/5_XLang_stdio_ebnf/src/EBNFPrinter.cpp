@@ -21,6 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "node/XLangNode.h" // node::Node
 #include "XLangTreeContext.h" // TreeContext
+#include "TreeChanges.h" // TreeChanges
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 #include <string> // std::string

@@ -18,11 +18,12 @@
 #ifndef EBNF_PRINTER_H_
 #define EBNF_PRINTER_H_
 
-#include "node/XLangNodeIFace.h" // node::SymbolNodeIFace
 #include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
-#include "XLangTreeContext.h" // TreeContext
-#include "TreeChanges.h" // TreeChanges
 #include "SetTreeChangesIFace.h" // SetTreeChangesIFace
+
+namespace xl { namespace node { class SymbolNodeIFace; } }
+namespace xl { class TreeContext; }
+class TreeChanges;
 
 class EBNFPrinter : public xl::visitor::DefaultTour, public SetTreeChangesIFace
 {

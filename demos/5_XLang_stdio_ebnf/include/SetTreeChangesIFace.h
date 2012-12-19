@@ -19,6 +19,7 @@
 #define SET_TREE_CHANGES_IFACE_H_
 
 class TreeChanges;
+
 class SetTreeChangesIFace
 {
 public:

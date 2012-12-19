@@ -18,7 +18,7 @@
 #ifndef XLANG_MVC_VIEW_H_
 #define XLANG_MVC_VIEW_H_
 
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+namespace xl { namespace node { class NodeIdentIFace; } }
 
 namespace xl { namespace mvc {
 

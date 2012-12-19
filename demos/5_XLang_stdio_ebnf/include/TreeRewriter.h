@@ -18,9 +18,9 @@
 #ifndef TREE_REWRITER_H_
 #define TREE_REWRITER_H_
 
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLangTreeContext.h" // TreeContext
+namespace xl { namespace node { class NodeIdentIFace; } }
+namespace xl { namespace visitor { class DefaultTour; } }
+namespace xl { class TreeContext; }
 
 void rewrite_tree_until_stable(
         xl::node::NodeIdentIFace* ast,

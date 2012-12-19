@@ -19,9 +19,10 @@
 #define XLANG_TREE_CONTEXT_H_
 
 #include "XLangAlloc.h" // Allocator
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include <string> // std::string
 #include <set> // std::set
+
+namespace xl { namespace node { class NodeIdentIFace; } }
 
 namespace xl {
 

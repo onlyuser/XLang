@@ -18,11 +18,12 @@
 #ifndef TREE_CHANGES_H_
 #define TREE_CHANGES_H_
 
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
 #include <list> // std::list
 #include <map> // std::map
+
+namespace xl { namespace node { class NodeIdentIFace; } }
+namespace xl { class TreeContext; }
 
 struct TreeChanges
 {
