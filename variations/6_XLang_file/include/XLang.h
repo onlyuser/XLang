@@ -24,7 +24,6 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <stdio.h> // FILE
 #include <string> // std::string
-#include <set> // std::set
 #include <sstream> // std::stringstream
 
 struct ScannerContext

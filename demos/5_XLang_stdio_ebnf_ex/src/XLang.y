@@ -20,17 +20,16 @@
 
 %{
 
-#include "node/XLangNodeIFace.h"
-
 // EBNF-EXPANDED:
 #include <vector> // std::vector
 #include <tuple> // std::tuple
 
 // EBNF-EXPANDED:
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> program_1_type_t;
 typedef std::vector<program_1_type_t> program_0_type_t;
 
-#include "XLang.h" // node::NodeIdentIFace
+#include "XLang.h"
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView

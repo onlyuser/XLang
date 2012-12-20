@@ -21,7 +21,8 @@
 
 %{
 
-#include "node/XLangNodeIFace.h"
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "XLangTreeContext.h" // TreeContext
 
 // EBNF-EXPANDED:
 #include <vector> // std::vector

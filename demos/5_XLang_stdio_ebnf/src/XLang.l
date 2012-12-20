@@ -21,12 +21,14 @@
 
 %{
 
-#include "XLang.h" // node::NodeIdentIFace
+#include "XLang.h"
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangTreeContext.h" // TreeContext
 #include "XLangString.h" // xl::unescape
 #include <stdlib.h> // atoi
-#include <string>
-#include <sstream>
+#include <string> // std::string
+#include <sstream> // std::stringstream
 
 std::stringstream &buf()
 {

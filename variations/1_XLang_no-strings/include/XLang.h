@@ -24,7 +24,6 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
-#include <set> // std::set
 #include <sstream> // std::stringstream
 
 // type of yylval to be set by scanner actions
