@@ -24,8 +24,10 @@
 #include <vector> // std::vector
 #include <tuple> // std::tuple
 
-// EBNF-EXPANDED:
+// NOTE: no way to automatically detect this dependency, the user must manually pull it up front
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+
+// EBNF-EXPANDED:
 typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> program_1_type_t;
 typedef std::vector<program_1_type_t> program_0_type_t;
 
