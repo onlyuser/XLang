@@ -32,6 +32,7 @@ typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>:
 typedef std::vector<program_1_type_t> program_0_type_t;
 
 #include "XLang.h"
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
