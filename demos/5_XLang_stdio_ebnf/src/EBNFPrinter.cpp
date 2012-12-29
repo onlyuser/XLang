@@ -60,15 +60,9 @@
 #define CHILD_OF(x) ((*x)[0])
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_recursive_rule_include_header()
+static std::string gen_shared_include_headers()
 {
-    return "#include <vector>";
-}
-
-// string to be inserted to front of proto_block_node's string value
-static std::string gen_stem_rule_include_header()
-{
-    return "#include <tuple>";
+    return "#include <vector>\n#include <tuple>";
 }
 
 // string to be inserted to front of proto_block_node's string value
@@ -76,7 +70,11 @@ static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec
 {
     std::string s;
     for(auto p = type_vec.begin(); p != type_vec.end(); p++)
+    {
         s.append(*p);
+        if(p+1 != type_vec.end())
+            s.append(", ");
+    }
     return std::string("typedef std::tuple<") + s + "> " + _typename + ";";
 }
 
@@ -102,14 +100,14 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
-static std::string gen_vec_name(std::string stem)
+static std::string gen_typename(std::string stem)
 {
-    return stem + "_vec";
+    return stem + "_type";
 }
 
-static std::string gen_type_name(std::string stem)
+static std::string gen_type(std::string stem)
 {
-    return stem + "_t";
+    return stem + "_type_t";
 }
 
 static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
@@ -587,65 +585,69 @@ static xl::node::NodeIdentIFace* make_def_symbol(
     return node;
 }
 
-static void add_shared_include_headers(
+static void add_shared_typedefs_and_headers(
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
-        const xl::node::NodeIdentIFace*                                    proto_block_node)
-{
-    if(!string_insertions_to_front)
-        return;
-    auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
-    if(!proto_block_symbol)
-        return;
-    const xl::node::NodeIdentIFace* term_node = CHILD_OF(proto_block_symbol);
-    if(!term_node)
-        return;
-    std::string proto_block_string = get_string_from_term_node(term_node);
-    std::string shared_include_headers =
-            std::string("\n") + gen_recursive_rule_include_header() +
-            "\n" + gen_stem_rule_include_header();
-    //if(proto_block_string.find(shared_include_headers) == std::string::npos)
-        (*string_insertions_to_front)[term_node].push_back(shared_include_headers);
-}
-
-static void add_recursive_rule_protos(
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
+        std::string                                                        name1,
+        std::string                                                        name2,
+        const xl::node::NodeIdentIFace*                                    kleene_node,
         const xl::node::NodeIdentIFace*                                    proto_block_node,
-        std::string                                                        name2)
+        std::map<std::string, std::string>*                                union_typename_to_type,
+        std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
 {
     if(!string_insertions_to_front)
         return;
-    auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
-    if(!proto_block_symbol)
+    auto alts_node = get_alts_node_from_kleene_node(kleene_node);
+    if(!alts_node)
         return;
-    const xl::node::NodeIdentIFace* term_node = CHILD_OF(proto_block_symbol);
-    if(!term_node)
+    auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
+    if(!alts_symbol)
         return;
-    std::string proto_block_string = get_string_from_term_node(term_node);
+    auto alt_node = CHILD_OF(alts_symbol);
+    auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
+    if(!alt_symbol)
+        return;
+    auto term_node = (*alt_symbol)[0];
+    auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
+    if(!term_symbol)
+        return;
     std::vector<std::string> type_vec;
-    std::string recursive_rule_typedef =
-            std::string("\n") + gen_recursive_rule_typedef(type_vec, gen_type_name(gen_vec_name(name2)));
-    if(proto_block_string.find(recursive_rule_typedef) == std::string::npos)
-        (*string_insertions_to_front)[term_node].push_back(recursive_rule_typedef);
-}
-
-static void add_stem_rule_protos(
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
-        const xl::node::NodeIdentIFace*                                    proto_block_node,
-        std::string                                                        name1)
-{
-    if(!string_insertions_to_front)
-        return;
+    for(size_t i = 0; i < term_symbol->size(); i++)
+    {
+        xl::node::NodeIdentIFace* child = (*term_symbol)[i];
+        switch(child->type())
+        {
+            case xl::node::NodeIdentIFace::INT: type_vec.push_back("int"); break;
+            case xl::node::NodeIdentIFace::FLOAT: type_vec.push_back("float"); break;
+            case xl::node::NodeIdentIFace::STRING: type_vec.push_back("std::string"); break;
+            case xl::node::NodeIdentIFace::CHAR: type_vec.push_back("char"); break;
+            case xl::node::NodeIdentIFace::IDENT:
+                {
+                    std::string def_symbol_name =
+                            *dynamic_cast<
+                                    xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
+                                    >(child)->value();
+                    std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
+                    std::string union_type = (*union_typename_to_type)[union_typename];
+                    type_vec.push_back(union_type);
+                }
+                break;
+            default:
+                break;
+        }
+    }
     auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
     if(!proto_block_symbol)
         return;
-    const xl::node::NodeIdentIFace* term_node = CHILD_OF(proto_block_symbol);
-    if(!term_node)
+    const xl::node::NodeIdentIFace* term_node2 = CHILD_OF(proto_block_symbol);
+    if(!term_node2)
         return;
-    std::string proto_block_string = get_string_from_term_node(term_node);
-    std::string stem_rule_typedef =
-            std::string("\n") + gen_stem_rule_typedef("dummy", gen_type_name(gen_vec_name(name1)));
-    if(proto_block_string.find(stem_rule_typedef) == std::string::npos)
-        (*string_insertions_to_front)[term_node].push_back(stem_rule_typedef);
+    std::string proto_block_string = get_string_from_term_node(term_node2);
+    std::string shared_typedefs =
+            std::string("\n") + gen_shared_include_headers() +
+            "\n" + gen_recursive_rule_typedef(type_vec, gen_type(name2)) +
+            "\n" + gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
+    if(proto_block_string.find(shared_typedefs) == std::string::npos)
+        (*string_insertions_to_front)[term_node2].push_back(shared_typedefs);
 }
 
 static void add_union_member(
@@ -667,7 +669,7 @@ static void add_union_member(
     if(!union_members_symbol)
         return;
     xl::node::NodeIdentIFace* union_member_node =
-            make_union_member_node(rule_type, gen_vec_name(rule_typename), tc);
+            make_union_member_node(rule_type, gen_typename(rule_typename), tc);
     if(!union_member_node)
         return;
     if(!union_members_symbol->find(union_member_node))
@@ -689,7 +691,7 @@ static void add_def_brace(
     std::vector<std::string> token_vec;
     token_vec.push_back(name1);
     xl::node::NodeIdentIFace* def_brace_node =
-            make_def_brace_node(gen_vec_name(rule_typename), token_vec, tc);
+            make_def_brace_node(gen_typename(rule_typename), token_vec, tc);
     if(!definitions_symbol->find(def_brace_node))
         (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
 }
@@ -736,7 +738,6 @@ static void add_term_rule(
 
 static void add_recursive_rule(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name1,
         std::string                                                                      name2,
@@ -749,12 +750,8 @@ static void add_recursive_rule(
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
-    if(!node_insertions_after || !string_insertions_to_front)
+    if(!node_insertions_after || !node_appends_to_back)
         return;
-    add_recursive_rule_protos(
-            string_insertions_to_front,
-            proto_block_node,
-            name2);
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
     {
@@ -794,7 +791,6 @@ static void add_recursive_rule(
 }
 
 static void add_stem_rule(
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*    string_insertions_to_front,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* node_replacements,
         std::string                                                           name1,
         const xl::node::NodeIdentIFace*                                       kleene_node,
@@ -802,12 +798,8 @@ static void add_stem_rule(
         const xl::node::NodeIdentIFace*                                       proto_block_node,
         xl::TreeContext*                                                      tc)
 {
-    if(!string_insertions_to_front || !node_replacements)
+    if(!node_replacements)
         return;
-    add_stem_rule_protos(
-            string_insertions_to_front,
-            proto_block_node,
-            name1);
     xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_node, tc);
     if(!stem_rule)
         return;
@@ -829,7 +821,7 @@ static void enqueue_changes_for_kleene_closure(
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
-        std::map<std::string, const xl::node::NodeIdentIFace*>*                          def_symbol_name_to_symbol,
+        std::map<std::string, const xl::node::NodeIdentIFace*>*                          def_symbol_name_to_node,
         std::map<std::string, std::string>*                                              union_typename_to_type,
         std::map<std::string, std::string>*                                              def_symbol_name_to_union_typename,
         xl::TreeContext*                                                                 tc)
@@ -838,7 +830,7 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
     std::string                     rule_typename        = (*def_symbol_name_to_union_typename)[rule_name];
     std::string                     rule_type            = (*union_typename_to_type)[rule_typename];
-    const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_symbol)[rule_name];
+    const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
 
@@ -851,7 +843,6 @@ static void enqueue_changes_for_kleene_closure(
             tc);
     add_recursive_rule(
             node_insertions_after,
-            string_insertions_to_front,
             node_appends_to_back,
             name1,
             name2,
@@ -864,16 +855,20 @@ static void enqueue_changes_for_kleene_closure(
             union_block_node,
             tc);
     add_stem_rule(
-            string_insertions_to_front,
             node_replacements,
             name1,
             kleene_node,
             rule_node,
             proto_block_node,
             tc);
-    add_shared_include_headers(
+    add_shared_typedefs_and_headers(
             string_insertions_to_front,
-            proto_block_node);
+            name1,
+            name2,
+            kleene_node,
+            proto_block_node,
+            union_typename_to_type,
+            def_symbol_name_to_union_typename);
 }
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
@@ -885,7 +880,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     static bool entered_kleene_closure = false;
     static const xl::node::NodeIdentIFace *definitions_node = NULL, *proto_block_node = NULL,
             *union_block_node = NULL;
-    static std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_symbol;
+    static std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_node;
     static std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
     static std::vector<std::string> union_term_names, def_symbol_names;
     bool more;
@@ -897,7 +892,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 definitions_node = NULL;
                 proto_block_node = NULL;
                 union_block_node = NULL;
-                def_symbol_name_to_symbol.clear();
+                def_symbol_name_to_node.clear();
                 union_typename_to_type.clear();
                 def_symbol_name_to_union_typename.clear();
             }
@@ -986,9 +981,10 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             if(!union_term_names.empty())
             {
                 std::string union_type;
-                for(size_t i = 0; i<union_term_names.size()-1; i++)
+                for(size_t i = 0; i<union_term_names.size()-1; i++) // exclude last
                     union_type.append(union_term_names[i]);
-                std::string union_typename = union_term_names[union_term_names.size()-1];
+                std::string union_typename =
+                        union_term_names[union_term_names.size()-1]; // last term is typename
                 union_typename_to_type[union_typename] = union_type;
             }
             break;
@@ -1014,7 +1010,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 std::cout << symbol_name;
                 if(!symbol_name.empty())
                 {
-                    def_symbol_name_to_symbol[symbol_name] = _node;
+                    def_symbol_name_to_node[symbol_name] = _node;
                     def_symbol_names.push_back(symbol_name);
                 }
             }
@@ -1074,7 +1070,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             definitions_node,
                             proto_block_node,
                             union_block_node,
-                            &def_symbol_name_to_symbol,
+                            &def_symbol_name_to_node,
                             &union_typename_to_type,
                             &def_symbol_name_to_union_typename,
                             m_tc);
