@@ -64,8 +64,8 @@ bool TreeChanges::apply()
                     dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
             if(parent_symbol)
             {
-                std::list<xl::node::NodeIdentIFace*> &insert_after_list = (*p).second;
-                for(auto q = insert_after_list.begin(); q != insert_after_list.end(); ++q)
+                std::list<xl::node::NodeIdentIFace*> &insert_list = (*p).second;
+                for(auto q = insert_list.begin(); q != insert_list.end(); ++q)
                 {
                     xl::node::NodeIdentIFace* new_node = *q;
 #ifdef DEBUG_EBNF
@@ -93,13 +93,14 @@ bool TreeChanges::apply()
                     dynamic_cast<const xl::node::SymbolNodeIFace*>(append_to_node);
             if(append_to_symbol)
             {
-                std::list<xl::node::NodeIdentIFace*> &append_to_list = (*i).second;
-                for(auto j = append_to_list.begin(); j != append_to_list.end(); ++j)
+                std::list<xl::node::NodeIdentIFace*> &append_list = (*i).second;
+                for(auto j = append_list.begin(); j != append_list.end(); ++j)
                 {
                     xl::node::NodeIdentIFace* new_node = *j;
 #ifdef DEBUG_EBNF
                     std::cout << "NODE_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
                             << ptr_to_string(new_node) << std::endl;
+                    //xl::mvc::MVCView::print_xml(append_to_node);
                     //xl::mvc::MVCView::print_xml(new_node);
 #endif
                     const_cast<xl::node::SymbolNodeIFace*>( // TODO: fix-me!
@@ -122,8 +123,8 @@ bool TreeChanges::apply()
                     dynamic_cast<const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>(append_to_node);
             if(append_to_term)
             {
-                std::list<std::string> &append_to_list = (*u).second;
-                for(auto v = append_to_list.begin(); v != append_to_list.end(); ++v)
+                std::list<std::string> &append_list = (*u).second;
+                for(auto v = append_list.begin(); v != append_list.end(); ++v)
                 {
                     std::string s = *v;
 #ifdef DEBUG_EBNF
@@ -146,25 +147,25 @@ bool TreeChanges::apply()
         // NOTE: unordered traversal
         for(auto m = m_string_insertions_to_front.begin(); m != m_string_insertions_to_front.end(); ++m)
         {
-            const xl::node::NodeIdentIFace* append_to_node = (*m).first;
-            if(!append_to_node)
+            const xl::node::NodeIdentIFace* insertion_to_node = (*m).first;
+            if(!insertion_to_node)
                 continue;
-            const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* append_to_term =
-                    dynamic_cast<const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>(append_to_node);
-            if(append_to_term)
+            const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* insertion_to_term =
+                    dynamic_cast<const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>(insertion_to_node);
+            if(insertion_to_term)
             {
-                std::list<std::string> &append_to_list = (*m).second;
-                for(auto v = append_to_list.begin(); v != append_to_list.end(); ++v)
+                std::list<std::string> &insert_list = (*m).second;
+                for(auto v = insert_list.begin(); v != insert_list.end(); ++v)
                 {
                     std::string s = *v;
 #ifdef DEBUG_EBNF
-                    std::cout << "STRING_INSERT_FRONT " << ptr_to_string(append_to_node) << " ==> "
+                    std::cout << "STRING_INSERT_FRONT " << ptr_to_string(insertion_to_node) << " ==> "
                             << '\"' << s << '\"' << std::endl;
-                    //xl::mvc::MVCView::print_xml(append_to_node);
+                    //xl::mvc::MVCView::print_xml(insertion_to_node);
 #endif
                     std::string &s_lvalue =
                             *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
-                                    append_to_term
+                                    insertion_to_term
                                     )->value();
                     s_lvalue.insert(0, s);
                 }
@@ -191,6 +192,7 @@ bool TreeChanges::apply()
 #ifdef DEBUG_EBNF
                 std::cout << "NODE_REPLACE " << ptr_to_string(find_node) << " ==> "
                         << ptr_to_string(replacement_node) << std::endl;
+                //xl::mvc::MVCView::print_xml(find_node);
                 //xl::mvc::MVCView::print_xml(replacement_node);
 #endif
                 parent_symbol->replace_first(
