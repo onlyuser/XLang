@@ -30,6 +30,8 @@
 // EBNF-EXPANDED:
 typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> program_1_type_t;
 typedef std::vector<program_1_type_t> program_0_type_t;
+typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> statement_1_type_t;
+typedef statement_1_type_t statement_0_type_t;
 
 #include "XLang.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
@@ -123,6 +125,8 @@ xl::TreeContext* &tree_context()
     // EBNF-EXPANDED:
     program_1_type_t* program_1_type;
     program_0_type_t* program_0_type;
+    statement_1_type_t* statement_1_type;
+    statement_0_type_t* statement_0_type;
 }
 
 // show detailed parse errors
@@ -133,11 +137,13 @@ xl::TreeContext* &tree_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<symbol_value> program statement expression statement_0 statement_1
+%type<symbol_value> program statement expression
 
 // EBNF-EXPANDED:
 %type<program_1_type> program_1
 %type<program_0_type> program_0
+%type<statement_1_type> statement_1
+%type<statement_0_type> statement_0
 
 %left '+' '-'
 %left '*' '/'
@@ -298,8 +304,8 @@ program_1:
 // EBNF:
 //statement:
 //      (
-//            ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
-//      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
+//            ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
+//      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2) : $2; }
 //    ;
 
 // EBNF-XML:
@@ -335,7 +341,13 @@ program_1:
 // EBNF-EXPANDED:
 // [
 statement:
-      statement_0 expression { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, $1, $2) : $2; }
+      statement_0 expression {
+                /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2) : $2;
+
+                // EBNF-EXPANDED:
+                if($1)
+                    delete $1;
+            }
     ;
 
 statement_0:
@@ -344,7 +356,7 @@ statement_0:
     ;
 
 statement_1:
-      ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+      ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
     ;
 // ]
 

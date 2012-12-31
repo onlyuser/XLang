@@ -146,7 +146,11 @@ decl        [%][^%{}]
                     reset_ss(buf());
                 yy_push_state(ST_ACTION_BLOCK);
             }
-<ST_ACTION_BLOCK>[\{] { yy_push_state(ST_ACTION_BLOCK); }
+<ST_ACTION_BLOCK>[\{] {
+                yy_push_state(ST_ACTION_BLOCK);
+                if(TOP_STATE != INITIAL)
+                    REJECT;
+            }
 <ST_ACTION_BLOCK>[\}] {
                 yy_pop_state();
                 if(TOP_STATE == INITIAL)
@@ -154,6 +158,8 @@ decl        [%][^%{}]
                     _XLANG_lval.string_value = tree_context()->alloc_string(buf().str());
                     return ID_STRING;
                 }
+                else
+                    REJECT;
             }
 <ST_ACTION_BLOCK>{any} { buf() << yytext; }
 <ST_RULES>"%%"         { reset_ss(buf()); BEGIN ST_CODE; return ID_FENCE; }

@@ -68,14 +68,14 @@ static std::string gen_shared_include_headers()
 // string to be inserted to front of proto_block_node's string value
 static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec, std::string _typename)
 {
-    std::string s;
+    std::string exploded_types;
     for(auto p = type_vec.begin(); p != type_vec.end(); p++)
     {
-        s.append(*p);
-        if(p+1 != type_vec.end())
-            s.append(", ");
+        exploded_types.append(*p);
+        if((p+1) != type_vec.end())
+            exploded_types.append(", ");
     }
-    return std::string("typedef std::tuple<") + s + "> " + _typename + ";";
+    return std::string("typedef std::tuple<") + exploded_types + "> " + _typename + ";";
 }
 
 // string to be inserted to front of proto_block_node's string value
@@ -409,8 +409,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                             MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $$ = new std::vector<"
-                                                            + vector_inner_type + ">; ")
+                                                    tc->alloc_string(" $$ = new "
+                                                            + gen_type(name1) + "; ")
                                                     )
                                             )
                                     ),
@@ -495,7 +495,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
 
 // node to be appended to back of union_block_node
 static xl::node::NodeIdentIFace* make_union_member_node(
-        std::string type, std::string _type_name, xl::TreeContext* tc)
+        std::string _type, std::string _typename, xl::TreeContext* tc)
 {
     // STRING:
     //std::vector< /* AAA */ type >* /* BBB */ _type_name;
@@ -516,10 +516,10 @@ static xl::node::NodeIdentIFace* make_union_member_node(
             MAKE_SYMBOL(tc, ID_UNION_MEMBER, 1,
                     MAKE_SYMBOL(tc, ID_UNION_TERMS, 2,
                             MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string("std::vector<" + type + ">"))
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(_type + "*"))
                                     ),
                             MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string(_type_name))
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(_typename))
                                     )
                             )
                     );
@@ -547,12 +547,10 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     std::string exploded_tokens;
     for(auto p = token_vec.begin(); p != token_vec.end(); p++)
     {
+        exploded_tokens.append(*p);
         if((p+1) != token_vec.end())
-            exploded_tokens.append(*p + ", ");
-        else
-            exploded_tokens.append(*p);
+            exploded_tokens.append(", ");
     }
-
     xl::node::NodeIdentIFace* node =
             MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
                     MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
@@ -566,6 +564,7 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     return node;
 }
 
+#if 0
 // node to be inserted right after kleene closure's rule's definition symbol
 static xl::node::NodeIdentIFace* make_def_symbol(
         std::string name, xl::TreeContext* tc)
@@ -584,6 +583,7 @@ static xl::node::NodeIdentIFace* make_def_symbol(
                     );
     return node;
 }
+#endif
 
 static void add_shared_typedefs_and_headers(
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
@@ -652,8 +652,7 @@ static void add_shared_typedefs_and_headers(
 
 static void add_union_member(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::string                                                                      rule_typename,
-        std::string                                                                      rule_type,
+        std::string                                                                      rule_name,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
@@ -669,7 +668,7 @@ static void add_union_member(
     if(!union_members_symbol)
         return;
     xl::node::NodeIdentIFace* union_member_node =
-            make_union_member_node(rule_type, gen_typename(rule_typename), tc);
+            make_union_member_node(gen_type(rule_name), gen_typename(rule_name), tc);
     if(!union_member_node)
         return;
     if(!union_members_symbol->find(union_member_node))
@@ -679,7 +678,6 @@ static void add_union_member(
 static void add_def_brace(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name1,
-        std::string                                                                      rule_typename,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         xl::TreeContext*                                                                 tc)
 {
@@ -691,11 +689,12 @@ static void add_def_brace(
     std::vector<std::string> token_vec;
     token_vec.push_back(name1);
     xl::node::NodeIdentIFace* def_brace_node =
-            make_def_brace_node(gen_typename(rule_typename), token_vec, tc);
+            make_def_brace_node(gen_typename(name1), token_vec, tc);
     if(!definitions_symbol->find(def_brace_node))
         (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
 }
 
+#if 0
 static void add_def_symbol(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::string                                                                      name2,
@@ -707,13 +706,17 @@ static void add_def_symbol(
     xl::node::NodeIdentIFace* def_symbol_node = make_def_symbol(name2, tc);
     (*node_insertions_after)[rule_def_symbol_node].push_back(def_symbol_node);
 }
+#endif
 
 static void add_term_rule(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
+        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name2,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
         const xl::node::NodeIdentIFace*                                                  rule_node,
         const xl::node::NodeIdentIFace*                                                  rule_def_symbol_node,
+        const xl::node::NodeIdentIFace*                                                  definitions_node,
+        const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
     if(!node_insertions_after)
@@ -728,11 +731,20 @@ static void add_term_rule(
     std::cout << "<<< (term_rule)" << std::endl;
 #endif
     (*node_insertions_after)[rule_node].push_back(term_rule);
-
-    add_def_symbol(
-            node_insertions_after,
+    add_union_member(
+            node_appends_to_back,
             name2,
-            rule_def_symbol_node,
+            union_block_node,
+            tc);
+//    add_def_symbol(
+//            node_insertions_after,
+//            name2,
+//            rule_def_symbol_node,
+//            tc);
+    add_def_brace(
+            node_appends_to_back,
+            name2,
+            definitions_node,
             tc);
 }
 
@@ -743,7 +755,6 @@ static void add_recursive_rule(
         std::string                                                                      name2,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
         const xl::node::NodeIdentIFace*                                                  rule_node,
-        std::string                                                                      rule_typename,
         std::string                                                                      rule_type,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
@@ -775,17 +786,14 @@ static void add_recursive_rule(
     std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
     (*node_insertions_after)[rule_node].push_back(recursive_rule);
-
     add_union_member(
             node_appends_to_back,
-            rule_typename,
-            rule_type,
+            name1,
             union_block_node,
             tc);
     add_def_brace(
             node_appends_to_back,
             name1,
-            rule_typename,
             definitions_node,
             tc);
 }
@@ -833,13 +841,15 @@ static void enqueue_changes_for_kleene_closure(
     const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
-
     add_term_rule(
             node_insertions_after,
+            node_appends_to_back,
             name2,
             kleene_node,
             rule_node,
             rule_def_symbol_node,
+            definitions_node,
+            union_block_node,
             tc);
     add_recursive_rule(
             node_insertions_after,
@@ -848,7 +858,6 @@ static void enqueue_changes_for_kleene_closure(
             name2,
             kleene_node,
             rule_node,
-            rule_typename,
             rule_type,
             definitions_node,
             proto_block_node,
