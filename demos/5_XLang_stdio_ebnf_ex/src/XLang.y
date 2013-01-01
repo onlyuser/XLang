@@ -360,15 +360,15 @@ statement_1:
     ;
 // ]
 
-// // EBNF-EXPANDED (fixes conflict):
+// // EBNF-EXPANDED (fixes conflict, but less intuitive):
 // // [
 // statement:
-//       statement_1 expression { /* DDD_1 */ $$ = MAKE_SYMBOL('=', 2, $1, $2); }
+//       statement_1 expression { /* DDD_1 */ $$ = MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2); }
 //     | expression             { /* DDD_2 */ $$ = $1; }
 //     ;
 //
 // statement_1:
-//       ID_IDENT '=' { /* CCC */ $$ = MAKE_TERM(ID_IDENT, $1); }
+//       ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
 //     ;
 // // ]
 

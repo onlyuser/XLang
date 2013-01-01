@@ -29,10 +29,10 @@
 #include <tuple> // std::tuple
 
 // EBNF-EXPANDED:
-typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> program_1_type_t;
-typedef std::vector<program_1_type_t> program_0_type_t;
-typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> statement_1_type_t;
-typedef statement_1_type_t statement_0_type_t;
+class program_1_type_t;
+class program_0_type_t;
+class statement_1_type_t;
+class statement_0_type_t;
 
 #include "XLang.h" // tree_context
 #include "XLang.tab.h" // ID_XXX (yacc generated)
