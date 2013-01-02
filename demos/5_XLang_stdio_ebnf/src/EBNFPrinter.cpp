@@ -656,9 +656,9 @@ static void add_shared_typedefs_and_headers(
     std::string proto_block_string = get_string_from_term_node(term_node2);
     std::string stem_rule_typedef;
     if(kleene_node->sym_id() == '?')
-        stem_rule_typedef = gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
-    else
         stem_rule_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+    else
+        stem_rule_typedef = gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
     std::string shared_typedefs =
             std::string("\n") + gen_shared_include_headers() +
             "\n" + gen_recursive_rule_typedef(type_vec, gen_type(name2)) +
