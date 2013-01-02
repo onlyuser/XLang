@@ -30,7 +30,7 @@
 // EBNF-EXPANDED:
 //typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> program_1_type_t;
 //typedef std::vector<program_1_type_t> program_0_type_t;
-//typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type, char> statement_1_type_t;
+//typedef std::tuple<xl::node::TermInternalType<xl::node::NodeIdentIFace::IDENT>::type, char> statement_1_type_t;
 //typedef statement_1_type_t statement_0_type_t;
 
 #include "XLang.h"
@@ -223,15 +223,15 @@ program:
 // EBNF:
 statement:
       (
-            ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
-      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2) : $2; }
+            ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t($1, '='); }
+      )? expression      { /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, std::get<0>(*$1)), $2) : $2; }
     ;
 
 // EBNF-EXPANDED:
 // [
 //statement:
 //      statement_0 expression {
-//                /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2) : $2;
+//                /* DDD */ $$ = $1 ? MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, std::get<0>(*$1)), $2) : $2;
 //
 //                // EBNF-EXPANDED:
 //                if($1)
@@ -245,19 +245,19 @@ statement:
 //    ;
 //
 //statement_1:
-//      ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
+//      ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t($1, '='); }
 //    ;
 // ]
 
 // // EBNF-EXPANDED (fixes conflict, but less intuitive):
 // // [
 // statement:
-//       statement_1 expression { /* DDD_1 */ $$ = MAKE_SYMBOL('=', 2, std::get<0>(*$1), $2); }
+//       statement_1 expression { /* DDD_1 */ $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, std::get<0>(*$1)), $2); }
 //     | expression             { /* DDD_2 */ $$ = $1; }
 //     ;
 //
 // statement_1:
-//       ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t(MAKE_TERM(ID_IDENT, $1), '='); }
+//       ID_IDENT '=' { /* CCC */ $$ = new statement_1_type_t($1, '='); }
 //     ;
 // // ]
 
