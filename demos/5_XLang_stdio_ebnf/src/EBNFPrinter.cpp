@@ -66,6 +66,12 @@ static std::string gen_shared_include_headers()
 }
 
 // string to be inserted to front of proto_block_node's string value
+static std::string gen_typedef(std::string _type, std::string _typename)
+{
+    return std::string("typedef ") + _type + " " + _typename + ";";
+}
+
+// string to be inserted to front of proto_block_node's string value
 static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec, std::string _typename)
 {
     std::string exploded_types;
@@ -75,13 +81,13 @@ static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec
         if((p+1) != type_vec.end())
             exploded_types.append(", ");
     }
-    return std::string("typedef std::tuple<") + exploded_types + "> " + _typename + ";";
+    return gen_typedef("std::tuple<" + exploded_types + ">", _typename);
 }
 
 // string to be inserted to front of proto_block_node's string value
 static std::string gen_stem_rule_typedef(std::string _type, std::string _typename)
 {
-    return std::string("typedef std::vector<") + _type + "> " + _typename + ";";
+    return gen_typedef("std::vector<" + _type + ">", _typename);
 }
 
 // string to be appended to back of kleene closure action_block's string value
@@ -351,6 +357,12 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                     }
                 }
             }
+        }
+        if(kleene_node->sym_id() == '?')
+        {
+            std::stringstream ss;
+            ss << "if($" << position << ") ";
+            action_string_ptr->append(ss.str());
         }
         action_string_ptr->append(gen_delete_rule_rvalue_term(position));
     }
@@ -642,10 +654,15 @@ static void add_shared_typedefs_and_headers(
     if(!term_node2)
         return;
     std::string proto_block_string = get_string_from_term_node(term_node2);
+    std::string stem_rule_typedef;
+    if(kleene_node->sym_id() == '?')
+        stem_rule_typedef = gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
+    else
+        stem_rule_typedef = gen_typedef(gen_type(name2), gen_type(name1));
     std::string shared_typedefs =
             std::string("\n") + gen_shared_include_headers() +
             "\n" + gen_recursive_rule_typedef(type_vec, gen_type(name2)) +
-            "\n" + gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
+            "\n" + stem_rule_typedef;
     if(proto_block_string.find(shared_typedefs) == std::string::npos)
         (*string_insertions_to_front)[term_node2].push_back(shared_typedefs);
 }
@@ -736,11 +753,13 @@ static void add_term_rule(
             name2,
             union_block_node,
             tc);
-//    add_def_symbol(
-//            node_insertions_after,
-//            name2,
-//            rule_def_symbol_node,
-//            tc);
+#if 0
+    add_def_symbol(
+            node_insertions_after,
+            name2,
+            rule_def_symbol_node,
+            tc);
+#endif
     add_def_brace(
             node_appends_to_back,
             name2,
