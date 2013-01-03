@@ -298,8 +298,8 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     // STRING:
     //program:
     //      (
-    //            statement ',' { /* AAA */ $$ = $1; }
-    //      )* statement { /* BBB */ ... }
+    //            statement ',' { /* AAA */ ... }
+    //      )* statement        { /* BBB */ ... }
     //    ;
     //
     // XML:
@@ -317,7 +317,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                                    <term type="char" value=','/>
     //                                </symbol>
     //                                <symbol type="action_block">
-    //                                    <term type="string" value=" /* AAA */ $$ = $1; "/>
+    //                                    <term type="string" value=" /* AAA */ ... "/>
     //                                </symbol>
     //                            </symbol>
     //                        </symbol>
@@ -383,14 +383,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
 {
     // STRING:
     //program_0:
-    //      /* empty */ {
-    //                /* AAA */
-    //                $$ = new std::vector<
-    //                        /* vector_inner_type */
-    //                        xl::node::TermInternalType<xl::node::NodeIdentIFace::SYMBOL>::type
-    //                        >;
-    //            }
-    //    | program_0 program_1 { /* BBB */ $1->push_back($2); $$ = $1; }
+    //      /* empty */         { /* AAA */ ... }
+    //    | program_0 program_1 { /* BBB */ ... }
     //    ;
     //
     // XML:
