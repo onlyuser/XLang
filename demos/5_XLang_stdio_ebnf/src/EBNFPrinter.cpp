@@ -375,7 +375,65 @@ static xl::node::NodeIdentIFace* make_stem_rule(
 static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std::string name2,
         xl::TreeContext* tc)
 {
-    return NULL;
+    // STRING:
+    //plus_0:
+    //      plus_1        { /* AAA */ ... }
+    //    | plus_0 plus_1 { /* BBB */ ... }
+    //    ;
+    //
+    // XML:
+    //<symbol type="rule">
+    //    <term type="ident" value=plus_0/>
+    //    <symbol type="alts">
+    //        <symbol type="alt">
+    //            <symbol type="terms">
+    //                <term type="ident" value=plus_1/>
+    //            </symbol>
+    //            <symbol type="action_block">
+    //                <term type="string" value=" /* AAA */ ... "/>
+    //            </symbol>
+    //        </symbol>
+    //        <symbol type="alt">
+    //            <symbol type="terms">
+    //                <term type="ident" value=plus_0/>
+    //                <term type="ident" value=plus_1/>
+    //            </symbol>
+    //            <symbol type="action_block">
+    //                <term type="string" value=" /* BBB */ ... "/>
+    //            </symbol>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    xl::node::NodeIdentIFace* node =
+            MAKE_SYMBOL(tc, ID_RULE, 2,
+                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                            ),
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING,
+                                                    tc->alloc_string(" $$ = new " + gen_type(name1) +
+                                                            "; $$->push_back(*$1); delete $1; ")
+                                                    )
+                                            )
+                                    ),
+                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                            ),
+                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                            MAKE_TERM(ID_STRING,
+                                                    tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
+                                                    )
+                                            )
+                                    )
+                            )
+                    );
+    return node;
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
