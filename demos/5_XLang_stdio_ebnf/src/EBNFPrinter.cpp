@@ -778,15 +778,7 @@ static void add_recursive_rule(
     switch(kleene_node->sym_id())
     {
         case '+': recursive_rule = make_recursive_rule_plus(name1, name2, tc); break;
-        case '*':
-            {
-                std::string* action_string_ptr = get_action_string_from_kleene_node(kleene_node);
-                if(!action_string_ptr)
-                    break;
-                std::string action_string = *action_string_ptr;
-                recursive_rule = make_recursive_rule_star(name1, name2, tc);
-                break;
-            }
+        case '*': recursive_rule = make_recursive_rule_star(name1, name2, tc); break;
         case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
     }
     if(!recursive_rule)
