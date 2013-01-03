@@ -1104,12 +1104,12 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                             m_tc);
                 entered_kleene_closure = true;
             }
-            xl::visitor::DefaultTour::visit(_node);
+            xl::visitor::TraverseDFS::visit(_node);
             std::cout << static_cast<char>(_node->sym_id());
             break;
         case '(':
             std::cout << '(';
-            xl::visitor::DefaultTour::visit(_node);
+            xl::visitor::TraverseDFS::visit(_node);
             std::cout << ')';
             break;
         case ID_CODE:

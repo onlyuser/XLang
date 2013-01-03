@@ -111,10 +111,10 @@ clean_lex :
 
 COMMON_CPP_STEMS = \
 		XLangAlloc \
-		XLangDefaultTour \
 		XLangMVCView \
 		XLangPrinter \
 		XLangString \
+		XLangTraverseDFS \
 		XLangTreeContext #\
 		XLangMVCModel \
 		XLangNode

@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_DEFAULT_TOUR_H_
-#define XLANG_DEFAULT_TOUR_H_
+#ifndef XLANG_TRAVERSE_DFS_H_
+#define XLANG_TRAVERSE_DFS_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitor.h" // visitor::Visitor
@@ -24,9 +24,9 @@
 
 namespace xl { namespace visitor {
 
-struct DefaultTour : public Visitor<const node::NodeIdentIFace>
+struct TraverseDFS : public Visitor<const node::NodeIdentIFace>
 {
-    virtual ~DefaultTour()
+    virtual ~TraverseDFS()
     {}
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);

@@ -19,11 +19,11 @@
 #define XLANG_PRINTER_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "visitor/XLangTraverseDFS.h" // visitor::TraverseDFS
 
 namespace xl { namespace visitor {
 
-class LispPrinter : public DefaultTour
+class LispPrinter : public TraverseDFS
 {
 public:
     LispPrinter()
@@ -32,7 +32,7 @@ public:
     void visit(const node::SymbolNodeIFace* _node);
 };
 
-struct XMLPrinter : public DefaultTour
+struct XMLPrinter : public TraverseDFS
 {
 public:
     XMLPrinter() : m_depth(0), m_include_node_uid(false)
@@ -50,7 +50,7 @@ private:
     bool m_include_node_uid;
 };
 
-struct DotPrinter : public DefaultTour
+struct DotPrinter : public TraverseDFS
 {
 public:
     DotPrinter(bool horizontal = false) : m_horizontal(horizontal)

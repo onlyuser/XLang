@@ -83,12 +83,12 @@ clean_objects :
 
 CPP_STEMS = \
 		XLangAlloc \
-		XLangDefaultTour \
 		XLangMVCModel \
 		XLangMVCView \
 		XLangNode \
 		XLangPrinter \
 		XLangString \
+		XLangTraverseDFS \
 		XLangTreeContext
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))

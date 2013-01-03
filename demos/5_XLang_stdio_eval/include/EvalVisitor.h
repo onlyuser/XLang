@@ -19,9 +19,9 @@
 #define EVAL_VISITOR_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "visitor/XLangTraverseDFS.h" // visitor::TraverseDFS
 
-struct EvalVisitor : public xl::visitor::DefaultTour
+struct EvalVisitor : public xl::visitor::TraverseDFS
 {
 public:
     EvalVisitor()

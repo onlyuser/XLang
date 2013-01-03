@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "visitor/XLangDefaultTour.h" // visitor::DefaultTour
+#include "visitor/XLangTraverseDFS.h" // visitor::TraverseDFS
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
@@ -26,32 +26,32 @@
 
 namespace xl { namespace visitor {
 
-void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
+void TraverseDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
     std::cout << _node->value();
 }
 
-void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
+void TraverseDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
     std::cout << _node->value();
 }
 
-void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
+void TraverseDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
     std::cout << '\"' << xl::escape(*_node->value()) << '\"';
 }
 
-void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
+void TraverseDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
     std::cout << '\'' << xl::escape(_node->value()) << '\'';
 }
 
-void DefaultTour::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)
+void TraverseDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
     std::cout << *_node->value();
 }
 
-void DefaultTour::visit_null()
+void TraverseDFS::visit_null()
 {
     std::cout << "NULL";
 }
@@ -74,7 +74,7 @@ static void stop_asc(ccrContParam)
 }
 #endif
 
-int DefaultTour::get_next_child_index(const node::SymbolNodeIFace* _node)
+int TraverseDFS::get_next_child_index(const node::SymbolNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
     return get_next_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state(), _node);
@@ -83,7 +83,7 @@ int DefaultTour::get_next_child_index(const node::SymbolNodeIFace* _node)
 #endif
 }
 
-node::NodeIdentIFace* DefaultTour::get_next_child(const node::SymbolNodeIFace* _node)
+node::NodeIdentIFace* TraverseDFS::get_next_child(const node::SymbolNodeIFace* _node)
 {
     int index = get_next_child_index(_node);
     if(index == -1)
@@ -91,7 +91,7 @@ node::NodeIdentIFace* DefaultTour::get_next_child(const node::SymbolNodeIFace* _
     return (*_node)[index];
 }
 
-bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node, node::NodeIdentIFace** ref_node)
+bool TraverseDFS::visit_next_child(const node::SymbolNodeIFace* _node, node::NodeIdentIFace** ref_node)
 {
 #ifdef USE_COROUTINE
     int index = get_next_child_index(_node);
@@ -111,19 +111,19 @@ bool DefaultTour::visit_next_child(const node::SymbolNodeIFace* _node, node::Nod
 #endif
 }
 
-void DefaultTour::abort_visitation(const node::SymbolNodeIFace* _node)
+void TraverseDFS::abort_visitation(const node::SymbolNodeIFace* _node)
 {
 #ifdef USE_COROUTINE
     stop_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state());
 #endif
 }
 
-void DefaultTour::visit(const node::SymbolNodeIFace* _node)
+void TraverseDFS::visit(const node::SymbolNodeIFace* _node)
 {
     while(visit_next_child(_node));
 }
 
-void DefaultTour::visit_any(const node::NodeIdentIFace* unknown)
+void TraverseDFS::visit_any(const node::NodeIdentIFace* unknown)
 {
     if(!unknown)
     {
