@@ -379,7 +379,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
-        std::string vector_inner_type, xl::TreeContext* tc)
+        xl::TreeContext* tc)
 {
     // STRING:
     //program_0:
@@ -415,8 +415,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
                             MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
                                     MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                             MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $$ = new "
-                                                            + gen_type(name1) + "; ")
+                                                    tc->alloc_string(" $$ = new " + gen_type(name1) + "; ")
                                                     )
                                             )
                                     ),
@@ -768,7 +767,6 @@ static void add_recursive_rule(
         std::string                                                                      name2,
         const xl::node::NodeIdentIFace*                                                  kleene_node,
         const xl::node::NodeIdentIFace*                                                  rule_node,
-        std::string                                                                      rule_type,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
@@ -786,7 +784,7 @@ static void add_recursive_rule(
                 if(!action_string_ptr)
                     break;
                 std::string action_string = *action_string_ptr;
-                recursive_rule = make_recursive_rule_star(name1, name2, rule_type, tc);
+                recursive_rule = make_recursive_rule_star(name1, name2, tc);
                 break;
             }
         case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
@@ -849,8 +847,6 @@ static void enqueue_changes_for_kleene_closure(
 {
     const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, kleene_node);
     std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
-    std::string                     rule_typename        = (*def_symbol_name_to_union_typename)[rule_name];
-    std::string                     rule_type            = (*union_typename_to_type)[rule_typename];
     const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
@@ -871,7 +867,6 @@ static void enqueue_changes_for_kleene_closure(
             name2,
             kleene_node,
             rule_node,
-            rule_type,
             definitions_node,
             proto_block_node,
             union_block_node,
