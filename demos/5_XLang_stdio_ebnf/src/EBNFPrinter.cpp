@@ -546,14 +546,14 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
 
 static xl::node::NodeIdentIFace* make_term_rule(
         std::string name,
-        const xl::node::NodeIdentIFace* alt_node,
+        const xl::node::NodeIdentIFace* alts_node,
         xl::TreeContext* tc)
 {
-    if(!alt_node)
+    if(!alts_node)
         return NULL;
     return MAKE_SYMBOL(tc, ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
-            alt_node->clone(tc));
+            alts_node->clone(tc));
 }
 
 // node to be appended to back of union_block_node

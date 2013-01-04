@@ -277,11 +277,15 @@ rule_alts:
     ;
 
 rule_alt:
-      rule_terms rule_action_block { $$ = MAKE_SYMBOL(ID_RULE_ALT, 2, $1, $2); }
+      rule_terms rule_action_block {
+                $$ = $2 ? MAKE_SYMBOL(ID_RULE_ALT, 2, $1, $2) :
+                        MAKE_SYMBOL(ID_RULE_ALT, 1, $1);
+            }
     ;
 
 rule_action_block:
-      ID_STRING {
+      /* empty */ { $$ = NULL; }
+    | ID_STRING {
                 $$ = (!$1->empty()) ? MAKE_SYMBOL(ID_RULE_ACTION_BLOCK, 1,
                         MAKE_TERM(ID_STRING, $1)) : NULL;
             }
