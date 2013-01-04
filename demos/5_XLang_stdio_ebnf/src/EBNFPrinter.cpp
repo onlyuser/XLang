@@ -659,17 +659,17 @@ static void add_shared_typedefs_and_headers(
 {
     if(!string_insertions_to_front)
         return;
-    auto alts_node = get_alts_node_from_kleene_node(kleene_node);
+    const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
     if(!alts_node)
         return;
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
-    auto alt_node = CHILD_OF(alts_symbol);
+    xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
     auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
     if(!alt_symbol)
         return;
-    auto term_node = (*alt_symbol)[0];
+    xl::node::NodeIdentIFace* term_node = (*alt_symbol)[0]; // left child is symbol, right child is action
     auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
     if(!term_symbol)
         return;
@@ -679,10 +679,10 @@ static void add_shared_typedefs_and_headers(
         xl::node::NodeIdentIFace* child = (*term_symbol)[i];
         switch(child->type())
         {
-            case xl::node::NodeIdentIFace::INT: type_vec.push_back("int"); break;
-            case xl::node::NodeIdentIFace::FLOAT: type_vec.push_back("float"); break;
+            case xl::node::NodeIdentIFace::INT:    type_vec.push_back("int"); break;
+            case xl::node::NodeIdentIFace::FLOAT:  type_vec.push_back("float"); break;
             case xl::node::NodeIdentIFace::STRING: type_vec.push_back("std::string"); break;
-            case xl::node::NodeIdentIFace::CHAR: type_vec.push_back("char"); break;
+            case xl::node::NodeIdentIFace::CHAR:   type_vec.push_back("char"); break;
             case xl::node::NodeIdentIFace::IDENT:
                 {
                     std::string def_symbol_name =
@@ -701,21 +701,21 @@ static void add_shared_typedefs_and_headers(
     auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
     if(!proto_block_symbol)
         return;
-    const xl::node::NodeIdentIFace* term_node2 = CHILD_OF(proto_block_symbol);
-    if(!term_node2)
+    xl::node::NodeIdentIFace* proto_block_term_node = CHILD_OF(proto_block_symbol);
+    if(!proto_block_term_node)
         return;
-    std::string proto_block_string = get_string_from_term_node(term_node2);
+    std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
     std::string stem_rule_typedef;
     if(kleene_node->sym_id() == '?')
         stem_rule_typedef = gen_typedef(gen_type(name2), gen_type(name1));
     else
         stem_rule_typedef = gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
-    std::string shared_typedefs =
+    std::string shared_typedefs_and_headers =
             std::string("\n") + gen_shared_include_headers() +
             "\n" + gen_recursive_rule_typedef(type_vec, gen_type(name2)) +
             "\n" + stem_rule_typedef;
-    if(proto_block_string.find(shared_typedefs) == std::string::npos)
-        (*string_insertions_to_front)[term_node2].push_back(shared_typedefs);
+    if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
+        (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
 }
 
 static void add_union_member(
@@ -729,7 +729,7 @@ static void add_union_member(
     auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
     if(!union_block_symbol)
         return;
-    const xl::node::NodeIdentIFace* union_members_node = CHILD_OF(union_block_symbol);
+    xl::node::NodeIdentIFace* union_members_node = CHILD_OF(union_block_symbol);
     if(!union_members_node)
         return;
     auto union_members_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_members_node);
@@ -790,6 +790,8 @@ static void add_term_rule(
     if(!node_insertions_after)
         return;
     const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
+    if(!alts_node)
+        return;
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
     if(!term_rule)
         return;
