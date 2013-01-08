@@ -660,7 +660,7 @@ static void add_shared_typedefs_and_headers(
         std::map<std::string, std::string>*                                union_typename_to_type,
         std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
 {
-    if(!string_insertions_to_front)
+    if(!string_insertions_to_front || !kleene_node)
         return;
     const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_kleene_node(kleene_node);
     if(!alts_node)
@@ -844,7 +844,7 @@ static void add_recursive_rule(
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
-    if(!node_insertions_after || !node_appends_to_back)
+    if(!node_insertions_after || !node_appends_to_back || !kleene_node)
         return;
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_node->sym_id())
@@ -909,6 +909,8 @@ static void enqueue_changes_for_kleene_closure(
         std::map<std::string, std::string>*                                              def_symbol_name_to_union_typename,
         xl::TreeContext*                                                                 tc)
 {
+    if(!kleene_node)
+        return;
     const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, kleene_node);
     std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
     const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
