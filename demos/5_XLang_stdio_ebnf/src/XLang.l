@@ -56,7 +56,7 @@ void reset_ss(std::stringstream &ss)
 ws          [ \t\n]+
 any         .|[\n]
 lit_initial [<>=]
-lit_rules   [:|()+*?;]
+lit_rules   [:|()+*?;@]
 digit       [0-9]
 alpha       [a-zA-Z]
 id          {alpha}|[_]

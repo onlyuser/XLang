@@ -305,6 +305,7 @@ rule_term:
     | rule_term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }
     | rule_term '*'     { $$ = MAKE_SYMBOL('*', 1, $1); }
     | rule_term '?'     { $$ = MAKE_SYMBOL('?', 1, $1); }
+    | rule_term '@'     { $$ = MAKE_SYMBOL('@', 1, $1); }
     | '(' rule_alts ')' { $$ = MAKE_SYMBOL('(', 1, $2); }
     ;
 

@@ -72,7 +72,7 @@ static std::string gen_typedef(std::string _type, std::string _typename)
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec, std::string _typename)
+static std::string gen_tuple_typedef(std::vector<std::string> &type_vec, std::string _typename)
 {
     std::string exploded_types;
     for(auto p = type_vec.begin(); p != type_vec.end(); p++)
@@ -85,7 +85,7 @@ static std::string gen_recursive_rule_typedef(std::vector<std::string> &type_vec
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_stem_rule_typedef(std::string _type, std::string _typename)
+static std::string gen_vector_typedef(std::string _type, std::string _typename)
 {
     return gen_typedef("std::vector<" + _type + ">", _typename);
 }
@@ -337,34 +337,37 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
     xl::node::NodeIdentIFace* kleene_node_copy =
             find_clone_of_original_recursive(rule_node_copy, kleene_node);
-    std::string* action_string_ptr = get_action_string_from_kleene_node(kleene_node_copy);
-    if(action_string_ptr)
+    if(kleene_node->sym_id() != '@')
     {
-        int position = 1;
-        xl::node::NodeIdentIFace* kleene_parent_node = kleene_node->parent();
-        if(kleene_parent_node)
+        std::string* action_string_ptr = get_action_string_from_kleene_node(kleene_node_copy);
+        if(action_string_ptr)
         {
-            xl::node::SymbolNodeIFace* kleene_parent_symbol =
-                    dynamic_cast<xl::node::SymbolNodeIFace*>(kleene_parent_node);
-            if(kleene_parent_symbol)
+            int position = 1;
+            xl::node::NodeIdentIFace* kleene_parent_node = kleene_node->parent();
+            if(kleene_parent_node)
             {
-                for(size_t i = 0; i<kleene_parent_symbol->size(); i++)
+                xl::node::SymbolNodeIFace* kleene_parent_symbol =
+                        dynamic_cast<xl::node::SymbolNodeIFace*>(kleene_parent_node);
+                if(kleene_parent_symbol)
                 {
-                    if((*kleene_parent_symbol)[i] == kleene_node)
+                    for(size_t i = 0; i<kleene_parent_symbol->size(); i++)
                     {
-                        position = i+1;
-                        break;
+                        if((*kleene_parent_symbol)[i] == kleene_node)
+                        {
+                            position = i+1;
+                            break;
+                        }
                     }
                 }
             }
+            if(kleene_node->sym_id() == '?')
+            {
+                std::stringstream ss;
+                ss << "if($" << position << ") ";
+                action_string_ptr->append(ss.str());
+            }
+            action_string_ptr->append(gen_delete_rule_rvalue_term(position));
         }
-        if(kleene_node->sym_id() == '?')
-        {
-            std::stringstream ss;
-            ss << "if($" << position << ") ";
-            action_string_ptr->append(ss.str());
-        }
-        action_string_ptr->append(gen_delete_rule_rvalue_term(position));
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
@@ -705,15 +708,24 @@ static void add_shared_typedefs_and_headers(
     if(!proto_block_term_node)
         return;
     std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
-    std::string stem_rule_typedef;
-    if(kleene_node->sym_id() == '?')
-        stem_rule_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+    std::string shared_typedefs_and_headers;
+    std::string shared_include_headers = gen_shared_include_headers();
+    if(kleene_node->sym_id() != '@')
+    {
+        std::string vector_typedef;
+        if(kleene_node->sym_id() == '?')
+            vector_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+        else
+            vector_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+        shared_typedefs_and_headers =
+                std::string("\n") + shared_include_headers +
+                "\n" + gen_tuple_typedef(type_vec, gen_type(name2)) +
+                "\n" + vector_typedef;
+    }
     else
-        stem_rule_typedef = gen_stem_rule_typedef(gen_type(name2), gen_type(name1));
-    std::string shared_typedefs_and_headers =
-            std::string("\n") + gen_shared_include_headers() +
-            "\n" + gen_recursive_rule_typedef(type_vec, gen_type(name2)) +
-            "\n" + stem_rule_typedef;
+        shared_typedefs_and_headers =
+                std::string("\n") + shared_include_headers +
+                "\n" + gen_tuple_typedef(type_vec, gen_type(name1));
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
         (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
 }
@@ -905,24 +917,25 @@ static void enqueue_changes_for_kleene_closure(
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
-            name2,
+            (kleene_node->sym_id() == '@') ? name1 : name2,
             kleene_node,
             rule_node,
             rule_def_symbol_node,
             definitions_node,
             union_block_node,
             tc);
-    add_recursive_rule(
-            node_insertions_after,
-            node_appends_to_back,
-            name1,
-            name2,
-            kleene_node,
-            rule_node,
-            definitions_node,
-            proto_block_node,
-            union_block_node,
-            tc);
+    if(kleene_node->sym_id() != '@')
+        add_recursive_rule(
+                node_insertions_after,
+                node_appends_to_back,
+                name1,
+                name2,
+                kleene_node,
+                rule_node,
+                definitions_node,
+                proto_block_node,
+                union_block_node,
+                tc);
     add_stem_rule(
             node_replacements,
             name1,
@@ -1126,6 +1139,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '+':
         case '*':
         case '?':
+        case '@':
             if(!entered_kleene_closure)
             {
                 if(m_changes)
