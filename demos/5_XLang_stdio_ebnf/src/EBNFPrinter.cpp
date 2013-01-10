@@ -685,7 +685,13 @@ static void add_shared_typedefs_and_headers(
     std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
     std::string shared_typedefs_and_headers;
     std::string shared_include_headers = gen_shared_include_headers();
-    if(kleene_op != '(')
+    if(kleene_op == '(')
+    {
+        shared_typedefs_and_headers =
+                std::string("\n") + shared_include_headers + "\n" +
+                gen_tuple_typedef(type_vec, gen_type(name1));
+    }
+    else
     {
         std::string vector_typedef;
         if(kleene_op == '?')
@@ -693,14 +699,10 @@ static void add_shared_typedefs_and_headers(
         else
             vector_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
         shared_typedefs_and_headers =
-                std::string("\n") + shared_include_headers +
-                "\n" + gen_tuple_typedef(type_vec, gen_type(name2)) +
-                "\n" + vector_typedef;
+                std::string("\n") + shared_include_headers + "\n" +
+                gen_tuple_typedef(type_vec, gen_type(name2)) + "\n" +
+                vector_typedef;
     }
-    else
-        shared_typedefs_and_headers =
-                std::string("\n") + shared_include_headers +
-                "\n" + gen_tuple_typedef(type_vec, gen_type(name1));
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
         (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
 }
