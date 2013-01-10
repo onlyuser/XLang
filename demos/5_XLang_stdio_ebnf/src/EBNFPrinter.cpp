@@ -625,27 +625,6 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     return node;
 }
 
-#if 0
-// node to be inserted right after kleene closure's rule's definition symbol
-static xl::node::NodeIdentIFace* make_def_symbol(
-        std::string name, xl::TreeContext* tc)
-{
-    // STRING:
-    //name
-    //
-    // XML:
-    //<symbol type="symbol">
-    //    <term type="ident" value= name />
-    //</symbol>
-
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name))
-                    );
-    return node;
-}
-#endif
-
 static void add_shared_typedefs_and_headers(
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
         std::string                                                        name1,
@@ -770,20 +749,6 @@ static void add_def_brace(
         (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
 }
 
-#if 0
-static void add_def_symbol(
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
-        std::string                                                                      name2,
-        const xl::node::NodeIdentIFace*                                                  rule_def_symbol_node,
-        xl::TreeContext*                                                                 tc)
-{
-    if(!node_insertions_after)
-        return;
-    xl::node::NodeIdentIFace* def_symbol_node = make_def_symbol(name2, tc);
-    (*node_insertions_after)[rule_def_symbol_node].push_back(def_symbol_node);
-}
-#endif
-
 static void add_term_rule(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
@@ -814,13 +779,6 @@ static void add_term_rule(
             name2,
             union_block_node,
             tc);
-#if 0
-    add_def_symbol(
-            node_insertions_after,
-            name2,
-            rule_def_symbol_node,
-            tc);
-#endif
     add_def_brace(
             node_appends_to_back,
             name2,
