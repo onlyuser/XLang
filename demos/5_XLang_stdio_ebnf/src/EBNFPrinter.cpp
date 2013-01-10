@@ -685,7 +685,7 @@ static void add_shared_typedefs_and_headers(
     std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
     std::string shared_typedefs_and_headers;
     std::string shared_include_headers = gen_shared_include_headers();
-    if(kleene_op != '@')
+    if(kleene_op != '(')
     {
         std::string vector_typedef;
         if(kleene_op == '?')
