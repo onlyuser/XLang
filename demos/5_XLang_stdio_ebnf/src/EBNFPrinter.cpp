@@ -285,7 +285,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         std::string name,
         const xl::node::NodeIdentIFace* rule_node,
         char                            kleene_op,
-        const xl::node::NodeIdentIFace* paren_node,
+        const xl::node::NodeIdentIFace* outermost_paren_node,
         xl::TreeContext* tc)
 {
     // STRING:
@@ -325,11 +325,11 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //    </symbol>
     //</symbol>
 
-    if(!rule_node || !paren_node)
+    if(!rule_node || !outermost_paren_node)
         return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
     const xl::node::NodeIdentIFace* outer_node =
-            (kleene_op == '(') ? paren_node : paren_node->parent();
+            (kleene_op == '(') ? outermost_paren_node : outermost_paren_node->parent();
     xl::node::NodeIdentIFace* outer_node_copy =
             find_clone_of_original_recursive(rule_node_copy, outer_node);
     if(kleene_op != '(')
@@ -833,14 +833,15 @@ static void add_stem_rule(
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* node_replacements,
         std::string                                                           name1,
         char                                                                  kleene_op,
-        const xl::node::NodeIdentIFace*                                       paren_node,
+        const xl::node::NodeIdentIFace*                                       outermost_paren_node,
         const xl::node::NodeIdentIFace*                                       rule_node,
         const xl::node::NodeIdentIFace*                                       proto_block_node,
         xl::TreeContext*                                                      tc)
 {
     if(!node_replacements)
         return;
-    xl::node::NodeIdentIFace* stem_rule = make_stem_rule(name1, rule_node, kleene_op, paren_node, tc);
+    xl::node::NodeIdentIFace* stem_rule =
+            make_stem_rule(name1, rule_node, kleene_op, outermost_paren_node, tc);
     if(!stem_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -874,11 +875,52 @@ static void enqueue_changes_for_kleene_closure(
     const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
+    const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
+    const xl::node::NodeIdentIFace* innermost_paren_node = paren_node;
+    if(innermost_paren_node->sym_id() == '(')
+    {
+        const xl::node::NodeIdentIFace* paren_child_node = NULL;
+        do
+        {
+            auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(innermost_paren_node);
+            if(!paren_symbol)
+                break;
+            if(paren_symbol->size() > 1)
+                break;
+            const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
+            if(alts_node->sym_id() != ID_RULE_ALTS)
+                break;
+            auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
+            if(!alts_symbol)
+                break;
+            if(alts_symbol->size() > 1)
+                break;
+            const xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
+            if(alt_node->sym_id() != ID_RULE_ALT)
+                break;
+            auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
+            if(!alt_symbol)
+                break;
+            if(alt_symbol->size() > 1)
+                break;
+            const xl::node::NodeIdentIFace* terms_node = CHILD_OF(alt_symbol);
+            if(terms_node->sym_id() != ID_RULE_TERMS)
+                break;
+            auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
+            if(!terms_symbol)
+                break;
+            if(terms_symbol->size() > 1)
+                break;
+            paren_child_node = CHILD_OF(terms_symbol);
+            if(paren_child_node->sym_id() == '(')
+                innermost_paren_node = paren_child_node;
+        } while(paren_child_node->sym_id() == '(');
+    }
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
             (kleene_op == '(') ? name1 : name2,
-            paren_node,
+            innermost_paren_node,
             rule_node,
             rule_def_symbol_node,
             definitions_node,
@@ -900,7 +942,7 @@ static void enqueue_changes_for_kleene_closure(
             node_replacements,
             name1,
             kleene_op,
-            paren_node,
+            outermost_paren_node,
             rule_node,
             proto_block_node,
             tc);
@@ -909,7 +951,7 @@ static void enqueue_changes_for_kleene_closure(
             name1,
             name2,
             kleene_op,
-            paren_node,
+            innermost_paren_node,
             proto_block_node,
             union_typename_to_type,
             def_symbol_name_to_union_typename);
