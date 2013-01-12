@@ -877,44 +877,33 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name2                = gen_name(rule_name);
     const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
     const xl::node::NodeIdentIFace* innermost_paren_node = paren_node;
-    if(innermost_paren_node->sym_id() == '(')
+    while(innermost_paren_node->sym_id() == '(')
     {
-        const xl::node::NodeIdentIFace* paren_child_node = NULL;
-        do
-        {
-            auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(innermost_paren_node);
-            if(!paren_symbol)
-                break;
-            if(paren_symbol->size() > 1)
-                break;
-            const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
-            if(alts_node->sym_id() != ID_RULE_ALTS)
-                break;
-            auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
-            if(!alts_symbol)
-                break;
-            if(alts_symbol->size() > 1)
-                break;
-            const xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
-            if(alt_node->sym_id() != ID_RULE_ALT)
-                break;
-            auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
-            if(!alt_symbol)
-                break;
-            if(alt_symbol->size() > 1)
-                break;
-            const xl::node::NodeIdentIFace* terms_node = CHILD_OF(alt_symbol);
-            if(terms_node->sym_id() != ID_RULE_TERMS)
-                break;
-            auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
-            if(!terms_symbol)
-                break;
-            if(terms_symbol->size() > 1)
-                break;
-            paren_child_node = CHILD_OF(terms_symbol);
-            if(paren_child_node->sym_id() == '(')
-                innermost_paren_node = paren_child_node;
-        } while(paren_child_node->sym_id() == '(');
+        auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(innermost_paren_node);
+        if(!paren_symbol || paren_symbol->size() > 1)
+            break;
+        const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
+        if(alts_node->sym_id() != ID_RULE_ALTS)
+            break;
+        auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
+        if(!alts_symbol || alts_symbol->size() > 1)
+            break;
+        const xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
+        if(alt_node->sym_id() != ID_RULE_ALT)
+            break;
+        auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
+        if(!alt_symbol || alt_symbol->size() > 1)
+            break;
+        const xl::node::NodeIdentIFace* terms_node = CHILD_OF(alt_symbol);
+        if(terms_node->sym_id() != ID_RULE_TERMS)
+            break;
+        auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
+        if(!terms_symbol || terms_symbol->size() > 1)
+            break;
+        const xl::node::NodeIdentIFace* paren_child_node = CHILD_OF(terms_symbol);
+        if(paren_child_node->sym_id() != '(')
+            break;
+        innermost_paren_node = paren_child_node;
     }
     add_term_rule(
             node_insertions_after,
