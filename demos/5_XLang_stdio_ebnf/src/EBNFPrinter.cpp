@@ -328,17 +328,17 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     if(!rule_node || !outermost_paren_node)
         return NULL;
     xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
-    const xl::node::NodeIdentIFace* outer_node =
+    const xl::node::NodeIdentIFace* find_node =
             (kleene_op == '(') ? outermost_paren_node : outermost_paren_node->parent();
-    xl::node::NodeIdentIFace* outer_node_copy =
-            find_clone_of_original_recursive(rule_node_copy, outer_node);
+    xl::node::NodeIdentIFace* find_node_copy =
+            find_clone_of_original_recursive(rule_node_copy, find_node);
     if(kleene_op != '(')
     {
-        std::string* action_string_ptr = get_action_string_from_kleene_node(outer_node_copy);
+        std::string* action_string_ptr = get_action_string_from_kleene_node(find_node_copy);
         if(action_string_ptr)
         {
             int position = 1;
-            xl::node::NodeIdentIFace* outer_parent_node = outer_node->parent();
+            xl::node::NodeIdentIFace* outer_parent_node = find_node->parent();
             if(outer_parent_node)
             {
                 xl::node::SymbolNodeIFace* outer_parent_symbol =
@@ -347,7 +347,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                 {
                     for(size_t i = 0; i<outer_parent_symbol->size(); i++)
                     {
-                        if((*outer_parent_symbol)[i] == outer_node)
+                        if((*outer_parent_symbol)[i] == find_node)
                         {
                             position = i+1;
                             break;
@@ -366,7 +366,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
-    replace_node(outer_node_copy, replacement_node);
+    replace_node(find_node_copy, replacement_node);
     return rule_node_copy;
 }
 
