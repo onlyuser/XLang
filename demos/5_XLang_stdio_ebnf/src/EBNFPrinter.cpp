@@ -210,25 +210,6 @@ static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* ter
     return *string_ptr;
 }
 
-// kleene_node --> paren_node --> alts_node
-static const xl::node::NodeIdentIFace* get_alts_node_from_paren_node(
-        const xl::node::NodeIdentIFace* paren_node)
-{
-    // XML:
-    //<symbol type="(">        // <-- paren_node
-    //    <symbol type="alts"> // <-- alts_node
-    //        <!-- ... -->
-    //    </symbol>
-    //</symbol>
-
-    if(!paren_node)
-        return NULL;
-    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
-    if(!paren_symbol)
-        return NULL;
-    return CHILD_OF(paren_symbol);
-}
-
 // kleene_node --> alt_node (up) --> action_node
 static std::string* get_action_string_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
@@ -637,7 +618,10 @@ static void add_shared_typedefs_and_headers(
 {
     if(!string_insertions_to_front || !paren_node)
         return;
-    const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_paren_node(paren_node);
+    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
+    if(!paren_symbol)
+        return;
+    const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
     if(!alts_node)
         return;
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
@@ -762,9 +746,12 @@ static void add_term_rule(
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
-    if(!node_insertions_after)
+    if(!node_insertions_after || !paren_node)
         return;
-    const xl::node::NodeIdentIFace* alts_node = get_alts_node_from_paren_node(paren_node);
+    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
+    if(!paren_symbol)
+        return;
+    const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
     if(!alts_node)
         return;
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
@@ -880,25 +867,25 @@ static void enqueue_changes_for_kleene_closure(
     while(innermost_paren_node->sym_id() == '(')
     {
         auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(innermost_paren_node);
-        if(!paren_symbol || paren_symbol->size() > 1)
+        if(!paren_symbol || paren_symbol->size() != 1)
             break;
         const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
         if(alts_node->sym_id() != ID_RULE_ALTS)
             break;
         auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
-        if(!alts_symbol || alts_symbol->size() > 1)
+        if(!alts_symbol || alts_symbol->size() != 1)
             break;
         const xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
         if(alt_node->sym_id() != ID_RULE_ALT)
             break;
         auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
-        if(!alt_symbol || alt_symbol->size() > 1)
+        if(!alt_symbol || alt_symbol->size() != 1)
             break;
         const xl::node::NodeIdentIFace* terms_node = CHILD_OF(alt_symbol);
         if(terms_node->sym_id() != ID_RULE_TERMS)
             break;
         auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
-        if(!terms_symbol || terms_symbol->size() > 1)
+        if(!terms_symbol || terms_symbol->size() != 1)
             break;
         const xl::node::NodeIdentIFace* paren_child_node = CHILD_OF(terms_symbol);
         if(paren_child_node->sym_id() != '(')
