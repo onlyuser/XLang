@@ -25,7 +25,7 @@ namespace xl {
 std::string escape(std::string s)
 {
     std::stringstream ss;
-    for(int i = 0; i<static_cast<int>(s.length()); i++)
+    for(size_t i = 0; i<s.length(); i++)
         ss << escape(s[i]);
     return ss.str();
 }

@@ -27,6 +27,7 @@
 #include <string> // std::string
 #include <vector> // std::vector
 #include <map> // std::map
+#include <stdarg.h> // va_list
 
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
@@ -132,7 +133,7 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
             });
     if(result)
         return result;
-    for(size_t i = 0; i < root_symbol->size(); i++)
+    for(size_t i = 0; i<root_symbol->size(); i++)
     {
         result = find_clone_of_original_recursive((*root_symbol)[i], original);
         if(result)
@@ -636,7 +637,7 @@ static void add_shared_typedefs_and_headers(
     if(!term_symbol)
         return;
     std::vector<std::string> type_vec;
-    for(size_t i = 0; i < term_symbol->size(); i++)
+    for(size_t i = 0; i<term_symbol->size(); i++)
     {
         xl::node::NodeIdentIFace* child = (*term_symbol)[i];
         switch(child->type())
@@ -839,6 +840,51 @@ static void add_stem_rule(
     (*node_replacements)[rule_node] = stem_rule;
 }
 
+static const xl::node::NodeIdentIFace* get_descendant_node(const xl::node::NodeIdentIFace* _node, ...)
+{
+    std::vector<uint32_t> sym_id_vec;
+    uint32_t sym_id = 0;
+    va_list ap;
+    va_start(ap, _node);
+    do
+    {
+        sym_id = va_arg(ap, uint32_t);
+        sym_id_vec.push_back(sym_id);
+    } while(sym_id);
+    va_end(ap);
+    if(sym_id_vec.empty())
+        return _node;
+    const xl::node::NodeIdentIFace* next_node = _node;
+    if(next_node->sym_id() == sym_id_vec[0])
+    {
+        bool done = false;
+        do
+        {
+            const xl::node::NodeIdentIFace* temp_next_node = next_node;
+            for(size_t i = 1; i<sym_id_vec.size(); i++)
+            {
+                size_t mapped_index = i%(sym_id_vec.size()-1);
+                auto next_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(temp_next_node);
+                if(!next_symbol || next_symbol->size() != 1)
+                {
+                    done = true;
+                    break;
+                }
+                const xl::node::NodeIdentIFace* child_node = CHILD_OF(next_symbol);
+                if(child_node->sym_id() != sym_id_vec[mapped_index])
+                {
+                    done = true;
+                    break;
+                }
+                temp_next_node = child_node;
+                if(mapped_index == 0)
+                    next_node = temp_next_node;
+            }
+        } while(next_node->sym_id() == sym_id_vec[0] && !done);
+    }
+    return next_node;
+}
+
 static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_appends_to_back,
@@ -863,35 +909,8 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
     const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
-    const xl::node::NodeIdentIFace* innermost_paren_node = paren_node;
-    while(innermost_paren_node->sym_id() == '(')
-    {
-        auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(innermost_paren_node);
-        if(!paren_symbol || paren_symbol->size() != 1)
-            break;
-        const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
-        if(alts_node->sym_id() != ID_RULE_ALTS)
-            break;
-        auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
-        if(!alts_symbol || alts_symbol->size() != 1)
-            break;
-        const xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol);
-        if(alt_node->sym_id() != ID_RULE_ALT)
-            break;
-        auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
-        if(!alt_symbol || alt_symbol->size() != 1)
-            break;
-        const xl::node::NodeIdentIFace* terms_node = CHILD_OF(alt_symbol);
-        if(terms_node->sym_id() != ID_RULE_TERMS)
-            break;
-        auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
-        if(!terms_symbol || terms_symbol->size() != 1)
-            break;
-        const xl::node::NodeIdentIFace* paren_child_node = CHILD_OF(terms_symbol);
-        if(paren_child_node->sym_id() != '(')
-            break;
-        innermost_paren_node = paren_child_node;
-    }
+    const xl::node::NodeIdentIFace* innermost_paren_node =
+            get_descendant_node(paren_node, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
