@@ -840,12 +840,13 @@ static void add_stem_rule(
     (*node_replacements)[rule_node] = stem_rule;
 }
 
-static const xl::node::NodeIdentIFace* get_descendant_node(const xl::node::NodeIdentIFace* _node, ...)
+static const xl::node::NodeIdentIFace* get_inner_node(
+        const xl::node::NodeIdentIFace* _node, bool cyclic, ...)
 {
     std::vector<uint32_t> sym_id_vec;
     uint32_t sym_id = 0;
     va_list ap;
-    va_start(ap, _node);
+    va_start(ap, cyclic);
     do
     {
         sym_id = va_arg(ap, uint32_t);
@@ -880,7 +881,7 @@ static const xl::node::NodeIdentIFace* get_descendant_node(const xl::node::NodeI
                 if(mapped_index == 0)
                     next_node = temp_next_node;
             }
-        } while(next_node->sym_id() == sym_id_vec[0] && !done);
+        } while(cyclic && next_node->sym_id() == sym_id_vec[0] && !done);
     }
     return next_node;
 }
@@ -910,7 +911,7 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name2                = gen_name(rule_name);
     const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
     const xl::node::NodeIdentIFace* innermost_paren_node =
-            get_descendant_node(paren_node, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
+            get_inner_node(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
