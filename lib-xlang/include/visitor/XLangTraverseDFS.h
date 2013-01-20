@@ -26,6 +26,8 @@ namespace xl { namespace visitor {
 
 struct TraverseDFS : public Visitor<const node::NodeIdentIFace>
 {
+    TraverseDFS() : m_allow_visit_null(true)
+    {}
     virtual ~TraverseDFS()
     {}
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
@@ -41,6 +43,13 @@ struct TraverseDFS : public Visitor<const node::NodeIdentIFace>
     virtual void abort_visitation(const node::SymbolNodeIFace* _node);
     virtual void visit(const node::SymbolNodeIFace* _node);
     virtual void visit_any(const node::NodeIdentIFace* unknown);
+    void set_allow_visit_null(bool allow_visit_null)
+    {
+        m_allow_visit_null = allow_visit_null;
+    }
+
+private:
+    bool m_allow_visit_null;
 };
 
 } }

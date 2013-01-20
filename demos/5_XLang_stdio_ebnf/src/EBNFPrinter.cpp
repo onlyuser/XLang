@@ -28,6 +28,7 @@
 #include <vector> // std::vector
 #include <map> // std::map
 #include <stdarg.h> // va_list
+#include <assert.h> // assert
 
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
@@ -58,7 +59,9 @@
 #endif
 #define MAKE_SYMBOL xl::mvc::MVCModel::make_symbol
 
-#define CHILD_OF(x) ((*x)[0])
+#define CHILD_OF(x)       (assert((x)->size() == 1), (*(x))[0])
+#define LEFT_CHILD_OF(x)  (assert((x)->size() == 2), (*(x))[0])
+#define RIGHT_CHILD_OF(x) (assert((x)->size() == 2), (*(x))[1])
 
 // string to be inserted to front of proto_block_node's string value
 static std::string gen_shared_include_headers()
@@ -129,7 +132,7 @@ static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
     static const xl::node::NodeIdentIFace* temp; // NOTE: must be static for compile-time closure!
     temp = original; // NOTE: do not combine with previous line! -- must assign every time
     xl::node::NodeIdentIFace* result = root_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
-            return _node->original() == temp;
+            return _node ? (_node->original() == temp) : false;
             });
     if(result)
         return result;
@@ -236,7 +239,7 @@ static std::string* get_action_string_from_kleene_node(
     auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
     if(!alt_symbol)
         return NULL;
-    xl::node::NodeIdentIFace* action_node = (*alt_symbol)[1];
+    xl::node::NodeIdentIFace* action_node = RIGHT_CHILD_OF(alt_symbol);
     if(!action_node)
         return NULL;
     auto action_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node);
@@ -253,7 +256,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     auto rule_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node);
     if(!rule_symbol)
         return "";
-    xl::node::NodeIdentIFace* lhs_node = CHILD_OF(rule_symbol);
+    xl::node::NodeIdentIFace* lhs_node = LEFT_CHILD_OF(rule_symbol);
     if(!lhs_node)
         return "";
     std::string* lhs_value_ptr = get_string_ptr_from_term_node(lhs_node);
@@ -628,11 +631,11 @@ static void add_shared_typedefs_and_headers(
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
-    xl::node::NodeIdentIFace* alt_node = CHILD_OF(alts_symbol); // only consider first alt_node
+    xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[0]; // only consider first alt_node
     auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
     if(!alt_symbol)
         return;
-    xl::node::NodeIdentIFace* term_node = (*alt_symbol)[0]; // left child is symbol, right child is action
+    xl::node::NodeIdentIFace* term_node = LEFT_CHILD_OF(alt_symbol);
     auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
     if(!term_symbol)
         return;
@@ -866,12 +869,18 @@ static const xl::node::NodeIdentIFace* get_inner_node(
             {
                 size_t mapped_index = i%(sym_id_vec.size()-1);
                 auto next_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(temp_next_node);
-                if(!next_symbol || next_symbol->size() != 1)
+                if(!next_symbol || (
+                        next_symbol->size() != 1 &&
+                                !(next_symbol->size() == 2 && !RIGHT_CHILD_OF(next_symbol))
+                                )
+                        )
                 {
                     done = true;
                     break;
                 }
-                const xl::node::NodeIdentIFace* child_node = CHILD_OF(next_symbol);
+                const xl::node::NodeIdentIFace* child_node =
+                        (next_symbol->size() == 1) ?
+                                CHILD_OF(next_symbol) : LEFT_CHILD_OF(next_symbol);
                 if(child_node->sym_id() != sym_id_vec[mapped_index])
                 {
                     done = true;
@@ -1121,7 +1130,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_RULE_ALT:
             if(visit_next_child(_node))
+            {
+                set_allow_visit_null(false);
                 visit_next_child(_node);
+                set_allow_visit_null(true);
+            }
             break;
         case ID_RULE_ACTION_BLOCK:
             std::cout << " {";

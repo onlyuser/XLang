@@ -127,7 +127,8 @@ void TraverseDFS::visit_any(const node::NodeIdentIFace* unknown)
 {
     if(!unknown)
     {
-        visit_null();
+        if(m_allow_visit_null)
+            visit_null();
         return;
     }
     switch(unknown->type())

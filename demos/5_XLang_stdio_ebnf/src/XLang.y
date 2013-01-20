@@ -277,10 +277,7 @@ rule_alts:
     ;
 
 rule_alt:
-      rule_terms rule_action_block {
-                $$ = $2 ? MAKE_SYMBOL(ID_RULE_ALT, 2, $1, $2) :
-                        MAKE_SYMBOL(ID_RULE_ALT, 1, $1);
-            }
+      rule_terms rule_action_block { $$ = MAKE_SYMBOL(ID_RULE_ALT, 2, $1, $2); }
     ;
 
 rule_action_block:
