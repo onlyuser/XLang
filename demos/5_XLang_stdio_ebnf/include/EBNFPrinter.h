@@ -18,14 +18,14 @@
 #ifndef EBNF_PRINTER_H_
 #define EBNF_PRINTER_H_
 
-#include "visitor/XLangTraverseDFS.h" // visitor::TraverseDFS
+#include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
 #include "SetTreeChangesIFace.h" // SetTreeChangesIFace
 
 namespace xl { namespace node { class SymbolNodeIFace; } }
 namespace xl { class TreeContext; }
 class TreeChanges;
 
-class EBNFPrinter : public xl::visitor::TraverseDFS, public SetTreeChangesIFace
+class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace
 {
 public:
     EBNFPrinter(xl::TreeContext* tc)

@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "TreeRewriter.h" // TreeRewriter
-#include "visitor/XLangTraverseDFS.h" // visitor::TraverseDFS
+#include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include "TreeChanges.h" // TreeChanges
@@ -44,7 +44,7 @@ static std::string _end_redirect_stdout()
 
 void rewrite_tree_until_stable(
         xl::node::NodeIdentIFace* ast, // NOTE: non-const ast
-        xl::visitor::TraverseDFS* v,
+        xl::visitor::VisitorDFS* v,
         xl::TreeContext* tc)
 {
     std::string captured_stdout;

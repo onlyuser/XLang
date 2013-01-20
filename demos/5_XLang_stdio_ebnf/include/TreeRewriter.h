@@ -19,12 +19,12 @@
 #define TREE_REWRITER_H_
 
 namespace xl { namespace node { class NodeIdentIFace; } }
-namespace xl { namespace visitor { class TraverseDFS; } }
+namespace xl { namespace visitor { class VisitorDFS; } }
 namespace xl { class TreeContext; }
 
 void rewrite_tree_until_stable(
         xl::node::NodeIdentIFace* ast,
-        xl::visitor::TraverseDFS* v,
+        xl::visitor::VisitorDFS* v,
         xl::TreeContext* tc);
 
 #endif

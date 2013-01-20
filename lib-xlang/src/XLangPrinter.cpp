@@ -48,7 +48,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _no
     if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     std::cout << "/>" << std::endl;
 }
 
@@ -59,7 +59,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _
     if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     std::cout << "/>" << std::endl;
 }
 
@@ -70,7 +70,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* 
     if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     std::cout << "/>" << std::endl;
 }
 
@@ -81,7 +81,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _n
     if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     std::cout << "/>" << std::endl;
 }
 
@@ -92,7 +92,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
     if(m_include_node_uid)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\" value=";
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     std::cout << "/>" << std::endl;
 }
 
@@ -110,7 +110,7 @@ void XMLPrinter::visit(const node::SymbolNodeIFace* _node)
         std::cout << "id=" << _node->uid() << " ";
     std::cout << "type=\"" << _node->name() << "\">" << std::endl;
     m_depth++;
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     m_depth--;
     std::cout << std::string(m_depth*4, ' ') << "</symbol>" << std::endl;
 }
@@ -177,7 +177,7 @@ void DotPrinter::visit(const node::SymbolNodeIFace* _node)
             "\t\tlabel=\"" << _node->name() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
             "\t];" << std::endl;
-    TraverseDFS::visit(_node);
+    VisitorDFS::visit(_node);
     if(!_node->is_root())
         std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
     if(_node->is_root())

@@ -1177,7 +1177,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 }
                 if(kleene_op == '(')
                     std::cout << '(';
-                xl::visitor::TraverseDFS::visit(_node);
+                xl::visitor::VisitorDFS::visit(_node);
                 if(kleene_op == '(')
                     std::cout << ')';
                 else

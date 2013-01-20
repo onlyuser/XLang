@@ -39,7 +39,7 @@ public:
 
 private:
     Allocator &m_alloc;
-    node::NodeIdentIFace* m_root; // parse result (AST root)
+    node::NodeIdentIFace* m_root; // parse result (parse tree root)
 
     struct str_ptr_compare_t
     {
