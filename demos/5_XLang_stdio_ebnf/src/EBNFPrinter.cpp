@@ -246,6 +246,8 @@ static std::string* get_action_string_from_kleene_node(
     if(!action_symbol)
         return NULL;
     xl::node::NodeIdentIFace* action_string_node = CHILD_OF(action_symbol);
+    if(!action_string_node)
+        return NULL;
     return get_string_ptr_from_term_node(action_string_node);
 }
 
