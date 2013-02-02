@@ -287,7 +287,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
         case args_t::MODE_EVAL:
             {
                 EvalVisitor v;
-                v.visit_any(ast);
+                v.dispatch_visit(ast);
             }
             break;
         case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;

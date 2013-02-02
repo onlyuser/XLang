@@ -43,19 +43,19 @@ namespace xl { namespace mvc {
 void MVCView::print_lisp(const node::NodeIdentIFace* _node)
 {
     visitor::LispPrinter v;
-    v.visit_any(_node);
+    v.dispatch_visit(_node);
 }
 
 void MVCView::print_xml(const node::NodeIdentIFace* _node)
 {
     visitor::XMLPrinter v;
-    v.visit_any(_node);
+    v.dispatch_visit(_node);
 }
 
 void MVCView::print_dot(const node::NodeIdentIFace* _node)
 {
     visitor::DotPrinter v(true);
-    v.visit_any(_node);
+    v.dispatch_visit(_node);
 }
 
 typedef const node::NodeIdentIFace nodeType;

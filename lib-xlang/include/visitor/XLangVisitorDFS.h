@@ -42,7 +42,7 @@ struct VisitorDFS : public Visitor<const node::NodeIdentIFace>
             node::NodeIdentIFace** ref_node = NULL);
     virtual void abort_visitation(const node::SymbolNodeIFace* _node);
     virtual void visit(const node::SymbolNodeIFace* _node);
-    virtual void visit_any(const node::NodeIdentIFace* unknown);
+    virtual void dispatch_visit(const node::NodeIdentIFace* unknown);
     void set_allow_visit_null(bool allow_visit_null)
     {
         m_allow_visit_null = allow_visit_null;

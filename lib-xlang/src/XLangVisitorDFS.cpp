@@ -99,7 +99,7 @@ bool VisitorDFS::visit_next_child(const node::SymbolNodeIFace* _node, node::Node
         return false;
     if(ref_node)
         *ref_node = (*_node)[index];
-    visit_any((*_node)[index]);
+    dispatch_visit((*_node)[index]);
     if(index == static_cast<int>(_node->size())-1)
     {
         abort_visitation(_node);
@@ -123,7 +123,7 @@ void VisitorDFS::visit(const node::SymbolNodeIFace* _node)
     while(visit_next_child(_node));
 }
 
-void VisitorDFS::visit_any(const node::NodeIdentIFace* unknown)
+void VisitorDFS::dispatch_visit(const node::NodeIdentIFace* unknown)
 {
     if(!unknown)
     {

@@ -59,10 +59,10 @@ void rewrite_tree_until_stable(
         dynamic_cast<SetTreeChangesIFace*>(v)->setTreeChanges(&changes);
         {
             #ifdef DEBUG_EBNF
-                v->visit_any(ast); // visit while recording changes
+                v->dispatch_visit(ast); // visit while recording changes
             #else
                 _begin_redirect_stdout();                 // begin capture stdout
-                v->visit_any(ast);                        // visit while recording changes
+                v->dispatch_visit(ast);                   // visit while recording changes
                 captured_stdout = _end_redirect_stdout(); // end capture stdout
             #endif
         }

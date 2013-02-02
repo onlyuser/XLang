@@ -25,7 +25,7 @@ struct Visitor
 {
     virtual ~Visitor()
     {}
-    virtual void visit_any(T* unknown) = 0;
+    virtual void dispatch_visit(T* unknown) = 0;
 };
 
 } }

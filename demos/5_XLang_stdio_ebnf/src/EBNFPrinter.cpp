@@ -765,7 +765,7 @@ static void add_term_rule(
         return;
 #ifdef DEBUG_EBNF
     std::cout << ">>> (term_rule)" << std::endl;
-    EBNFPrinter v(tc); v.visit_any(term_rule); std::cout << std::endl;
+    EBNFPrinter v(tc); v.dispatch_visit(term_rule); std::cout << std::endl;
     std::cout << "<<< (term_rule)" << std::endl;
 #endif
     (*node_insertions_after)[rule_node].push_back(term_rule);
@@ -806,7 +806,7 @@ static void add_recursive_rule(
         return;
 #ifdef DEBUG_EBNF
     std::cout << ">>> (recursive_rule)" << std::endl;
-    EBNFPrinter v(tc); v.visit_any(recursive_rule); std::cout << std::endl;
+    EBNFPrinter v(tc); v.dispatch_visit(recursive_rule); std::cout << std::endl;
     std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
     (*node_insertions_after)[rule_node].push_back(recursive_rule);
@@ -839,13 +839,13 @@ static void add_stem_rule(
         return;
 #ifdef DEBUG_EBNF
     std::cout << ">>> (stem_rule)" << std::endl;
-    EBNFPrinter v(tc); v.visit_any(stem_rule); std::cout << std::endl;
+    EBNFPrinter v(tc); v.dispatch_visit(stem_rule); std::cout << std::endl;
     std::cout << "<<< (stem_rule)" << std::endl;
 #endif
     (*node_replacements)[rule_node] = stem_rule;
 }
 
-static const xl::node::NodeIdentIFace* get_inner_node(
+static const xl::node::NodeIdentIFace* punch_through_cyclic_hier(
         const xl::node::NodeIdentIFace* _node, bool cyclic, ...)
 {
     std::vector<uint32_t> sym_id_vec;
@@ -922,7 +922,7 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name2                = gen_name(rule_name);
     const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
     const xl::node::NodeIdentIFace* innermost_paren_node =
-            get_inner_node(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
+            punch_through_cyclic_hier(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
