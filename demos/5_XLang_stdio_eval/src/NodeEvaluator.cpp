@@ -15,37 +15,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "EvalVisitor.h" // EvalVisitor
+#include "NodeEvaluator.h" // NodeEvaluator
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
-void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
 {
     value = _node->value();
 }
 
-void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node)
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node)
 {
     value = _node->value();
 }
 
-void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* _node)
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* _node)
 {
     value = 0;
 }
 
-void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node)
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node)
 {
     value = 0;
 }
 
-void EvalVisitor::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node)
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node)
 {
     value = 0;
 }
 
-void EvalVisitor::visit(const xl::node::SymbolNodeIFace* _node)
+void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
 {
     if(_node->sym_id() == ID_UMINUS)
     {

@@ -21,10 +21,10 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
 
-struct EvalVisitor : public xl::visitor::VisitorDFS
+struct NodeEvaluator : public xl::visitor::VisitorDFS
 {
 public:
-    EvalVisitor()
+    NodeEvaluator()
     {}
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node);
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node);

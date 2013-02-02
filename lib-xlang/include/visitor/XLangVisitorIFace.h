@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_VISITOR_H_
-#define XLANG_VISITOR_H_
+#ifndef XLANG_VISITOR_IFACE_H_
+#define XLANG_VISITOR_IFACE_H_
 
 namespace xl { namespace visitor {
 
 template<class T>
-struct Visitor
+struct VisitorIFace
 {
-    virtual ~Visitor()
+    virtual ~VisitorIFace()
     {}
     virtual void dispatch_visit(T* unknown) = 0;
 };
