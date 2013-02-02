@@ -30,7 +30,7 @@ public:
     {}
     virtual ~Visitable()
     {}
-    // NOTE: Visitor is non-const to allow mutable visitor state for pretty-printers
+    // NOTE: Visitor is non-const to allow mutable visitor state
     virtual void accept(Visitor<T>* v)
     {
         // "Java Tip 98" from http://en.wikipedia.org/wiki/Visitor_pattern
