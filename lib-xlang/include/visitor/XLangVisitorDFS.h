@@ -19,12 +19,12 @@
 #define XLANG_VISITOR_DFS_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangVisitor.h" // visitor::Visitor
+#include "visitor/XLangVisitorIFace.h" // visitor::VisitorIFace
 #include <sstream> // std::stringstream
 
 namespace xl { namespace visitor {
 
-struct VisitorDFS : public Visitor<const node::NodeIdentIFace>
+struct VisitorDFS : public VisitorIFace<const node::NodeIdentIFace>
 {
     VisitorDFS() : m_allow_visit_null(true)
     {}

@@ -28,7 +28,7 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
-#include "EvalVisitor.h" // EvalVisitor
+#include "NodeEvaluator.h" // NodeEvaluator
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string
@@ -286,7 +286,7 @@ void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
     {
         case args_t::MODE_EVAL:
             {
-                EvalVisitor v;
+                NodeEvaluator v;
                 v.dispatch_visit(ast);
             }
             break;

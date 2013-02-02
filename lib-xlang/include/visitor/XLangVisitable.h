@@ -18,7 +18,7 @@
 #ifndef XLANG_VISITABLE_H_
 #define XLANG_VISITABLE_H_
 
-#include "visitor/XLangVisitor.h" // visitor::Visitor
+#include "visitor/XLangVisitorIFace.h" // visitor::VisitorIFace
 
 namespace xl { namespace visitor {
 
@@ -30,10 +30,10 @@ public:
     {}
     virtual ~Visitable()
     {}
-    // NOTE: Visitor is non-const to allow mutable visitor state
-    virtual void accept(Visitor<T>* v)
+    // NOTE: VisitorIFace is non-const to allow mutable visitor state
+    virtual void accept(VisitorIFace<T>* v)
     {
-        // "Java Tip 98" from http://en.wikipedia.org/wiki/Visitor_pattern
+        // "Java Tip 98" from http://en.wikipedia.org/wiki/VisitorIFace_pattern
         v->dispatch_visit(m_instance);
     }
 

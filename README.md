@@ -260,10 +260,10 @@ References:
     <dt>"O-Reilly Lex-Yacc book examples"</dt>
     <dd>http://examples.oreilly.com/lex/</dd>
 
-    <dt>"Cooperative Visitor: A Template Technique for Visitor Creation"</dt>
+    <dt>"Cooperative VisitorIFace: A Template Technique for VisitorIFace Creation"</dt>
     <dd>http://www.artima.com/cppsource/cooperative_visitor.html</dd>
 
-    <dt>"Java Tip 98: Reflect on the Visitor design pattern"</dt>
+    <dt>"Java Tip 98: Reflect on the VisitorIFace design pattern"</dt>
     <dd>http://www.javaworld.com/javaworld/javatips/jw-javatip98.html</dd>
 
     <dt>"Coroutines in C"</dt>
