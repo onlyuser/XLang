@@ -63,6 +63,30 @@
 #define LEFT_CHILD_OF(x)  (assert((x)->size() == 2), (*(x))[0])
 #define RIGHT_CHILD_OF(x) (assert((x)->size() == 2), (*(x))[1])
 
+static const xl::node::NodeIdentIFace* get_child(const xl::node::NodeIdentIFace* _node)
+{
+    auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
+    if(!symbol)
+        return NULL;
+    return CHILD_OF(symbol);
+}
+
+static const xl::node::NodeIdentIFace* get_left_child(const xl::node::NodeIdentIFace* _node)
+{
+    auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
+    if(!symbol)
+        return NULL;
+    return LEFT_CHILD_OF(symbol);
+}
+
+static const xl::node::NodeIdentIFace* get_right_child(const xl::node::NodeIdentIFace* _node)
+{
+    auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
+    if(!symbol)
+        return NULL;
+    return RIGHT_CHILD_OF(symbol);
+}
+
 // string to be inserted to front of proto_block_node's string value
 static std::string gen_shared_include_headers()
 {
@@ -236,16 +260,10 @@ static std::string* get_action_string_from_kleene_node(
     const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_RULE_ALT, kleene_node);
     if(!alt_node)
         return NULL;
-    auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
-    if(!alt_symbol)
-        return NULL;
-    xl::node::NodeIdentIFace* action_node = RIGHT_CHILD_OF(alt_symbol);
+    const xl::node::NodeIdentIFace* action_node = get_right_child(alt_node);
     if(!action_node)
         return NULL;
-    auto action_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(action_node);
-    if(!action_symbol)
-        return NULL;
-    xl::node::NodeIdentIFace* action_string_node = CHILD_OF(action_symbol);
+    const xl::node::NodeIdentIFace* action_string_node = get_child(action_node);
     if(!action_string_node)
         return NULL;
     return get_string_ptr_from_term_node(action_string_node);
@@ -255,10 +273,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
 {
     if(!rule_node)
         return "";
-    auto rule_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(rule_node);
-    if(!rule_symbol)
-        return "";
-    xl::node::NodeIdentIFace* lhs_node = LEFT_CHILD_OF(rule_symbol);
+    const xl::node::NodeIdentIFace* lhs_node = get_left_child(rule_node);
     if(!lhs_node)
         return "";
     std::string* lhs_value_ptr = get_string_ptr_from_term_node(lhs_node);
@@ -624,20 +639,14 @@ static void add_shared_typedefs_and_headers(
 {
     if(!string_insertions_to_front || !paren_node)
         return;
-    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
-    if(!paren_symbol)
-        return;
-    const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
+    const xl::node::NodeIdentIFace* alts_node = get_child(paren_node);
     if(!alts_node)
         return;
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
-    xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[0]; // only consider first alt_node
-    auto alt_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alt_node);
-    if(!alt_symbol)
-        return;
-    xl::node::NodeIdentIFace* term_node = LEFT_CHILD_OF(alt_symbol);
+    const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[0]; // only consider first alt_node
+    const xl::node::NodeIdentIFace* term_node = get_left_child(alt_node);
     auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
     if(!term_symbol)
         return;
@@ -666,10 +675,7 @@ static void add_shared_typedefs_and_headers(
                 break;
         }
     }
-    auto proto_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(proto_block_node);
-    if(!proto_block_symbol)
-        return;
-    xl::node::NodeIdentIFace* proto_block_term_node = CHILD_OF(proto_block_symbol);
+    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
     if(!proto_block_term_node)
         return;
     std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
@@ -705,10 +711,7 @@ static void add_union_member(
 {
     if(!node_appends_to_back)
         return;
-    auto union_block_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_block_node);
-    if(!union_block_symbol)
-        return;
-    xl::node::NodeIdentIFace* union_members_node = CHILD_OF(union_block_symbol);
+    const xl::node::NodeIdentIFace* union_members_node = get_child(union_block_node);
     if(!union_members_node)
         return;
     auto union_members_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(union_members_node);
@@ -754,10 +757,7 @@ static void add_term_rule(
 {
     if(!node_insertions_after || !paren_node)
         return;
-    auto paren_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(paren_node);
-    if(!paren_symbol)
-        return;
-    const xl::node::NodeIdentIFace* alts_node = CHILD_OF(paren_symbol);
+    const xl::node::NodeIdentIFace* alts_node = get_child(paren_node);
     if(!alts_node)
         return;
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
