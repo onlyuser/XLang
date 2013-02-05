@@ -59,16 +59,13 @@
 #endif
 #define MAKE_SYMBOL xl::mvc::MVCModel::make_symbol
 
-#define CHILD_OF(x)       (assert((x)->size() == 1), (*(x))[0])
-#define LEFT_CHILD_OF(x)  (assert((x)->size() == 2), (*(x))[0])
-#define RIGHT_CHILD_OF(x) (assert((x)->size() == 2), (*(x))[1])
-
 static const xl::node::NodeIdentIFace* get_child(const xl::node::NodeIdentIFace* _node)
 {
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
-    return CHILD_OF(symbol);
+    assert(symbol->size() == 1);
+    return (*symbol)[0];
 }
 
 static const xl::node::NodeIdentIFace* get_left_child(const xl::node::NodeIdentIFace* _node)
@@ -76,7 +73,8 @@ static const xl::node::NodeIdentIFace* get_left_child(const xl::node::NodeIdentI
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
-    return LEFT_CHILD_OF(symbol);
+    assert(symbol->size() == 2);
+    return (*symbol)[0];
 }
 
 static const xl::node::NodeIdentIFace* get_right_child(const xl::node::NodeIdentIFace* _node)
@@ -84,7 +82,8 @@ static const xl::node::NodeIdentIFace* get_right_child(const xl::node::NodeIdent
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
-    return RIGHT_CHILD_OF(symbol);
+    assert(symbol->size() == 2);
+    return (*symbol)[1];
 }
 
 // string to be inserted to front of proto_block_node's string value
@@ -873,7 +872,7 @@ static const xl::node::NodeIdentIFace* punch_through_cyclic_hier(
                 auto next_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(temp_next_node);
                 if(!next_symbol || (
                         next_symbol->size() != 1 &&
-                                !(next_symbol->size() == 2 && !RIGHT_CHILD_OF(next_symbol))
+                                !(next_symbol->size() == 2 && !get_right_child(next_symbol))
                                 )
                         )
                 {
@@ -882,7 +881,7 @@ static const xl::node::NodeIdentIFace* punch_through_cyclic_hier(
                 }
                 const xl::node::NodeIdentIFace* child_node =
                         (next_symbol->size() == 1) ?
-                                CHILD_OF(next_symbol) : LEFT_CHILD_OF(next_symbol);
+                                get_child(next_symbol) : get_left_child(next_symbol);
                 if(child_node->sym_id() != sym_id_vec[mapped_index])
                 {
                     done = true;
@@ -1041,7 +1040,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_DEF_PROTO_BLOCK:
             proto_block_node = _node;
             std::cout << "%{";
-            std::cout << get_string_from_term_node(CHILD_OF(_node));
+            std::cout << get_string_from_term_node(get_child(_node));
             std::cout << "%}";
             break;
         case ID_UNION_BLOCK:
@@ -1083,7 +1082,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_UNION_TERM:
             {
-                std::string name = get_string_from_term_node(CHILD_OF(_node));
+                std::string name = get_string_from_term_node(get_child(_node));
                 std::cout << name;
                 union_term_names.push_back(name);
             }
@@ -1099,7 +1098,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEF_SYMBOL:
             {
-                std::string symbol_name = get_string_from_term_node(CHILD_OF(_node));
+                std::string symbol_name = get_string_from_term_node(get_child(_node));
                 std::cout << symbol_name;
                 if(!symbol_name.empty())
                 {
@@ -1140,7 +1139,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_RULE_ACTION_BLOCK:
             std::cout << " {";
-            std::cout << get_string_from_term_node(CHILD_OF(_node));
+            std::cout << get_string_from_term_node(get_child(_node));
             std::cout << '}';
             break;
         case ID_RULE_TERMS:
@@ -1167,7 +1166,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                                 &m_changes->m_node_appends_to_back,
                                 &m_changes->m_node_replacements,
                                 kleene_op,
-                                (kleene_op == '(') ? _node : CHILD_OF(_node),
+                                (kleene_op == '(') ? _node : get_child(_node),
                                 definitions_node,
                                 proto_block_node,
                                 union_block_node,
@@ -1187,7 +1186,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             }
             break;
         case ID_CODE:
-            std::cout << get_string_from_term_node(CHILD_OF(_node));
+            std::cout << get_string_from_term_node(get_child(_node));
             break;
     }
 #ifdef DEBUG_EBNF
