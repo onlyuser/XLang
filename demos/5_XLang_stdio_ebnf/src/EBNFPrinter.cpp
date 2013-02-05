@@ -61,6 +61,8 @@
 
 static const xl::node::NodeIdentIFace* get_child(const xl::node::NodeIdentIFace* _node)
 {
+    if(!_node)
+        return NULL;
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
@@ -70,6 +72,8 @@ static const xl::node::NodeIdentIFace* get_child(const xl::node::NodeIdentIFace*
 
 static const xl::node::NodeIdentIFace* get_left_child(const xl::node::NodeIdentIFace* _node)
 {
+    if(!_node)
+        return NULL;
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
@@ -79,6 +83,8 @@ static const xl::node::NodeIdentIFace* get_left_child(const xl::node::NodeIdentI
 
 static const xl::node::NodeIdentIFace* get_right_child(const xl::node::NodeIdentIFace* _node)
 {
+    if(!_node)
+        return NULL;
     auto symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(_node);
     if(!symbol)
         return NULL;
@@ -198,6 +204,8 @@ static const xl::node::NodeIdentIFace* get_ancestor_node(
 
 static std::string* get_string_ptr_from_term_node(const xl::node::NodeIdentIFace* term_node)
 {
+    if(!term_node)
+        return NULL;
     switch(term_node->type())
     {
         case xl::node::NodeIdentIFace::IDENT:
@@ -223,6 +231,8 @@ static std::string* get_string_ptr_from_term_node(const xl::node::NodeIdentIFace
 
 static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* term_node)
 {
+    if(!term_node)
+        return "";
     if(term_node->type() == xl::node::NodeIdentIFace::CHAR)
     {
         auto char_term =
