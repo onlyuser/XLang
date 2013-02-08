@@ -655,7 +655,11 @@ static void add_shared_typedefs_and_headers(
     if(!alts_symbol)
         return;
     const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[0]; // only consider first alt_node
+    if(!alt_node)
+        return;
     const xl::node::NodeIdentIFace* term_node = get_left_child(alt_node);
+    if(!term_node)
+        return;
     auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
     if(!term_symbol)
         return;
