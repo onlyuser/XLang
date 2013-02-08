@@ -854,54 +854,67 @@ static void add_stem_rule(
     (*node_replacements)[rule_node] = stem_rule;
 }
 
-static const xl::node::NodeIdentIFace* punch_through_cyclic_hier(
+static xl::node::NodeIdentIFace* find_unique_child_by_sym_id(
+        const xl::node::SymbolNodeIFace* symbol, uint32_t sym_id)
+{
+    xl::node::NodeIdentIFace* unique_child_node = NULL;
+    for(size_t i = 0; i<symbol->size(); i++)
+    {
+        xl::node::NodeIdentIFace* child_node = (*symbol)[i];
+        if(child_node && child_node->sym_id() == sym_id)
+        {
+            if(unique_child_node)
+                return NULL;
+            unique_child_node = child_node;
+        }
+    }
+    return unique_child_node;
+}
+
+static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
         const xl::node::NodeIdentIFace* _node, bool cyclic, ...)
 {
-    std::vector<uint32_t> sym_id_vec;
+    std::vector<uint32_t> cyclic_sequence;
     uint32_t sym_id = 0;
     va_list ap;
     va_start(ap, cyclic);
     do
     {
         sym_id = va_arg(ap, uint32_t);
-        sym_id_vec.push_back(sym_id);
+        cyclic_sequence.push_back(sym_id);
     } while(sym_id);
     va_end(ap);
-    if(sym_id_vec.empty())
+    if(cyclic_sequence.empty())
         return _node;
     const xl::node::NodeIdentIFace* next_node = _node;
-    if(next_node->sym_id() == sym_id_vec[0])
+    if(next_node->sym_id() == cyclic_sequence[0])
     {
         bool done = false;
         do
         {
-            const xl::node::NodeIdentIFace* temp_next_node = next_node;
-            for(size_t i = 1; i<sym_id_vec.size(); i++)
+            const xl::node::NodeIdentIFace* next_node_in_sequence = next_node;
+            for(size_t i = 1; i<cyclic_sequence.size(); i++)
             {
-                size_t mapped_index = i%(sym_id_vec.size()-1);
-                auto next_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(temp_next_node);
-                if(!next_symbol || (
-                        next_symbol->size() != 1 &&
-                                !(next_symbol->size() == 2 && !get_right_child(next_symbol))
-                                )
-                        )
+                auto next_symbol =
+                        dynamic_cast<const xl::node::SymbolNodeIFace*>(next_node_in_sequence);
+                if(!next_symbol)
                 {
                     done = true;
                     break;
                 }
-                const xl::node::NodeIdentIFace* child_node =
-                        (next_symbol->size() == 1) ?
-                                get_child(next_symbol) : get_left_child(next_symbol);
-                if(child_node->sym_id() != sym_id_vec[mapped_index])
+                size_t mapped_index = i%(cyclic_sequence.size()-1);
+                const xl::node::NodeIdentIFace* unique_child_node =
+                        find_unique_child_by_sym_id(next_symbol, cyclic_sequence[mapped_index]);
+                if(!unique_child_node || unique_child_node->sym_id() != cyclic_sequence[mapped_index])
                 {
                     done = true;
                     break;
                 }
-                temp_next_node = child_node;
+                next_node_in_sequence = unique_child_node;
                 if(mapped_index == 0)
-                    next_node = temp_next_node;
+                    next_node = next_node_in_sequence;
             }
-        } while(cyclic && next_node->sym_id() == sym_id_vec[0] && !done);
+        } while(cyclic && next_node->sym_id() == cyclic_sequence[0] && !done);
     }
     return next_node;
 }
@@ -931,7 +944,7 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name2                = gen_name(rule_name);
     const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
     const xl::node::NodeIdentIFace* innermost_paren_node =
-            punch_through_cyclic_hier(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
+            enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
