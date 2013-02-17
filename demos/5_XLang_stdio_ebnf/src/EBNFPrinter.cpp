@@ -174,20 +174,14 @@ static xl::node::NodeIdentIFace* find_node_recursive(
     return NULL;
 }
 
-static void replace_node(
-        const xl::node::NodeIdentIFace* find_node,
-        const xl::node::NodeIdentIFace* replacement_node)
+static void replace_node(xl::node::NodeIdentIFace* find_node,
+        xl::node::NodeIdentIFace* replacement_node)
 {
     if(!find_node)
         return;
-    auto parent_symbol =
-            dynamic_cast<xl::node::SymbolNodeIFace*>(find_node->parent());
+    auto parent_symbol = dynamic_cast<xl::node::SymbolNodeIFace*>(find_node->parent());
     if(parent_symbol)
-    {
-        parent_symbol->replace_first(
-                const_cast<xl::node::NodeIdentIFace*>(find_node),
-                const_cast<xl::node::NodeIdentIFace*>(replacement_node));
-    }
+        parent_symbol->replace_first(find_node, replacement_node);
 }
 
 static const xl::node::NodeIdentIFace* get_ancestor_node(
