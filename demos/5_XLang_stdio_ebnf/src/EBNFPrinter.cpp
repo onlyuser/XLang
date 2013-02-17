@@ -206,49 +206,59 @@ static std::string* get_string_ptr_from_term_node(const xl::node::NodeIdentIFace
 {
     if(!term_node)
         return NULL;
-    switch(term_node->type())
-    {
-        case xl::node::NodeIdentIFace::IDENT:
-            {
-                auto ident_term =
-                        dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(term_node);
-                if(!ident_term)
-                    return NULL;
-                return const_cast<std::string*>(ident_term->value()); // TODO: fix-me!
-            }
-        case xl::node::NodeIdentIFace::STRING:
-            {
-                auto string_term =
-                        dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(term_node);
-                if(!string_term)
-                    return NULL;
-                return string_term->value();
-            }
-        default:
-            return NULL;
-    }
+    auto string_term =
+            dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>*>(term_node);
+    if(!string_term)
+        return NULL;
+    return string_term->value();
 }
 
-static std::string get_string_from_term_node(const xl::node::NodeIdentIFace* term_node)
+static const std::string* get_ident_string_ptr_from_term_node(const xl::node::NodeIdentIFace* term_node)
+{
+    if(!term_node)
+        return NULL;
+    auto ident_term =
+            dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>*>(term_node);
+    if(!ident_term)
+        return NULL;
+    return ident_term->value();
+}
+
+static std::string get_string_value_from_term_node(const xl::node::NodeIdentIFace* term_node)
 {
     if(!term_node)
         return "";
-    if(term_node->type() == xl::node::NodeIdentIFace::CHAR)
+    switch(term_node->type())
     {
-        auto char_term =
-                dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>*>(term_node);
-        std::stringstream ss;
-        ss << '\'' << xl::escape(char_term->value()) << '\'';
-        return ss.str();
+        case xl::node::NodeIdentIFace::CHAR:
+            {
+                auto char_term =
+                        dynamic_cast<const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>*>(term_node);
+                std::stringstream ss;
+                ss << '\'' << xl::escape(char_term->value()) << '\'';
+                return ss.str();
+            }
+        case xl::node::NodeIdentIFace::STRING:
+            {
+                std::string* string_ptr = get_string_ptr_from_term_node(term_node);
+                if(!string_ptr)
+                    return "";
+                return *string_ptr;
+            }
+        case xl::node::NodeIdentIFace::IDENT:
+            {
+                const std::string* ident_string_ptr = get_ident_string_ptr_from_term_node(term_node);
+                if(!ident_string_ptr)
+                    return "";
+                return *ident_string_ptr;
+            }
+        default:
+            return "";
     }
-    std::string* string_ptr = get_string_ptr_from_term_node(term_node);
-    if(!string_ptr)
-        return "";
-    return *string_ptr;
 }
 
 // kleene_node --> alt_node (up) --> action_node
-static std::string* get_action_string_from_kleene_node(
+static std::string* get_action_string_ptr_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
     // XML:
@@ -285,10 +295,10 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     const xl::node::NodeIdentIFace* lhs_node = get_left_child(rule_node);
     if(!lhs_node)
         return "";
-    std::string* lhs_value_ptr = get_string_ptr_from_term_node(lhs_node);
-    if(!lhs_value_ptr)
+    const std::string* ident_string_ptr = get_ident_string_ptr_from_term_node(lhs_node);
+    if(!ident_string_ptr)
         return "";
-    return *lhs_value_ptr;
+    return *ident_string_ptr;
 }
 
 static std::string gen_delete_rule_rvalue_term(int position);
@@ -345,7 +355,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
             find_node_recursive(rule_node_clone, find_node);
     if(kleene_op != '(')
     {
-        std::string* action_string_ptr = get_action_string_from_kleene_node(find_node_clone);
+        std::string* action_string_ptr = get_action_string_ptr_from_kleene_node(find_node_clone);
         if(action_string_ptr)
         {
             int position = 1;
@@ -681,7 +691,7 @@ static void add_shared_typedefs_and_headers(
     const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
     if(!proto_block_term_node)
         return;
-    std::string proto_block_string = get_string_from_term_node(proto_block_term_node);
+    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     std::string shared_typedefs_and_headers;
     std::string shared_include_headers = gen_shared_include_headers();
     if(kleene_op == '(')
@@ -1046,7 +1056,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     xl::node::NodeIdentIFace* child_node = NULL;
                     visit_next_child(_node, &child_node);
                     if(child_node)
-                        union_typename = get_string_from_term_node(child_node);
+                        union_typename = get_string_value_from_term_node(child_node);
                     std::cout << "> ";
                 }
                 visit_next_child(_node);
@@ -1057,7 +1067,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_DEF_PROTO_BLOCK:
             proto_block_node = _node;
             std::cout << "%{";
-            std::cout << get_string_from_term_node(get_child(_node));
+            std::cout << get_string_value_from_term_node(get_child(_node));
             std::cout << "%}";
             break;
         case ID_UNION_BLOCK:
@@ -1099,7 +1109,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_UNION_TERM:
             {
-                std::string name = get_string_from_term_node(get_child(_node));
+                std::string name = get_string_value_from_term_node(get_child(_node));
                 std::cout << name;
                 union_term_names.push_back(name);
             }
@@ -1115,7 +1125,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_DEF_SYMBOL:
             {
-                std::string symbol_name = get_string_from_term_node(get_child(_node));
+                std::string symbol_name = get_string_value_from_term_node(get_child(_node));
                 std::cout << symbol_name;
                 if(!symbol_name.empty())
                 {
@@ -1156,7 +1166,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_RULE_ACTION_BLOCK:
             std::cout << " {";
-            std::cout << get_string_from_term_node(get_child(_node));
+            std::cout << get_string_value_from_term_node(get_child(_node));
             std::cout << '}';
             break;
         case ID_RULE_TERMS:
@@ -1203,7 +1213,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             }
             break;
         case ID_CODE:
-            std::cout << get_string_from_term_node(get_child(_node));
+            std::cout << get_string_value_from_term_node(get_child(_node));
             break;
     }
 #ifdef DEBUG_EBNF
