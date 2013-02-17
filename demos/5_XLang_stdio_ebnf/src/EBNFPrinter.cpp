@@ -149,27 +149,27 @@ static std::string gen_type(std::string stem)
     return stem + "_type_t";
 }
 
-static xl::node::NodeIdentIFace* find_clone_of_original_recursive(
-        const xl::node::NodeIdentIFace* root,
-        const xl::node::NodeIdentIFace* original)
+static xl::node::NodeIdentIFace* find_node_recursive(
+        const xl::node::NodeIdentIFace* root_node,
+        const xl::node::NodeIdentIFace* find_node)
 {
-    if(!root || !original)
+    if(!root_node || !find_node)
         return NULL;
-    auto root_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(root);
+    auto root_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(root_node);
     if(!root_symbol)
         return NULL;
-    static const xl::node::NodeIdentIFace* temp; // NOTE: must be static for compile-time closure!
-    temp = original; // NOTE: do not combine with previous line! -- must assign every time
-    xl::node::NodeIdentIFace* result = root_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
-            return _node ? (_node->original() == temp) : false;
+    static const xl::node::NodeIdentIFace* temp_node; // NOTE: must be static for compile-time closure!
+    temp_node = find_node; // NOTE: do not combine with previous line! -- must assign every time
+    xl::node::NodeIdentIFace* clone_node = root_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
+            return _node ? (_node->original() == temp_node) : false;
             });
-    if(result)
-        return result;
+    if(clone_node)
+        return clone_node;
     for(size_t i = 0; i<root_symbol->size(); i++)
     {
-        result = find_clone_of_original_recursive((*root_symbol)[i], original);
-        if(result)
-            return result;
+        clone_node = find_node_recursive((*root_symbol)[i], find_node);
+        if(clone_node)
+            return clone_node;
     }
     return NULL;
 }
@@ -192,9 +192,9 @@ static void replace_node(
 
 static const xl::node::NodeIdentIFace* get_ancestor_node(
         uint32_t sym_id,
-        const xl::node::NodeIdentIFace* node)
+        const xl::node::NodeIdentIFace* _node)
 {
-    for(auto p = node; p; p = p->parent())
+    for(auto p = _node; p; p = p->parent())
     {
         if(p->sym_id() == sym_id)
             return p;
@@ -338,14 +338,14 @@ static xl::node::NodeIdentIFace* make_stem_rule(
 
     if(!rule_node || !outermost_paren_node)
         return NULL;
-    xl::node::NodeIdentIFace* rule_node_copy = rule_node->clone(tc);
+    xl::node::NodeIdentIFace* rule_node_clone = rule_node->clone(tc);
     const xl::node::NodeIdentIFace* find_node =
             (kleene_op == '(') ? outermost_paren_node : outermost_paren_node->parent();
-    xl::node::NodeIdentIFace* find_node_copy =
-            find_clone_of_original_recursive(rule_node_copy, find_node);
+    xl::node::NodeIdentIFace* find_node_clone =
+            find_node_recursive(rule_node_clone, find_node);
     if(kleene_op != '(')
     {
-        std::string* action_string_ptr = get_action_string_from_kleene_node(find_node_copy);
+        std::string* action_string_ptr = get_action_string_from_kleene_node(find_node_clone);
         if(action_string_ptr)
         {
             int position = 1;
@@ -377,8 +377,8 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
-    replace_node(find_node_copy, replacement_node);
-    return rule_node_copy;
+    replace_node(find_node_clone, replacement_node);
+    return rule_node_clone;
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std::string name2,
@@ -414,35 +414,33 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(std::string name1, std
     //    </symbol>
     //</symbol>
 
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_RULE, 2,
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
-                                            ),
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $$ = new " + gen_type(name1) +
-                                                            "; $$->push_back(*$1); delete $1; ")
-                                                    )
-                                            )
+    return MAKE_SYMBOL(tc, ID_RULE, 2,
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                     ),
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
-                                            ),
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
-                                                    )
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING,
+                                            tc->alloc_string(" $$ = new " + gen_type(name1) +
+                                                    "; $$->push_back(*$1); delete $1; ")
+                                            )
+                                    )
+                            ),
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                    ),
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING,
+                                            tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
                                             )
                                     )
                             )
-                    );
-    return node;
+                    )
+            );
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std::string name2,
@@ -475,31 +473,29 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(std::string name1, std
     //    </symbol>
     //</symbol>
 
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_RULE, 2,
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $$ = new " + gen_type(name1) + "; ")
-                                                    )
+    return MAKE_SYMBOL(tc, ID_RULE, 2,
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING,
+                                            tc->alloc_string(" $$ = new " + gen_type(name1) + "; ")
                                             )
+                                    )
+                            ),
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                     ),
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
-                                            ),
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING,
-                                                    tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
-                                                    )
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING,
+                                            tc->alloc_string(" $1->push_back(*$2); delete $2; $$ = $1; ")
                                             )
                                     )
                             )
-                    );
-    return node;
+                    )
+            );
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1, std::string name2,
@@ -531,26 +527,24 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(std::string name1,
     //    </symbol>
     //</symbol>
 
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_RULE, 2,
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                    MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = NULL; "))
-                                            )
+    return MAKE_SYMBOL(tc, ID_RULE, 2,
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = NULL; "))
+                                    )
+                            ),
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
+                            MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
                                     ),
-                            MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
-                                    MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
-                                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
-                                            ),
-                                    MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                            MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
-                                            )
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
                                     )
                             )
-                    );
-    return node;
+                    )
+            );
 }
 
 static xl::node::NodeIdentIFace* make_term_rule(
@@ -584,18 +578,16 @@ static xl::node::NodeIdentIFace* make_union_member_node(
     //    </symbol>
     //</symbol>
 
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_UNION_MEMBER, 1,
-                    MAKE_SYMBOL(tc, ID_UNION_TERMS, 2,
-                            MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string(_type + "*"))
-                                    ),
-                            MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string(_typename))
-                                    )
+    return MAKE_SYMBOL(tc, ID_UNION_MEMBER, 1,
+            MAKE_SYMBOL(tc, ID_UNION_TERMS, 2,
+                    MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
+                            MAKE_TERM(ID_STRING, tc->alloc_string(_type + "*"))
+                            ),
+                    MAKE_SYMBOL(tc, ID_UNION_TERM, 1,
+                            MAKE_TERM(ID_STRING, tc->alloc_string(_typename))
                             )
-                    );
-    return node;
+                    )
+            );
 }
 
 // node to be appended to back of definitions block
@@ -623,17 +615,15 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
         if((p+1) != token_vec.end())
             exploded_tokens.append(", ");
     }
-    xl::node::NodeIdentIFace* node =
-            MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
-                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(_type_name)),
-                    MAKE_SYMBOL(tc, ID_DEF_SYMBOLS, 1,
-                            MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
-                                    )
+    return MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(_type_name)),
+            MAKE_SYMBOL(tc, ID_DEF_SYMBOLS, 1,
+                    MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
+                            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
                             )
-                    );
-    return node;
+                    )
+            );
 }
 
 static void add_shared_typedefs_and_headers(
@@ -666,8 +656,8 @@ static void add_shared_typedefs_and_headers(
     std::vector<std::string> type_vec;
     for(size_t i = 0; i<term_symbol->size(); i++)
     {
-        xl::node::NodeIdentIFace* child = (*term_symbol)[i];
-        switch(child->type())
+        xl::node::NodeIdentIFace* child_node = (*term_symbol)[i];
+        switch(child_node->type())
         {
             case xl::node::NodeIdentIFace::INT:    type_vec.push_back("int"); break;
             case xl::node::NodeIdentIFace::FLOAT:  type_vec.push_back("float"); break;
@@ -678,7 +668,7 @@ static void add_shared_typedefs_and_headers(
                     std::string def_symbol_name =
                             *dynamic_cast<
                                     xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
-                                    >(child)->value();
+                                    >(child_node)->value();
                     std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
                     std::string union_type = (*union_typename_to_type)[union_typename];
                     type_vec.push_back(union_type);
@@ -1053,10 +1043,10 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 visit_next_child(_node);
                 {
                     std::cout << '<';
-                    xl::node::NodeIdentIFace* child = NULL;
-                    visit_next_child(_node, &child);
-                    if(child)
-                        union_typename = get_string_from_term_node(child);
+                    xl::node::NodeIdentIFace* child_node = NULL;
+                    visit_next_child(_node, &child_node);
+                    if(child_node)
+                        union_typename = get_string_from_term_node(child_node);
                     std::cout << "> ";
                 }
                 visit_next_child(_node);
