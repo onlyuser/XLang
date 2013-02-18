@@ -76,11 +76,11 @@ protected:
 
 template<NodeIdentIFace::type_t _type>
 class TermNode
-    : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type> >
+    : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type>>
 {
 public:
     TermNode(uint32_t _sym_id, typename TermInternalType<_type>::type _value)
-        : Node(_type, _sym_id), visitor::Visitable<TermNode<_type> >(this), m_value(_value)
+        : Node(_type, _sym_id), visitor::Visitable<TermNode<_type>>(this), m_value(_value)
     {}
     typename TermInternalType<_type>::type value() const
     {
