@@ -105,7 +105,8 @@ static std::string gen_typedef(std::string _type, std::string _typename)
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_tuple_typedef(std::vector<std::string> &type_vec, std::string _typename)
+static std::string gen_template_typedef(
+        std::string template_type, std::vector<std::string> &type_vec, std::string _typename)
 {
     std::string exploded_types;
     for(auto p = type_vec.begin(); p != type_vec.end(); p++)
@@ -114,7 +115,19 @@ static std::string gen_tuple_typedef(std::vector<std::string> &type_vec, std::st
         if((p+1) != type_vec.end())
             exploded_types.append(", ");
     }
-    return gen_typedef("std::tuple<" + exploded_types + ">", _typename);
+    return gen_typedef(std::string(template_type) + "<" + exploded_types + ">", _typename);
+}
+
+// string to be inserted to front of proto_block_node's string value
+static std::string gen_tuple_typedef(std::vector<std::string> &type_vec, std::string _typename)
+{
+    return gen_template_typedef("std::tuple", type_vec, _typename);
+}
+
+// string to be inserted to front of proto_block_node's string value
+static std::string gen_variant_typedef(std::vector<std::string> &type_vec, std::string _typename)
+{
+    return gen_template_typedef("boost::variant", type_vec, _typename);
 }
 
 // string to be inserted to front of proto_block_node's string value
