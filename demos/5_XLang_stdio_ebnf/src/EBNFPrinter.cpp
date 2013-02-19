@@ -648,14 +648,14 @@ static void add_shared_typedefs_and_headers(
         std::string                                                        name1,
         std::string                                                        name2,
         char                                                               kleene_op,
-        const xl::node::NodeIdentIFace*                                    paren_node,
+        const xl::node::NodeIdentIFace*                                    innermost_paren_node,
         const xl::node::NodeIdentIFace*                                    proto_block_node,
         std::map<std::string, std::string>*                                union_typename_to_type,
         std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
 {
-    if(!string_insertions_to_front || !paren_node)
+    if(!string_insertions_to_front || !innermost_paren_node)
         return;
-    const xl::node::NodeIdentIFace* alts_node = get_child(paren_node);
+    const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
     if(!alts_node)
         return;
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
@@ -778,16 +778,16 @@ static void add_term_rule(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name2,
-        const xl::node::NodeIdentIFace*                                                  paren_node,
+        const xl::node::NodeIdentIFace*                                                  innermost_paren_node,
         const xl::node::NodeIdentIFace*                                                  rule_node,
         const xl::node::NodeIdentIFace*                                                  rule_def_symbol_node,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
-    if(!node_insertions_after || !paren_node)
+    if(!node_insertions_after || !innermost_paren_node)
         return;
-    const xl::node::NodeIdentIFace* alts_node = get_child(paren_node);
+    const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
     if(!alts_node)
         return;
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
