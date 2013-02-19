@@ -713,10 +713,16 @@ static void add_shared_typedefs_and_headers(
         else
         {
             std::string vector_typedef;
-            if(kleene_op == '?')
-                vector_typedef = gen_typedef(gen_type(name2), gen_type(name1));
-            else
-                vector_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+            switch(kleene_op)
+            {
+                case '?':
+                    vector_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+                    break;
+                case '*':
+                case '+':
+                    vector_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+                    break;
+            }
             shared_typedefs_and_headers =
                     std::string("\n") + shared_include_headers + "\n" +
                     gen_tuple_typedef(type_vec, gen_type(name2)) + "\n" +
