@@ -105,8 +105,7 @@ static std::string gen_typedef(std::string _type, std::string _typename)
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_template_typedef(
-        std::string template_type, std::vector<std::string> &type_vec, std::string _typename)
+static std::string gen_template_type(std::string template_type, std::vector<std::string> &type_vec)
 {
     std::string exploded_types;
     for(auto p = type_vec.begin(); p != type_vec.end(); p++)
@@ -115,19 +114,19 @@ static std::string gen_template_typedef(
         if((p+1) != type_vec.end())
             exploded_types.append(", ");
     }
-    return gen_typedef(std::string(template_type) + "<" + exploded_types + ">", _typename);
+    return std::string(template_type) + "<" + exploded_types + ">";
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_tuple_typedef(std::vector<std::string> &type_vec, std::string _typename)
+static std::string gen_tuple_type(std::vector<std::string> &type_vec)
 {
-    return gen_template_typedef("std::tuple", type_vec, _typename);
+    return gen_template_type("std::tuple", type_vec);
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_variant_typedef(std::vector<std::string> &type_vec, std::string _typename)
+static std::string gen_variant_type(std::vector<std::string> &type_vec)
 {
-    return gen_template_typedef("boost::variant", type_vec, _typename);
+    return gen_template_type("boost::variant", type_vec);
 }
 
 // string to be inserted to front of proto_block_node's string value
@@ -708,7 +707,7 @@ static void add_shared_typedefs_and_headers(
         {
             shared_typedefs_and_headers =
                     std::string("\n") + shared_include_headers + "\n" +
-                    gen_tuple_typedef(type_vec, gen_type(name1));
+                    gen_typedef(gen_tuple_type(type_vec), gen_type(name1));
         }
         else
         {
@@ -725,7 +724,7 @@ static void add_shared_typedefs_and_headers(
             }
             shared_typedefs_and_headers =
                     std::string("\n") + shared_include_headers + "\n" +
-                    gen_tuple_typedef(type_vec, gen_type(name2)) + "\n" +
+                    gen_typedef(gen_tuple_type(type_vec), gen_type(name2)) + "\n" +
                     kleene_typedef;
         }
         if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
