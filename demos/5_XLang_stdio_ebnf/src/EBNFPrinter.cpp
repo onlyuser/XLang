@@ -93,9 +93,21 @@ static const xl::node::NodeIdentIFace* get_right_child(const xl::node::NodeIdent
 }
 
 // string to be inserted to front of proto_block_node's string value
-static std::string gen_shared_include_headers()
+static std::string gen_tuple_include_headers()
 {
-    return "#include <vector>\n#include <tuple>\n#include <boost/variant.hpp>";
+    return "#include <tuple>";
+}
+
+// string to be inserted to front of proto_block_node's string value
+static std::string gen_variant_include_headers()
+{
+    return "#include <boost/variant.hpp>";
+}
+
+// string to be inserted to front of proto_block_node's string value
+static std::string gen_vector_include_headers()
+{
+    return "#include <vector>";
 }
 
 // string to be inserted to front of proto_block_node's string value
@@ -660,7 +672,6 @@ static void add_shared_typedefs_and_headers(
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
-    // TODO: should construct variant of tuples instead of duplicate typedefs
     std::vector<std::string> variant_type_vec;
     for(size_t j = 0; j<alts_symbol->size(); j++)
     {
@@ -694,24 +705,34 @@ static void add_shared_typedefs_and_headers(
                         tuple_type_vec.push_back(union_type);
                     }
                     break;
+                case xl::node::NodeIdentIFace::SYMBOL:
+                    std::cerr << "DOH!" << std::endl; // TODO: fix-me!
+                    break;
                 default:
                     break;
             }
         }
         variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
     }
-    std::string variant_type = gen_variant_type(variant_type_vec);
+    std::string include_headers = gen_tuple_include_headers();
+    std::string _type;
+    if(alts_symbol->size() > 1)
+    {
+        _type = gen_variant_type(variant_type_vec);
+        include_headers.insert(0, gen_variant_include_headers() + "\n");
+    }
+    else
+        _type = variant_type_vec[0];
     const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
     if(!proto_block_term_node)
         return;
     std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     std::string shared_typedefs_and_headers;
-    std::string shared_include_headers = gen_shared_include_headers();
     if(kleene_op == '(')
     {
         shared_typedefs_and_headers =
-                std::string("\n") + shared_include_headers + "\n" +
-                gen_typedef(variant_type, gen_type(name1));
+                std::string("\n") + include_headers + "\n" +
+                gen_typedef(_type, gen_type(name1));
     }
     else
     {
@@ -724,11 +745,12 @@ static void add_shared_typedefs_and_headers(
             case '*':
             case '+':
                 kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+                include_headers.insert(0, gen_vector_include_headers() + "\n");
                 break;
         }
         shared_typedefs_and_headers =
-                std::string("\n") + shared_include_headers + "\n" +
-                gen_typedef(variant_type, gen_type(name2)) + "\n" +
+                std::string("\n") + include_headers + "\n" +
+                gen_typedef(_type, gen_type(name2)) + "\n" +
                 kleene_typedef;
     }
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
