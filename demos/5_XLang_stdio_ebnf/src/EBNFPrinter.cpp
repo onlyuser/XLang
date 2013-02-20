@@ -661,6 +661,7 @@ static void add_shared_typedefs_and_headers(
     if(!alts_symbol)
         return;
     // TODO: should construct variant of tuples instead of duplicate typedefs
+    std::vector<std::string> variant_type_vec;
     for(size_t j = 0; j<alts_symbol->size(); j++)
     {
         const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[j];
@@ -672,16 +673,16 @@ static void add_shared_typedefs_and_headers(
         auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
         if(!term_symbol)
             return;
-        std::vector<std::string> type_vec;
+        std::vector<std::string> tuple_type_vec;
         for(size_t i = 0; i<term_symbol->size(); i++)
         {
             xl::node::NodeIdentIFace* child_node = (*term_symbol)[i];
             switch(child_node->type())
             {
-                case xl::node::NodeIdentIFace::INT:    type_vec.push_back("int"); break;
-                case xl::node::NodeIdentIFace::FLOAT:  type_vec.push_back("float"); break;
-                case xl::node::NodeIdentIFace::STRING: type_vec.push_back("std::string"); break;
-                case xl::node::NodeIdentIFace::CHAR:   type_vec.push_back("char"); break;
+                case xl::node::NodeIdentIFace::INT:    tuple_type_vec.push_back("int"); break;
+                case xl::node::NodeIdentIFace::FLOAT:  tuple_type_vec.push_back("float"); break;
+                case xl::node::NodeIdentIFace::STRING: tuple_type_vec.push_back("std::string"); break;
+                case xl::node::NodeIdentIFace::CHAR:   tuple_type_vec.push_back("char"); break;
                 case xl::node::NodeIdentIFace::IDENT:
                     {
                         std::string def_symbol_name =
@@ -690,46 +691,48 @@ static void add_shared_typedefs_and_headers(
                                         >(child_node)->value();
                         std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
                         std::string union_type = (*union_typename_to_type)[union_typename];
-                        type_vec.push_back(union_type);
+                        tuple_type_vec.push_back(union_type);
                     }
                     break;
                 default:
                     break;
             }
         }
-        const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
-        if(!proto_block_term_node)
-            return;
-        std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
-        std::string shared_typedefs_and_headers;
-        std::string shared_include_headers = gen_shared_include_headers();
-        if(kleene_op == '(')
-        {
-            shared_typedefs_and_headers =
-                    std::string("\n") + shared_include_headers + "\n" +
-                    gen_typedef(gen_tuple_type(type_vec), gen_type(name1));
-        }
-        else
-        {
-            std::string kleene_typedef;
-            switch(kleene_op)
-            {
-                case '?':
-                    kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
-                    break;
-                case '*':
-                case '+':
-                    kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
-                    break;
-            }
-            shared_typedefs_and_headers =
-                    std::string("\n") + shared_include_headers + "\n" +
-                    gen_typedef(gen_tuple_type(type_vec), gen_type(name2)) + "\n" +
-                    kleene_typedef;
-        }
-        if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
-            (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
+        variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
     }
+    std::string variant_type = gen_variant_type(variant_type_vec);
+    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
+    if(!proto_block_term_node)
+        return;
+    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
+    std::string shared_typedefs_and_headers;
+    std::string shared_include_headers = gen_shared_include_headers();
+    if(kleene_op == '(')
+    {
+        shared_typedefs_and_headers =
+                std::string("\n") + shared_include_headers + "\n" +
+                gen_typedef(variant_type, gen_type(name1));
+    }
+    else
+    {
+        std::string kleene_typedef;
+        switch(kleene_op)
+        {
+            case '?':
+                kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+                break;
+            case '*':
+            case '+':
+                kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+                break;
+        }
+        shared_typedefs_and_headers =
+                std::string("\n") + shared_include_headers + "\n" +
+                gen_typedef(variant_type, gen_type(name2)) + "\n" +
+                kleene_typedef;
+    }
+    if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
+        (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
 }
 
 static void add_union_member(
