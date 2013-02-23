@@ -319,7 +319,6 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
     return *ident_string_ptr;
 }
 
-static std::string gen_delete_rule_rvalue_term(int position);
 static xl::node::NodeIdentIFace* make_stem_rule(
         std::string name,
         const xl::node::NodeIdentIFace* rule_node,
@@ -654,109 +653,6 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
             );
 }
 
-static void add_shared_typedefs_and_headers(
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
-        std::string                                                        name1,
-        std::string                                                        name2,
-        char                                                               kleene_op,
-        const xl::node::NodeIdentIFace*                                    innermost_paren_node,
-        const xl::node::NodeIdentIFace*                                    proto_block_node,
-        std::map<std::string, std::string>*                                union_typename_to_type,
-        std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
-{
-    if(!string_insertions_to_front || !innermost_paren_node)
-        return;
-    const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
-    if(!alts_node)
-        return;
-    auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
-    if(!alts_symbol)
-        return;
-    std::vector<std::string> variant_type_vec;
-    for(size_t j = 0; j<alts_symbol->size(); j++)
-    {
-        const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[j];
-        if(!alt_node)
-            return;
-        const xl::node::NodeIdentIFace* term_node = get_left_child(alt_node);
-        if(!term_node)
-            return;
-        auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
-        if(!term_symbol)
-            return;
-        std::vector<std::string> tuple_type_vec;
-        for(size_t i = 0; i<term_symbol->size(); i++)
-        {
-            xl::node::NodeIdentIFace* child_node = (*term_symbol)[i];
-            switch(child_node->type())
-            {
-                case xl::node::NodeIdentIFace::INT:    tuple_type_vec.push_back("int"); break;
-                case xl::node::NodeIdentIFace::FLOAT:  tuple_type_vec.push_back("float"); break;
-                case xl::node::NodeIdentIFace::STRING: tuple_type_vec.push_back("std::string"); break;
-                case xl::node::NodeIdentIFace::CHAR:   tuple_type_vec.push_back("char"); break;
-                case xl::node::NodeIdentIFace::IDENT:
-                    {
-                        std::string def_symbol_name =
-                                *dynamic_cast<
-                                        xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
-                                        >(child_node)->value();
-                        std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
-                        std::string union_type = (*union_typename_to_type)[union_typename];
-                        tuple_type_vec.push_back(union_type);
-                    }
-                    break;
-                case xl::node::NodeIdentIFace::SYMBOL:
-                    std::cerr << "DOH!" << std::endl; // TODO: fix-me!
-                    break;
-                default:
-                    break;
-            }
-        }
-        variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
-    }
-    std::string include_headers = gen_tuple_include_headers();
-    std::string _type;
-    if(alts_symbol->size() > 1)
-    {
-        _type = gen_variant_type(variant_type_vec);
-        include_headers.insert(0, gen_variant_include_headers() + "\n");
-    }
-    else
-        _type = variant_type_vec[0];
-    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
-    if(!proto_block_term_node)
-        return;
-    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
-    std::string shared_typedefs_and_headers;
-    if(kleene_op == '(')
-    {
-        shared_typedefs_and_headers =
-                std::string("\n") + include_headers + "\n" +
-                gen_typedef(_type, gen_type(name1));
-    }
-    else
-    {
-        std::string kleene_typedef;
-        switch(kleene_op)
-        {
-            case '?':
-                kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
-                break;
-            case '*':
-            case '+':
-                kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
-                include_headers.insert(0, gen_vector_include_headers() + "\n");
-                break;
-        }
-        shared_typedefs_and_headers =
-                std::string("\n") + include_headers + "\n" +
-                gen_typedef(_type, gen_type(name2)) + "\n" +
-                kleene_typedef;
-    }
-    if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
-        (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
-}
-
 static void add_union_member(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      rule_name,
@@ -964,14 +860,147 @@ static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
     return next_node;
 }
 
+static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::NodeIdentIFace* paren_node)
+{
+    return enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
+}
+
+static void add_shared_typedefs_and_headers(
+        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
+        std::string                                                        name1,
+        std::string                                                        name2,
+        char                                                               kleene_op,
+        const xl::node::NodeIdentIFace*                                    innermost_paren_node,
+        const xl::node::NodeIdentIFace*                                    proto_block_node,
+        std::map<std::string, std::string>*                                union_typename_to_type,
+        std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
+{
+    if(!string_insertions_to_front || !innermost_paren_node)
+        return;
+    const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
+    if(!alts_node)
+        return;
+    auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
+    if(!alts_symbol)
+        return;
+    std::vector<std::string> variant_type_vec;
+    for(size_t j = 0; j<alts_symbol->size(); j++)
+    {
+        const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[j];
+        if(!alt_node)
+            return;
+        const xl::node::NodeIdentIFace* term_node = get_left_child(alt_node);
+        if(!term_node)
+            return;
+        auto term_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(term_node);
+        if(!term_symbol)
+            return;
+        std::vector<std::string> tuple_type_vec;
+        for(size_t i = 0; i<term_symbol->size(); i++)
+        {
+            xl::node::NodeIdentIFace* child_node = (*term_symbol)[i];
+            switch(child_node->type())
+            {
+                case xl::node::NodeIdentIFace::INT:    tuple_type_vec.push_back("int"); break;
+                case xl::node::NodeIdentIFace::FLOAT:  tuple_type_vec.push_back("float"); break;
+                case xl::node::NodeIdentIFace::STRING: tuple_type_vec.push_back("std::string"); break;
+                case xl::node::NodeIdentIFace::CHAR:   tuple_type_vec.push_back("char"); break;
+                case xl::node::NodeIdentIFace::IDENT:
+                    {
+                        std::string def_symbol_name =
+                                *dynamic_cast<
+                                        xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
+                                        >(child_node)->value();
+                        std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
+                        std::string union_type = (*union_typename_to_type)[union_typename];
+                        tuple_type_vec.push_back(union_type);
+                    }
+                    break;
+                case xl::node::NodeIdentIFace::SYMBOL:
+                    {
+                        const xl::node::NodeIdentIFace* kleene_node = child_node;
+                        uint32_t kleene_op = kleene_node->sym_id();
+                        switch(kleene_op)
+                        {
+                            case '+':
+                            case '*':
+                            case '?':
+                            case '(':
+                                {
+                                    const xl::node::NodeIdentIFace* outermost_paren_node =
+                                            (kleene_op == '(') ? kleene_node : get_child(kleene_node);
+                                    const xl::node::NodeIdentIFace* innermost_paren_node =
+                                            get_innermost_paren_node(outermost_paren_node);
+                                    add_shared_typedefs_and_headers(
+                                            string_insertions_to_front,
+                                            gen_name(name1),
+                                            name2,
+                                            kleene_op,
+                                            innermost_paren_node,
+                                            proto_block_node,
+                                            union_typename_to_type,
+                                            def_symbol_name_to_union_typename);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
+    }
+    std::string include_headers = gen_tuple_include_headers();
+    std::string _type;
+    if(alts_symbol->size() == 1)
+        _type = variant_type_vec[0];
+    else
+    {
+        _type = gen_variant_type(variant_type_vec);
+        include_headers.insert(0, gen_variant_include_headers() + "\n");
+    }
+    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
+    if(!proto_block_term_node)
+        return;
+    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
+    std::string shared_typedefs_and_headers;
+    if(kleene_op == '(')
+    {
+        shared_typedefs_and_headers =
+                std::string("\n") + include_headers + "\n" +
+                gen_typedef(_type, gen_type(name1));
+    }
+    else
+    {
+        std::string kleene_typedef;
+        switch(kleene_op)
+        {
+            case '?':
+                kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+                break;
+            case '*':
+            case '+':
+                kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+                include_headers.insert(0, gen_vector_include_headers() + "\n");
+                break;
+        }
+        shared_typedefs_and_headers =
+                std::string("\n") + include_headers + "\n" +
+                gen_typedef(_type, gen_type(name2)) + "\n" +
+                kleene_typedef;
+    }
+    if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
+        (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
+}
+
 static void enqueue_changes_for_kleene_closure(
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_appends_to_back,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            node_replacements,
-        char                                                                             kleene_op,
-        const xl::node::NodeIdentIFace*                                                  paren_node,
+        const xl::node::NodeIdentIFace*                                                  kleene_node,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
         const xl::node::NodeIdentIFace*                                                  proto_block_node,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
@@ -980,16 +1009,16 @@ static void enqueue_changes_for_kleene_closure(
         std::map<std::string, std::string>*                                              def_symbol_name_to_union_typename,
         xl::TreeContext*                                                                 tc)
 {
-    if(!paren_node)
+    if(!kleene_node)
         return;
-    const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, paren_node);
+    uint32_t kleene_op = kleene_node->sym_id();
+    const xl::node::NodeIdentIFace* outermost_paren_node = (kleene_op == '(') ? kleene_node : get_child(kleene_node);
+    const xl::node::NodeIdentIFace* innermost_paren_node = get_innermost_paren_node(outermost_paren_node);
+    const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
     const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
-    const xl::node::NodeIdentIFace* outermost_paren_node = paren_node;
-    const xl::node::NodeIdentIFace* innermost_paren_node =
-            enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
     add_term_rule(
             node_insertions_after,
             node_appends_to_back,
@@ -1044,7 +1073,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     static std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
     static std::vector<std::string> union_term_names, def_symbol_names;
     bool more;
-    switch(_node->sym_id())
+    uint32_t kleene_op = _node->sym_id();
+    switch(kleene_op)
     {
         case ID_GRAMMAR:
             {
@@ -1223,7 +1253,6 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '?':
         case '(':
             {
-                char kleene_op = _node->sym_id();
                 if(!entered_kleene_closure)
                 {
                     if(m_changes)
@@ -1233,8 +1262,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                                 &m_changes->m_string_insertions_to_front,
                                 &m_changes->m_node_appends_to_back,
                                 &m_changes->m_node_replacements,
-                                kleene_op,
-                                (kleene_op == '(') ? _node : get_child(_node),
+                                _node,
                                 definitions_node,
                                 proto_block_node,
                                 union_block_node,
@@ -1242,11 +1270,11 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                                 &union_typename_to_type,
                                 &def_symbol_name_to_union_typename,
                                 m_tc);
-                    entered_kleene_closure = true;
+                    entered_kleene_closure = true; // only enter once
                 }
                 if(kleene_op == '(')
                     std::cout << '(';
-                xl::visitor::VisitorDFS::visit(_node);
+                xl::visitor::VisitorDFS::visit(_node); // continue visitation/pretty-print
                 if(kleene_op == '(')
                     std::cout << ')';
                 else
