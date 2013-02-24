@@ -951,18 +951,18 @@ static void add_shared_typedefs_and_headers(
         variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
     }
     std::string include_headers = gen_tuple_include_headers();
-    std::string outtermost_type;
+    std::string kleene_type;
     if(alts_symbol->size() == 1)
-        outtermost_type = variant_type_vec[0];
+        kleene_type = variant_type_vec[0];
     else
     {
-        outtermost_type = gen_variant_type(variant_type_vec);
+        kleene_type = gen_variant_type(variant_type_vec);
         include_headers.insert(0, gen_variant_include_headers() + "\n");
     }
     std::string kleene_typedef;
     std::string kleene_depends_typedef;
     if(kleene_op == '(')
-        kleene_typedef = gen_typedef(outtermost_type, gen_type(name1));
+        kleene_typedef = gen_typedef(kleene_type, gen_type(name1));
     else
     {
         switch(kleene_op)
@@ -976,7 +976,7 @@ static void add_shared_typedefs_and_headers(
                 include_headers.insert(0, gen_vector_include_headers() + "\n");
                 break;
         }
-        kleene_depends_typedef = gen_typedef(outtermost_type, gen_type(name2));
+        kleene_depends_typedef = gen_typedef(kleene_type, gen_type(name2));
     }
     std::string shared_typedefs_and_headers =
             std::string("\n") + include_headers + "\n" +
@@ -1286,7 +1286,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 if(kleene_op == '(')
                     std::cout << ')';
                 else
-                    std::cout << kleene_op;
+                    std::cout << static_cast<char>(kleene_op);
             }
             break;
         case ID_CODE:
