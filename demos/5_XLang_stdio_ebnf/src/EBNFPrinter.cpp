@@ -927,16 +927,19 @@ static void add_shared_typedefs_and_headers(
                             case '?':
                             case '(':
                                 {
-                                    const xl::node::NodeIdentIFace* outermost_paren_node =
+                                    std::string next_name1 = gen_name(name1);
+                                    std::string next_name1_type = gen_type(next_name1);
+                                    tuple_type_vec.push_back(next_name1_type);
+                                    const xl::node::NodeIdentIFace* next_outermost_paren_node =
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
-                                    const xl::node::NodeIdentIFace* innermost_paren_node =
-                                            get_innermost_paren_node(outermost_paren_node);
+                                    const xl::node::NodeIdentIFace* next_innermost_paren_node =
+                                            get_innermost_paren_node(next_outermost_paren_node);
                                     add_shared_typedefs_and_headers(
                                             string_insertions_to_front,
-                                            gen_name(name1),
+                                            next_name1,
                                             name2,
                                             kleene_op,
-                                            innermost_paren_node,
+                                            next_innermost_paren_node,
                                             proto_block_node,
                                             union_typename_to_type,
                                             def_symbol_name_to_union_typename);
@@ -952,28 +955,20 @@ static void add_shared_typedefs_and_headers(
         variant_type_vec.push_back(gen_tuple_type(tuple_type_vec));
     }
     std::string include_headers = gen_tuple_include_headers();
-    std::string _type;
+    std::string outtermost_type;
     if(alts_symbol->size() == 1)
-        _type = variant_type_vec[0];
+        outtermost_type = variant_type_vec[0];
     else
     {
-        _type = gen_variant_type(variant_type_vec);
+        outtermost_type = gen_variant_type(variant_type_vec);
         include_headers.insert(0, gen_variant_include_headers() + "\n");
     }
-    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
-    if(!proto_block_term_node)
-        return;
-    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
-    std::string shared_typedefs_and_headers;
+    std::string kleene_typedef;
+    std::string kleene_depends_typedef;
     if(kleene_op == '(')
-    {
-        shared_typedefs_and_headers =
-                std::string("\n") + include_headers + "\n" +
-                gen_typedef(_type, gen_type(name1));
-    }
+        kleene_typedef = gen_typedef(outtermost_type, gen_type(name1));
     else
     {
-        std::string kleene_typedef;
         switch(kleene_op)
         {
             case '?':
@@ -985,11 +980,16 @@ static void add_shared_typedefs_and_headers(
                 include_headers.insert(0, gen_vector_include_headers() + "\n");
                 break;
         }
-        shared_typedefs_and_headers =
-                std::string("\n") + include_headers + "\n" +
-                gen_typedef(_type, gen_type(name2)) + "\n" +
-                kleene_typedef;
+        kleene_depends_typedef = gen_typedef(outtermost_type, gen_type(name2));
     }
+    std::string shared_typedefs_and_headers =
+            std::string("\n") + include_headers + "\n" +
+            (kleene_depends_typedef.empty() ? "" : kleene_depends_typedef + "\n") +
+            kleene_typedef;
+    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
+    if(!proto_block_term_node)
+        return;
+    std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
         (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
 }
