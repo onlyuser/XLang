@@ -883,6 +883,8 @@ static void add_shared_typedefs_and_headers(
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
+    typedef std::vector<std::pair<std::string, const xl::node::NodeIdentIFace*>> delayed_recursion_args_t;
+    delayed_recursion_args_t delayed_recursion_args;
     std::vector<std::string> variant_type_vec;
     for(size_t j = 0; j<alts_symbol->size(); j++)
     {
@@ -934,15 +936,9 @@ static void add_shared_typedefs_and_headers(
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
                                     const xl::node::NodeIdentIFace* next_innermost_paren_node =
                                             get_innermost_paren_node(next_outermost_paren_node);
-                                    add_shared_typedefs_and_headers(
-                                            string_insertions_to_front,
+                                    delayed_recursion_args.push_back(delayed_recursion_args_t::value_type(
                                             next_name1,
-                                            name2,
-                                            kleene_op,
-                                            next_innermost_paren_node,
-                                            proto_block_node,
-                                            union_typename_to_type,
-                                            def_symbol_name_to_union_typename);
+                                            next_innermost_paren_node));
                                 }
                                 break;
                         }
@@ -992,6 +988,18 @@ static void add_shared_typedefs_and_headers(
     std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
         (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
+    for(auto p = delayed_recursion_args.begin(); p != delayed_recursion_args.end(); p++)
+    {
+        add_shared_typedefs_and_headers(
+                string_insertions_to_front,
+                (*p).first,
+                name2,
+                kleene_op,
+                (*p).second,
+                proto_block_node,
+                union_typename_to_type,
+                def_symbol_name_to_union_typename);
+    }
 }
 
 static void enqueue_changes_for_kleene_closure(
