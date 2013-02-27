@@ -163,6 +163,11 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
+static std::string gen_name(std::string stem, bool internal)
+{
+    return gen_name(stem) + "_int";
+}
+
 static std::string gen_typename(std::string stem)
 {
     return stem + "_type";
@@ -929,7 +934,7 @@ static void add_shared_typedefs_and_headers(
                             case '?':
                             case '(':
                                 {
-                                    std::string next_name1 = gen_name(name1);
+                                    std::string next_name1 = gen_name(name1, true);
                                     std::string next_name1_type = gen_type(next_name1);
                                     tuple_type_vec.push_back(next_name1_type);
                                     const xl::node::NodeIdentIFace* next_outermost_paren_node =
