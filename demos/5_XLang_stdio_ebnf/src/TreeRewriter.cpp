@@ -44,8 +44,7 @@ static std::string _end_redirect_stdout()
 
 void rewrite_tree_until_stable(
         xl::node::NodeIdentIFace* ast, // NOTE: non-const ast
-        xl::visitor::VisitorDFS* v,
-        xl::TreeContext* tc)
+        xl::visitor::VisitorDFS* v)
 {
     std::string captured_stdout;
     bool changed = false;
@@ -55,7 +54,7 @@ void rewrite_tree_until_stable(
         #ifdef DEBUG_EBNF
             std::cout << "(iter #" << n << ") <<<" << std::endl;
         #endif
-        TreeChanges changes(tc);
+        TreeChanges changes;
         dynamic_cast<SetTreeChangesIFace*>(v)->setTreeChanges(&changes);
         {
             #ifdef DEBUG_EBNF

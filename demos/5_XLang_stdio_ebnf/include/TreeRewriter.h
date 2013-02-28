@@ -24,7 +24,6 @@ namespace xl { class TreeContext; }
 
 void rewrite_tree_until_stable(
         xl::node::NodeIdentIFace* ast,
-        xl::visitor::VisitorDFS* v,
-        xl::TreeContext* tc);
+        xl::visitor::VisitorDFS* v);
 
 #endif

@@ -446,7 +446,7 @@ void export_ast(args_t &args, xl::node::NodeIdentIFace* ast)
         case args_t::MODE_YACC:
             {
                 EBNFPrinter v(tree_context());
-                rewrite_tree_until_stable(ast, &v, tree_context());
+                rewrite_tree_until_stable(ast, &v);
             }
             break;
         case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;

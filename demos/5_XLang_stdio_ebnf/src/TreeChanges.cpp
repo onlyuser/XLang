@@ -43,6 +43,26 @@ void TreeChanges::reset()
     m_node_replacements.clear();
 }
 
+void TreeChanges::insert_after(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
+{
+}
+
+void TreeChanges::append_to_back(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
+{
+}
+
+void TreeChanges::string_append_to_back(const xl::node::NodeIdentIFace* _node, std::string s)
+{
+}
+
+void TreeChanges::string_insert_to_front(const xl::node::NodeIdentIFace* _node, std::string s)
+{
+}
+
+void TreeChanges::node_replace(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
+{
+}
+
 bool TreeChanges::apply()
 {
 #ifdef DEBUG_EBNF
