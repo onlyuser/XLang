@@ -659,6 +659,7 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
 }
 
 static void add_union_member(
+        TreeChanges*                                                                     tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      rule_name,
         const xl::node::NodeIdentIFace*                                                  union_block_node,
@@ -681,6 +682,7 @@ static void add_union_member(
 }
 
 static void add_def_brace(
+        TreeChanges*                                                                     tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name1,
         const xl::node::NodeIdentIFace*                                                  definitions_node,
@@ -700,6 +702,7 @@ static void add_def_brace(
 }
 
 static void add_term_rule(
+        TreeChanges*                                                                     tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name2,
@@ -725,11 +728,13 @@ static void add_term_rule(
 #endif
     (*node_insertions_after)[rule_node].push_back(term_rule);
     add_union_member(
+            tree_changes,
             node_appends_to_back,
             name2,
             union_block_node,
             tc);
     add_def_brace(
+            tree_changes,
             node_appends_to_back,
             name2,
             definitions_node,
@@ -737,6 +742,7 @@ static void add_term_rule(
 }
 
 static void add_recursive_rule(
+        TreeChanges* tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name1,
@@ -766,11 +772,13 @@ static void add_recursive_rule(
 #endif
     (*node_insertions_after)[rule_node].push_back(recursive_rule);
     add_union_member(
+            tree_changes,
             node_appends_to_back,
             name1,
             union_block_node,
             tc);
     add_def_brace(
+            tree_changes,
             node_appends_to_back,
             name1,
             definitions_node,
@@ -778,6 +786,7 @@ static void add_recursive_rule(
 }
 
 static void add_stem_rule(
+        TreeChanges* tree_changes,
         std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* node_replacements,
         std::string                                                           name1,
         char                                                                  kleene_op,
@@ -871,6 +880,7 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
 }
 
 static void add_shared_typedefs_and_headers(
+        TreeChanges*                                                       tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
         std::string                                                        name1,
         std::string                                                        name2,
@@ -996,6 +1006,7 @@ static void add_shared_typedefs_and_headers(
     for(auto p = delayed_recursion_args.begin(); p != delayed_recursion_args.end(); p++)
     {
         add_shared_typedefs_and_headers(
+                tree_changes,
                 string_insertions_to_front,
                 (*p).first,
                 name2,
@@ -1007,7 +1018,8 @@ static void add_shared_typedefs_and_headers(
     }
 }
 
-static void enqueue_changes_for_kleene_closure(
+static void add_changes_for_kleene_closure(
+        TreeChanges*                                                                     tree_changes,
         std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_appends_to_back,
         std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
@@ -1033,6 +1045,7 @@ static void enqueue_changes_for_kleene_closure(
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
     add_term_rule(
+            tree_changes,
             node_insertions_after,
             node_appends_to_back,
             (kleene_op == '(') ? name1 : name2,
@@ -1044,6 +1057,7 @@ static void enqueue_changes_for_kleene_closure(
             tc);
     if(kleene_op != '(')
         add_recursive_rule(
+                tree_changes,
                 node_insertions_after,
                 node_appends_to_back,
                 name1,
@@ -1055,6 +1069,7 @@ static void enqueue_changes_for_kleene_closure(
                 union_block_node,
                 tc);
     add_stem_rule(
+            tree_changes,
             node_replacements,
             name1,
             kleene_op,
@@ -1063,6 +1078,7 @@ static void enqueue_changes_for_kleene_closure(
             proto_block_node,
             tc);
     add_shared_typedefs_and_headers(
+            tree_changes,
             string_insertions_to_front,
             name1,
             name2,
@@ -1269,7 +1285,8 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 if(!entered_kleene_closure)
                 {
                     if(m_changes)
-                        enqueue_changes_for_kleene_closure(
+                        add_changes_for_kleene_closure(
+                                m_changes,
                                 &m_changes->m_node_insertions_after,
                                 &m_changes->m_string_appends_to_back,
                                 &m_changes->m_string_insertions_to_front,

@@ -29,26 +29,24 @@ struct TreeChange
 {
     typedef enum
     {
-        NODE_INSERT_AFTER,
-        NODE_APPEND_TO_BACK,
-        STRING_APPEND_TO_BACK,
-        STRING_INSERT_TO_FRONT,
-        NODE_REPLACE
+        NODE_INSERTIONS_AFTER,
+        NODE_APPENDS_TO_BACK,
+        STRING_APPENDS_TO_BACK,
+        STRING_INSERTIONS_TO_FRONT,
+        NODE_REPLACEMENTS
     } type_t;
 };
 
-struct TreeChanges
+class TreeChanges
 {
+public:
     TreeChanges()
     {}
     void reset();
-    void insert_after(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node);
-    void append_to_back(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node);
-    void string_append_to_back(const xl::node::NodeIdentIFace* _node, std::string s);
-    void string_insert_to_front(const xl::node::NodeIdentIFace* _node, std::string s);
-    void node_replace(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node);
+    void add(TreeChange::type_t _type, ...);
     bool apply();
 
+//private:
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_insertions_after;
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_appends_to_back;
     std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_appends_to_back;

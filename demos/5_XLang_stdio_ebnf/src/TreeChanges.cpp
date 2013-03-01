@@ -43,24 +43,53 @@ void TreeChanges::reset()
     m_node_replacements.clear();
 }
 
-void TreeChanges::insert_after(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
+void TreeChanges::add(TreeChange::type_t _type, ...)
 {
-}
-
-void TreeChanges::append_to_back(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
-{
-}
-
-void TreeChanges::string_append_to_back(const xl::node::NodeIdentIFace* _node, std::string s)
-{
-}
-
-void TreeChanges::string_insert_to_front(const xl::node::NodeIdentIFace* _node, std::string s)
-{
-}
-
-void TreeChanges::node_replace(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
-{
+    va_list ap;
+    va_start(ap, _type);
+    auto _node = va_arg(ap, const xl::node::NodeIdentIFace*);
+    switch(_type)
+    {
+        case TreeChange::NODE_INSERTIONS_AFTER:
+        case TreeChange::NODE_APPENDS_TO_BACK:
+        case TreeChange::NODE_REPLACEMENTS:
+            {
+                auto new_node = va_arg(ap, xl::node::NodeIdentIFace*);
+                switch(_type)
+                {
+                    case TreeChange::NODE_INSERTIONS_AFTER:
+                        m_node_insertions_after[_node].push_back(new_node);
+                        break;
+                    case TreeChange::NODE_APPENDS_TO_BACK:
+                        m_node_appends_to_back[_node].push_back(new_node);
+                        break;
+                    case TreeChange::NODE_REPLACEMENTS:
+                        m_node_replacements[_node] = new_node;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case TreeChange::STRING_APPENDS_TO_BACK:
+        case TreeChange::STRING_INSERTIONS_TO_FRONT:
+            {
+                auto s = va_arg(ap, std::string*);
+                switch(_type)
+                {
+                    case TreeChange::STRING_APPENDS_TO_BACK:
+                        m_string_appends_to_back[_node].push_back(*s);
+                        break;
+                    case TreeChange::STRING_INSERTIONS_TO_FRONT:
+                        m_string_insertions_to_front[_node].push_back(*s);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+    }
+    va_end(ap);
 }
 
 bool TreeChanges::apply()
