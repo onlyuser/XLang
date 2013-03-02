@@ -57,7 +57,7 @@ public:
             std::string s);
     bool apply();
 
-//private:
+private:
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_insertions_after;
     std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>> m_node_appends_to_back;
     std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_appends_to_back;
