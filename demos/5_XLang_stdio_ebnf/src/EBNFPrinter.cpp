@@ -659,13 +659,12 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
 }
 
 static void add_union_member(
-        TreeChanges*                                                                     tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::string                                                                      rule_name,
-        const xl::node::NodeIdentIFace*                                                  union_block_node,
-        xl::TreeContext*                                                                 tc)
+        TreeChanges*                    tree_changes,
+        std::string                     rule_name,
+        const xl::node::NodeIdentIFace* union_block_node,
+        xl::TreeContext*                tc)
 {
-    if(!node_appends_to_back)
+    if(!tree_changes)
         return;
     const xl::node::NodeIdentIFace* union_members_node = get_child(union_block_node);
     if(!union_members_node)
@@ -678,17 +677,16 @@ static void add_union_member(
     if(!union_member_node)
         return;
     if(!union_members_symbol->find(union_member_node))
-        (*node_appends_to_back)[union_members_symbol].push_back(union_member_node);
+        tree_changes->m_node_appends_to_back[union_members_symbol].push_back(union_member_node);
 }
 
 static void add_def_brace(
-        TreeChanges*                                                                     tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::string                                                                      name1,
-        const xl::node::NodeIdentIFace*                                                  definitions_node,
-        xl::TreeContext*                                                                 tc)
+        TreeChanges*                    tree_changes,
+        std::string                     name1,
+        const xl::node::NodeIdentIFace* definitions_node,
+        xl::TreeContext*                tc)
 {
-    if(!node_appends_to_back)
+    if(!tree_changes)
         return;
     auto definitions_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(definitions_node);
     if(!definitions_symbol)
@@ -698,13 +696,11 @@ static void add_def_brace(
     xl::node::NodeIdentIFace* def_brace_node =
             make_def_brace_node(gen_typename(name1), token_vec, tc);
     if(!definitions_symbol->find(def_brace_node))
-        (*node_appends_to_back)[definitions_symbol].push_back(def_brace_node);
+        tree_changes->m_node_appends_to_back[definitions_symbol].push_back(def_brace_node);
 }
 
 static void add_term_rule(
         TreeChanges*                                                                     tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
         std::string                                                                      name2,
         const xl::node::NodeIdentIFace*                                                  innermost_paren_node,
         const xl::node::NodeIdentIFace*                                                  rule_node,
@@ -713,7 +709,7 @@ static void add_term_rule(
         const xl::node::NodeIdentIFace*                                                  union_block_node,
         xl::TreeContext*                                                                 tc)
 {
-    if(!node_insertions_after || !innermost_paren_node)
+    if(!tree_changes || !innermost_paren_node)
         return;
     const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
     if(!alts_node)
@@ -726,35 +722,31 @@ static void add_term_rule(
     EBNFPrinter v(tc); v.dispatch_visit(term_rule); std::cout << std::endl;
     std::cout << "<<< (term_rule)" << std::endl;
 #endif
-    (*node_insertions_after)[rule_node].push_back(term_rule);
+    tree_changes->m_node_insertions_after[rule_node].push_back(term_rule);
     add_union_member(
             tree_changes,
-            node_appends_to_back,
             name2,
             union_block_node,
             tc);
     add_def_brace(
             tree_changes,
-            node_appends_to_back,
             name2,
             definitions_node,
             tc);
 }
 
 static void add_recursive_rule(
-        TreeChanges* tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::string                                                                      name1,
-        std::string                                                                      name2,
-        char                                                                             kleene_op,
-        const xl::node::NodeIdentIFace*                                                  rule_node,
-        const xl::node::NodeIdentIFace*                                                  definitions_node,
-        const xl::node::NodeIdentIFace*                                                  proto_block_node,
-        const xl::node::NodeIdentIFace*                                                  union_block_node,
-        xl::TreeContext*                                                                 tc)
+        TreeChanges*                    tree_changes,
+        std::string                     name1,
+        std::string                     name2,
+        char                            kleene_op,
+        const xl::node::NodeIdentIFace* rule_node,
+        const xl::node::NodeIdentIFace* definitions_node,
+        const xl::node::NodeIdentIFace* proto_block_node,
+        const xl::node::NodeIdentIFace* union_block_node,
+        xl::TreeContext*                tc)
 {
-    if(!node_insertions_after || !node_appends_to_back)
+    if(!tree_changes)
         return;
     xl::node::NodeIdentIFace* recursive_rule = NULL;
     switch(kleene_op)
@@ -770,32 +762,29 @@ static void add_recursive_rule(
     EBNFPrinter v(tc); v.dispatch_visit(recursive_rule); std::cout << std::endl;
     std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
-    (*node_insertions_after)[rule_node].push_back(recursive_rule);
+    tree_changes->m_node_insertions_after[rule_node].push_back(recursive_rule);
     add_union_member(
             tree_changes,
-            node_appends_to_back,
             name1,
             union_block_node,
             tc);
     add_def_brace(
             tree_changes,
-            node_appends_to_back,
             name1,
             definitions_node,
             tc);
 }
 
 static void add_stem_rule(
-        TreeChanges* tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>* node_replacements,
-        std::string                                                           name1,
-        char                                                                  kleene_op,
-        const xl::node::NodeIdentIFace*                                       outermost_paren_node,
-        const xl::node::NodeIdentIFace*                                       rule_node,
-        const xl::node::NodeIdentIFace*                                       proto_block_node,
-        xl::TreeContext*                                                      tc)
+        TreeChanges*                    tree_changes,
+        std::string                     name1,
+        char                            kleene_op,
+        const xl::node::NodeIdentIFace* outermost_paren_node,
+        const xl::node::NodeIdentIFace* rule_node,
+        const xl::node::NodeIdentIFace* proto_block_node,
+        xl::TreeContext*                tc)
 {
-    if(!node_replacements)
+    if(!tree_changes)
         return;
     xl::node::NodeIdentIFace* stem_rule =
             make_stem_rule(name1, rule_node, kleene_op, outermost_paren_node, tc);
@@ -806,7 +795,7 @@ static void add_stem_rule(
     EBNFPrinter v(tc); v.dispatch_visit(stem_rule); std::cout << std::endl;
     std::cout << "<<< (stem_rule)" << std::endl;
 #endif
-    (*node_replacements)[rule_node] = stem_rule;
+    tree_changes->m_node_replacements[rule_node] = stem_rule;
 }
 
 static xl::node::NodeIdentIFace* find_unique_child_by_sym_id(
@@ -880,17 +869,16 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
 }
 
 static void add_shared_typedefs_and_headers(
-        TreeChanges*                                                       tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>* string_insertions_to_front,
-        std::string                                                        name1,
-        std::string                                                        name2,
-        char                                                               kleene_op,
-        const xl::node::NodeIdentIFace*                                    innermost_paren_node,
-        const xl::node::NodeIdentIFace*                                    proto_block_node,
-        std::map<std::string, std::string>*                                union_typename_to_type,
-        std::map<std::string, std::string>*                                def_symbol_name_to_union_typename)
+        TreeChanges*                        tree_changes,
+        std::string                         name1,
+        std::string                         name2,
+        char                                kleene_op,
+        const xl::node::NodeIdentIFace*     innermost_paren_node,
+        const xl::node::NodeIdentIFace*     proto_block_node,
+        std::map<std::string, std::string>* union_typename_to_type,
+        std::map<std::string, std::string>* def_symbol_name_to_union_typename)
 {
-    if(!string_insertions_to_front || !innermost_paren_node)
+    if(!tree_changes || !innermost_paren_node)
         return;
     const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
     if(!alts_node)
@@ -1002,12 +990,11 @@ static void add_shared_typedefs_and_headers(
         return;
     std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
-        (*string_insertions_to_front)[proto_block_term_node].push_back(shared_typedefs_and_headers);
+        tree_changes->m_string_insertions_to_front[proto_block_term_node].push_back(shared_typedefs_and_headers);
     for(auto p = delayed_recursion_args.begin(); p != delayed_recursion_args.end(); p++)
     {
         add_shared_typedefs_and_headers(
                 tree_changes,
-                string_insertions_to_front,
                 (*p).first,
                 name2,
                 kleene_op,
@@ -1019,22 +1006,17 @@ static void add_shared_typedefs_and_headers(
 }
 
 static void add_changes_for_kleene_closure(
-        TreeChanges*                                                                     tree_changes,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_insertions_after,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_appends_to_back,
-        std::map<const xl::node::NodeIdentIFace*, std::list<std::string>>*               string_insertions_to_front,
-        std::map<const xl::node::NodeIdentIFace*, std::list<xl::node::NodeIdentIFace*>>* node_appends_to_back,
-        std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*>*            node_replacements,
-        const xl::node::NodeIdentIFace*                                                  kleene_node,
-        const xl::node::NodeIdentIFace*                                                  definitions_node,
-        const xl::node::NodeIdentIFace*                                                  proto_block_node,
-        const xl::node::NodeIdentIFace*                                                  union_block_node,
-        std::map<std::string, const xl::node::NodeIdentIFace*>*                          def_symbol_name_to_node,
-        std::map<std::string, std::string>*                                              union_typename_to_type,
-        std::map<std::string, std::string>*                                              def_symbol_name_to_union_typename,
-        xl::TreeContext*                                                                 tc)
+        TreeChanges*                                            tree_changes,
+        const xl::node::NodeIdentIFace*                         kleene_node,
+        const xl::node::NodeIdentIFace*                         definitions_node,
+        const xl::node::NodeIdentIFace*                         proto_block_node,
+        const xl::node::NodeIdentIFace*                         union_block_node,
+        std::map<std::string, const xl::node::NodeIdentIFace*>* def_symbol_name_to_node,
+        std::map<std::string, std::string>*                     union_typename_to_type,
+        std::map<std::string, std::string>*                     def_symbol_name_to_union_typename,
+        xl::TreeContext*                                        tc)
 {
-    if(!kleene_node)
+    if(!tree_changes || !kleene_node)
         return;
     uint32_t kleene_op = kleene_node->sym_id();
     const xl::node::NodeIdentIFace* outermost_paren_node = (kleene_op == '(') ? kleene_node : get_child(kleene_node);
@@ -1046,8 +1028,6 @@ static void add_changes_for_kleene_closure(
     std::string                     name2                = gen_name(rule_name);
     add_term_rule(
             tree_changes,
-            node_insertions_after,
-            node_appends_to_back,
             (kleene_op == '(') ? name1 : name2,
             innermost_paren_node,
             rule_node,
@@ -1058,8 +1038,6 @@ static void add_changes_for_kleene_closure(
     if(kleene_op != '(')
         add_recursive_rule(
                 tree_changes,
-                node_insertions_after,
-                node_appends_to_back,
                 name1,
                 name2,
                 kleene_op,
@@ -1070,7 +1048,6 @@ static void add_changes_for_kleene_closure(
                 tc);
     add_stem_rule(
             tree_changes,
-            node_replacements,
             name1,
             kleene_op,
             outermost_paren_node,
@@ -1079,7 +1056,6 @@ static void add_changes_for_kleene_closure(
             tc);
     add_shared_typedefs_and_headers(
             tree_changes,
-            string_insertions_to_front,
             name1,
             name2,
             kleene_op,
@@ -1284,14 +1260,9 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             {
                 if(!entered_kleene_closure)
                 {
-                    if(m_changes)
+                    if(m_tree_changes)
                         add_changes_for_kleene_closure(
-                                m_changes,
-                                &m_changes->m_node_insertions_after,
-                                &m_changes->m_string_appends_to_back,
-                                &m_changes->m_string_insertions_to_front,
-                                &m_changes->m_node_appends_to_back,
-                                &m_changes->m_node_replacements,
+                                m_tree_changes,
                                 _node,
                                 definitions_node,
                                 proto_block_node,

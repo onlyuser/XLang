@@ -29,17 +29,17 @@ class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace
 {
 public:
     EBNFPrinter(xl::TreeContext* tc)
-        : m_tc(tc), m_changes(NULL)
+        : m_tc(tc), m_tree_changes(NULL)
     {}
     void visit(const xl::node::SymbolNodeIFace* _node);
-    void setTreeChanges(TreeChanges* changes)
+    void setTreeChanges(TreeChanges* tree_changes)
     {
-        m_changes = changes;
+        m_tree_changes = tree_changes;
     }
 
 private:
     xl::TreeContext* m_tc;
-    TreeChanges* m_changes;
+    TreeChanges* m_tree_changes;
 };
 
 #endif
