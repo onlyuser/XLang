@@ -31,10 +31,14 @@ struct TreeChange
     {
         NODE_INSERTIONS_AFTER,
         NODE_APPENDS_TO_BACK,
-        STRING_APPENDS_TO_BACK,
-        STRING_INSERTIONS_TO_FRONT,
         NODE_REPLACEMENTS
-    } type_t;
+    } node_type_change_t;
+
+    typedef enum
+    {
+        STRING_APPENDS_TO_BACK,
+        STRING_INSERTIONS_TO_FRONT
+    } string_type_change_t;
 };
 
 class TreeChanges
@@ -43,7 +47,14 @@ public:
     TreeChanges()
     {}
     void reset();
-    void add(TreeChange::type_t _type, ...);
+    void add_node_change(
+            TreeChange::node_type_change_t _type,
+            const xl::node::NodeIdentIFace* _node,
+            xl::node::NodeIdentIFace* new_node);
+    void add_string_change(
+            TreeChange::string_type_change_t _type,
+            const xl::node::NodeIdentIFace* _node,
+            std::string s);
     bool apply();
 
 //private:
