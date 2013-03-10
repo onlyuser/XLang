@@ -39,6 +39,33 @@ struct TreeChange
         STRING_APPENDS_TO_BACK,
         STRING_INSERTIONS_TO_FRONT
     } string_type_change_t;
+
+    virtual ~TreeChange()
+    {}
+};
+
+class TreeChangeNode : public TreeChange
+{
+public:
+    TreeChangeNode(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
+        : m_node(_node), m_new_node(new_node)
+    {}
+
+private:
+    const xl::node::NodeIdentIFace* m_node;
+    xl::node::NodeIdentIFace*       m_new_node;
+};
+
+class TreeChangeString : public TreeChange
+{
+public:
+    TreeChangeString(const xl::node::NodeIdentIFace* _node, std::string new_string)
+        : m_node(_node), m_new_string(new_string)
+    {}
+
+private:
+    const xl::node::NodeIdentIFace* m_node;
+    std::string                     m_new_string;
 };
 
 class TreeChanges
@@ -54,7 +81,7 @@ public:
     void add_string_change(
             TreeChange::string_type_change_t _type,
             const xl::node::NodeIdentIFace* _node,
-            std::string s);
+            std::string new_string);
     bool apply();
 
 private:
@@ -63,6 +90,8 @@ private:
     std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_appends_to_back;
     std::map<const xl::node::NodeIdentIFace*, std::list<std::string>> m_string_insertions_to_front;
     std::map<const xl::node::NodeIdentIFace*, xl::node::NodeIdentIFace*> m_node_replacements;
+
+    std::list<TreeChange*> m_tree_changes;
 };
 
 #endif

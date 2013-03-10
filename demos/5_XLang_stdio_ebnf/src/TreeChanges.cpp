@@ -67,15 +67,15 @@ void TreeChanges::add_node_change(
 void TreeChanges::add_string_change(
         TreeChange::string_type_change_t _type,
         const xl::node::NodeIdentIFace* _node,
-        std::string s)
+        std::string new_string)
 {
     switch(_type)
     {
         case TreeChange::STRING_APPENDS_TO_BACK:
-            m_string_appends_to_back[_node].push_back(s);
+            m_string_appends_to_back[_node].push_back(new_string);
             break;
         case TreeChange::STRING_INSERTIONS_TO_FRONT:
-            m_string_insertions_to_front[_node].push_back(s);
+            m_string_insertions_to_front[_node].push_back(new_string);
             break;
         default:
             break;
