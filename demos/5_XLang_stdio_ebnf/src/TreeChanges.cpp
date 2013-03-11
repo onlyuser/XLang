@@ -34,6 +34,40 @@
     }
 #endif
 
+void TreeChangeNode::apply()
+{
+    switch(m_type)
+    {
+        case TreeChange::NODE_INSERTIONS_AFTER:
+            break;
+        case TreeChange::NODE_APPENDS_TO_BACK:
+            break;
+        case TreeChange::NODE_REPLACEMENTS:
+            break;
+        default:
+            break;
+    }
+}
+
+void TreeChangeString::apply()
+{
+    switch(m_type)
+    {
+        case TreeChange::STRING_APPENDS_TO_BACK:
+            break;
+        case TreeChange::STRING_INSERTIONS_TO_FRONT:
+            break;
+        default:
+            break;
+    }
+}
+
+TreeChanges::~TreeChanges()
+{
+    for(auto p = m_tree_changes.begin(); p != m_tree_changes.end(); p++)
+        delete *p;
+}
+
 void TreeChanges::reset()
 {
     m_node_insertions_after.clear();
@@ -44,10 +78,14 @@ void TreeChanges::reset()
 }
 
 void TreeChanges::add_node_change(
-        TreeChange::node_type_change_t _type,
+        TreeChange::type_t _type,
         const xl::node::NodeIdentIFace* _node,
         xl::node::NodeIdentIFace* new_node)
 {
+#if 0
+    m_tree_changes.push_back(new TreeChangeNode(_type, _node, new_node));
+    return;
+#endif
     switch(_type)
     {
         case TreeChange::NODE_INSERTIONS_AFTER:
@@ -65,10 +103,14 @@ void TreeChanges::add_node_change(
 }
 
 void TreeChanges::add_string_change(
-        TreeChange::string_type_change_t _type,
+        TreeChange::type_t _type,
         const xl::node::NodeIdentIFace* _node,
         std::string new_string)
 {
+#if 0
+    m_tree_changes.push_back(new TreeChangeString(_type, _node, new_string));
+    return;
+#endif
     switch(_type)
     {
         case TreeChange::STRING_APPENDS_TO_BACK:
@@ -84,6 +126,11 @@ void TreeChanges::add_string_change(
 
 bool TreeChanges::apply()
 {
+#if 0
+    for(auto p = m_tree_changes.begin(); p != m_tree_changes.end(); p++)
+        (*p)->apply();
+    return true;
+#endif
 #ifdef DEBUG_EBNF
     std::cout << "BEGIN APPLYING CHANGES" << std::endl;
 #endif

@@ -25,47 +25,58 @@
 namespace xl { namespace node { class NodeIdentIFace; } }
 namespace xl { class TreeContext; }
 
-struct TreeChange
+class TreeChange
 {
+public:
     typedef enum
     {
         NODE_INSERTIONS_AFTER,
         NODE_APPENDS_TO_BACK,
-        NODE_REPLACEMENTS
-    } node_type_change_t;
-
-    typedef enum
-    {
+        NODE_REPLACEMENTS,
         STRING_APPENDS_TO_BACK,
         STRING_INSERTIONS_TO_FRONT
-    } string_type_change_t;
+    } type_t;
 
+    TreeChange(type_t _type, const xl::node::NodeIdentIFace* _node)
+        : m_type(_type), m_node(_node)
+    {}
     virtual ~TreeChange()
     {}
+    virtual void apply() = 0;
+
+protected:
+    type_t m_type;
+    const xl::node::NodeIdentIFace* m_node;
 };
 
 class TreeChangeNode : public TreeChange
 {
 public:
-    TreeChangeNode(const xl::node::NodeIdentIFace* _node, xl::node::NodeIdentIFace* new_node)
-        : m_node(_node), m_new_node(new_node)
+    TreeChangeNode(
+            TreeChange::type_t _type,
+            const xl::node::NodeIdentIFace* _node,
+            xl::node::NodeIdentIFace* new_node)
+        : TreeChange(_type, _node), m_new_node(new_node)
     {}
+    void apply();
 
 private:
-    const xl::node::NodeIdentIFace* m_node;
-    xl::node::NodeIdentIFace*       m_new_node;
+    xl::node::NodeIdentIFace* m_new_node;
 };
 
 class TreeChangeString : public TreeChange
 {
 public:
-    TreeChangeString(const xl::node::NodeIdentIFace* _node, std::string new_string)
-        : m_node(_node), m_new_string(new_string)
+    TreeChangeString(
+            TreeChange::type_t _type,
+            const xl::node::NodeIdentIFace* _node,
+            std::string new_string)
+        : TreeChange(_type, _node), m_new_string(new_string)
     {}
+    void apply();
 
 private:
-    const xl::node::NodeIdentIFace* m_node;
-    std::string                     m_new_string;
+    std::string m_new_string;
 };
 
 class TreeChanges
@@ -73,13 +84,14 @@ class TreeChanges
 public:
     TreeChanges()
     {}
+    ~TreeChanges();
     void reset();
     void add_node_change(
-            TreeChange::node_type_change_t _type,
+            TreeChange::type_t _type,
             const xl::node::NodeIdentIFace* _node,
             xl::node::NodeIdentIFace* new_node);
     void add_string_change(
-            TreeChange::string_type_change_t _type,
+            TreeChange::type_t _type,
             const xl::node::NodeIdentIFace* _node,
             std::string new_string);
     bool apply();
