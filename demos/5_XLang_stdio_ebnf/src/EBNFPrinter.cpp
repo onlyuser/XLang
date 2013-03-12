@@ -722,7 +722,7 @@ static void add_union_member(
     if(!union_member_node)
         return;
     if(!union_members_symbol->find(union_member_node))
-        tree_changes->add_node_change(
+        tree_changes->add_change(
                 TreeChange::NODE_APPENDS_TO_BACK,
                 union_members_symbol,
                 union_member_node);
@@ -746,7 +746,7 @@ static void add_def_brace(
     xl::node::NodeIdentIFace* def_brace_node =
             make_def_brace_node(gen_typename(name1), &token_vec, tc);
     if(!definitions_symbol->find(def_brace_node))
-        tree_changes->add_node_change(
+        tree_changes->add_change(
                 TreeChange::NODE_APPENDS_TO_BACK,
                 definitions_symbol,
                 def_brace_node);
@@ -781,7 +781,7 @@ static void add_term_rule(
     EBNFPrinter v(tc); v.dispatch_visit(term_rule); std::cout << std::endl;
     std::cout << "<<< (term_rule)" << std::endl;
 #endif
-    tree_changes->add_node_change(
+    tree_changes->add_change(
             TreeChange::NODE_INSERTIONS_AFTER,
             rule_node,
             term_rule);
@@ -829,7 +829,7 @@ static void add_recursive_rule(
     EBNFPrinter v(tc); v.dispatch_visit(recursive_rule); std::cout << std::endl;
     std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
-    tree_changes->add_node_change(
+    tree_changes->add_change(
             TreeChange::NODE_INSERTIONS_AFTER,
             rule_node,
             recursive_rule);
@@ -869,7 +869,7 @@ static void add_stem_rule(
     EBNFPrinter v(tc); v.dispatch_visit(stem_rule); std::cout << std::endl;
     std::cout << "<<< (stem_rule)" << std::endl;
 #endif
-    tree_changes->add_node_change(
+    tree_changes->add_change(
             TreeChange::NODE_REPLACEMENTS,
             rule_node,
             stem_rule);
@@ -1080,7 +1080,7 @@ static void add_shared_typedefs_and_headers(
         return;
     std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
     if(proto_block_string.find(shared_typedefs_and_headers) == std::string::npos)
-        tree_changes->add_string_change(
+        tree_changes->add_change(
                 TreeChange::STRING_INSERTIONS_TO_FRONT,
                 proto_block_term_node,
                 shared_typedefs_and_headers);

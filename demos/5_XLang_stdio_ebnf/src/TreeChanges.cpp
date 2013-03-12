@@ -34,32 +34,116 @@
     }
 #endif
 
-void TreeChangeNode::apply()
+void TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>::apply()
 {
-    switch(m_type)
-    {
-        case TreeChange::NODE_INSERTIONS_AFTER:
-            break;
-        case TreeChange::NODE_APPENDS_TO_BACK:
-            break;
-        case TreeChange::NODE_REPLACEMENTS:
-            break;
-        default:
-            break;
-    }
+    const xl::node::NodeIdentIFace* insert_after_node = m_node;
+    if(!insert_after_node)
+        return;
+    xl::node::NodeIdentIFace* parent_node = insert_after_node->parent();
+    if(!parent_node)
+        return;
+    xl::node::SymbolNodeIFace* parent_symbol =
+            dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
+    if(!parent_symbol)
+        return;
+    xl::node::NodeIdentIFace* new_node = m_new_node;
+#ifdef DEBUG_EBNF
+    std::cout << "NODE_INSERT_AFTER " << ptr_to_string(insert_after_node) << " ==> "
+            << ptr_to_string(new_node) << std::endl;
+    //xl::mvc::MVCView::print_xml(new_node);
+#endif
+    parent_symbol->insert_after(
+            const_cast<xl::node::NodeIdentIFace*>(insert_after_node), // TODO: fix-me!
+            new_node);
 }
 
-void TreeChangeString::apply()
+void TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>::apply()
 {
-    switch(m_type)
-    {
-        case TreeChange::STRING_APPENDS_TO_BACK:
-            break;
-        case TreeChange::STRING_INSERTIONS_TO_FRONT:
-            break;
-        default:
-            break;
-    }
+    const xl::node::NodeIdentIFace* append_to_node = m_node;
+    if(!append_to_node)
+        return;
+    const xl::node::SymbolNodeIFace* append_to_symbol =
+            dynamic_cast<const xl::node::SymbolNodeIFace*>(append_to_node);
+    if(!append_to_symbol)
+        return;
+    xl::node::NodeIdentIFace* new_node = m_new_node;
+#ifdef DEBUG_EBNF
+    std::cout << "NODE_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+            << ptr_to_string(new_node) << std::endl;
+    //xl::mvc::MVCView::print_xml(append_to_node);
+    //xl::mvc::MVCView::print_xml(new_node);
+#endif
+    const_cast<xl::node::SymbolNodeIFace*>( // TODO: fix-me!
+            append_to_symbol
+            )->push_back(new_node);
+}
+
+void TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>::apply()
+{
+    const xl::node::NodeIdentIFace* find_node = m_node;
+    if(!find_node)
+        return;
+    xl::node::NodeIdentIFace* parent_node = find_node->parent();
+    if(!parent_node)
+        return;
+    xl::node::SymbolNodeIFace* parent_symbol =
+            dynamic_cast<xl::node::SymbolNodeIFace*>(parent_node);
+    if(!parent_symbol)
+        return;
+    xl::node::NodeIdentIFace* replacement_node = m_new_node;
+#ifdef DEBUG_EBNF
+    std::cout << "NODE_REPLACE " << ptr_to_string(find_node) << " ==> "
+            << ptr_to_string(replacement_node) << std::endl;
+    //xl::mvc::MVCView::print_xml(find_node);
+    //xl::mvc::MVCView::print_xml(replacement_node);
+#endif
+    parent_symbol->replace_first(
+            const_cast<xl::node::NodeIdentIFace*>(find_node), // TODO: fix-me!
+            replacement_node);
+}
+
+void TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>::apply()
+{
+    const xl::node::NodeIdentIFace* append_to_node = m_node;
+    if(!append_to_node)
+        return;
+    const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* append_to_term =
+            dynamic_cast<const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>(append_to_node);
+    if(!append_to_term)
+        return;
+    std::string s = m_new_string;
+#ifdef DEBUG_EBNF
+    std::cout << "STRING_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+            << '\"' << s << '\"' << std::endl;
+    //xl::mvc::MVCView::print_xml(append_to_node);
+#endif
+    std::string &s_lvalue =
+            *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
+                    append_to_term
+                    )->value();
+    s_lvalue.append(s);
+}
+
+void TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>::apply()
+{
+    const xl::node::NodeIdentIFace* insertion_to_node = m_node;
+    if(!insertion_to_node)
+        return;
+    const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* insertion_to_term =
+            dynamic_cast<const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>(insertion_to_node);
+    if(!insertion_to_term)
+        return;
+    std::string s = m_new_string;
+#ifdef DEBUG_EBNF
+    std::cout << "STRING_INSERT_FRONT " << ptr_to_string(insertion_to_node) << " ==> "
+            << '\"' << s << '\"' << std::endl;
+    //xl::mvc::MVCView::print_xml(insertion_to_node);
+#endif
+    std::string &s_lvalue =
+            *const_cast<xl::node::TermNode<xl::node::NodeIdentIFace::STRING>*>( // TODO: fix-me!
+                    insertion_to_term
+                    )->value();
+    s_lvalue.insert(0, s);
 }
 
 TreeChanges::~TreeChanges()
@@ -77,7 +161,7 @@ void TreeChanges::reset()
     m_node_replacements.clear();
 }
 
-void TreeChanges::add_node_change(
+void TreeChanges::add_change(
         TreeChange::type_t _type,
         const xl::node::NodeIdentIFace* _node,
         xl::node::NodeIdentIFace* new_node)
@@ -102,7 +186,7 @@ void TreeChanges::add_node_change(
     }
 }
 
-void TreeChanges::add_string_change(
+void TreeChanges::add_change(
         TreeChange::type_t _type,
         const xl::node::NodeIdentIFace* _node,
         std::string new_string)
