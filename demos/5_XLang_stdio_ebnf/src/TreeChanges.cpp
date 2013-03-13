@@ -148,12 +148,16 @@ void TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>::apply()
 
 TreeChanges::~TreeChanges()
 {
-    for(auto p = m_tree_changes.begin(); p != m_tree_changes.end(); p++)
-        delete *p;
+    reset();
 }
 
 void TreeChanges::reset()
 {
+#if 1
+    for(auto p = m_tree_changes.begin(); p != m_tree_changes.end(); p++)
+        delete *p;
+    return;
+#endif
     m_node_insertions_after.clear();
     m_node_appends_to_back.clear();
     m_string_appends_to_back.clear();
@@ -166,8 +170,24 @@ void TreeChanges::add_change(
         const xl::node::NodeIdentIFace* _node,
         xl::node::NodeIdentIFace* new_node)
 {
-#if 0
-    m_tree_changes.push_back(new TreeChangeNode(_type, _node, new_node));
+#if 1
+    switch(_type)
+    {
+        case TreeChange::NODE_INSERTIONS_AFTER:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>(_type, _node, new_node));
+            break;
+        case TreeChange::NODE_APPENDS_TO_BACK:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>(_type, _node, new_node));
+            break;
+        case TreeChange::NODE_REPLACEMENTS:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>(_type, _node, new_node));
+            break;
+        default:
+            break;
+    }
     return;
 #endif
     switch(_type)
@@ -191,8 +211,20 @@ void TreeChanges::add_change(
         const xl::node::NodeIdentIFace* _node,
         std::string new_string)
 {
-#if 0
-    m_tree_changes.push_back(new TreeChangeString(_type, _node, new_string));
+#if 1
+    switch(_type)
+    {
+        case TreeChange::STRING_APPENDS_TO_BACK:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>(_type, _node, new_string));
+            break;
+        case TreeChange::STRING_INSERTIONS_TO_FRONT:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>(_type, _node, new_string));
+            break;
+        default:
+            break;
+    }
     return;
 #endif
     switch(_type)
@@ -210,7 +242,9 @@ void TreeChanges::add_change(
 
 bool TreeChanges::apply()
 {
-#if 0
+#if 1
+    if(m_tree_changes.empty())
+        return false;
     for(auto p = m_tree_changes.begin(); p != m_tree_changes.end(); p++)
         (*p)->apply();
     return true;
