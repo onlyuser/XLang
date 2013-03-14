@@ -758,7 +758,7 @@ static void add_term_rule(
         const xl::node::NodeIdentIFace* innermost_paren_node,
         const xl::node::NodeIdentIFace* rule_node,
         const xl::node::NodeIdentIFace* rule_def_symbol_node,
-        EBNFTreeContext*                ebnf_context,
+        EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
@@ -803,7 +803,7 @@ static void add_recursive_rule(
         std::string                     name2,
         char                            kleene_op,
         const xl::node::NodeIdentIFace* rule_node,
-        EBNFTreeContext*                ebnf_context,
+        EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
@@ -956,7 +956,7 @@ static void add_shared_typedefs_and_headers(
         std::string                     name2,
         char                            kleene_op,
         const xl::node::NodeIdentIFace* innermost_paren_node,
-        EBNFTreeContext*                ebnf_context)
+        EBNFContext*                    ebnf_context)
 {
     assert(tree_changes);
     assert(innermost_paren_node);
@@ -1095,7 +1095,7 @@ static void add_shared_typedefs_and_headers(
 static void add_changes_for_kleene_closure(
         TreeChanges*                    tree_changes,
         const xl::node::NodeIdentIFace* kleene_node,
-        EBNFTreeContext*                ebnf_context,
+        EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
@@ -1145,7 +1145,7 @@ static void add_changes_for_kleene_closure(
             ebnf_context);
 }
 
-void EBNFTreeContext::reset()
+void EBNFContext::reset()
 {
     definitions_node = NULL;
     proto_block_node = NULL;
@@ -1164,7 +1164,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         std::cout << '[';
 #endif
     static bool entered_kleene_closure = false;
-    static EBNFTreeContext ebnf_context;
+    static EBNFContext ebnf_context;
     static std::vector<std::string> union_term_names, def_symbol_names;
     bool more;
     uint32_t kleene_op = _node->sym_id();

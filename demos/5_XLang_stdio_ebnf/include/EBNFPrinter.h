@@ -26,7 +26,7 @@ namespace xl { namespace node { class SymbolNodeIFace; } }
 namespace xl { class TreeContext; }
 class TreeChanges;
 
-struct EBNFTreeContext
+struct EBNFContext
 {
     void reset();
 
