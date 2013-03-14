@@ -20,10 +20,22 @@
 
 #include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
 #include "SetTreeChangesIFace.h" // SetTreeChangesIFace
+#include <map> // std::map
 
 namespace xl { namespace node { class SymbolNodeIFace; } }
 namespace xl { class TreeContext; }
 class TreeChanges;
+
+struct EBNFTreeContext
+{
+    void reset();
+
+    const xl::node::NodeIdentIFace* definitions_node;
+    const xl::node::NodeIdentIFace* proto_block_node;
+    const xl::node::NodeIdentIFace* union_block_node;
+    std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_node;
+    std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
+};
 
 class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace
 {

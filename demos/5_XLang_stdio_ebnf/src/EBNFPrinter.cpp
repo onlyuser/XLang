@@ -758,16 +758,16 @@ static void add_term_rule(
         const xl::node::NodeIdentIFace* innermost_paren_node,
         const xl::node::NodeIdentIFace* rule_node,
         const xl::node::NodeIdentIFace* rule_def_symbol_node,
-        const xl::node::NodeIdentIFace* definitions_node,
-        const xl::node::NodeIdentIFace* union_block_node,
+        EBNFTreeContext*                ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
     assert(innermost_paren_node);
     assert(rule_node);
     assert(rule_def_symbol_node);
-    assert(definitions_node);
-    assert(union_block_node);
+    assert(ebnf_context);
+    assert(ebnf_context->union_block_node);
+    assert(ebnf_context->definitions_node);
     assert(tc);
 
     const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
@@ -788,12 +788,12 @@ static void add_term_rule(
     add_union_member(
             tree_changes,
             name2,
-            union_block_node,
+            ebnf_context->union_block_node,
             tc);
     add_def_brace(
             tree_changes,
             name2,
-            definitions_node,
+            ebnf_context->definitions_node,
             tc);
 }
 
@@ -803,16 +803,14 @@ static void add_recursive_rule(
         std::string                     name2,
         char                            kleene_op,
         const xl::node::NodeIdentIFace* rule_node,
-        const xl::node::NodeIdentIFace* definitions_node,
-        const xl::node::NodeIdentIFace* proto_block_node,
-        const xl::node::NodeIdentIFace* union_block_node,
+        EBNFTreeContext*                ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
     assert(rule_node);
-    assert(definitions_node);
-    assert(proto_block_node);
-    assert(union_block_node);
+    assert(ebnf_context);
+    assert(ebnf_context->union_block_node);
+    assert(ebnf_context->definitions_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* recursive_rule = NULL;
@@ -836,12 +834,12 @@ static void add_recursive_rule(
     add_union_member(
             tree_changes,
             name1,
-            union_block_node,
+            ebnf_context->union_block_node,
             tc);
     add_def_brace(
             tree_changes,
             name1,
-            definitions_node,
+            ebnf_context->definitions_node,
             tc);
 }
 
@@ -851,13 +849,11 @@ static void add_stem_rule(
         char                            kleene_op,
         const xl::node::NodeIdentIFace* outermost_paren_node,
         const xl::node::NodeIdentIFace* rule_node,
-        const xl::node::NodeIdentIFace* proto_block_node,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
     assert(outermost_paren_node);
     assert(rule_node);
-    assert(proto_block_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* stem_rule =
@@ -955,20 +951,19 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
 }
 
 static void add_shared_typedefs_and_headers(
-        TreeChanges*                        tree_changes,
-        std::string                         name1,
-        std::string                         name2,
-        char                                kleene_op,
-        const xl::node::NodeIdentIFace*     innermost_paren_node,
-        const xl::node::NodeIdentIFace*     proto_block_node,
-        std::map<std::string, std::string>* union_typename_to_type,
-        std::map<std::string, std::string>* def_symbol_name_to_union_typename)
+        TreeChanges*                    tree_changes,
+        std::string                     name1,
+        std::string                     name2,
+        char                            kleene_op,
+        const xl::node::NodeIdentIFace* innermost_paren_node,
+        EBNFTreeContext*                ebnf_context)
 {
     assert(tree_changes);
     assert(innermost_paren_node);
-    assert(proto_block_node);
-    assert(union_typename_to_type);
-    assert(def_symbol_name_to_union_typename);
+    assert(ebnf_context);
+    assert(ebnf_context->def_symbol_name_to_union_typename.size());
+    assert(ebnf_context->union_typename_to_type.size());
+    assert(ebnf_context->proto_block_node);
 
     const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
     if(!alts_node)
@@ -1006,8 +1001,9 @@ static void add_shared_typedefs_and_headers(
                                 *dynamic_cast<
                                         xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
                                         >(child_node)->value();
-                        std::string union_typename = (*def_symbol_name_to_union_typename)[def_symbol_name];
-                        std::string union_type = (*union_typename_to_type)[union_typename];
+                        std::string union_typename =
+                                ebnf_context->def_symbol_name_to_union_typename[def_symbol_name];
+                        std::string union_type = ebnf_context->union_typename_to_type[union_typename];
                         tuple_type_vec.push_back(union_type);
                     }
                     break;
@@ -1075,7 +1071,7 @@ static void add_shared_typedefs_and_headers(
             std::string("\n") + include_headers + "\n" +
             (kleene_depends_typedef.empty() ? "" : kleene_depends_typedef + "\n") +
             kleene_typedef;
-    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(proto_block_node);
+    const xl::node::NodeIdentIFace* proto_block_term_node = get_child(ebnf_context->proto_block_node);
     if(!proto_block_term_node)
         return;
     std::string proto_block_string = get_string_value_from_term_node(proto_block_term_node);
@@ -1092,31 +1088,20 @@ static void add_shared_typedefs_and_headers(
                 name2,
                 kleene_op,
                 (*p).second,
-                proto_block_node,
-                union_typename_to_type,
-                def_symbol_name_to_union_typename);
+                ebnf_context);
     }
 }
 
 static void add_changes_for_kleene_closure(
-        TreeChanges*                                            tree_changes,
-        const xl::node::NodeIdentIFace*                         kleene_node,
-        const xl::node::NodeIdentIFace*                         definitions_node,
-        const xl::node::NodeIdentIFace*                         proto_block_node,
-        const xl::node::NodeIdentIFace*                         union_block_node,
-        std::map<std::string, const xl::node::NodeIdentIFace*>* def_symbol_name_to_node,
-        std::map<std::string, std::string>*                     union_typename_to_type,
-        std::map<std::string, std::string>*                     def_symbol_name_to_union_typename,
-        xl::TreeContext*                                        tc)
+        TreeChanges*                    tree_changes,
+        const xl::node::NodeIdentIFace* kleene_node,
+        EBNFTreeContext*                ebnf_context,
+        xl::TreeContext*                tc)
 {
     assert(tree_changes);
     assert(kleene_node);
-    assert(definitions_node);
-    assert(proto_block_node);
-    assert(union_block_node);
-    assert(def_symbol_name_to_node);
-    assert(union_typename_to_type);
-    assert(def_symbol_name_to_union_typename);
+    assert(ebnf_context);
+    assert(ebnf_context->def_symbol_name_to_node.size());
     assert(tc);
 
     uint32_t kleene_op = kleene_node->sym_id();
@@ -1124,7 +1109,7 @@ static void add_changes_for_kleene_closure(
     const xl::node::NodeIdentIFace* innermost_paren_node = get_innermost_paren_node(outermost_paren_node);
     const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
-    const xl::node::NodeIdentIFace* rule_def_symbol_node = (*def_symbol_name_to_node)[rule_name];
+    const xl::node::NodeIdentIFace* rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
     std::string                     name1                = gen_name(rule_name);
     std::string                     name2                = gen_name(rule_name);
     add_term_rule(
@@ -1133,8 +1118,7 @@ static void add_changes_for_kleene_closure(
             innermost_paren_node,
             rule_node,
             rule_def_symbol_node,
-            definitions_node,
-            union_block_node,
+            ebnf_context,
             tc);
     if(kleene_op != '(')
         add_recursive_rule(
@@ -1143,9 +1127,7 @@ static void add_changes_for_kleene_closure(
                 name2,
                 kleene_op,
                 rule_node,
-                definitions_node,
-                proto_block_node,
-                union_block_node,
+                ebnf_context,
                 tc);
     add_stem_rule(
             tree_changes,
@@ -1153,7 +1135,6 @@ static void add_changes_for_kleene_closure(
             kleene_op,
             outermost_paren_node,
             rule_node,
-            proto_block_node,
             tc);
     add_shared_typedefs_and_headers(
             tree_changes,
@@ -1161,9 +1142,17 @@ static void add_changes_for_kleene_closure(
             name2,
             kleene_op,
             innermost_paren_node,
-            proto_block_node,
-            union_typename_to_type,
-            def_symbol_name_to_union_typename);
+            ebnf_context);
+}
+
+void EBNFTreeContext::reset()
+{
+    definitions_node = NULL;
+    proto_block_node = NULL;
+    union_block_node = NULL;
+    def_symbol_name_to_node.clear();
+    union_typename_to_type.clear();
+    def_symbol_name_to_union_typename.clear();
 }
 
 void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
@@ -1175,10 +1164,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         std::cout << '[';
 #endif
     static bool entered_kleene_closure = false;
-    static const xl::node::NodeIdentIFace *definitions_node = NULL, *proto_block_node = NULL,
-            *union_block_node = NULL;
-    static std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_node;
-    static std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
+    static EBNFTreeContext ebnf_context;
     static std::vector<std::string> union_term_names, def_symbol_names;
     bool more;
     uint32_t kleene_op = _node->sym_id();
@@ -1187,12 +1173,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case ID_GRAMMAR:
             {
                 entered_kleene_closure = false;
-                definitions_node = NULL;
-                proto_block_node = NULL;
-                union_block_node = NULL;
-                def_symbol_name_to_node.clear();
-                union_typename_to_type.clear();
-                def_symbol_name_to_union_typename.clear();
+                ebnf_context.reset();
             }
             visit_next_child(_node);
             std::cout << std::endl << std::endl << "%%" << std::endl << std::endl;
@@ -1202,7 +1183,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             std::cout << std::endl;
             break;
         case ID_DEFINITIONS:
-            definitions_node = _node;
+            ebnf_context.definitions_node = _node;
             do
             {
                 more = visit_next_child(_node);
@@ -1240,17 +1221,17 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 }
                 visit_next_child(_node);
                 for(auto p = def_symbol_names.begin(); p != def_symbol_names.end(); p++)
-                    def_symbol_name_to_union_typename[*p] = union_typename;
+                    ebnf_context.def_symbol_name_to_union_typename[*p] = union_typename;
             }
             break;
         case ID_DEF_PROTO_BLOCK:
-            proto_block_node = _node;
+            ebnf_context.proto_block_node = _node;
             std::cout << "%{";
             std::cout << get_string_value_from_term_node(get_child(_node));
             std::cout << "%}";
             break;
         case ID_UNION_BLOCK:
-            union_block_node = _node;
+            ebnf_context.union_block_node = _node;
             std::cout << std::endl << '{' << std::endl;
             visit_next_child(_node);
             std::cout << std::endl << '}';
@@ -1283,7 +1264,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                     union_type.append(union_term_names[i]);
                 std::string union_typename =
                         union_term_names[union_term_names.size()-1]; // last term is typename
-                union_typename_to_type[union_typename] = union_type;
+                ebnf_context.union_typename_to_type[union_typename] = union_type;
             }
             break;
         case ID_UNION_TERM:
@@ -1308,7 +1289,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                 std::cout << symbol_name;
                 if(!symbol_name.empty())
                 {
-                    def_symbol_name_to_node[symbol_name] = _node;
+                    ebnf_context.def_symbol_name_to_node[symbol_name] = _node;
                     def_symbol_names.push_back(symbol_name);
                 }
             }
@@ -1367,12 +1348,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                         add_changes_for_kleene_closure(
                                 m_tree_changes,
                                 _node,
-                                definitions_node,
-                                proto_block_node,
-                                union_block_node,
-                                &def_symbol_name_to_node,
-                                &union_typename_to_type,
-                                &def_symbol_name_to_union_typename,
+                                &ebnf_context,
                                 m_tc);
                     entered_kleene_closure = true; // only enter once
                 }
