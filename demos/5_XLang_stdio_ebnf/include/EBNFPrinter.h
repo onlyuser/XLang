@@ -30,11 +30,28 @@ struct EBNFContext
 {
     void reset();
 
-    const xl::node::NodeIdentIFace* definitions_node;
-    const xl::node::NodeIdentIFace* proto_block_node;
-    const xl::node::NodeIdentIFace* union_block_node;
+    const xl::node::NodeIdentIFace*                        definitions_node;
+    const xl::node::NodeIdentIFace*                        proto_block_node;
+    const xl::node::NodeIdentIFace*                        union_block_node;
     std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_node;
-    std::map<std::string, std::string> union_typename_to_type, def_symbol_name_to_union_typename;
+    std::map<std::string, std::string>                     union_typename_to_type;
+    std::map<std::string, std::string>                     def_symbol_name_to_union_typename;
+};
+
+struct KleeneContext
+{
+    KleeneContext(
+            const xl::node::NodeIdentIFace* kleene_node,
+            EBNFContext*                    ebnf_context);
+
+    uint32_t                        kleene_op;
+    const xl::node::NodeIdentIFace* outermost_paren_node;
+    const xl::node::NodeIdentIFace* innermost_paren_node;
+    const xl::node::NodeIdentIFace* rule_node;
+    std::string                     rule_name;
+    const xl::node::NodeIdentIFace* rule_def_symbol_node;
+    std::string                     name1;
+    std::string                     name2;
 };
 
 class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace

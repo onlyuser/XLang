@@ -753,24 +753,23 @@ static void add_def_brace(
 }
 
 static void add_term_rule(
-        TreeChanges*                    tree_changes,
-        std::string                     name2,
-        const xl::node::NodeIdentIFace* innermost_paren_node,
-        const xl::node::NodeIdentIFace* rule_node,
-        const xl::node::NodeIdentIFace* rule_def_symbol_node,
-        EBNFContext*                    ebnf_context,
-        xl::TreeContext*                tc)
+        TreeChanges*     tree_changes,
+        std::string      name2,
+        KleeneContext*   kleene_context,
+        EBNFContext*     ebnf_context,
+        xl::TreeContext* tc)
 {
     assert(tree_changes);
-    assert(innermost_paren_node);
-    assert(rule_node);
-    assert(rule_def_symbol_node);
+    assert(kleene_context);
+    assert(kleene_context->innermost_paren_node);
+    assert(kleene_context->rule_node);
+    assert(kleene_context->rule_def_symbol_node);
     assert(ebnf_context);
     assert(ebnf_context->union_block_node);
     assert(ebnf_context->definitions_node);
     assert(tc);
 
-    const xl::node::NodeIdentIFace* alts_node = get_child(innermost_paren_node);
+    const xl::node::NodeIdentIFace* alts_node = get_child(kleene_context->innermost_paren_node);
     if(!alts_node)
         return;
     xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
@@ -783,7 +782,7 @@ static void add_term_rule(
 #endif
     tree_changes->add_change(
             TreeChange::NODE_INSERTIONS_AFTER,
-            rule_node,
+            kleene_context->rule_node,
             term_rule);
     add_union_member(
             tree_changes,
@@ -798,27 +797,31 @@ static void add_term_rule(
 }
 
 static void add_recursive_rule(
-        TreeChanges*                    tree_changes,
-        std::string                     name1,
-        std::string                     name2,
-        char                            kleene_op,
-        const xl::node::NodeIdentIFace* rule_node,
-        EBNFContext*                    ebnf_context,
-        xl::TreeContext*                tc)
+        TreeChanges*     tree_changes,
+        KleeneContext*   kleene_context,
+        EBNFContext*     ebnf_context,
+        xl::TreeContext* tc)
 {
     assert(tree_changes);
-    assert(rule_node);
+    assert(kleene_context);
+    assert(kleene_context->rule_node);
     assert(ebnf_context);
     assert(ebnf_context->union_block_node);
     assert(ebnf_context->definitions_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* recursive_rule = NULL;
-    switch(kleene_op)
+    switch(kleene_context->kleene_op)
     {
-        case '+': recursive_rule = make_recursive_rule_plus(name1, name2, tc); break;
-        case '*': recursive_rule = make_recursive_rule_star(name1, name2, tc); break;
-        case '?': recursive_rule = make_recursive_rule_optional(name1, name2, tc); break;
+        case '+':
+            recursive_rule = make_recursive_rule_plus(kleene_context->name1, kleene_context->name2, tc);
+            break;
+        case '*':
+            recursive_rule = make_recursive_rule_star(kleene_context->name1, kleene_context->name2, tc);
+            break;
+        case '?':
+            recursive_rule = make_recursive_rule_optional(kleene_context->name1, kleene_context->name2, tc);
+            break;
     }
     if(!recursive_rule)
         return;
@@ -829,35 +832,38 @@ static void add_recursive_rule(
 #endif
     tree_changes->add_change(
             TreeChange::NODE_INSERTIONS_AFTER,
-            rule_node,
+            kleene_context->rule_node,
             recursive_rule);
     add_union_member(
             tree_changes,
-            name1,
+            kleene_context->name1,
             ebnf_context->union_block_node,
             tc);
     add_def_brace(
             tree_changes,
-            name1,
+            kleene_context->name1,
             ebnf_context->definitions_node,
             tc);
 }
 
 static void add_stem_rule(
-        TreeChanges*                    tree_changes,
-        std::string                     name1,
-        char                            kleene_op,
-        const xl::node::NodeIdentIFace* outermost_paren_node,
-        const xl::node::NodeIdentIFace* rule_node,
-        xl::TreeContext*                tc)
+        TreeChanges*     tree_changes,
+        KleeneContext*   kleene_context,
+        xl::TreeContext* tc)
 {
     assert(tree_changes);
-    assert(outermost_paren_node);
-    assert(rule_node);
+    assert(kleene_context);
+    assert(kleene_context->outermost_paren_node);
+    assert(kleene_context->rule_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* stem_rule =
-            make_stem_rule(name1, rule_node, kleene_op, outermost_paren_node, tc);
+            make_stem_rule(
+                    kleene_context->name1,
+                    kleene_context->rule_node,
+                    kleene_context->kleene_op,
+                    kleene_context->outermost_paren_node,
+                    tc);
     if(!stem_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -867,7 +873,7 @@ static void add_stem_rule(
 #endif
     tree_changes->add_change(
             TreeChange::NODE_REPLACEMENTS,
-            rule_node,
+            kleene_context->rule_node,
             stem_rule);
 }
 
@@ -954,12 +960,13 @@ static void add_shared_typedefs_and_headers(
         TreeChanges*                    tree_changes,
         std::string                     name1,
         std::string                     name2,
-        char                            kleene_op,
         const xl::node::NodeIdentIFace* innermost_paren_node,
+        KleeneContext*                  kleene_context,
         EBNFContext*                    ebnf_context)
 {
     assert(tree_changes);
     assert(innermost_paren_node);
+    assert(kleene_context);
     assert(ebnf_context);
     assert(ebnf_context->def_symbol_name_to_union_typename.size());
     assert(ebnf_context->union_typename_to_type.size());
@@ -1050,11 +1057,11 @@ static void add_shared_typedefs_and_headers(
     }
     std::string kleene_typedef;
     std::string kleene_depends_typedef;
-    if(kleene_op == '(')
+    if(kleene_context->kleene_op == '(')
         kleene_typedef = gen_typedef(kleene_type, gen_type(name1));
     else
     {
-        switch(kleene_op)
+        switch(kleene_context->kleene_op)
         {
             case '?':
                 kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
@@ -1086,10 +1093,24 @@ static void add_shared_typedefs_and_headers(
                 tree_changes,
                 (*p).first,
                 name2,
-                kleene_op,
                 (*p).second,
+                kleene_context,
                 ebnf_context);
     }
+}
+
+KleeneContext::KleeneContext(
+        const xl::node::NodeIdentIFace* kleene_node,
+        EBNFContext*                    ebnf_context)
+{
+    kleene_op            = kleene_node->sym_id();
+    outermost_paren_node = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
+    innermost_paren_node = get_innermost_paren_node(outermost_paren_node);
+    rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
+    rule_name            = get_rule_name_from_rule_node(rule_node);
+    rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
+    name1                = gen_name(rule_name);
+    name2                = gen_name(rule_name);
 }
 
 static void add_changes_for_kleene_closure(
@@ -1104,44 +1125,29 @@ static void add_changes_for_kleene_closure(
     assert(ebnf_context->def_symbol_name_to_node.size());
     assert(tc);
 
-    uint32_t kleene_op = kleene_node->sym_id();
-    const xl::node::NodeIdentIFace* outermost_paren_node = (kleene_op == '(') ? kleene_node : get_child(kleene_node);
-    const xl::node::NodeIdentIFace* innermost_paren_node = get_innermost_paren_node(outermost_paren_node);
-    const xl::node::NodeIdentIFace* rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
-    std::string                     rule_name            = get_rule_name_from_rule_node(rule_node);
-    const xl::node::NodeIdentIFace* rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
-    std::string                     name1                = gen_name(rule_name);
-    std::string                     name2                = gen_name(rule_name);
+    KleeneContext kleene_context(kleene_node, ebnf_context);
     add_term_rule(
             tree_changes,
-            (kleene_op == '(') ? name1 : name2,
-            innermost_paren_node,
-            rule_node,
-            rule_def_symbol_node,
+            (kleene_context.kleene_op == '(') ? kleene_context.name1 : kleene_context.name2,
+            &kleene_context,
             ebnf_context,
             tc);
-    if(kleene_op != '(')
+    if(kleene_context.kleene_op != '(')
         add_recursive_rule(
                 tree_changes,
-                name1,
-                name2,
-                kleene_op,
-                rule_node,
+                &kleene_context,
                 ebnf_context,
                 tc);
     add_stem_rule(
             tree_changes,
-            name1,
-            kleene_op,
-            outermost_paren_node,
-            rule_node,
+            &kleene_context,
             tc);
     add_shared_typedefs_and_headers(
             tree_changes,
-            name1,
-            name2,
-            kleene_op,
-            innermost_paren_node,
+            kleene_context.name1,
+            kleene_context.name2,
+            kleene_context.innermost_paren_node,
+            &kleene_context,
             ebnf_context);
 }
 
