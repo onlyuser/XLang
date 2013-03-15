@@ -36,7 +36,7 @@
 
 void TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>::apply()
 {
-    const xl::node::NodeIdentIFace* insert_after_node = m_node;
+    const xl::node::NodeIdentIFace* insert_after_node = m_reference_node;
     if(!insert_after_node)
         return;
     xl::node::NodeIdentIFace* parent_node = insert_after_node->parent();
@@ -59,7 +59,7 @@ void TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>::apply()
 
 void TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>::apply()
 {
-    const xl::node::NodeIdentIFace* append_to_node = m_node;
+    const xl::node::NodeIdentIFace* append_to_node = m_reference_node;
     if(!append_to_node)
         return;
     const xl::node::SymbolNodeIFace* append_to_symbol =
@@ -80,7 +80,7 @@ void TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>::apply()
 
 void TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>::apply()
 {
-    const xl::node::NodeIdentIFace* find_node = m_node;
+    const xl::node::NodeIdentIFace* find_node = m_reference_node;
     if(!find_node)
         return;
     xl::node::NodeIdentIFace* parent_node = find_node->parent();
@@ -104,7 +104,7 @@ void TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>::apply()
 
 void TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>::apply()
 {
-    const xl::node::NodeIdentIFace* append_to_node = m_node;
+    const xl::node::NodeIdentIFace* append_to_node = m_reference_node;
     if(!append_to_node)
         return;
     const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* append_to_term =
@@ -126,7 +126,7 @@ void TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>::apply()
 
 void TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>::apply()
 {
-    const xl::node::NodeIdentIFace* insertion_to_node = m_node;
+    const xl::node::NodeIdentIFace* insertion_to_node = m_reference_node;
     if(!insertion_to_node)
         return;
     const xl::node::TermNode<xl::node::NodeIdentIFace::STRING>* insertion_to_term =
@@ -159,22 +159,22 @@ void TreeChanges::reset()
 
 void TreeChanges::add_change(
         TreeChange::type_t _type,
-        const xl::node::NodeIdentIFace* _node,
+        const xl::node::NodeIdentIFace* reference_node,
         xl::node::NodeIdentIFace* new_node)
 {
     switch(_type)
     {
         case TreeChange::NODE_INSERTIONS_AFTER:
             m_tree_changes.push_back(
-                    new TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>(_type, _node, new_node));
+                    new TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER>(_type, reference_node, new_node));
             break;
         case TreeChange::NODE_APPENDS_TO_BACK:
             m_tree_changes.push_back(
-                    new TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>(_type, _node, new_node));
+                    new TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>(_type, reference_node, new_node));
             break;
         case TreeChange::NODE_REPLACEMENTS:
             m_tree_changes.push_back(
-                    new TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>(_type, _node, new_node));
+                    new TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>(_type, reference_node, new_node));
             break;
         default:
             break;
@@ -183,18 +183,18 @@ void TreeChanges::add_change(
 
 void TreeChanges::add_change(
         TreeChange::type_t _type,
-        const xl::node::NodeIdentIFace* _node,
+        const xl::node::NodeIdentIFace* reference_node,
         std::string new_string)
 {
     switch(_type)
     {
         case TreeChange::STRING_APPENDS_TO_BACK:
             m_tree_changes.push_back(
-                    new TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>(_type, _node, new_string));
+                    new TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>(_type, reference_node, new_string));
             break;
         case TreeChange::STRING_INSERTIONS_TO_FRONT:
             m_tree_changes.push_back(
-                    new TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>(_type, _node, new_string));
+                    new TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>(_type, reference_node, new_string));
             break;
         default:
             break;

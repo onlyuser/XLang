@@ -37,8 +37,8 @@ public:
         STRING_INSERTIONS_TO_FRONT
     } type_t;
 
-    TreeChange(type_t _type, const xl::node::NodeIdentIFace* _node)
-        : m_type(_type), m_node(_node)
+    TreeChange(type_t _type, const xl::node::NodeIdentIFace* reference_node)
+        : m_type(_type), m_reference_node(reference_node)
     {}
     virtual ~TreeChange()
     {}
@@ -46,7 +46,7 @@ public:
 
 protected:
     type_t m_type;
-    const xl::node::NodeIdentIFace* m_node;
+    const xl::node::NodeIdentIFace* m_reference_node;
 };
 
 template<TreeChange::type_t>
@@ -57,9 +57,9 @@ class TreeChangeImpl<TreeChange::NODE_INSERTIONS_AFTER> : public TreeChange
 {
 public:
     TreeChangeImpl(
-            TreeChange::type_t _type, const xl::node::NodeIdentIFace* _node,
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
             xl::node::NodeIdentIFace* new_node)
-        : TreeChange(_type, _node), m_new_node(new_node)
+        : TreeChange(_type, reference_node), m_new_node(new_node)
     {}
     void apply();
 
@@ -72,9 +72,9 @@ class TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK> : public TreeChange
 {
 public:
     TreeChangeImpl(
-            TreeChange::type_t _type, const xl::node::NodeIdentIFace* _node,
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
             xl::node::NodeIdentIFace* new_node)
-        : TreeChange(_type, _node), m_new_node(new_node)
+        : TreeChange(_type, reference_node), m_new_node(new_node)
     {}
     void apply();
 
@@ -87,9 +87,9 @@ class TreeChangeImpl<TreeChange::NODE_REPLACEMENTS> : public TreeChange
 {
 public:
     TreeChangeImpl(
-            TreeChange::type_t _type, const xl::node::NodeIdentIFace* _node,
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
             xl::node::NodeIdentIFace* new_node)
-        : TreeChange(_type, _node), m_new_node(new_node)
+        : TreeChange(_type, reference_node), m_new_node(new_node)
     {}
     void apply();
 
@@ -102,9 +102,9 @@ class TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK> : public TreeChange
 {
 public:
     TreeChangeImpl(
-            TreeChange::type_t _type, const xl::node::NodeIdentIFace* _node,
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
             std::string new_string)
-        : TreeChange(_type, _node), m_new_string(new_string)
+        : TreeChange(_type, reference_node), m_new_string(new_string)
     {}
     void apply();
 
@@ -117,9 +117,9 @@ class TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT> : public TreeChange
 {
 public:
     TreeChangeImpl(
-            TreeChange::type_t _type, const xl::node::NodeIdentIFace* _node,
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
             std::string new_string)
-        : TreeChange(_type, _node), m_new_string(new_string)
+        : TreeChange(_type, reference_node), m_new_string(new_string)
     {}
     void apply();
 
@@ -136,11 +136,11 @@ public:
     void reset();
     void add_change(
             TreeChange::type_t _type,
-            const xl::node::NodeIdentIFace* _node,
+            const xl::node::NodeIdentIFace* reference_node,
             xl::node::NodeIdentIFace* new_node);
     void add_change(
             TreeChange::type_t _type,
-            const xl::node::NodeIdentIFace* _node,
+            const xl::node::NodeIdentIFace* reference_node,
             std::string new_string);
     bool apply();
 

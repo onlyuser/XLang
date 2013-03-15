@@ -1166,7 +1166,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     static bool entered_kleene_closure = false;
     static EBNFContext ebnf_context;
     static std::vector<std::string> union_term_names, def_symbol_names;
-    bool more;
+    bool more = false;
     uint32_t kleene_op = _node->sym_id();
     switch(kleene_op)
     {
