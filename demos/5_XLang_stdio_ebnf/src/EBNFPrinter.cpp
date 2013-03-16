@@ -971,8 +971,8 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
 
 static void add_shared_typedefs_and_headers(
         TreeChanges*                    tree_changes,
-        std::string                     name1,
-        std::string                     name2,
+        std::string                     rule_name_recursive,
+        std::string                     rule_name_term,
         const xl::node::NodeIdentIFace* innermost_paren_node,
         KleeneContext*                  kleene_context,
         EBNFContext*                    ebnf_context)
@@ -1038,15 +1038,17 @@ static void add_shared_typedefs_and_headers(
                             case '?':
                             case '(':
                                 {
-                                    std::string next_name1      = gen_name(name1 + INTERNAL_NAME_SUFFIX);
-                                    std::string next_name1_type = gen_type(next_name1);
-                                    tuple_type_vec.push_back(next_name1_type);
+                                    std::string next_rule_name_recursive =
+                                            gen_name(rule_name_recursive + INTERNAL_NAME_SUFFIX);
+                                    std::string next_rule_name_recursive_type =
+                                            gen_type(next_rule_name_recursive);
+                                    tuple_type_vec.push_back(next_rule_name_recursive_type);
                                     const xl::node::NodeIdentIFace* next_outermost_paren_node =
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
                                     const xl::node::NodeIdentIFace* next_innermost_paren_node =
                                             get_innermost_paren_node(next_outermost_paren_node);
                                     delayed_recursion_args.push_back(delayed_recursion_args_t::value_type(
-                                            next_name1,
+                                            next_rule_name_recursive,
                                             next_innermost_paren_node));
                                 }
                                 break;
@@ -1071,21 +1073,27 @@ static void add_shared_typedefs_and_headers(
     std::string kleene_typedef;
     std::string kleene_depends_typedef;
     if(kleene_context->kleene_op == '(')
-        kleene_typedef = gen_typedef(kleene_type, gen_type(name1));
+        kleene_typedef = gen_typedef(kleene_type, gen_type(rule_name_recursive));
     else
     {
         switch(kleene_context->kleene_op)
         {
             case '?':
-                kleene_typedef = gen_typedef(gen_type(name2), gen_type(name1));
+                kleene_typedef =
+                        gen_typedef(
+                                gen_type(rule_name_term),
+                                gen_type(rule_name_recursive));
                 break;
             case '*':
             case '+':
-                kleene_typedef = gen_vector_typedef(gen_type(name2), gen_type(name1));
+                kleene_typedef =
+                        gen_vector_typedef(
+                                gen_type(rule_name_term),
+                                gen_type(rule_name_recursive));
                 include_headers.insert(0, gen_vector_include_headers() + "\n");
                 break;
         }
-        kleene_depends_typedef = gen_typedef(kleene_type, gen_type(name2));
+        kleene_depends_typedef = gen_typedef(kleene_type, gen_type(rule_name_term));
     }
     std::string shared_typedefs_and_headers =
             std::string("\n") + include_headers + "\n" +
@@ -1105,7 +1113,7 @@ static void add_shared_typedefs_and_headers(
         add_shared_typedefs_and_headers(
                 tree_changes,
                 (*p).first,
-                name2,
+                rule_name_term,
                 (*p).second,
                 kleene_context,
                 ebnf_context);
