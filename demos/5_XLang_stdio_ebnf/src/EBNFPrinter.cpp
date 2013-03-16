@@ -815,13 +815,25 @@ static void add_recursive_rule(
     switch(kleene_context->kleene_op)
     {
         case '+':
-            recursive_rule = make_recursive_rule_plus(kleene_context->name1, kleene_context->name2, tc);
+            recursive_rule =
+                    make_recursive_rule_plus(
+                            kleene_context->rule_name_recursive,
+                            kleene_context->rule_name_term,
+                            tc);
             break;
         case '*':
-            recursive_rule = make_recursive_rule_star(kleene_context->name1, kleene_context->name2, tc);
+            recursive_rule =
+                    make_recursive_rule_star(
+                            kleene_context->rule_name_recursive,
+                            kleene_context->rule_name_term,
+                            tc);
             break;
         case '?':
-            recursive_rule = make_recursive_rule_optional(kleene_context->name1, kleene_context->name2, tc);
+            recursive_rule =
+                    make_recursive_rule_optional(
+                            kleene_context->rule_name_recursive,
+                            kleene_context->rule_name_term,
+                            tc);
             break;
     }
     if(!recursive_rule)
@@ -837,12 +849,12 @@ static void add_recursive_rule(
             recursive_rule);
     add_union_member(
             tree_changes,
-            kleene_context->name1,
+            kleene_context->rule_name_recursive,
             ebnf_context->union_block_node,
             tc);
     add_def_brace(
             tree_changes,
-            kleene_context->name1,
+            kleene_context->rule_name_recursive,
             ebnf_context->definitions_node,
             tc);
 }
@@ -860,7 +872,7 @@ static void add_stem_rule(
 
     xl::node::NodeIdentIFace* stem_rule =
             make_stem_rule(
-                    kleene_context->name1,
+                    kleene_context->rule_name_recursive,
                     kleene_context->rule_node,
                     kleene_context->kleene_op,
                     kleene_context->outermost_paren_node,
@@ -1104,26 +1116,26 @@ KleeneContext::KleeneContext(
         const xl::node::NodeIdentIFace* kleene_node,
         EBNFContext*                    ebnf_context)
 {
-    kleene_op            = kleene_node->sym_id();
-    outermost_paren_node = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
-    innermost_paren_node = get_innermost_paren_node(outermost_paren_node);
-    rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
-    rule_name            = get_rule_name_from_rule_node(rule_node);
-    rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
+    kleene_op                  = kleene_node->sym_id();
+    outermost_paren_node       = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
+    innermost_paren_node       = get_innermost_paren_node(outermost_paren_node);
+    rule_node                  = get_ancestor_node(ID_RULE, outermost_paren_node);
+    std::string rule_name_stem = get_rule_name_from_rule_node(rule_node);
     switch(kleene_op)
     {
         case '+':
         case '*':
-            name1 = gen_name(rule_name + RECURSIVE_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name_stem + RECURSIVE_NAME_SUFFIX);
             break;
         case '?':
-            name1 = gen_name(rule_name + OPTIONAL_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name_stem + OPTIONAL_NAME_SUFFIX);
             break;
         case '(':
-            name1 = gen_name(rule_name + PAREN_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name_stem + PAREN_NAME_SUFFIX);
             break;
     }
-    name2 = gen_name(rule_name + TERM_NAME_SUFFIX);
+    rule_name_term       = gen_name(rule_name_stem + TERM_NAME_SUFFIX);
+    rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name_stem];
 }
 
 static void add_changes_for_kleene_closure(
@@ -1141,7 +1153,8 @@ static void add_changes_for_kleene_closure(
     KleeneContext kleene_context(kleene_node, ebnf_context);
     add_term_rule(
             tree_changes,
-            (kleene_context.kleene_op == '(') ? kleene_context.name1 : kleene_context.name2,
+            (kleene_context.kleene_op == '(') ?
+                    kleene_context.rule_name_recursive : kleene_context.rule_name_term,
             &kleene_context,
             ebnf_context,
             tc);
@@ -1157,8 +1170,8 @@ static void add_changes_for_kleene_closure(
             tc);
     add_shared_typedefs_and_headers(
             tree_changes,
-            kleene_context.name1,
-            kleene_context.name2,
+            kleene_context.rule_name_recursive,
+            kleene_context.rule_name_term,
             kleene_context.innermost_paren_node,
             &kleene_context,
             ebnf_context);

@@ -48,10 +48,9 @@ struct KleeneContext
     const xl::node::NodeIdentIFace* outermost_paren_node;
     const xl::node::NodeIdentIFace* innermost_paren_node;
     const xl::node::NodeIdentIFace* rule_node;
-    std::string                     rule_name;
     const xl::node::NodeIdentIFace* rule_def_symbol_node;
-    std::string                     name1;
-    std::string                     name2;
+    std::string                     rule_name_recursive;
+    std::string                     rule_name_term;
 };
 
 class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace
