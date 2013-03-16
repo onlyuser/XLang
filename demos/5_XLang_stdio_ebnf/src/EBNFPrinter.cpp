@@ -306,16 +306,21 @@ static std::string* get_action_string_ptr_from_kleene_node(
 {
     assert(kleene_node);
 
+    // STRING:
+    //rule_name:
+    //      rule_name_production { /* AAA */ ... }
+    //    ;
+    //
     // XML:
     //<symbol type="alt"> // <-- alt_node
     //    <symbol type="terms">
     //        <symbol type="*"> // <-- kleene_node
     //            <!-- ... -->
     //        </symbol>
-    //        <term type="ident" value=statement/>
+    //        <term type="ident" value=rule_name_production/>
     //    </symbol>
     //    <symbol type="action_block"> // <-- action_node
-    //        <term type="string" value=" /* BBB */ ... "/>
+    //        <term type="string" value=" /* AAA */ ... "/>
     //    </symbol>
     //</symbol>
 
@@ -345,7 +350,7 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
 }
 
 static xl::node::NodeIdentIFace* make_stem_rule(
-        std::string name,
+        std::string                     rule_name_recursive,
         const xl::node::NodeIdentIFace* rule_node,
         char                            kleene_op,
         const xl::node::NodeIdentIFace* outermost_paren_node,
@@ -356,15 +361,15 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     assert(tc);
 
     // STRING:
-    //program:
+    //rule_name_stem:
     //      (
-    //            statement ',' { /* AAA */ ... }
-    //      )* statement        { /* BBB */ ... }
+    //            kleene_internal_node ',' { /* AAA */ ... }
+    //      )* kleene_external_node        { /* BBB */ ... }
     //    ;
     //
     // XML:
     //<symbol type="rule">
-    //    <term type="ident" value=program/>
+    //    <term type="ident" value=rule_name_stem/>
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="terms">
@@ -373,7 +378,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                        <symbol type="alts">
     //                            <symbol type="alt">
     //                                <symbol type="terms">
-    //                                    <term type="ident" value=statement/>
+    //                                    <term type="ident" value=kleene_internal_node/>
     //                                    <term type="char" value=','/>
     //                                </symbol>
     //                                <symbol type="action_block">
@@ -383,7 +388,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                        </symbol>
     //                    </symbol>
     //                </symbol>
-    //                <term type="ident" value=statement/>
+    //                <term type="ident" value=kleene_external_node/>
     //            </symbol>
     //            <symbol type="action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
@@ -430,31 +435,31 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         }
     }
     xl::node::NodeIdentIFace* replacement_node =
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name));
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive));
     replace_node(find_node_clone, replacement_node);
     return rule_node_clone;
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_plus(
-        std::string      name1,
-        std::string      name2,
+        std::string      rule_name_recursive,
+        std::string      rule_name_term,
         xl::TreeContext* tc)
 {
     assert(tc);
 
     // STRING:
-    //plus_0:
-    //      plus_1        { /* AAA */ ... }
-    //    | plus_0 plus_1 { /* BBB */ ... }
+    //rule_name_recursive:
+    //      rule_name_term                     { /* AAA */ ... }
+    //    | rule_name_recursive rule_name_term { /* BBB */ ... }
     //    ;
     //
     // XML:
     //<symbol type="rule">
-    //    <term type="ident" value=plus_0/>
+    //    <term type="ident" value=rule_name_recursive/>
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="terms">
-    //                <term type="ident" value=plus_1/>
+    //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="action_block">
     //                <term type="string" value=" /* AAA */ ... "/>
@@ -462,8 +467,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
     //        </symbol>
     //        <symbol type="alt">
     //            <symbol type="terms">
-    //                <term type="ident" value=plus_0/>
-    //                <term type="ident" value=plus_1/>
+    //                <term type="ident" value=rule_name_recursive/>
+    //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
@@ -473,23 +478,23 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
     //</symbol>
 
     return MAKE_SYMBOL(tc, ID_RULE, 2,
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive)),
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term))
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING,
-                                            tc->alloc_string(" $$ = new " + gen_type(name1) +
+                                            tc->alloc_string(" $$ = new " + gen_type(rule_name_recursive) +
                                                     "; $$->push_back(*$1); delete $1; ")
                                             )
                                     )
                             ),
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive)),
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term))
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING,
@@ -502,21 +507,21 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_star(
-        std::string      name1,
-        std::string      name2,
+        std::string      rule_name_recursive,
+        std::string      rule_name_term,
         xl::TreeContext* tc)
 {
     assert(tc);
 
     // STRING:
-    //program_0:
-    //      /* empty */         { /* AAA */ ... }
-    //    | program_0 program_1 { /* BBB */ ... }
+    //rule_name_recursive:
+    //      /* empty */                        { /* AAA */ ... }
+    //    | rule_name_recursive rule_name_term { /* BBB */ ... }
     //    ;
     //
     // XML:
     //<symbol type="rule">
-    //    <term type="ident" value=program_0/>
+    //    <term type="ident" value=rule_name_recursive/>
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="action_block">
@@ -525,8 +530,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
     //        </symbol>
     //        <symbol type="alt">
     //            <symbol type="terms">
-    //                <term type="ident" value=program_0/>
-    //                <term type="ident" value=program_1/>
+    //                <term type="ident" value=rule_name_recursive/>
+    //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
@@ -536,19 +541,19 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
     //</symbol>
 
     return MAKE_SYMBOL(tc, ID_RULE, 2,
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive)),
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING,
-                                            tc->alloc_string(" $$ = new " + gen_type(name1) + "; ")
+                                            tc->alloc_string(" $$ = new " + gen_type(rule_name_recursive) + "; ")
                                             )
                                     )
                             ),
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 2,
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive)),
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term))
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING,
@@ -561,21 +566,21 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
 }
 
 static xl::node::NodeIdentIFace* make_recursive_rule_optional(
-        std::string      name1,
-        std::string      name2,
+        std::string      rule_name_optional,
+        std::string      rule_name_term,
         xl::TreeContext* tc)
 {
     assert(tc);
 
     // STRING:
-    //statement_0:
-    //      /* empty */ { /* AAA */ $$ = NULL; }
-    //    | statement_1 { /* BBB */ $$ = $1; }
+    //rule_name_optional:
+    //      /* empty */    { /* AAA */ $$ = NULL; }
+    //    | rule_name_term { /* BBB */ $$ = $1; }
     //    ;
     //
     // XML:
     //<symbol type="rule">
-    //    <term type="ident" value=statement_0/>
+    //    <term type="ident" value=rule_name_optional/>
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="action_block">
@@ -584,7 +589,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
     //        </symbol>
     //        <symbol type="alt">
     //            <symbol type="terms">
-    //                <term type="ident" value=statement_1/>
+    //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
@@ -594,7 +599,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
     //</symbol>
 
     return MAKE_SYMBOL(tc, ID_RULE, 2,
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name1)),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_optional)),
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 2,
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
@@ -603,7 +608,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
                             ),
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
-                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name2))
+                                    MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term))
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
@@ -614,7 +619,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
 }
 
 static xl::node::NodeIdentIFace* make_term_rule(
-        std::string                     name,
+        std::string                     rule_name_term,
         const xl::node::NodeIdentIFace* alts_node,
         xl::TreeContext*                tc)
 {
@@ -622,7 +627,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
     assert(tc);
 
     return MAKE_SYMBOL(tc, ID_RULE, 2,
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(name)),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term)),
             alts_node->clone(tc));
 }
 
@@ -635,7 +640,7 @@ static xl::node::NodeIdentIFace* make_union_member_node(
     assert(tc);
 
     // STRING:
-    //std::vector< /* AAA */ type >* /* BBB */ _type_name;
+    //std::vector< /* AAA */ type >* /* BBB */ _typename;
     //
     // XML:
     //<symbol type="decl_stmt">
@@ -644,7 +649,7 @@ static xl::node::NodeIdentIFace* make_union_member_node(
     //            <term type="string" value="std::vector< /* AAA */ type >*"/>
     //        </symbol>
     //        <symbol type="decl_chunk">
-    //            <term type="string" value=" /* BBB */ _type_name "/>
+    //            <term type="string" value=" /* BBB */ _typename "/>
     //        </symbol>
     //    </symbol>
     //</symbol>
@@ -663,7 +668,7 @@ static xl::node::NodeIdentIFace* make_union_member_node(
 
 // node to be appended to back of definitions block
 static xl::node::NodeIdentIFace* make_def_brace_node(
-        std::string               _type_name,
+        std::string               _typename,
         std::vector<std::string>* token_vec,
         xl::TreeContext*          tc)
 {
@@ -671,12 +676,12 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     assert(tc);
 
     // STRING:
-    //%type< /* AAA */ _type_name > /* BBB */ token_vec
+    //%type< /* AAA */ _typename > /* BBB */ token_vec
     //
     // XML:
     //<symbol type="decl_brace">
     //    <term type="ident" value=type/>
-    //    <term type="ident" value= /* AAA */ _type_name />
+    //    <term type="ident" value= /* AAA */ _typename />
     //    <symbol type="symbols">
     //        <symbol type="symbol">
     //            <term type="ident" value= /* BBB */ token_vec />
@@ -693,7 +698,7 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     }
     return MAKE_SYMBOL(tc, ID_DEF_BRACE, 3,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string("type")),
-            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(_type_name)),
+            MAKE_TERM(ID_IDENT, tc->alloc_unique_string(_typename)),
             MAKE_SYMBOL(tc, ID_DEF_SYMBOLS, 1,
                     MAKE_SYMBOL(tc, ID_DEF_SYMBOL, 1,
                             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(exploded_tokens))
@@ -731,7 +736,7 @@ static void add_union_member(
 
 static void add_def_brace(
         TreeChanges*                    tree_changes,
-        std::string                     name1,
+        std::string                     rule_name,
         const xl::node::NodeIdentIFace* definitions_node,
         xl::TreeContext*                tc)
 {
@@ -743,9 +748,9 @@ static void add_def_brace(
     if(!definitions_symbol)
         return;
     std::vector<std::string> token_vec;
-    token_vec.push_back(name1);
+    token_vec.push_back(rule_name);
     xl::node::NodeIdentIFace* def_brace_node =
-            make_def_brace_node(gen_typename(name1), &token_vec, tc);
+            make_def_brace_node(gen_typename(rule_name), &token_vec, tc);
     if(!definitions_symbol->find(def_brace_node))
         tree_changes->add_change(
                 TreeChange::NODE_APPENDS_TO_BACK,
@@ -755,7 +760,7 @@ static void add_def_brace(
 
 static void add_term_rule(
         TreeChanges*     tree_changes,
-        std::string      name2,
+        std::string      rule_name_term,
         KleeneContext*   kleene_context,
         EBNFContext*     ebnf_context,
         xl::TreeContext* tc)
@@ -773,7 +778,7 @@ static void add_term_rule(
     const xl::node::NodeIdentIFace* alts_node = get_child(kleene_context->innermost_paren_node);
     if(!alts_node)
         return;
-    xl::node::NodeIdentIFace* term_rule = make_term_rule(name2, alts_node, tc);
+    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name_term, alts_node, tc);
     if(!term_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -787,12 +792,12 @@ static void add_term_rule(
             term_rule);
     add_union_member(
             tree_changes,
-            name2,
+            rule_name_term,
             ebnf_context->union_block_node,
             tc);
     add_def_brace(
             tree_changes,
-            name2,
+            rule_name_term,
             ebnf_context->definitions_node,
             tc);
 }
@@ -1309,9 +1314,9 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
         case ID_UNION_TERM:
             {
-                std::string name = get_string_value_from_term_node(get_child(_node));
-                std::cout << name;
-                union_term_names.push_back(name);
+                std::string union_term_name = get_string_value_from_term_node(get_child(_node));
+                std::cout << union_term_name;
+                union_term_names.push_back(union_term_name);
             }
             break;
         case ID_DEF_SYMBOLS:
