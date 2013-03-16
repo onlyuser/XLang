@@ -68,7 +68,7 @@ void TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>::apply()
         return;
     xl::node::NodeIdentIFace* new_node = m_new_node;
 #ifdef DEBUG_EBNF
-    std::cout << "NODE_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+    std::cout << "NODE_APPEND_TO_BACK " << ptr_to_string(append_to_node) << " ==> "
             << ptr_to_string(new_node) << std::endl;
     //xl::mvc::MVCView::print_xml(append_to_node);
     //xl::mvc::MVCView::print_xml(new_node);
@@ -113,7 +113,7 @@ void TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>::apply()
         return;
     std::string s = m_new_string;
 #ifdef DEBUG_EBNF
-    std::cout << "STRING_APPEND_BACK " << ptr_to_string(append_to_node) << " ==> "
+    std::cout << "STRING_APPEND_TO_BACK " << ptr_to_string(append_to_node) << " ==> "
             << '\"' << s << '\"' << std::endl;
     //xl::mvc::MVCView::print_xml(append_to_node);
 #endif
@@ -135,7 +135,7 @@ void TreeChangeImpl<TreeChange::STRING_INSERTIONS_TO_FRONT>::apply()
         return;
     std::string s = m_new_string;
 #ifdef DEBUG_EBNF
-    std::cout << "STRING_INSERT_FRONT " << ptr_to_string(insertion_to_node) << " ==> "
+    std::cout << "STRING_INSERT_TO_FRONT " << ptr_to_string(insertion_to_node) << " ==> "
             << '\"' << s << '\"' << std::endl;
     //xl::mvc::MVCView::print_xml(insertion_to_node);
 #endif

@@ -61,6 +61,14 @@
 #endif
 #define MAKE_SYMBOL xl::mvc::MVCModel::make_symbol
 
+#define RECURSIVE_NAME_SUFFIX "_recursive" // +, *
+#define OPTIONAL_NAME_SUFFIX  "_optional"  // ?
+#define PAREN_NAME_SUFFIX     "_paren"     // ()
+#define TERM_NAME_SUFFIX      "_term"
+#define INTERNAL_NAME_SUFFIX  "_internal"
+#define TYPENAME_SUFFIX       "_type"
+#define TYPE_SUFFIX           "_type_t"
+
 static const xl::node::NodeIdentIFace* get_child(const xl::node::NodeIdentIFace* _node)
 {
     assert(_node);
@@ -175,21 +183,14 @@ static std::string gen_name(std::string stem)
     return ss.str();
 }
 
-static std::string gen_name(
-        std::string stem,
-        bool        internal)
-{
-    return gen_name(stem) + "_int";
-}
-
 static std::string gen_typename(std::string stem)
 {
-    return stem + "_type";
+    return stem + TYPENAME_SUFFIX;
 }
 
 static std::string gen_type(std::string stem)
 {
-    return stem + "_type_t";
+    return stem + TYPE_SUFFIX;
 }
 
 static xl::node::NodeIdentIFace* find_node_recursive(
@@ -1025,7 +1026,7 @@ static void add_shared_typedefs_and_headers(
                             case '?':
                             case '(':
                                 {
-                                    std::string next_name1 = gen_name(name1, true);
+                                    std::string next_name1      = gen_name(name1 + INTERNAL_NAME_SUFFIX);
                                     std::string next_name1_type = gen_type(next_name1);
                                     tuple_type_vec.push_back(next_name1_type);
                                     const xl::node::NodeIdentIFace* next_outermost_paren_node =
@@ -1109,8 +1110,20 @@ KleeneContext::KleeneContext(
     rule_node            = get_ancestor_node(ID_RULE, outermost_paren_node);
     rule_name            = get_rule_name_from_rule_node(rule_node);
     rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
-    name1                = gen_name(rule_name);
-    name2                = gen_name(rule_name);
+    switch(kleene_op)
+    {
+        case '+':
+        case '*':
+            name1 = gen_name(rule_name + RECURSIVE_NAME_SUFFIX);
+            break;
+        case '?':
+            name1 = gen_name(rule_name + OPTIONAL_NAME_SUFFIX);
+            break;
+        case '(':
+            name1 = gen_name(rule_name + PAREN_NAME_SUFFIX);
+            break;
+    }
+    name2 = gen_name(rule_name + TERM_NAME_SUFFIX);
 }
 
 static void add_changes_for_kleene_closure(
