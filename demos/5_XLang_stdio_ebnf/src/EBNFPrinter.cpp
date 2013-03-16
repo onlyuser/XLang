@@ -306,12 +306,12 @@ static std::string* get_action_string_ptr_from_kleene_node(
 {
     assert(kleene_node);
 
-    // STRING:
+    // EBNF:
     //rule_name:
     //      rule_name_production { /* AAA */ ... }
     //    ;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="alt"> // <-- alt_node
     //    <symbol type="terms">
     //        <symbol type="*"> // <-- kleene_node
@@ -360,14 +360,14 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     assert(outermost_paren_node);
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //rule_name_stem:
     //      (
     //            kleene_internal_node ',' { /* AAA */ ... }
     //      )* kleene_external_node        { /* BBB */ ... }
     //    ;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_stem/>
     //    <symbol type="alts">
@@ -447,13 +447,13 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
 {
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //rule_name_recursive:
     //      rule_name_term                     { /* AAA */ ... }
     //    | rule_name_recursive rule_name_term { /* BBB */ ... }
     //    ;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_recursive/>
     //    <symbol type="alts">
@@ -513,13 +513,13 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
 {
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //rule_name_recursive:
     //      /* empty */                        { /* AAA */ ... }
     //    | rule_name_recursive rule_name_term { /* BBB */ ... }
     //    ;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_recursive/>
     //    <symbol type="alts">
@@ -572,13 +572,13 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
 {
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //rule_name_optional:
     //      /* empty */    { /* AAA */ $$ = NULL; }
     //    | rule_name_term { /* BBB */ $$ = $1; }
     //    ;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_optional/>
     //    <symbol type="alts">
@@ -639,10 +639,10 @@ static xl::node::NodeIdentIFace* make_union_member_node(
 {
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //std::vector< /* AAA */ type >* /* BBB */ _typename;
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="decl_stmt">
     //    <symbol type="decl_chunks">
     //        <symbol type="decl_chunk">
@@ -675,10 +675,10 @@ static xl::node::NodeIdentIFace* make_def_brace_node(
     assert(token_vec);
     assert(tc);
 
-    // STRING:
+    // EBNF:
     //%type< /* AAA */ _typename > /* BBB */ token_vec
     //
-    // XML:
+    // EBNF-XML:
     //<symbol type="decl_brace">
     //    <term type="ident" value=type/>
     //    <term type="ident" value= /* AAA */ _typename />
