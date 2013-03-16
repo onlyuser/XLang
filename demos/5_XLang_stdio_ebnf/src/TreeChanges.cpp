@@ -182,9 +182,9 @@ void TreeChanges::add_change(
 }
 
 void TreeChanges::add_change(
-        TreeChange::type_t _type,
+        TreeChange::type_t              _type,
         const xl::node::NodeIdentIFace* reference_node,
-        std::string new_string)
+        std::string                     new_string)
 {
     switch(_type)
     {

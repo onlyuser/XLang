@@ -307,8 +307,8 @@ static std::string* get_action_string_ptr_from_kleene_node(
     assert(kleene_node);
 
     // EBNF:
-    //rule_name:
-    //      rule_name_production { /* AAA */ ... }
+    //rule_name_lhs:
+    //      rule_name_rhs { /* AAA */ ... }
     //    ;
     //
     // EBNF-XML:
@@ -317,7 +317,7 @@ static std::string* get_action_string_ptr_from_kleene_node(
     //        <symbol type="*"> // <-- kleene_node
     //            <!-- ... -->
     //        </symbol>
-    //        <term type="ident" value=rule_name_production/>
+    //        <term type="ident" value=rule_name_rhs/>
     //    </symbol>
     //    <symbol type="action_block"> // <-- action_node
     //        <term type="string" value=" /* AAA */ ... "/>
@@ -361,7 +361,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     assert(tc);
 
     // EBNF:
-    //rule_name_stem:
+    //rule_name_lhs:
     //      (
     //            kleene_internal_node ',' { /* AAA */ ... }
     //      )* kleene_external_node        { /* BBB */ ... }
@@ -369,7 +369,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //
     // EBNF-XML:
     //<symbol type="rule">
-    //    <term type="ident" value=rule_name_stem/>
+    //    <term type="ident" value=rule_name_lhs/>
     //    <symbol type="alts">
     //        <symbol type="alt">
     //            <symbol type="terms">
@@ -1129,26 +1129,26 @@ KleeneContext::KleeneContext(
         const xl::node::NodeIdentIFace* kleene_node,
         EBNFContext*                    ebnf_context)
 {
-    kleene_op                  = kleene_node->sym_id();
-    outermost_paren_node       = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
-    innermost_paren_node       = get_innermost_paren_node(outermost_paren_node);
-    rule_node                  = get_ancestor_node(ID_RULE, outermost_paren_node);
-    std::string rule_name_stem = get_rule_name_from_rule_node(rule_node);
+    kleene_op             = kleene_node->sym_id();
+    outermost_paren_node  = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
+    innermost_paren_node  = get_innermost_paren_node(outermost_paren_node);
+    rule_node             = get_ancestor_node(ID_RULE, outermost_paren_node);
+    std::string rule_name = get_rule_name_from_rule_node(rule_node);
     switch(kleene_op)
     {
         case '+':
         case '*':
-            rule_name_recursive = gen_name(rule_name_stem + RECURSIVE_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name + RECURSIVE_NAME_SUFFIX);
             break;
         case '?':
-            rule_name_recursive = gen_name(rule_name_stem + OPTIONAL_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name + OPTIONAL_NAME_SUFFIX);
             break;
         case '(':
-            rule_name_recursive = gen_name(rule_name_stem + PAREN_NAME_SUFFIX);
+            rule_name_recursive = gen_name(rule_name + PAREN_NAME_SUFFIX);
             break;
     }
-    rule_name_term       = gen_name(rule_name_stem + TERM_NAME_SUFFIX);
-    rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name_stem];
+    rule_name_term       = gen_name(rule_name + TERM_NAME_SUFFIX);
+    rule_def_symbol_node = ebnf_context->def_symbol_name_to_node[rule_name];
 }
 
 static void add_changes_for_kleene_closure(
