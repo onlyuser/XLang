@@ -758,9 +758,41 @@ static void add_def_brace(
                 def_brace_node);
 }
 
+static void add_rule(
+        TreeChanges*                    tree_changes,
+        std::string                     new_rule_name,
+        xl::node::NodeIdentIFace*       new_rule_node,
+        const xl::node::NodeIdentIFace* node_insert_after,
+        EBNFContext*                    ebnf_context,
+        xl::TreeContext*                tc)
+{
+    assert(tree_changes);
+    assert(new_rule_node);
+    assert(node_insert_after);
+    assert(ebnf_context);
+    assert(ebnf_context->union_block_node);
+    assert(ebnf_context->definitions_node);
+    assert(tc);
+
+    tree_changes->add_change(
+            TreeChange::NODE_INSERTIONS_AFTER,
+            node_insert_after,
+            new_rule_node);
+    add_union_member(
+            tree_changes,
+            new_rule_name,
+            ebnf_context->union_block_node,
+            tc);
+    add_def_brace(
+            tree_changes,
+            new_rule_name,
+            ebnf_context->definitions_node,
+            tc);
+}
+
 static void add_term_rule(
         TreeChanges*     tree_changes,
-        std::string      rule_name_term,
+        std::string      rule_name,
         KleeneContext*   kleene_context,
         EBNFContext*     ebnf_context,
         xl::TreeContext* tc)
@@ -769,16 +801,13 @@ static void add_term_rule(
     assert(kleene_context);
     assert(kleene_context->innermost_paren_node);
     assert(kleene_context->rule_node);
-    assert(kleene_context->rule_def_symbol_node);
     assert(ebnf_context);
-    assert(ebnf_context->union_block_node);
-    assert(ebnf_context->definitions_node);
     assert(tc);
 
     const xl::node::NodeIdentIFace* alts_node = get_child(kleene_context->innermost_paren_node);
     if(!alts_node)
         return;
-    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name_term, alts_node, tc);
+    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name, alts_node, tc);
     if(!term_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -786,19 +815,12 @@ static void add_term_rule(
     EBNFPrinter v(tc); v.dispatch_visit(term_rule); std::cout << std::endl;
     std::cout << "<<< (term_rule)" << std::endl;
 #endif
-    tree_changes->add_change(
-            TreeChange::NODE_INSERTIONS_AFTER,
+    add_rule(
+            tree_changes,
+            rule_name,
+            term_rule,
             kleene_context->rule_node,
-            term_rule);
-    add_union_member(
-            tree_changes,
-            rule_name_term,
-            ebnf_context->union_block_node,
-            tc);
-    add_def_brace(
-            tree_changes,
-            rule_name_term,
-            ebnf_context->definitions_node,
+            ebnf_context,
             tc);
 }
 
@@ -812,8 +834,6 @@ static void add_recursive_rule(
     assert(kleene_context);
     assert(kleene_context->rule_node);
     assert(ebnf_context);
-    assert(ebnf_context->union_block_node);
-    assert(ebnf_context->definitions_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* recursive_rule = NULL;
@@ -848,19 +868,12 @@ static void add_recursive_rule(
     EBNFPrinter v(tc); v.dispatch_visit(recursive_rule); std::cout << std::endl;
     std::cout << "<<< (recursive_rule)" << std::endl;
 #endif
-    tree_changes->add_change(
-            TreeChange::NODE_INSERTIONS_AFTER,
+    add_rule(
+            tree_changes,
+            kleene_context->rule_name_recursive,
+            recursive_rule,
             kleene_context->rule_node,
-            recursive_rule);
-    add_union_member(
-            tree_changes,
-            kleene_context->rule_name_recursive,
-            ebnf_context->union_block_node,
-            tc);
-    add_def_brace(
-            tree_changes,
-            kleene_context->rule_name_recursive,
-            ebnf_context->definitions_node,
+            ebnf_context,
             tc);
 }
 
@@ -871,8 +884,8 @@ static void add_stem_rule(
 {
     assert(tree_changes);
     assert(kleene_context);
-    assert(kleene_context->outermost_paren_node);
     assert(kleene_context->rule_node);
+    assert(kleene_context->outermost_paren_node);
     assert(tc);
 
     xl::node::NodeIdentIFace* stem_rule =
@@ -1160,7 +1173,6 @@ static void add_changes_for_kleene_closure(
     assert(tree_changes);
     assert(kleene_node);
     assert(ebnf_context);
-    assert(ebnf_context->def_symbol_name_to_node.size());
     assert(tc);
 
     KleeneContext kleene_context(kleene_node, ebnf_context);
