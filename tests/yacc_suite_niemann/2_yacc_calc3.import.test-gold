@@ -1,0 +1,452 @@
+<symbol type="grammar">
+    <symbol type="definitions">
+        <symbol type="def_proto_block">
+            <term type="string" value="\n#include <stdio.h>\n#include <stdlib.h>\n#include <stdarg.h>\n#include \"calc3.h\"\n\n/* prototypes */\nnodeType *opr(int oper, int nops, ...);\nnodeType *id(int i);\nnodeType *con(int value);\nvoid freeNode(nodeType *p);\nint ex(nodeType *p);\nint yylex(void);\n\nvoid yyerror(char *s);\nint sym[26];                    /* symbol table */\n"/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=union/>
+            <symbol type="union_block">
+                <symbol type="union_members">
+                    <symbol type="union_member">
+                        <symbol type="union_terms">
+                            <symbol type="union_term">
+                                <term type="string" value="int"/>
+                            </symbol>
+                            <symbol type="union_term">
+                                <term type="string" value="iValue"/>
+                            </symbol>
+                        </symbol>
+                    </symbol>
+                    <symbol type="union_member">
+                        <symbol type="union_terms">
+                            <symbol type="union_term">
+                                <term type="string" value="char"/>
+                            </symbol>
+                            <symbol type="union_term">
+                                <term type="string" value="sIndex"/>
+                            </symbol>
+                        </symbol>
+                    </symbol>
+                    <symbol type="union_member">
+                        <symbol type="union_terms">
+                            <symbol type="union_term">
+                                <term type="string" value="nodeType"/>
+                            </symbol>
+                            <symbol type="union_term">
+                                <term type="string" value="nPtr"/>
+                            </symbol>
+                        </symbol>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="def_brace">
+            <term type="ident" value=token/>
+            <term type="ident" value=iValue/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=INTEGER/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="def_brace">
+            <term type="ident" value=token/>
+            <term type="ident" value=sIndex/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=VARIABLE/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=WHILE/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=IF/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=PRINT/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=IFX/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=ELSE/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=GE/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=LE/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=EQ/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=NE/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='>'/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='<'/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="char" value='+'/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='-'/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="char" value='*'/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='/'/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=nonassoc/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=UMINUS/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="def_brace">
+            <term type="ident" value=type/>
+            <term type="ident" value=nPtr/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=stmt/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=expr/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=stmt_list/>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="rules">
+        <symbol type="rule">
+            <term type="ident" value=program/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=function/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" exit(0); "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=function/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=function/>
+                        <term type="ident" value=stmt/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" ex($2); freeNode($2); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <NULL/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=stmt/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="char" value=';'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\';\', 2, NULL, NULL); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value=';'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=PRINT/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=';'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(PRINT, 1, $2); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=VARIABLE/>
+                        <term type="char" value='='/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=';'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'=\', 2, id($1), $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=WHILE/>
+                        <term type="char" value='('/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=')'/>
+                        <term type="ident" value=stmt/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(WHILE, 2, $3, $5); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=IF/>
+                        <term type="char" value='('/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=')'/>
+                        <term type="ident" value=stmt/>
+                        <term type="ident" value=%prec/>
+                        <term type="ident" value=IFX/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(IF, 2, $3, $5); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=IF/>
+                        <term type="char" value='('/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=')'/>
+                        <term type="ident" value=stmt/>
+                        <term type="ident" value=ELSE/>
+                        <term type="ident" value=stmt/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(IF, 3, $3, $5, $7); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="char" value='{'/>
+                        <term type="ident" value=stmt_list/>
+                        <term type="char" value='}'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $2; "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=stmt_list/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=stmt/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=stmt_list/>
+                        <term type="ident" value=stmt/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\';\', 2, $1, $2); "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=expr/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=INTEGER/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = con($1); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=VARIABLE/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = id($1); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expr/>
+                        <term type="ident" value=%prec/>
+                        <term type="ident" value=UMINUS/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(UMINUS, 1, $2); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='+'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'+\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'-\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='*'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'*\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='/'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'/\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='<'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'<\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='>'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(\'>\', 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="ident" value=GE/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(GE, 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="ident" value=LE/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(LE, 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="ident" value=NE/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(NE, 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="ident" value=EQ/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = opr(EQ, 2, $1, $3); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="char" value='('/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value=')'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $2; "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="code">
+        <term type="string" value="\n\nnodeType *con(int value) {\n    nodeType *p;\n\n    /* allocate node */\n    if ((p = malloc(sizeof(nodeType))) == NULL)\n        yyerror(\"out of memory\");\n\n    /* copy information */\n    p->type = typeCon;\n    p->con.value = value;\n\n    return p;\n}\n\nnodeType *id(int i) {\n    nodeType *p;\n\n    /* allocate node */\n    if ((p = malloc(sizeof(nodeType))) == NULL)\n        yyerror(\"out of memory\");\n\n    /* copy information */\n    p->type = typeId;\n    p->id.i = i;\n\n    return p;\n}\n\nnodeType *opr(int oper, int nops, ...) {\n    va_list ap;\n    nodeType *p;\n    int i;\n\n    /* allocate node */\n    if ((p = malloc(sizeof(nodeType))) == NULL)\n        yyerror(\"out of memory\");\n    if ((p->opr.op = malloc(nops * sizeof(nodeType))) == NULL)\n        yyerror(\"out of memory\");\n\n    /* copy information */\n    p->type = typeOpr;\n    p->opr.oper = oper;\n    p->opr.nops = nops;\n    va_start(ap, nops);\n    for (i = 0; i < nops; i++)\n        p->opr.op[i] = va_arg(ap, nodeType*);\n    va_end(ap);\n    return p;\n}\n\nvoid freeNode(nodeType *p) {\n    int i;\n\n    if (!p) return;\n    if (p->type == typeOpr) {\n        for (i = 0; i < p->opr.nops; i++)\n            freeNode(p->opr.op[i]);\n\t\tfree (p->opr.op);\n    }\n    free (p);\n}\n\nvoid yyerror(char *s) {\n    fprintf(stdout, \"%s\\n\", s);\n}\n\nint main(void) {\n    yyparse();\n    return 0;\n}\n"/>
+    </symbol>
+</symbol>

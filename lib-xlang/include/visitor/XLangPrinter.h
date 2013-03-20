@@ -35,7 +35,7 @@ public:
 struct XMLPrinter : public VisitorDFS
 {
 public:
-    XMLPrinter() : m_depth(0), m_include_node_uid(false)
+    XMLPrinter()
     {}
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
@@ -44,10 +44,6 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
-
-private:
-    size_t m_depth;
-    bool m_include_node_uid;
 };
 
 struct DotPrinter : public VisitorDFS

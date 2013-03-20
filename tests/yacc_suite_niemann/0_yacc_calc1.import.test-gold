@@ -1,0 +1,69 @@
+<symbol type="grammar">
+    <symbol type="definitions">
+        <symbol type="def_proto_block">
+            <term type="string" value="\n    #include <stdio.h>\n    int yylex(void);\n    void yyerror(char *);\n"/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=INTEGER/>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="rules">
+        <symbol type="rule">
+            <term type="ident" value=program/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=program/>
+                        <term type="ident" value=expr/>
+                        <term type="char" value='\n'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" printf(\"%d\\n\", $2); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <NULL/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=expr/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=INTEGER/>
+                    </symbol>
+                    <NULL/>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='+'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 + $3; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expr/>
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expr/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 - $3; "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="code">
+        <term type="string" value="\n\nvoid yyerror(char *s) {\n    fprintf(stderr, \"%s\\n\", s);\n}\n\nint main(void) {\n    yyparse();\n    return 0;\n}\n"/>
+    </symbol>
+</symbol>

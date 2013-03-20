@@ -1,0 +1,153 @@
+<symbol type="grammar">
+    <symbol type="definitions">
+        <symbol type="def_proto_block">
+            <term type="string" value="\n    #include <stdio.h>\n    void yyerror(char *);\n    int yylex(void);\n\n    int sym[26];\n"/>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=token/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="ident" value=INTEGER/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="ident" value=VARIABLE/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="char" value='+'/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='-'/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="definition">
+            <term type="ident" value=left/>
+            <symbol type="def_symbols">
+                <symbol type="def_symbol">
+                    <term type="char" value='*'/>
+                </symbol>
+                <symbol type="def_symbol">
+                    <term type="char" value='/'/>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="rules">
+        <symbol type="rule">
+            <term type="ident" value=program/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=program/>
+                        <term type="ident" value=statement/>
+                        <term type="char" value='\n'/>
+                    </symbol>
+                    <NULL/>
+                </symbol>
+                <symbol type="rule_alt">
+                    <NULL/>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=statement/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" printf(\"%d\\n\", $1); "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=VARIABLE/>
+                        <term type="char" value='='/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" sym[$1] = $3; "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+        <symbol type="rule">
+            <term type="ident" value=expression/>
+            <symbol type="rule_alts">
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=INTEGER/>
+                    </symbol>
+                    <NULL/>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=VARIABLE/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = sym[$1]; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='+'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 + $3; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='-'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 - $3; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='*'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 * $3; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="ident" value=expression/>
+                        <term type="char" value='/'/>
+                        <term type="ident" value=expression/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $1 / $3; "/>
+                    </symbol>
+                </symbol>
+                <symbol type="rule_alt">
+                    <symbol type="rule_terms">
+                        <term type="char" value='('/>
+                        <term type="ident" value=expression/>
+                        <term type="char" value=')'/>
+                    </symbol>
+                    <symbol type="rule_action_block">
+                        <term type="string" value=" $$ = $2; "/>
+                    </symbol>
+                </symbol>
+            </symbol>
+        </symbol>
+    </symbol>
+    <symbol type="code">
+        <term type="string" value="\n\nvoid yyerror(char *s) {\n    fprintf(stderr, \"%s\\n\", s);\n}\n\nint main(void) {\n    yyparse();\n}\n"/>
+    </symbol>
+</symbol>

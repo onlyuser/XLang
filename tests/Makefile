@@ -61,6 +61,13 @@ ifneq ($(strip $(YACC_SUITE)),)
 			1_ebnf \
 			2_ebnf-ex
 endif
+ifneq ($(strip $(YACC_SUITE_NIEMANN)),)
+	TEST_PATH = yacc_suite_niemann
+	TEST_FILE_STEMS = \
+			0_yacc_calc1 \
+			1_yacc_calc2 \
+			2_yacc_calc3
+endif
 OUT_PREFIX = $(TEST_PATH)
 
 #==================
