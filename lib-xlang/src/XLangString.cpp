@@ -60,12 +60,11 @@ std::string unescape(std::string s)
             buf[i] = unescape(buf[i]);
             unescape_next_char = false;
         }
-        else
-            if('\\' == buf[i])
-            {
-                unescape_next_char = true;
-                continue;
-            }
+        else if('\\' == buf[i])
+        {
+            unescape_next_char = true;
+            continue;
+        }
         buf[n++] = buf[i];
     }
     buf[n] = '\0';

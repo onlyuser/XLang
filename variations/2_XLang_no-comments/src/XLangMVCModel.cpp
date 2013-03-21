@@ -58,24 +58,25 @@ node::NodeIdentIFace* MVCModel::make_term<
 }
 
 #ifdef TIXML_USE_TICPP
-static node::NodeIdentIFace* make_term(TreeContext* tc, std::string type, std::string value)
+static node::NodeIdentIFace* make_term(
+        TreeContext* tc, std::string node_type, uint32_t sym_id, std::string node_value)
 {
     static YYLTYPE dummy_loc;
     memset(&dummy_loc, 0, sizeof(dummy_loc));
-    if(type == "int")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+    if(node_type == "int")
+        return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::INT>::type>(
-                        atoi(value.c_str())
+                        atoi(node_value.c_str())
                         ));
-    if(type == "float")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+    if(node_type == "float")
+        return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::FLOAT>::type>(
-                        atof(value.c_str())
+                        atof(node_value.c_str())
                         ));
-    if(type == "ident")
-        return mvc::MVCModel::make_term(tc, name_to_id(type), dummy_loc,
+    if(node_type == "ident")
+        return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(
-                        tc->alloc_unique_string(value)
+                        tc->alloc_unique_string(node_value)
                         ));
     return NULL;
 }
@@ -105,6 +106,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
     if(dynamic_cast<ticpp::Declaration*>(node))
         return NULL;
     std::string node_type, node_value;
+    uint32_t sym_id;
     ticpp::Element* elem = dynamic_cast<ticpp::Element*>(node);
     if(elem)
     {
@@ -119,12 +121,13 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
         }
         node_type = attrib_map["type"];
         node_value = attrib_map["value"];
+        sym_id = name_to_id(node_type);
     }
     if(node->NoChildren())
-        return make_term(tc, node_type, node_value);
+        return make_term(tc, node_type, sym_id, node_value);
     else
     {
-        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(node_type), dummy_loc, 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, sym_id, dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->push_back(visit(tc, child.Get()));
