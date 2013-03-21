@@ -105,6 +105,9 @@ public:
         return m_child_vec.size();
     }
 
+    // optional
+    void push_back(NodeIdentIFace* _node);
+
     // built-in
     visitor::VisitStateIFace::state_t &visit_state()
     {

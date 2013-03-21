@@ -54,7 +54,7 @@ PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
-#DEBUG = -g
+DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef EXTERN_INCLUDE_PATH
 	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH

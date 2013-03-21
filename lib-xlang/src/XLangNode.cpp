@@ -103,7 +103,7 @@ SymbolNode::SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec)
     : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
-    for(std::vector<NodeIdentIFace*>::iterator q = vec.begin(); q != vec.end(); q++)
+    for(auto q = vec.begin(); q != vec.end(); q++)
     {
         NodeIdentIFace* child = *q;
         if(child == SymbolNode::eol())

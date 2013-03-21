@@ -57,6 +57,9 @@ public:
     }
     std::string uid() const;
 
+    // optional
+    void push_back(NodeIdentIFace* _node);
+
     // built-in
     YYLTYPE loc() const
     {
@@ -104,6 +107,9 @@ public:
     {
         return m_child_vec.size();
     }
+
+    // optional
+    void push_back(NodeIdentIFace* _node);
 
     // built-in
     visitor::VisitStateIFace::state_t &visit_state()

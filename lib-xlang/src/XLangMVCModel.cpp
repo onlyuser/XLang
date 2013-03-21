@@ -123,27 +123,27 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* node)
     }
     if(dynamic_cast<ticpp::Declaration*>(node))
         return NULL;
-    std::string type, value;
+    std::string node_type, node_value;
     ticpp::Element* elem = dynamic_cast<ticpp::Element*>(node);
     if(elem)
     {
         std::map<std::string, std::string> attrib_map; // in case you need it
-        ticpp::Iterator< ticpp::Attribute > attribute;
+        ticpp::Iterator<ticpp::Attribute> attribute;
         for(attribute = attribute.begin(elem); attribute != attribute.end(); attribute++)
         {
-            std::string Key, Value;
-            attribute->GetName(&Key);
-            attribute->GetValue(&Value);
-            attrib_map[Key] = Value;
+            std::string attrib_name, attrib_value;
+            attribute->GetName(&attrib_name);
+            attribute->GetValue(&attrib_value);
+            attrib_map[attrib_name] = attrib_value;
         }
-        type = attrib_map["type"];
-        value = attrib_map["value"];
+        node_type = attrib_map["type"];
+        node_value = attrib_map["value"];
     }
     if(node->NoChildren())
-        return make_term(tc, type, value);
+        return make_term(tc, node_type, node_value);
     else
     {
-        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(type), 0);
+        node::SymbolNode* dest_node = mvc::MVCModel::make_symbol(tc, name_to_id(node_type), 0);
         ticpp::Iterator<ticpp::Node> child;
         for(child = child.begin(node); child != child.end(); child++)
             dest_node->push_back(visit(tc, child.Get()));

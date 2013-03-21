@@ -70,4 +70,11 @@ SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
     }
 }
 
+void SymbolNode::push_back(NodeIdentIFace* _node)
+{
+    m_child_vec.push_back(_node);
+    if(_node)
+        _node->set_parent(this);
+}
+
 } }
