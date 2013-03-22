@@ -43,89 +43,80 @@ void LispPrinter::visit(const node::SymbolNodeIFace* _node)
 
 void LispPrinter::visit_null()
 {
-    std::cout << "(NULL)";
+    std::cout << std::string(depth*4, ' ') << "(NULL)" << std::endl;
 }
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
 {
-    std::cout << "<term ";
+    std::cout << std::string(depth*4, ' ') << "<term ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
     VisitorDFS::visit(_node);
-    std::cout << "/>";
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node)
 {
-    std::cout << "<term ";
+    std::cout << std::string(depth*4, ' ') << "<term ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
     VisitorDFS::visit(_node);
-    std::cout << "/>";
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node)
 {
-    std::cout << "<term ";
+    std::cout << std::string(depth*4, ' ') << "<term ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
     VisitorDFS::visit(_node);
-    std::cout << "/>";
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node)
 {
-    std::cout << "<term ";
+    std::cout << std::string(depth*4, ' ') << "<term ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
     VisitorDFS::visit(_node);
-    std::cout << "/>";
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node)
 {
-    std::cout << "<term ";
+    std::cout << std::string(depth*4, ' ') << "<term ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
     VisitorDFS::visit(_node);
-    std::cout << "/>";
+    std::cout << "/>" << std::endl;
 }
 
 void XMLPrinter::visit_null()
 {
-    std::cout << "<NULL/>";
+    std::cout << std::string(depth*4, ' ') << "<NULL/>" << std::endl;
 }
 
 void XMLPrinter::visit(const node::SymbolNodeIFace* _node)
 {
-    static size_t depth;
-    std::cout << "<symbol ";
+    std::cout << std::string(depth*4, ' ') << "<symbol ";
     #ifdef INCLUDE_NODE_UID
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\">" << std::endl;
     depth++;
-    bool more;
-    do
-    {
-        std::cout << std::string(depth*4, ' ');
-        more = visit_next_child(_node);
-        std::cout << std::endl;
-    } while(more);
+    VisitorDFS::visit(_node);
     depth--;
-    std::cout << std::string(depth*4, ' ') << "</symbol>";
-    if(_node->is_root())
-        std::cout << std::endl;
+    std::cout << std::string(depth*4, ' ') << "</symbol>" << std::endl;
 }
 
 void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)

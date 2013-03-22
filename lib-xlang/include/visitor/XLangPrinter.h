@@ -26,16 +26,19 @@ namespace xl { namespace visitor {
 class LispPrinter : public VisitorDFS
 {
 public:
-    LispPrinter()
+    LispPrinter() : depth(0)
     {}
     void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
+
+private:
+    size_t depth;
 };
 
 struct XMLPrinter : public VisitorDFS
 {
 public:
-    XMLPrinter()
+    XMLPrinter() : depth(0)
     {}
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
@@ -44,6 +47,9 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
+
+private:
+    size_t depth;
 };
 
 struct DotPrinter : public VisitorDFS
