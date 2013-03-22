@@ -23,7 +23,6 @@
 #include <string> // std::string
 #include <vector> // std::vector
 
-#define TIXML_USE_TICPP
 #ifdef EXTERN_INCLUDE_PATH
     #define TIXML_USE_TICPP
 #endif
