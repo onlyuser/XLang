@@ -30,44 +30,34 @@
 PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
 
+TEST_FILE_KEYWORDS = ""
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
-	TEST_FILE_STEMS = \
-			0_simple \
-			1_op_prec \
-			2_grouping \
-			3_identifier \
-			4_uminus
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
 	TEST_PATH = advanced_suite
-	TEST_FILE_STEMS = \
-			0_comments
+	TEST_FILE_KEYWORDS = "comments"
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_PATH = advanced_suite
-	TEST_FILE_STEMS = \
-			1_strings
+	TEST_FILE_KEYWORDS = "strings"
 endif
 ifneq ($(strip $(C_SUITE)),)
 	TEST_PATH = c_suite
-	TEST_FILE_STEMS = \
-			0_hello_world
 endif
 ifneq ($(strip $(YACC_SUITE)),)
 	TEST_PATH = yacc_suite
-	TEST_FILE_STEMS = \
-			0_yacc \
-			1_ebnf \
-			2_ebnf-ex
 endif
 ifneq ($(strip $(YACC_SUITE_NIEMANN)),)
 	TEST_PATH = yacc_suite_niemann
-	TEST_FILE_STEMS = \
-			0_yacc_calc1 \
-			1_yacc_calc2 \
-			2_yacc_calc3
 endif
+TEST_FILE_STEMS = \
+		$(shell \
+				find $(TEST_PATH) -mindepth 1 -maxdepth 1 -name "*" -type f | sort \
+						| xargs -I@ basename @ \
+						| cut -d. -f1 | uniq \
+						| grep "$(TEST_FILE_KEYWORDS)" \
+				)
 OUT_PREFIX = $(TEST_PATH)
 
 #==================

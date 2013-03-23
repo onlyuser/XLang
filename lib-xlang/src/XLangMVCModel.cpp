@@ -88,7 +88,7 @@ static node::NodeIdentIFace* make_term(
     if(_typename == "string")
         return mvc::MVCModel::make_term(tc, sym_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
-                        tc->alloc_string(xl::unescape_xml(value))
+                        tc->alloc_string(value)
                         ));
     if(_typename == "char")
         return mvc::MVCModel::make_term(tc, sym_id,

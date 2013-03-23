@@ -17,15 +17,7 @@
 
 LIB_PATH = lib
 CHILD_PATH = variations
-SUBPATHS = \
-	$(CHILD_PATH)/0_XLang_full \
-	$(CHILD_PATH)/1_XLang_no-strings \
-	$(CHILD_PATH)/2_XLang_no-comments \
-	$(CHILD_PATH)/3_XLang_no-locations \
-	$(CHILD_PATH)/4_XLang_no-reentrant \
-	$(CHILD_PATH)/5_XLang_stdio \
-	$(CHILD_PATH)/6_XLang_file \
-	$(CHILD_PATH)/7_XLang_no-flex
+SUBPATHS = $(shell find $(CHILD_PATH) -mindepth 1 -maxdepth 1 -name "*" -type d | sort)
 
 .DEFAULT_GOAL : all
 all :
@@ -38,6 +30,7 @@ test :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
+	find . -name "*.test.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : import
 import :
@@ -50,6 +43,7 @@ pure :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
+	find . -name "*.test.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : dot
 dot :
@@ -69,6 +63,7 @@ lint :
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
 	cd lib-xlang; $(MAKE) $@
+	find . -name "*.test.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : doc
 doc :

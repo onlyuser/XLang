@@ -50,7 +50,8 @@ ifdef EXTERN_LIB_PATH
 endif
 PARENT_LIB_STEMS = xlang
 PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
-LIB_FLAGS = $(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
+LIB_FLAGS = \
+		$(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
@@ -76,18 +77,19 @@ all : $(BINARY)
 #==================
 
 $(PARENT_LIBS) :
-	cd $(COMMON); $(MAKE) -f Makefile
+	cd $(COMMON); $(MAKE)
 
 .PHONY : clean_parent_libs
 clean_parent_libs :
-	cd $(COMMON); $(MAKE) -f Makefile clean
+	cd $(COMMON); $(MAKE) clean
 
 #==================
 # yacc-gen
 #==================
 
 YACC_STEMS = XLang.tab
-YACC_GEN = $(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
+YACC_GEN = \
+		$(patsubst %, $(SRC_PATH)/%.cpp, $(YACC_STEMS)) \
 		$(patsubst %, $(INCLUDE_PATH)/%.h, $(YACC_STEMS))
 .SECONDARY : $(YACC_GEN)
 
@@ -151,13 +153,13 @@ clean_binary : clean_objects clean_parent_libs
 
 .PHONY : test
 test : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			YACC_SUITE_NIEMANN=1
 
 .PHONY : clean_test
 clean_test :
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_SUITE_NIEMANN=1
 
@@ -167,13 +169,13 @@ clean_test :
 
 .PHONY : import
 import : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
 			YACC_SUITE_NIEMANN=1
 
 .PHONY : clean_import
 clean_import :
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_SUITE_NIEMANN=1
 
@@ -183,13 +185,13 @@ clean_import :
 
 .PHONY : pure
 pure : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			YACC_SUITE_NIEMANN=1
 
 .PHONY : clean_pure
 clean_pure :
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_SUITE_NIEMANN=1
 
@@ -199,13 +201,13 @@ clean_pure :
 
 .PHONY : dot
 dot : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			YACC_SUITE_NIEMANN=1
 
 .PHONY : clean_dot
 clean_dot :
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_SUITE_NIEMANN=1
 
@@ -215,13 +217,13 @@ clean_dot :
 
 .PHONY : xml
 xml : $(BINARY)
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			YACC_SUITE_NIEMANN=1
 
 .PHONY : clean_xml
 clean_xml :
-	cd $(TEST_PATH); $(MAKE) -f Makefile $@ \
+	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_SUITE_NIEMANN=1
 
