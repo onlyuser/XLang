@@ -1,0 +1,14 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: make
+branches:
+  only:
+    - master
+notifications:
+  recipients:
+    - onlyuser@gmail.com
+  email:
+    on_success: change
+    on_failure: always
