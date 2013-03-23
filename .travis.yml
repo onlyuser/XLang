@@ -2,7 +2,7 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: make
+script: make test
 branches:
   only:
     - master
