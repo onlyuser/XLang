@@ -22,12 +22,60 @@
 
 namespace xl {
 
+std::string replace(std::string s, const std::string& find_string, const std::string& replace_string)
+{
+    for(size_t p = 0; (p = s.find(find_string, p)) != std::string::npos; p += replace_string.length())
+         s.replace(p, find_string.length(), replace_string);
+    return s;
+}
+
+std::string escape_xml(std::string s)
+{
+    std::string xml = s;
+    xml = replace(xml, "\"", "&quot;");
+    return escape(xml);
+}
+
+std::string unescape_xml(std::string s)
+{
+    std::string xml = s;
+    xml = replace(xml, "&quot;", "\"");
+    return unescape(xml);
+}
+
 std::string escape(std::string s)
 {
     std::stringstream ss;
     for(size_t i = 0; i<s.length(); i++)
         ss << escape(s[i]);
     return ss.str();
+}
+
+std::string unescape(std::string s)
+{
+    char* buf = new char[s.length()+1]; // can't use allocator for arrays
+    strcpy(buf, s.c_str());
+    char* w = buf;
+    bool unescape_next_char = false;
+    for(char* r = buf; *r; r++)
+    {
+        if(!unescape_next_char && *r == '\\')
+        {
+            unescape_next_char = true;
+            continue;
+        }
+        else if(unescape_next_char)
+        {
+            *w++ = unescape(*r);
+            unescape_next_char = false;
+            continue;
+        }
+        *w++ = *r;
+    }
+    *w = '\0';
+    std::string s2(buf);
+    delete []buf;
+    return s2;
 }
 
 std::string escape(char c)
@@ -45,32 +93,6 @@ std::string escape(char c)
     buf[0] = c;
     std::string s(buf);
     return s;
-}
-
-std::string unescape(std::string s)
-{
-    char* buf = new char[s.length()+1]; // can't use allocator for arrays
-    strcpy(buf, s.c_str());
-    int n = 0;
-    bool unescape_next_char = false;
-    for(int i = 0; buf[i]; i++)
-    {
-        if(unescape_next_char)
-        {
-            buf[i] = unescape(buf[i]);
-            unescape_next_char = false;
-        }
-        else if('\\' == buf[i])
-        {
-            unescape_next_char = true;
-            continue;
-        }
-        buf[n++] = buf[i];
-    }
-    buf[n] = '\0';
-    std::string s2(buf);
-    delete []buf;
-    return s2;
 }
 
 char unescape(char c)

@@ -22,10 +22,12 @@
 
 namespace xl {
 
+std::string escape_xml(std::string s);
+std::string unescape_xml(std::string s);
 std::string escape(std::string s);
-std::string escape(char c);
 std::string unescape(std::string s);
-char unescape(char c);
+std::string escape(char c);
+char        unescape(char c);
 
 }
 

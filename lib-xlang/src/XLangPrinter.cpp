@@ -75,7 +75,7 @@ void XMLPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* 
         std::cout << "id=" << _node->uid() << " ";
     #endif
     std::cout << "type=\"" << _node->name() << "\" value=";
-    VisitorDFS::visit(_node);
+    std::cout << '\"' << xl::escape_xml(*_node->value()) << '\"';
     std::cout << "/>" << std::endl;
 }
 
