@@ -339,7 +339,7 @@ bool do_work(args_t &args)
     return true;
 }
 
-int main(int argc, char** argv)
+int main2(int argc, char** argv)
 {
     args_t args;
     if(!parse_args(argc, argv, args))
