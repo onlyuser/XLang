@@ -198,21 +198,21 @@ FAQ:
 7.  Why allocators ?
 
     I've incorporated a simple memory allocator in this project because I
-    wanted to keep my AST node classes as clean as possible, without
-    destructors that delete child nodes. But the way the allocator was
-    written really doesn't improve the program's memory usage patterns. With
-    some effort, I suppose one could upgrade that into a real allocator with
-    true memory pooling.
+    want to keep my AST node classes as clean as possible, without destructors
+    that delete child nodes. But the way the allocator was written really
+    doesn't improve the program's memory usage patterns. With some effort, I
+    suppose one could upgrade that into a real allocator with true memory
+    pooling.
 
 8.  Why c++0x ?
 
-    Lambda functions are the only c++0x feature used here, and only because
-    they solve the problem elegantly. The goal is to deliberately avoid
+    Lambda functions are one of the few c++0x feature used here, and only
+    because they solve the problem elegantly. The goal is to deliberately avoid
     implementing clean-up code within the AST node destructors. This goes
     along a grander design decision to keep the AST node class clear of
     method clutter by moving all the predicate code into visitors. Lambdas
-    help us provide ad hoc anonymous callbacks for the allocator, whose job
-    is to perform clean-up originally intended for the destructor.
+    help provide ad hoc anonymous callbacks for the allocator, whose job is to
+    perform clean-up originally intended for the destructor.
 
 9.  Why coroutines ?
 
