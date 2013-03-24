@@ -32,8 +32,8 @@ std::string replace(std::string s, const std::string& find_string, const std::st
 std::string escape_xml(std::string s)
 {
     std::string xml = s;
+    xml = replace(xml, "&",  "&amp;"); // must replace first
     xml = replace(xml, "\"", "&quot;");
-    xml = replace(xml, "&",  "&amp;");
     xml = replace(xml, "\'", "&apos;");
     xml = replace(xml, "<",  "&lt;");
     xml = replace(xml, ">",  "&gt;");
@@ -44,10 +44,10 @@ std::string unescape_xml(std::string s)
 {
     std::string xml = s;
     xml = replace(xml, "&quot;", "\"");
-    xml = replace(xml, "&amp;",  "&");
     xml = replace(xml, "&apos;", "\'");
     xml = replace(xml, "&lt;",   "<");
     xml = replace(xml, "&gt;",   ">");
+    xml = replace(xml, "&amp;",  "&"); // must replace last
     return unescape(xml);
 }
 
@@ -65,7 +65,7 @@ std::string unescape(std::string s)
     strcpy(buf, s.c_str());
     char* w = buf;
     bool unescape_next_char = false;
-    for(char* r = buf; *r; r++)
+    for(const char* r = buf; *r; r++)
     {
         if(!unescape_next_char && *r == '\\')
         {

@@ -110,8 +110,7 @@ _float  {digit}*[.]{digit}+
             }
 <ST_CHAR>[^\']* {
                 begin_token(yyscanner, yyleng);
-                std::string s = xl::unescape(yytext);
-                yylval->char_value = s[0];
+                yylval->char_value = xl::unescape(yytext)[0];
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] {

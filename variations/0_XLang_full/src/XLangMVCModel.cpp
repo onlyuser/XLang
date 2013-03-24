@@ -86,12 +86,12 @@ static node::NodeIdentIFace* _make_term_from_typename(
     if(_typename == "string")
         return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
-                        tc->alloc_string(value)
+                        tc->alloc_string(xl::unescape_xml(value))
                         ));
     if(_typename == "char")
         return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
-                        value[0]
+                        xl::unescape_xml(value)[0]
                         ));
     if(_typename == "ident")
         return mvc::MVCModel::make_term(tc, sym_id, dummy_loc,

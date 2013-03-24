@@ -96,8 +96,7 @@ decl        [%][^%{}]
 
 [\']            { yy_push_state(ST_CHAR); }
 <ST_CHAR>[^\']* {
-                std::string s = xl::unescape(yytext);
-                _XLANG_lval.char_value = s[0];
+                _XLANG_lval.char_value = xl::unescape(yytext)[0];
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] { yy_pop_state(); }

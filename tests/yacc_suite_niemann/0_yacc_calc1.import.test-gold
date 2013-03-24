@@ -1,7 +1,7 @@
 <symbol type="grammar">
     <symbol type="definitions">
         <symbol type="def_proto_block">
-            <term type="string" value="\n    #include <stdio.h>\n    int yylex(void);\n    void yyerror(char *);\n"/>
+            <term type="string" value="\n    #include &lt;stdio.h&gt;\n    int yylex(void);\n    void yyerror(char *);\n"/>
         </symbol>
         <symbol type="definition">
             <term type="ident" value=token/>
@@ -23,7 +23,7 @@
                         <term type="char" value='\n'/>
                     </symbol>
                     <symbol type="rule_action_block">
-                        <term type="string" value=" printf(\"%d\\n\", $2); "/>
+                        <term type="string" value=" printf(&quot;%d\\n&quot;, $2); "/>
                     </symbol>
                 </symbol>
                 <symbol type="rule_alt">
@@ -64,6 +64,6 @@
         </symbol>
     </symbol>
     <symbol type="code">
-        <term type="string" value="\n\nvoid yyerror(char *s) {\n    fprintf(stderr, \"%s\\n\", s);\n}\n\nint main(void) {\n    yyparse();\n    return 0;\n}\n"/>
+        <term type="string" value="\n\nvoid yyerror(char *s) {\n    fprintf(stderr, &quot;%s\\n&quot;, s);\n}\n\nint main(void) {\n    yyparse();\n    return 0;\n}\n"/>
     </symbol>
 </symbol>
