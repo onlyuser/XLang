@@ -37,13 +37,14 @@ import :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
+	find . -name "*.import.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : pure
 pure :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	find . -name "*.test.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
+	find . -name "*.pure.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : dot
 dot :
@@ -63,7 +64,7 @@ lint :
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
 	cd lib-xlang; $(MAKE) $@
-	find . -name "*.test.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
+	find . -name "*.lint.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : doc
 doc :
