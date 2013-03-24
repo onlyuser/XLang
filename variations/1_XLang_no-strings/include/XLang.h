@@ -88,7 +88,7 @@ int _XLANG_parse(ParserContext*, yyscan_t);
 void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s);
 void _XLANG_error(const char* s);
 
-std::stringstream &errors();
+std::stringstream &error_messages();
 std::string id_to_name(uint32_t sym_id);
 
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, char* s);

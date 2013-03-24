@@ -58,7 +58,7 @@ node::NodeIdentIFace* MVCModel::make_term<
 }
 
 #ifdef TIXML_USE_TICPP
-static node::NodeIdentIFace* make_term(
+static node::NodeIdentIFace* _make_term_from_typename(
         TreeContext* tc, std::string _typename, uint32_t sym_id, std::string value)
 {
     static YYLTYPE dummy_loc;
@@ -81,7 +81,7 @@ static node::NodeIdentIFace* make_term(
     return NULL;
 }
 
-static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* ticpp_node)
+static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* ticpp_node)
 {
     static YYLTYPE dummy_loc;
     memset(&dummy_loc, 0, sizeof(dummy_loc));
@@ -93,7 +93,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* ticpp_node)
         {
             ticpp::Iterator<ticpp::Node> p;
             for(p = p.begin(ticpp_node); p != p.end(); p++)
-                root_symbol->push_back(visit(tc, p.Get()));
+                root_symbol->push_back(_make_ast_from_ticpp(tc, p.Get()));
             if(root_symbol->size() == 1)
             {
                 node::NodeIdentIFace* root_node = (*root_symbol)[0];
@@ -124,7 +124,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* ticpp_node)
         node_value = attr_map["value"];
         sym_id = name_to_id(node_typename);
     }
-    node::NodeIdentIFace* term_node = make_term(tc, node_typename, sym_id, node_value);
+    node::NodeIdentIFace* term_node = _make_term_from_typename(tc, node_typename, sym_id, node_value);
     if(term_node)
         return term_node;
     else
@@ -132,7 +132,7 @@ static node::NodeIdentIFace* visit(TreeContext* tc, ticpp::Node* ticpp_node)
         node::SymbolNode* symbol_node = mvc::MVCModel::make_symbol(tc, sym_id, dummy_loc, 0);
         ticpp::Iterator<ticpp::Node> r;
         for(r = r.begin(ticpp_node); r != r.end(); r++)
-            symbol_node->push_back(visit(tc, r.Get()));
+            symbol_node->push_back(_make_ast_from_ticpp(tc, r.Get()));
         return symbol_node;
     }
 }
@@ -143,7 +143,7 @@ node::NodeIdentIFace* MVCModel::make_ast(TreeContext* tc, std::string filename)
 #ifdef TIXML_USE_TICPP
     ticpp::Document doc(filename.c_str());
     doc.LoadFile();
-    return visit(tc, &doc);
+    return _make_ast_from_ticpp(tc, &doc);
 #else
     return NULL;
 #endif

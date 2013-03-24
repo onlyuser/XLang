@@ -43,14 +43,14 @@
 // report error
 void _XLANG_error(const char* s)
 {
-    errors() << s;
+    error_messages() << s;
 }
 
 // get resource
-std::stringstream &errors()
+std::stringstream &error_messages()
 {
-    static std::stringstream _errors;
-    return _errors;
+    static std::stringstream _error_messages;
+    return _error_messages;
 }
 std::string id_to_name(uint32_t sym_id)
 {
@@ -165,9 +165,9 @@ ScannerContext::ScannerContext(FILE* file)
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, FILE* file)
 {
     parser_context() = new (PNEW(alloc, , ParserContext)) ParserContext(alloc, file);
-    int error = _XLANG_parse(); // parser entry point
+    int error_code = _XLANG_parse(); // parser entry point
     _XLANG_lex_destroy();
-    return (!error && errors().str().empty()) ? parser_context()->tree_context().root() : NULL;
+    return (!error_code && error_messages().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 
 void display_usage(bool verbose)
@@ -284,7 +284,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
         fclose(file);
         if(!ast)
         {
-            std::cout << errors().str().c_str() << std::endl;
+            std::cout << error_messages().str().c_str() << std::endl;
             return false;
         }
     }

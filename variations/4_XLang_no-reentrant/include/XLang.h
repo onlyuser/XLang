@@ -57,7 +57,7 @@ int _XLANG_lex_destroy();
 int _XLANG_parse();
 void _XLANG_error(const char* s);
 
-std::stringstream &errors();
+std::stringstream &error_messages();
 std::string id_to_name(uint32_t sym_id);
 ParserContext* &parser_context();
 

@@ -33,6 +33,10 @@ std::string escape_xml(std::string s)
 {
     std::string xml = s;
     xml = replace(xml, "\"", "&quot;");
+    xml = replace(xml, "&",  "&amp;");
+    xml = replace(xml, "\'", "&apos;");
+    xml = replace(xml, "<",  "&lt;");
+    xml = replace(xml, ">",  "&gt;");
     return escape(xml);
 }
 
@@ -40,6 +44,10 @@ std::string unescape_xml(std::string s)
 {
     std::string xml = s;
     xml = replace(xml, "&quot;", "\"");
+    xml = replace(xml, "&amp;",  "&");
+    xml = replace(xml, "&apos;", "\'");
+    xml = replace(xml, "&lt;",   "<");
+    xml = replace(xml, "&gt;",   ">");
     return unescape(xml);
 }
 
