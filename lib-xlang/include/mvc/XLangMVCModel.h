@@ -30,14 +30,14 @@ namespace xl { namespace mvc {
 struct MVCModel
 {
     template<class T>
-    static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t sym_id, T value)
+    static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t lexer_id, T value)
     {
         return new (PNEW_LOC(tc->alloc())) node::TermNode<
                 static_cast<node::NodeIdentIFace::type_t>(node::TermType<T>::type)
-                >(sym_id, value); // assumes trivial dtor
+                >(lexer_id, value); // assumes trivial dtor
     }
-    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...);
-    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, std::vector<node::NodeIdentIFace*>& vec);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t lexer_id, size_t size, ...);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t lexer_id, std::vector<node::NodeIdentIFace*>& vec);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 

@@ -44,7 +44,7 @@
     {
         assert(_node);
 
-        switch(_node->sym_id())
+        switch(_node->lexer_id())
         {
             case '+':
             case '*':
@@ -55,7 +55,7 @@
     }
 #endif
 
-#define MAKE_TERM(sym_id, ...) xl::mvc::MVCModel::make_term(tc, sym_id, ##__VA_ARGS__)
+#define MAKE_TERM(lexer_id, ...) xl::mvc::MVCModel::make_term(tc, lexer_id, ##__VA_ARGS__)
 #if 0 // NOTE: macro recursion not allowed
     #define MAKE_SYMBOL(...) xl::mvc::MVCModel::make_symbol(tc, ##__VA_ARGS__)
 #endif
@@ -232,14 +232,14 @@ static void replace_node(
 }
 
 static const xl::node::NodeIdentIFace* get_ancestor_node(
-        uint32_t sym_id,
+        uint32_t lexer_id,
         const xl::node::NodeIdentIFace* _node)
 {
     assert(_node);
 
     for(auto p = _node; p; p = p->parent())
     {
-        if(p->sym_id() == sym_id)
+        if(p->lexer_id() == lexer_id)
             return p;
     }
     return NULL;
@@ -908,9 +908,9 @@ static void add_stem_rule(
             stem_rule);
 }
 
-static xl::node::NodeIdentIFace* find_unique_child_by_sym_id(
+static xl::node::NodeIdentIFace* find_unique_child_by_lexer_id(
         const xl::node::SymbolNodeIFace* symbol,
-        uint32_t                         sym_id)
+        uint32_t                         lexer_id)
 {
     assert(symbol);
 
@@ -918,7 +918,7 @@ static xl::node::NodeIdentIFace* find_unique_child_by_sym_id(
     for(size_t i = 0; i<symbol->size(); i++)
     {
         xl::node::NodeIdentIFace* child_node = (*symbol)[i];
-        if(child_node && child_node->sym_id() == sym_id)
+        if(child_node && child_node->lexer_id() == lexer_id)
         {
             if(unique_child_node)
                 return NULL;
@@ -936,19 +936,19 @@ static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
     assert(_node);
 
     std::vector<uint32_t> cyclic_sequence;
-    uint32_t sym_id = 0;
+    uint32_t lexer_id = 0;
     va_list ap;
     va_start(ap, cyclic);
     do
     {
-        sym_id = va_arg(ap, uint32_t);
-        cyclic_sequence.push_back(sym_id);
-    } while(sym_id);
+        lexer_id = va_arg(ap, uint32_t);
+        cyclic_sequence.push_back(lexer_id);
+    } while(lexer_id);
     va_end(ap);
     if(cyclic_sequence.empty())
         return _node;
     const xl::node::NodeIdentIFace* next_node = _node;
-    if(next_node->sym_id() == cyclic_sequence[0])
+    if(next_node->lexer_id() == cyclic_sequence[0])
     {
         bool done = false;
         do
@@ -965,8 +965,8 @@ static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
                 }
                 size_t mapped_index = i%(cyclic_sequence.size()-1);
                 const xl::node::NodeIdentIFace* unique_child_node =
-                        find_unique_child_by_sym_id(next_symbol, cyclic_sequence[mapped_index]);
-                if(!unique_child_node || unique_child_node->sym_id() != cyclic_sequence[mapped_index])
+                        find_unique_child_by_lexer_id(next_symbol, cyclic_sequence[mapped_index]);
+                if(!unique_child_node || unique_child_node->lexer_id() != cyclic_sequence[mapped_index])
                 {
                     done = true;
                     break;
@@ -975,7 +975,7 @@ static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
                 if(mapped_index == 0)
                     next_node = next_node_in_sequence;
             }
-        } while(cyclic && next_node->sym_id() == cyclic_sequence[0] && !done);
+        } while(cyclic && next_node->lexer_id() == cyclic_sequence[0] && !done);
     }
     return next_node;
 }
@@ -1048,7 +1048,7 @@ static void add_shared_typedefs_and_headers(
                 case xl::node::NodeIdentIFace::SYMBOL:
                     {
                         const xl::node::NodeIdentIFace* kleene_node = child_node;
-                        uint32_t kleene_op = kleene_node->sym_id();
+                        uint32_t kleene_op = kleene_node->lexer_id();
                         switch(kleene_op)
                         {
                             case '+':
@@ -1142,8 +1142,8 @@ KleeneContext::KleeneContext(
         const xl::node::NodeIdentIFace* kleene_node,
         EBNFContext*                    ebnf_context)
 {
-    kleene_op             = kleene_node->sym_id();
-    outermost_paren_node  = (kleene_node->sym_id() == '(') ? kleene_node : get_child(kleene_node);
+    kleene_op             = kleene_node->lexer_id();
+    outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
     innermost_paren_node  = get_innermost_paren_node(outermost_paren_node);
     rule_node             = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string rule_name = get_rule_name_from_rule_node(rule_node);
@@ -1217,14 +1217,14 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
     assert(_node);
 
 #ifdef DEBUG_EBNF
-    if(_node->sym_id() == ID_RULE || is_kleene_node(_node))
+    if(_node->lexer_id() == ID_RULE || is_kleene_node(_node))
         std::cout << '[';
 #endif
     static bool entered_kleene_closure = false;
     static EBNFContext ebnf_context;
     static std::vector<std::string> union_term_names, def_symbol_names;
     bool more = false;
-    uint32_t kleene_op = _node->sym_id();
+    uint32_t kleene_op = _node->lexer_id();
     switch(kleene_op)
     {
         case ID_GRAMMAR:
@@ -1423,7 +1423,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
             break;
     }
 #ifdef DEBUG_EBNF
-    if(_node->sym_id() == ID_RULE || is_kleene_node(_node))
+    if(_node->lexer_id() == ID_RULE || is_kleene_node(_node))
     {
         std::cout << '<'
                 << _node->name() << "::"

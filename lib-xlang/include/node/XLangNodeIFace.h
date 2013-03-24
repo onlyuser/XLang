@@ -36,7 +36,7 @@ struct NodeIdentIFace
 
     // required
     virtual type_t type() const = 0;
-    virtual uint32_t sym_id() const = 0;
+    virtual uint32_t lexer_id() const = 0;
     virtual std::string name() const = 0;
     virtual void set_parent(NodeIdentIFace* parent) = 0;
     virtual NodeIdentIFace* parent() const = 0;
@@ -63,7 +63,7 @@ struct NodeIdentIFace
     // built-in
     bool is_same_type(const NodeIdentIFace* _node) const
     {
-        return type() == _node->type() && sym_id() == _node->sym_id();
+        return type() == _node->type() && lexer_id() == _node->lexer_id();
     }
     bool is_root() const
     {

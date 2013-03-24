@@ -32,8 +32,8 @@ namespace xl { namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id)
-        : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_original(NULL)
+    Node(NodeIdentIFace::type_t _type, uint32_t _lexer_id)
+        : m_type(_type), m_lexer_id(_lexer_id), m_parent(NULL), m_original(NULL)
     {}
 
     // required
@@ -41,9 +41,9 @@ public:
     {
         return m_type;
     }
-    uint32_t sym_id() const
+    uint32_t lexer_id() const
     {
-        return m_sym_id;
+        return m_lexer_id;
     }
     std::string name() const;
     void set_parent(NodeIdentIFace* parent)
@@ -69,7 +69,7 @@ public:
 
 protected:
     NodeIdentIFace::type_t m_type;
-    uint32_t m_sym_id;
+    uint32_t m_lexer_id;
     NodeIdentIFace* m_parent;
     const NodeIdentIFace* m_original;
 };
@@ -79,8 +79,8 @@ class TermNode
     : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type>>
 {
 public:
-    TermNode(uint32_t _sym_id, typename TermInternalType<_type>::type _value)
-        : Node(_type, _sym_id), visitor::Visitable<TermNode<_type>>(this), m_value(_value)
+    TermNode(uint32_t _lexer_id, typename TermInternalType<_type>::type _value)
+        : Node(_type, _lexer_id), visitor::Visitable<TermNode<_type>>(this), m_value(_value)
     {}
     typename TermInternalType<_type>::type value() const
     {
@@ -89,7 +89,7 @@ public:
     NodeIdentIFace* clone(TreeContext* tc) const
     {
         return new (PNEW_LOC(tc->alloc()))
-                TermNode<_type>(m_sym_id, m_value); // assumes trivial dtor
+                TermNode<_type>(m_lexer_id, m_value); // assumes trivial dtor
     }
     bool compare(const NodeIdentIFace* _node) const
     {
@@ -107,8 +107,8 @@ class SymbolNode
       virtual public visitor::VisitStateIFace
 {
 public:
-    SymbolNode(uint32_t _sym_id, size_t _size, va_list ap);
-    SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec);
+    SymbolNode(uint32_t _lexer_id, size_t _size, va_list ap);
+    SymbolNode(uint32_t _lexer_id, std::vector<NodeIdentIFace*>& vec);
 
     // required
     NodeIdentIFace* operator[](uint32_t index) const

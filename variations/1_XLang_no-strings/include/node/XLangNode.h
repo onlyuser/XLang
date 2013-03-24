@@ -33,8 +33,8 @@ namespace xl { namespace node {
 class Node : virtual public NodeIdentIFace
 {
 public:
-    Node(NodeIdentIFace::type_t _type, uint32_t _sym_id, YYLTYPE _loc)
-        : m_type(_type), m_sym_id(_sym_id), m_parent(NULL), m_loc(_loc)
+    Node(NodeIdentIFace::type_t _type, uint32_t _lexer_id, YYLTYPE _loc)
+        : m_type(_type), m_lexer_id(_lexer_id), m_parent(NULL), m_loc(_loc)
     {}
 
     // required
@@ -42,9 +42,9 @@ public:
     {
         return m_type;
     }
-    uint32_t sym_id() const
+    uint32_t lexer_id() const
     {
-        return m_sym_id;
+        return m_lexer_id;
     }
     std::string name() const;
     void set_parent(NodeIdentIFace* parent)
@@ -68,7 +68,7 @@ public:
 
 protected:
     NodeIdentIFace::type_t m_type;
-    uint32_t m_sym_id;
+    uint32_t m_lexer_id;
     NodeIdentIFace* m_parent;
     YYLTYPE m_loc;
 };
@@ -78,8 +78,8 @@ class TermNode
     : public Node, public TermNodeIFace<_type>, public visitor::Visitable<TermNode<_type>>
 {
 public:
-    TermNode(uint32_t _sym_id, YYLTYPE loc, typename TermInternalType<_type>::type _value)
-        : Node(_type, _sym_id, loc), visitor::Visitable<TermNode<_type>>(this), m_value(_value)
+    TermNode(uint32_t _lexer_id, YYLTYPE loc, typename TermInternalType<_type>::type _value)
+        : Node(_type, _lexer_id, loc), visitor::Visitable<TermNode<_type>>(this), m_value(_value)
     {
     }
     typename TermInternalType<_type>::type value() const
@@ -96,7 +96,7 @@ class SymbolNode
       virtual public visitor::VisitStateIFace
 {
 public:
-    SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap);
+    SymbolNode(uint32_t _lexer_id, YYLTYPE loc, size_t _size, va_list ap);
 
     // required
     NodeIdentIFace* operator[](uint32_t index) const

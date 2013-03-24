@@ -31,13 +31,13 @@ namespace xl { namespace mvc {
 struct MVCModel
 {
     template<class T>
-    static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, T value)
+    static node::NodeIdentIFace* make_term(TreeContext* tc, uint32_t lexer_id, YYLTYPE loc, T value)
     {
         return new (PNEW_LOC(tc->alloc())) node::TermNode<
                 static_cast<node::NodeIdentIFace::type_t>(node::TermType<T>::type)
-                >(sym_id, loc, value); // assumes trivial dtor
+                >(lexer_id, loc, value); // assumes trivial dtor
     }
-    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t sym_id, YYLTYPE loc, size_t size, ...);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t lexer_id, YYLTYPE loc, size_t size, ...);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 

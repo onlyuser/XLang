@@ -47,7 +47,7 @@ void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace
 
 void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
 {
-    if(_node->sym_id() == ID_UMINUS)
+    if(_node->lexer_id() == ID_UMINUS)
     {
         visit_next_child(_node);
         value = -value;
@@ -59,7 +59,7 @@ void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
     while(more)
     {
         more = visit_next_child(_node);
-        switch(_node->sym_id())
+        switch(_node->lexer_id())
         {
             case '+': _value += value; break;
             case '-': _value -= value; break;

@@ -22,7 +22,7 @@
 #include <algorithm> // std::replace, std::find_if
 
 // prototype
-extern std::string id_to_name(uint32_t sym_id);
+extern std::string id_to_name(uint32_t lexer_id);
 
 static std::string ptr_to_string(const void* x)
 {
@@ -36,7 +36,7 @@ namespace xl { namespace node {
 
 std::string Node::name() const
 {
-    return id_to_name(sym_id());
+    return id_to_name(lexer_id());
 }
 
 std::string Node::uid() const
@@ -58,7 +58,7 @@ template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
     TermNodeIFace<NodeIdentIFace::STRING> *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
-            TermNode<NodeIdentIFace::STRING>(m_sym_id, m_value);
+            TermNode<NodeIdentIFace::STRING>(m_lexer_id, m_value);
     _clone->set_original(this);
     return _clone;
 }
@@ -71,8 +71,8 @@ bool TermNode<NodeIdentIFace::STRING>::compare(const NodeIdentIFace* _node) cons
     return *m_value == *dynamic_cast<const TermNode<NodeIdentIFace::STRING>*>(_node)->value();
 }
 
-SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
-    : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
+SymbolNode::SymbolNode(uint32_t _lexer_id, size_t _size, va_list ap)
+    : Node(NodeIdentIFace::SYMBOL, _lexer_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
     for(size_t i = 0; i<_size; i++)
@@ -99,8 +99,8 @@ SymbolNode::SymbolNode(uint32_t _sym_id, size_t _size, va_list ap)
     }
 }
 
-SymbolNode::SymbolNode(uint32_t _sym_id, std::vector<NodeIdentIFace*>& vec)
-    : Node(NodeIdentIFace::SYMBOL, _sym_id), visitor::Visitable<SymbolNode>(this),
+SymbolNode::SymbolNode(uint32_t _lexer_id, std::vector<NodeIdentIFace*>& vec)
+    : Node(NodeIdentIFace::SYMBOL, _lexer_id), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
     for(auto q = vec.begin(); q != vec.end(); q++)
@@ -131,7 +131,7 @@ NodeIdentIFace* SymbolNode::clone(TreeContext* tc) const
 {
     va_list ap;
     SymbolNodeIFace *_clone = new (PNEW(tc->alloc(), , NodeIdentIFace))
-            SymbolNode(m_sym_id, 0, ap);
+            SymbolNode(m_lexer_id, 0, ap);
     _clone->set_original(this);
     for(auto p = m_child_vec.begin(); p != m_child_vec.end(); ++p)
     {

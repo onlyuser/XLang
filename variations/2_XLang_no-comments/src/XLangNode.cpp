@@ -20,7 +20,7 @@
 #include <sstream> // std::stringstream
 
 // prototype
-extern std::string id_to_name(uint32_t sym_id);
+extern std::string id_to_name(uint32_t lexer_id);
 
 static std::string ptr_to_string(const void* x)
 {
@@ -34,7 +34,7 @@ namespace xl { namespace node {
 
 std::string Node::name() const
 {
-    return id_to_name(sym_id());
+    return id_to_name(lexer_id());
 }
 
 std::string Node::uid() const
@@ -42,8 +42,8 @@ std::string Node::uid() const
     return ptr_to_string(this);
 }
 
-SymbolNode::SymbolNode(uint32_t _sym_id, YYLTYPE loc, size_t _size, va_list ap)
-    : Node(NodeIdentIFace::SYMBOL, _sym_id, loc), visitor::Visitable<SymbolNode>(this),
+SymbolNode::SymbolNode(uint32_t _lexer_id, YYLTYPE loc, size_t _size, va_list ap)
+    : Node(NodeIdentIFace::SYMBOL, _lexer_id, loc), visitor::Visitable<SymbolNode>(this),
       m_visit_state(NULL)
 {
     for(size_t i = 0; i<_size; i++)

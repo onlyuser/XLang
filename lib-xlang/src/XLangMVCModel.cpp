@@ -37,66 +37,66 @@
 
 namespace xl { namespace mvc {
 
-node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, size_t size, ...)
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t lexer_id, size_t size, ...)
 {
     va_list ap;
     va_start(ap, size);
     node::SymbolNode* node = new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::SymbolNode(sym_id, size, ap);
+            node::SymbolNode(lexer_id, size, ap);
     va_end(ap);
     return node;
 }
 
-node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t sym_id, std::vector<node::NodeIdentIFace*>& vec)
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t lexer_id, std::vector<node::NodeIdentIFace*>& vec)
 {
     return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::SymbolNode(sym_id, vec);
+            node::SymbolNode(lexer_id, vec);
 }
 
 template<>
 node::NodeIdentIFace* MVCModel::make_term<
         node::TermInternalType<node::NodeIdentIFace::STRING>::type
-        >(TreeContext* tc, uint32_t sym_id, node::TermInternalType<node::NodeIdentIFace::STRING>::type value)
+        >(TreeContext* tc, uint32_t lexer_id, node::TermInternalType<node::NodeIdentIFace::STRING>::type value)
 {
     return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::TermNode<node::NodeIdentIFace::STRING>(sym_id, value); // supports non-trivial dtor
+            node::TermNode<node::NodeIdentIFace::STRING>(lexer_id, value); // supports non-trivial dtor
 }
 
 template<>
 node::NodeIdentIFace* MVCModel::make_term<
         node::TermInternalType<node::NodeIdentIFace::IDENT>::type
-        >(TreeContext* tc, uint32_t sym_id, node::TermInternalType<node::NodeIdentIFace::IDENT>::type value)
+        >(TreeContext* tc, uint32_t lexer_id, node::TermInternalType<node::NodeIdentIFace::IDENT>::type value)
 {
     return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
-            node::TermNode<node::NodeIdentIFace::IDENT>(sym_id, value); // supports non-trivial dtor
+            node::TermNode<node::NodeIdentIFace::IDENT>(lexer_id, value); // supports non-trivial dtor
 }
 
 #ifdef TIXML_USE_TICPP
 static node::NodeIdentIFace* _make_term_from_typename(
-        TreeContext* tc, std::string _typename, uint32_t sym_id, std::string value)
+        TreeContext* tc, std::string _typename, uint32_t lexer_id, std::string value)
 {
     if(_typename == "int")
-        return mvc::MVCModel::make_term(tc, sym_id,
+        return mvc::MVCModel::make_term(tc, lexer_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::INT>::type>(
                         atoi(value.c_str())
                         ));
     if(_typename == "float")
-        return mvc::MVCModel::make_term(tc, sym_id,
+        return mvc::MVCModel::make_term(tc, lexer_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::FLOAT>::type>(
                         atof(value.c_str())
                         ));
     if(_typename == "string")
-        return mvc::MVCModel::make_term(tc, sym_id,
+        return mvc::MVCModel::make_term(tc, lexer_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::STRING>::type>(
                         tc->alloc_string(xl::unescape_xml(value))
                         ));
     if(_typename == "char")
-        return mvc::MVCModel::make_term(tc, sym_id,
+        return mvc::MVCModel::make_term(tc, lexer_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::CHAR>::type>(
                         xl::unescape_xml(value)[0]
                         ));
     if(_typename == "ident")
-        return mvc::MVCModel::make_term(tc, sym_id,
+        return mvc::MVCModel::make_term(tc, lexer_id,
                 static_cast<node::TermInternalType<node::NodeIdentIFace::IDENT>::type>(
                         tc->alloc_unique_string(value)
                         ));
@@ -107,8 +107,8 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
 {
     if(dynamic_cast<ticpp::Document*>(ticpp_node))
     {
-        uint32_t sym_id = 0;
-        node::SymbolNode* document_node = mvc::MVCModel::make_symbol(tc, sym_id, 0);
+        uint32_t lexer_id = 0;
+        node::SymbolNode* document_node = mvc::MVCModel::make_symbol(tc, lexer_id, 0);
         if(ticpp_node->NoChildren())
             return document_node;
         ticpp::Iterator<ticpp::Node> p;
@@ -132,7 +132,7 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
         if(block_name == "NULL")
             return NULL;
         std::string node_typename;
-        uint32_t sym_id = 0;
+        uint32_t lexer_id = 0;
         std::string node_value;
         ticpp::Element* elem = dynamic_cast<ticpp::Element*>(ticpp_node);
         if(elem)
@@ -150,15 +150,15 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
             {
                 node_typename = attr_map["type"];
                 node_value = attr_map["value"];
-                sym_id = name_to_id(node_typename);
+                lexer_id = name_to_id(node_typename);
             }
         }
-        node::NodeIdentIFace* term_node = _make_term_from_typename(tc, node_typename, sym_id, node_value);
+        node::NodeIdentIFace* term_node = _make_term_from_typename(tc, node_typename, lexer_id, node_value);
         if(term_node)
             return term_node;
         else
         {
-            node::SymbolNode* symbol_node = mvc::MVCModel::make_symbol(tc, sym_id, 0);
+            node::SymbolNode* symbol_node = mvc::MVCModel::make_symbol(tc, lexer_id, 0);
             ticpp::Iterator<ticpp::Node> r;
             for(r = r.begin(ticpp_node); r != r.end(); r++)
                 symbol_node->push_back(_make_ast_from_ticpp(tc, r.Get()));
