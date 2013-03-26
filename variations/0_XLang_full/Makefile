@@ -195,13 +195,13 @@ clean_test :
 .PHONY : import
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
 			BASIC_SUITE=1
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
 			ADVANCED_SUITE_COMMENTS=1
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
 			ADVANCED_SUITE_STRINGS=1
 
 .PHONY : clean_import

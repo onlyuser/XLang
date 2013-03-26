@@ -155,13 +155,13 @@ clean_binary : clean_objects clean_parent_libs
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 #==================
 # import
@@ -170,14 +170,14 @@ clean_test :
 .PHONY : import
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) \
-			YACC_SUITE_NIEMANN=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
+			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 #==================
 # ebnf
@@ -187,13 +187,13 @@ clean_import :
 ebnf : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			YACC_SUITE_EBNF=1
+			YACC_EBNF_SUITE=1
 
 .PHONY : clean_ebnf
 clean_ebnf :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_EBNF=1
+			YACC_EBNF_SUITE=1
 
 #==================
 # pure
@@ -203,13 +203,13 @@ clean_ebnf :
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 #==================
 # dot
@@ -219,13 +219,13 @@ clean_pure :
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 #==================
 # xml
@@ -235,13 +235,13 @@ clean_dot :
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			YACC_SUITE_NIEMANN=1
+			YACC_NIEMANN_SUITE=1
 
 #==================
 # lint

@@ -48,11 +48,11 @@ endif
 ifneq ($(strip $(YACC_SUITE)),)
 	TEST_PATH = yacc_suite
 endif
-ifneq ($(strip $(YACC_SUITE_EBNF)),)
-	TEST_PATH = yacc_suite_ebnf
+ifneq ($(strip $(YACC_EBNF_SUITE)),)
+	TEST_PATH = yacc_ebnf_suite
 endif
-ifneq ($(strip $(YACC_SUITE_NIEMANN)),)
-	TEST_PATH = yacc_suite_niemann
+ifneq ($(strip $(YACC_NIEMANN_SUITE)),)
+	TEST_PATH = yacc_niemann_suite
 endif
 TEST_FILE_STEMS = \
 		$(shell \
@@ -100,7 +100,7 @@ IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.import.pass : $(BINARY) $(TEST_PATH)/%.import.test-gold
-	-$(TEST_SH) $(BINARY) --xml xml $(TEST_PATH)/$*.import.test-gold \
+	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.import.test-gold \
 			$(TEST_PATH)/$*.import.test-gold $(BUILD_PATH)/$(OUT_PREFIX).$*.import
 
 .PHONY : import
