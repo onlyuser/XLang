@@ -165,6 +165,7 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
             return symbol_node;
         }
     }
+    return NULL;
 }
 #endif
 

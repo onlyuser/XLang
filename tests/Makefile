@@ -48,6 +48,9 @@ endif
 ifneq ($(strip $(YACC_SUITE)),)
 	TEST_PATH = yacc_suite
 endif
+ifneq ($(strip $(YACC_SUITE_EBNF)),)
+	TEST_PATH = yacc_suite_ebnf
+endif
 ifneq ($(strip $(YACC_SUITE_NIEMANN)),)
 	TEST_PATH = yacc_suite_niemann
 endif
@@ -91,14 +94,13 @@ clean_test :
 # import
 #==================
 
-INPUT_MODE = xml
 IMPORT_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.import, $(TEST_FILE_STEMS))
 IMPORT_PASS_FILES = $(patsubst %, %.pass, $(IMPORT_FILES))
 IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
-$(BUILD_PATH)/$(OUT_PREFIX).%.import.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.import.test-gold \
+$(BUILD_PATH)/$(OUT_PREFIX).%.import.pass : $(BINARY) $(TEST_PATH)/%.import.test-gold
+	-$(TEST_SH) $(BINARY) --xml xml $(TEST_PATH)/$*.import.test-gold \
 			$(TEST_PATH)/$*.import.test-gold $(BUILD_PATH)/$(OUT_PREFIX).$*.import
 
 .PHONY : import
@@ -107,6 +109,26 @@ import : $(IMPORT_PASS_FILES)
 .PHONY : clean_import
 clean_import :
 	-rm $(IMPORT_PASS_FILES) $(IMPORT_FAIL_FILES)
+
+#==================
+# ebnf
+#==================
+
+EBNF_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.ebnf, $(TEST_FILE_STEMS))
+EBNF_PASS_FILES = $(patsubst %, %.pass, $(EBNF_FILES))
+EBNF_FAIL_FILES = $(patsubst %, %.fail, $(EBNF_FILES))
+TEST_SH := $(SCRIPT_PATH)/test.sh
+
+$(BUILD_PATH)/$(OUT_PREFIX).%.ebnf.pass : $(BINARY) $(TEST_PATH)/%.ebnf.test
+	-$(TEST_SH) $(BINARY) --yacc $(INPUT_MODE) $(TEST_PATH)/$*.ebnf.test $(TEST_PATH)/$*.ebnf.gold \
+			$(BUILD_PATH)/$(OUT_PREFIX).$*.ebnf
+
+.PHONY : ebnf
+ebnf : $(EBNF_PASS_FILES)
+
+.PHONY : clean_ebnf
+clean_ebnf :
+	-rm $(EBNF_PASS_FILES) $(EBNF_FAIL_FILES)
 
 #==================
 # pure
@@ -173,4 +195,4 @@ clean_xml :
 #==================
 
 .PHONY : clean
-clean : clean_test clean_import clean_pure clean_dot clean_xml
+clean : clean_test clean_import clean_ebnf clean_pure clean_dot clean_xml

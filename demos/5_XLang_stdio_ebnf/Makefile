@@ -180,6 +180,22 @@ clean_import :
 			YACC_SUITE_NIEMANN=1
 
 #==================
+# ebnf
+#==================
+
+.PHONY : ebnf
+ebnf : $(BINARY)
+	cd $(TEST_PATH); $(MAKE) $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			YACC_SUITE_EBNF=1
+
+.PHONY : clean_ebnf
+clean_ebnf :
+	cd $(TEST_PATH); $(MAKE) $@ \
+			BUILD_PATH=$(abspath $(BUILD_PATH)) \
+			YACC_SUITE_EBNF=1
+
+#==================
 # pure
 #==================
 
@@ -272,5 +288,5 @@ clean_doc :
 #==================
 
 .PHONY : clean
-clean : clean_binary clean_test clean_import clean_pure clean_dot clean_xml clean_lint clean_doc
+clean : clean_binary clean_test clean_import clean_ebnf clean_pure clean_dot clean_xml clean_lint clean_doc
 	-rmdir $(BUILD_PATH) $(BIN_PATH)
