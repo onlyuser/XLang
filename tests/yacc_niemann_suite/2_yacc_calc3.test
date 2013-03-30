@@ -1,3 +1,12 @@
+// Permission to reproduce portions of this document is given provided the web
+// site listed below is referenced. No additional restrictions apply. Source
+// code, when part of a software project, may be used freely without reference
+// to the author.
+//
+// Tom Niemann
+// Portland, Oregon
+// epaperpress.com
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +94,7 @@ nodeType *con(int value) {
     nodeType *p;
 
     /* allocate node */
-    if((p = malloc(sizeof(nodeType))) == NULL)
+    if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
 
     /* copy information */
@@ -99,7 +108,7 @@ nodeType *id(int i) {
     nodeType *p;
 
     /* allocate node */
-    if((p = malloc(sizeof(nodeType))) == NULL)
+    if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
 
     /* copy information */
@@ -115,9 +124,9 @@ nodeType *opr(int oper, int nops, ...) {
     int i;
 
     /* allocate node */
-    if((p = malloc(sizeof(nodeType))) == NULL)
+    if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-    if((p->opr.op = malloc(nops * sizeof(nodeType))) == NULL)
+    if ((p->opr.op = malloc(nops * sizeof(nodeType))) == NULL)
         yyerror("out of memory");
 
     /* copy information */
@@ -125,7 +134,7 @@ nodeType *opr(int oper, int nops, ...) {
     p->opr.oper = oper;
     p->opr.nops = nops;
     va_start(ap, nops);
-    for(i = 0; i < nops; i++)
+    for (i = 0; i < nops; i++)
         p->opr.op[i] = va_arg(ap, nodeType*);
     va_end(ap);
     return p;
@@ -134,9 +143,9 @@ nodeType *opr(int oper, int nops, ...) {
 void freeNode(nodeType *p) {
     int i;
 
-    if(!p) return;
-    if(p->type == typeOpr) {
-        for(i = 0; i < p->opr.nops; i++)
+    if (!p) return;
+    if (p->type == typeOpr) {
+        for (i = 0; i < p->opr.nops; i++)
             freeNode(p->opr.op[i]);
         free (p->opr.op);
     }
