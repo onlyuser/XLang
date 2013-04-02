@@ -31,7 +31,7 @@ PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
 
 TEST_REGEX_ENABLE = ""
-TEST_REGEX_DISABLE = "phony_regex_never_occurs"
+TEST_REGEX_DISABLE = "phony_regex_should_never_occur"
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
 endif
@@ -61,7 +61,7 @@ TEST_FILE_STEMS = \
 				find $(TEST_PATH) -mindepth 1 -maxdepth 1 -name "*" -type f | sort \
 						| xargs -I@ basename @ \
 						| cut -d. -f1 | uniq \
-						| grep "$(TEST_REGEX_ENABLE)" \
+						| grep    "$(TEST_REGEX_ENABLE)" \
 						| grep -v "$(TEST_REGEX_DISABLE)" \
 				)
 OUT_PREFIX = $(TEST_PATH)
