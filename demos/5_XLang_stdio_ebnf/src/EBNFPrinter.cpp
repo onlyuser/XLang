@@ -983,6 +983,7 @@ static const xl::node::NodeIdentIFace* enter_cyclic_sequence(
 static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::NodeIdentIFace* paren_node)
 {
     assert(paren_node);
+    assert(paren_node->lexer_id() == '(');
 
     return enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
 }

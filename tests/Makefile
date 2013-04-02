@@ -30,17 +30,18 @@
 PARENT = ..
 SCRIPT_PATH = $(PARENT)/scripts
 
-TEST_FILE_KEYWORDS = ""
+TEST_REGEX_ENABLE = ""
+TEST_REGEX_DISABLE = "phony_regex_never_occurs"
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
 	TEST_PATH = advanced_suite
-	TEST_FILE_KEYWORDS = "comments"
+	TEST_REGEX_ENABLE = comments
 endif
 ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_PATH = advanced_suite
-	TEST_FILE_KEYWORDS = "strings"
+	TEST_REGEX_ENABLE = strings
 endif
 ifneq ($(strip $(C_SUITE)),)
 	TEST_PATH = c_suite
@@ -50,6 +51,7 @@ ifneq ($(strip $(YACC_SUITE)),)
 endif
 ifneq ($(strip $(YACC_EBNF_SUITE)),)
 	TEST_PATH = yacc_ebnf_suite
+	TEST_REGEX_DISABLE = no_paren
 endif
 ifneq ($(strip $(YACC_NIEMANN_SUITE)),)
 	TEST_PATH = yacc_niemann_suite
@@ -59,7 +61,8 @@ TEST_FILE_STEMS = \
 				find $(TEST_PATH) -mindepth 1 -maxdepth 1 -name "*" -type f | sort \
 						| xargs -I@ basename @ \
 						| cut -d. -f1 | uniq \
-						| grep "$(TEST_FILE_KEYWORDS)" \
+						| grep "$(TEST_REGEX_ENABLE)" \
+						| grep -v "$(TEST_REGEX_DISABLE)" \
 				)
 OUT_PREFIX = $(TEST_PATH)
 
