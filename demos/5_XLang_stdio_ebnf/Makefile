@@ -152,13 +152,13 @@ clean_binary : clean_objects clean_parent_libs
 #==================
 
 .PHONY : test
-test : $(BINARY)
+test : $(BINARY) ebnf
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
 			YACC_NIEMANN_SUITE=1
 
 .PHONY : clean_test
-clean_test :
+clean_test : clean_ebnf
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
 			YACC_NIEMANN_SUITE=1

@@ -1009,8 +1009,8 @@ static void add_shared_typedefs_and_headers(
     auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
     if(!alts_symbol)
         return;
-    typedef std::vector<std::pair<std::string, const xl::node::NodeIdentIFace*>> delayed_recursion_args_t;
-    delayed_recursion_args_t delayed_recursion_args;
+    typedef std::vector<std::pair<std::string, const xl::node::NodeIdentIFace*>> deferred_recursion_args_t;
+    deferred_recursion_args_t deferred_recursion_args;
     std::vector<std::string> variant_type_vec;
     for(size_t j = 0; j<alts_symbol->size(); j++)
     {
@@ -1065,7 +1065,7 @@ static void add_shared_typedefs_and_headers(
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
                                     const xl::node::NodeIdentIFace* next_innermost_paren_node =
                                             get_innermost_paren_node(next_outermost_paren_node);
-                                    delayed_recursion_args.push_back(delayed_recursion_args_t::value_type(
+                                    deferred_recursion_args.push_back(deferred_recursion_args_t::value_type(
                                             next_rule_name_recursive,
                                             next_innermost_paren_node));
                                 }
@@ -1126,7 +1126,7 @@ static void add_shared_typedefs_and_headers(
                 TreeChange::STRING_INSERTIONS_TO_FRONT,
                 proto_block_term_node,
                 shared_typedefs_and_headers);
-    for(auto p = delayed_recursion_args.begin(); p != delayed_recursion_args.end(); p++)
+    for(auto p = deferred_recursion_args.begin(); p != deferred_recursion_args.end(); p++)
     {
         add_shared_typedefs_and_headers(
                 tree_changes,
