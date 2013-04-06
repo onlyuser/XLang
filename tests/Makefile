@@ -83,7 +83,11 @@ TEST_FAIL_FILES = $(patsubst %, %.fail, $(TEST_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.test.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(TEST_SH) $(BINARY) --lisp $(INPUT_MODE) $(TEST_PATH)/$*.test $(TEST_PATH)/$*.gold \
+	-$(TEST_SH) $(BINARY) \
+			--lisp \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.test \
+			$(TEST_PATH)/$*.gold \
 			$(BUILD_PATH)/$(OUT_PREFIX).$*.test
 
 .PHONY : test
@@ -103,8 +107,12 @@ IMPORT_FAIL_FILES = $(patsubst %, %.fail, $(IMPORT_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.import.pass : $(BINARY) $(TEST_PATH)/%.import.test-gold
-	-$(TEST_SH) $(BINARY) --xml $(INPUT_MODE) $(TEST_PATH)/$*.import.test-gold \
-			$(TEST_PATH)/$*.import.test-gold $(BUILD_PATH)/$(OUT_PREFIX).$*.import
+	-$(TEST_SH) $(BINARY) \
+			--xml \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.import.test-gold \
+			$(TEST_PATH)/$*.import.test-gold \
+			$(BUILD_PATH)/$(OUT_PREFIX).$*.import
 
 .PHONY : import
 import : $(IMPORT_PASS_FILES)
@@ -123,7 +131,11 @@ EBNF_FAIL_FILES = $(patsubst %, %.fail, $(EBNF_FILES))
 TEST_SH := $(SCRIPT_PATH)/test.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.ebnf.pass : $(BINARY) $(TEST_PATH)/%.ebnf.test
-	-$(TEST_SH) $(BINARY) --yacc $(INPUT_MODE) $(TEST_PATH)/$*.ebnf.test $(TEST_PATH)/$*.ebnf.gold \
+	-$(TEST_SH) $(BINARY) \
+			--yacc \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.ebnf.test \
+			$(TEST_PATH)/$*.ebnf.gold \
 			$(BUILD_PATH)/$(OUT_PREFIX).$*.ebnf
 
 .PHONY : ebnf
@@ -144,7 +156,10 @@ GOLD_KEYWORD = "All heap blocks were freed -- no leaks are possible"
 PURE_SH = $(SCRIPT_PATH)/pure.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.pure.pass : $(BINARY) $(TEST_PATH)/%.test
-	-$(PURE_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test $(GOLD_KEYWORD) \
+	-$(PURE_SH) $(BINARY) \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.test \
+			$(GOLD_KEYWORD) \
 			$(BUILD_PATH)/$(OUT_PREFIX).$*.pure
 
 .PHONY : pure
@@ -163,7 +178,9 @@ DOT_PNG_FILES = $(patsubst %, %.png, $(DOT_FILES))
 EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.dot.png : $(BINARY) $(TEST_PATH)/%.test
-	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+	-$(EXPORT_SH) $(BINARY) \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.test \
 			png \
 			$(BUILD_PATH)/$(OUT_PREFIX).$*.dot
 
@@ -182,7 +199,9 @@ XML_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.xml, $(TEST_FILE_STEMS))
 EXPORT_SH := $(SCRIPT_PATH)/export.sh
 
 $(BUILD_PATH)/$(OUT_PREFIX).%.xml : $(BINARY) $(TEST_PATH)/%.test
-	-$(EXPORT_SH) $(BINARY) $(INPUT_MODE) $(TEST_PATH)/$*.test \
+	-$(EXPORT_SH) $(BINARY) \
+			$(INPUT_MODE) \
+			$(TEST_PATH)/$*.test \
 			xml \
 			$(BUILD_PATH)/$(OUT_PREFIX).$*
 
