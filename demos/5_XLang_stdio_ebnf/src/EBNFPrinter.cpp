@@ -30,6 +30,8 @@
 #include <stdarg.h> // va_list
 #include <assert.h> // assert
 
+#define ENABLE_EBNF
+
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
     static std::string ptr_to_string(const void* x)
@@ -1400,6 +1402,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
         case '?':
         case '(':
             {
+#ifdef ENABLE_EBNF
                 if(!entered_kleene_closure)
                 {
                     if(m_tree_changes)
@@ -1410,6 +1413,7 @@ void EBNFPrinter::visit(const xl::node::SymbolNodeIFace* _node)
                                 m_tc);
                     entered_kleene_closure = true; // only enter once
                 }
+#endif
                 if(kleene_op == '(')
                     std::cout << '(';
                 xl::visitor::VisitorDFS::visit(_node); // continue visitation/pretty-print
