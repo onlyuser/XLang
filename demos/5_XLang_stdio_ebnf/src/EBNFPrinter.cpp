@@ -315,14 +315,14 @@ static std::string* get_action_string_ptr_from_kleene_node(
     //    ;
     //
     // EBNF-XML:
-    //<symbol type="alt"> // <-- alt_node
-    //    <symbol type="terms">
+    //<symbol type="rule_alt"> // <-- alt_node
+    //    <symbol type="rule_terms">
     //        <symbol type="*"> // <-- kleene_node
     //            <!-- ... -->
     //        </symbol>
     //        <term type="ident" value=rule_name_rhs/>
     //    </symbol>
-    //    <symbol type="action_block"> // <-- action_node
+    //    <symbol type="rule_action_block"> // <-- action_node
     //        <term type="string" value=" /* AAA */ ... "/>
     //    </symbol>
     //</symbol>
@@ -373,18 +373,18 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_lhs/>
-    //    <symbol type="alts">
-    //        <symbol type="alt">
-    //            <symbol type="terms">
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
     //                <symbol type="*">     // <-- kleene_node
     //                    <symbol type="("> // <-- paren_node
-    //                        <symbol type="alts">
-    //                            <symbol type="alt">
-    //                                <symbol type="terms">
+    //                        <symbol type="rule_alts">
+    //                            <symbol type="rule_alt">
+    //                                <symbol type="rule_terms">
     //                                    <term type="ident" value=kleene_internal_node/>
     //                                    <term type="char" value=','/>
     //                                </symbol>
-    //                                <symbol type="action_block">
+    //                                <symbol type="rule_action_block">
     //                                    <term type="string" value=" /* AAA */ ... "/>
     //                                </symbol>
     //                            </symbol>
@@ -393,7 +393,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                </symbol>
     //                <term type="ident" value=kleene_external_node/>
     //            </symbol>
-    //            <symbol type="action_block">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
@@ -459,21 +459,21 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
     // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_recursive/>
-    //    <symbol type="alts">
-    //        <symbol type="alt">
-    //            <symbol type="terms">
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
-    //            <symbol type="action_block">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* AAA */ ... "/>
     //            </symbol>
     //        </symbol>
-    //        <symbol type="alt">
-    //            <symbol type="terms">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
     //                <term type="ident" value=rule_name_recursive/>
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
-    //            <symbol type="action_block">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
@@ -525,18 +525,18 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
     // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_recursive/>
-    //    <symbol type="alts">
-    //        <symbol type="alt">
-    //            <symbol type="action_block">
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* AAA */ ... "/>
     //            </symbol>
     //        </symbol>
-    //        <symbol type="alt">
-    //            <symbol type="terms">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
     //                <term type="ident" value=rule_name_recursive/>
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
-    //            <symbol type="action_block">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
@@ -584,17 +584,17 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
     // EBNF-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_optional/>
-    //    <symbol type="alts">
-    //        <symbol type="alt">
-    //            <symbol type="action_block">
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* AAA */ ... "/>
     //            </symbol>
     //        </symbol>
-    //        <symbol type="alt">
-    //            <symbol type="terms">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
-    //            <symbol type="action_block">
+    //            <symbol type="rule_action_block">
     //                <term type="string" value=" /* BBB */ ... "/>
     //            </symbol>
     //        </symbol>
@@ -615,6 +615,39 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
+                                    )
+                            )
+                    )
+            );
+}
+
+static xl::node::NodeIdentIFace* make_paren(
+        const xl::node::NodeIdentIFace* kernel_node,
+        xl::TreeContext*                tc)
+{
+    assert(kernel_node);
+    assert(tc);
+
+    // EBNF:
+    //(kernel_node)
+    //
+    // EBNF-XML:
+    //<symbol type="(">
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
+    //            </symbol>
+    //            <NULL/>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
+
+    // NOTE: fix-me!
+    return MAKE_SYMBOL(tc, '(', 1,
+            MAKE_SYMBOL(tc, ID_RULE_ALTS, 1,
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                            MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
+                                    kernel_node->clone(tc)
                                     )
                             )
                     )
@@ -1145,12 +1178,15 @@ static void add_shared_typedefs_and_headers(
 KleeneContext::KleeneContext(
         TreeChanges*                    tree_changes,
         const xl::node::NodeIdentIFace* kleene_node,
-        EBNFContext*                    ebnf_context)
+        EBNFContext*                    ebnf_context,
+        xl::TreeContext*                tc)
 {
     kleene_op             = kleene_node->lexer_id();
     outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
     if(outermost_paren_node->lexer_id() != '(')
     {
+        xl::node::NodeIdentIFace* new_parent_node =
+                make_paren(outermost_paren_node, tc);
 //        tree_changes->add_change(
 //                TreeChange::NODE_INSERTIONS_NEW_PARENT,
 //                outermost_paren_node,
@@ -1191,7 +1227,7 @@ static void add_changes_for_kleene_closure(
     KleeneContext* kleene_context;
     try
     {
-        kleene_context = new KleeneContext(tree_changes, kleene_node, ebnf_context);
+        kleene_context = new KleeneContext(tree_changes, kleene_node, ebnf_context, tc);
     }
     catch(const char* e)
     {

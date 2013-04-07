@@ -43,7 +43,8 @@ struct KleeneContext
     KleeneContext(
             TreeChanges*                    tree_changes,
             const xl::node::NodeIdentIFace* kleene_node,
-            EBNFContext*                    ebnf_context);
+            EBNFContext*                    ebnf_context,
+            xl::TreeContext*                tc);
 
     uint32_t                        kleene_op;
     const xl::node::NodeIdentIFace* outermost_paren_node;
