@@ -1188,39 +1188,41 @@ static void add_changes_for_kleene_closure(
     assert(ebnf_context);
     assert(tc);
 
+    KleeneContext* kleene_context;
     try
     {
-        KleeneContext kleene_context(tree_changes, kleene_node, ebnf_context);
-        add_term_rule(
-                tree_changes,
-                (kleene_context.kleene_op == '(') ?
-                        kleene_context.rule_name_recursive : kleene_context.rule_name_term,
-                &kleene_context,
-                ebnf_context,
-                tc);
-        if(kleene_context.kleene_op != '(')
-            add_recursive_rule(
-                    tree_changes,
-                    &kleene_context,
-                    ebnf_context,
-                    tc);
-        add_stem_rule(
-                tree_changes,
-                &kleene_context,
-                tc);
-        add_shared_typedefs_and_headers(
-                tree_changes,
-                kleene_context.rule_name_recursive,
-                kleene_context.rule_name_term,
-                kleene_context.innermost_paren_node,
-                &kleene_context,
-                ebnf_context);
+        kleene_context = new KleeneContext(tree_changes, kleene_node, ebnf_context);
     }
     catch(const char* e)
     {
         // TODO: fix-me!
         std::cerr << e << std::endl;
+        return;
     }
+    add_term_rule(
+            tree_changes,
+            (kleene_context->kleene_op == '(') ?
+                    kleene_context->rule_name_recursive : kleene_context->rule_name_term,
+            kleene_context,
+            ebnf_context,
+            tc);
+    if(kleene_context->kleene_op != '(')
+        add_recursive_rule(
+                tree_changes,
+                kleene_context,
+                ebnf_context,
+                tc);
+    add_stem_rule(
+            tree_changes,
+            kleene_context,
+            tc);
+    add_shared_typedefs_and_headers(
+            tree_changes,
+            kleene_context->rule_name_recursive,
+            kleene_context->rule_name_term,
+            kleene_context->innermost_paren_node,
+            kleene_context,
+            ebnf_context);
 }
 
 void EBNFContext::reset()
