@@ -41,6 +41,7 @@ struct EBNFContext
 struct KleeneContext
 {
     KleeneContext(
+            TreeChanges*                    tree_changes,
             const xl::node::NodeIdentIFace* kleene_node,
             EBNFContext*                    ebnf_context);
 

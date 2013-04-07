@@ -31,6 +31,7 @@
 #include <assert.h> // assert
 
 #define ENABLE_EBNF
+#define ERROR_KLEENE_NODE_WITHOUT_PAREN "kleene node without paren detected"
 
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
@@ -1142,11 +1143,20 @@ static void add_shared_typedefs_and_headers(
 }
 
 KleeneContext::KleeneContext(
+        TreeChanges*                    tree_changes,
         const xl::node::NodeIdentIFace* kleene_node,
         EBNFContext*                    ebnf_context)
 {
     kleene_op             = kleene_node->lexer_id();
     outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
+    if(outermost_paren_node->lexer_id() != '(')
+    {
+//        tree_changes->add_change(
+//                TreeChange::NODE_INSERTIONS_NEW_PARENT,
+//                outermost_paren_node,
+//                new_parent_node);
+        throw ERROR_KLEENE_NODE_WITHOUT_PAREN;
+    }
     innermost_paren_node  = get_innermost_paren_node(outermost_paren_node);
     rule_node             = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string rule_name = get_rule_name_from_rule_node(rule_node);
@@ -1178,31 +1188,39 @@ static void add_changes_for_kleene_closure(
     assert(ebnf_context);
     assert(tc);
 
-    KleeneContext kleene_context(kleene_node, ebnf_context);
-    add_term_rule(
-            tree_changes,
-            (kleene_context.kleene_op == '(') ?
-                    kleene_context.rule_name_recursive : kleene_context.rule_name_term,
-            &kleene_context,
-            ebnf_context,
-            tc);
-    if(kleene_context.kleene_op != '(')
-        add_recursive_rule(
+    try
+    {
+        KleeneContext kleene_context(tree_changes, kleene_node, ebnf_context);
+        add_term_rule(
                 tree_changes,
+                (kleene_context.kleene_op == '(') ?
+                        kleene_context.rule_name_recursive : kleene_context.rule_name_term,
                 &kleene_context,
                 ebnf_context,
                 tc);
-    add_stem_rule(
-            tree_changes,
-            &kleene_context,
-            tc);
-    add_shared_typedefs_and_headers(
-            tree_changes,
-            kleene_context.rule_name_recursive,
-            kleene_context.rule_name_term,
-            kleene_context.innermost_paren_node,
-            &kleene_context,
-            ebnf_context);
+        if(kleene_context.kleene_op != '(')
+            add_recursive_rule(
+                    tree_changes,
+                    &kleene_context,
+                    ebnf_context,
+                    tc);
+        add_stem_rule(
+                tree_changes,
+                &kleene_context,
+                tc);
+        add_shared_typedefs_and_headers(
+                tree_changes,
+                kleene_context.rule_name_recursive,
+                kleene_context.rule_name_term,
+                kleene_context.innermost_paren_node,
+                &kleene_context,
+                ebnf_context);
+    }
+    catch(const char* e)
+    {
+        // TODO: fix-me!
+        std::cerr << e << std::endl;
+    }
 }
 
 void EBNFContext::reset()
