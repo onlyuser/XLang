@@ -621,7 +621,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
             );
 }
 
-static xl::node::NodeIdentIFace* make_paren_parent_node(
+static xl::node::NodeIdentIFace* make_paren_node(
         const xl::node::NodeIdentIFace* _node,
         xl::TreeContext*                tc)
 {
@@ -792,6 +792,8 @@ static void add_def_brace(
     token_vec.push_back(rule_name);
     xl::node::NodeIdentIFace* def_brace_node =
             make_def_brace_node(gen_typename(rule_name), &token_vec, tc);
+    if(!def_brace_node)
+        return;
     if(!definitions_symbol->find(def_brace_node))
         tree_changes->add_change(
                 TreeChange::NODE_APPENDS_TO_BACK,
@@ -1029,13 +1031,34 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
     return enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
 }
 
+static const xl::node::NodeIdentIFace* force_get_innermost_paren_node(
+        TreeChanges*                    tree_changes,
+        const xl::node::NodeIdentIFace* _node,
+        xl::TreeContext*                tc)
+{
+    if(_node->lexer_id() != '(')
+    {
+        xl::node::NodeIdentIFace* paren_node =
+                make_paren_node(_node, tc);
+        if(!paren_node)
+            return NULL;
+        tree_changes->add_change(
+                TreeChange::NODE_REPLACEMENTS,
+                _node,
+                paren_node);
+        throw ERROR_KLEENE_NODE_WITHOUT_PAREN;
+    }
+    return get_innermost_paren_node(_node);
+}
+
 static void add_shared_typedefs_and_headers(
         TreeChanges*                    tree_changes,
         std::string                     rule_name_recursive,
         std::string                     rule_name_term,
         const xl::node::NodeIdentIFace* innermost_paren_node,
         KleeneContext*                  kleene_context,
-        EBNFContext*                    ebnf_context)
+        EBNFContext*                    ebnf_context,
+        xl::TreeContext*                tc)
 {
     assert(tree_changes);
     assert(innermost_paren_node);
@@ -1106,7 +1129,8 @@ static void add_shared_typedefs_and_headers(
                                     const xl::node::NodeIdentIFace* next_outermost_paren_node =
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
                                     const xl::node::NodeIdentIFace* next_innermost_paren_node =
-                                            get_innermost_paren_node(next_outermost_paren_node);
+                                            force_get_innermost_paren_node(
+                                                    tree_changes, next_outermost_paren_node, tc);
                                     deferred_recursion_args.push_back(deferred_recursion_args_t::value_type(
                                             next_rule_name_recursive,
                                             next_innermost_paren_node));
@@ -1176,7 +1200,8 @@ static void add_shared_typedefs_and_headers(
                 rule_name_term,
                 (*p).second,
                 kleene_context,
-                ebnf_context);
+                ebnf_context,
+                tc);
     }
 }
 
@@ -1186,19 +1211,9 @@ KleeneContext::KleeneContext(
         EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
-    kleene_op            = kleene_node->lexer_id();
-    outermost_paren_node = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
-    if(outermost_paren_node->lexer_id() != '(')
-    {
-        xl::node::NodeIdentIFace* paren_parent_node =
-                make_paren_parent_node(outermost_paren_node, tc);
-        tree_changes->add_change(
-                TreeChange::NODE_REPLACEMENTS,
-                outermost_paren_node,
-                paren_parent_node);
-        throw ERROR_KLEENE_NODE_WITHOUT_PAREN;
-    }
-    innermost_paren_node  = get_innermost_paren_node(outermost_paren_node);
+    kleene_op             = kleene_node->lexer_id();
+    outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
+    innermost_paren_node  = force_get_innermost_paren_node(tree_changes, outermost_paren_node, tc);
     rule_node             = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string rule_name = get_rule_name_from_rule_node(rule_node);
     switch(kleene_op)
@@ -1255,13 +1270,20 @@ static void add_changes_for_kleene_closure(
             tree_changes,
             kleene_context,
             tc);
-    add_shared_typedefs_and_headers(
-            tree_changes,
-            kleene_context->rule_name_recursive,
-            kleene_context->rule_name_term,
-            kleene_context->innermost_paren_node,
-            kleene_context,
-            ebnf_context);
+    try
+    {
+        add_shared_typedefs_and_headers(
+                tree_changes,
+                kleene_context->rule_name_recursive,
+                kleene_context->rule_name_term,
+                kleene_context->innermost_paren_node,
+                kleene_context,
+                ebnf_context,
+                tc);
+    }
+    catch(const char* e)
+    {
+    }
 }
 
 void EBNFContext::reset()
