@@ -642,14 +642,17 @@ static xl::node::NodeIdentIFace* make_paren(
     //    </symbol>
     //</symbol>
 
-    // NOTE: fix-me!
+    // TODO: fix-me! -- ID_RULE_ALT should have 2 children, but this causes crash
     return MAKE_SYMBOL(tc, '(', 1,
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 1,
-                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1,
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1, // <-- NOTE: should be 2
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
                                     kernel_node->clone(tc)
                                     )
-                            )
+                            ),
+                            MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
+                                    )
                     )
             );
 }
@@ -1185,8 +1188,12 @@ KleeneContext::KleeneContext(
     outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
     if(outermost_paren_node->lexer_id() != '(')
     {
+        xl::node::NodeIdentIFace* parent = outermost_paren_node->parent();
+        const_cast<xl::node::NodeIdentIFace*>(outermost_paren_node)->detach();
         xl::node::NodeIdentIFace* new_parent_node =
                 make_paren(outermost_paren_node, tc);
+        dynamic_cast<xl::node::SymbolNode*>(parent)->push_back(new_parent_node);
+        outermost_paren_node = new_parent_node;
 //        tree_changes->add_change(
 //                TreeChange::NODE_INSERTIONS_NEW_PARENT,
 //                outermost_paren_node,
@@ -1231,7 +1238,7 @@ static void add_changes_for_kleene_closure(
     }
     catch(const char* e)
     {
-        // TODO: fix-me!
+        // TODO: fix-me! -- no other way to notify outside of c-tor failure
         std::cerr << e << std::endl;
         return;
     }
