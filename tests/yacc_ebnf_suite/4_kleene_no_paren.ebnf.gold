@@ -1,4 +1,8 @@
 %{
+#include <vector>
+#include <tuple>
+typedef std::tuple<int> program_term_0_type_t;
+typedef std::vector<program_term_0_type_t> program_recursive_0_type_t;
     #include <stdio.h>
     int yylex(void);
     void yyerror(char *);
@@ -6,10 +10,12 @@
 %union 
 {
 	int iValue;
+	program_term_0_type_t* program_term_0_type;
 	program_recursive_0_type_t* program_recursive_0_type;
 }
 %token INTEGER
 %token<iValue> program expr
+%type<program_term_0_type> program_term_0
 %type<program_recursive_0_type> program_recursive_0
 
 %%
@@ -25,6 +31,9 @@ program:
 program_recursive_0:
 	  program_term_0 { $$ = new program_recursive_0_type_t; $$->push_back(*$1); delete $1; }
 	| program_recursive_0 program_term_0 { $1->push_back(*$2); delete $2; $$ = $1; };
+
+program_term_0:
+	  expr { $$ = $1; };
 
 expr:
 	  INTEGER { $$ = $1; }

@@ -621,7 +621,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
             );
 }
 
-static xl::node::NodeIdentIFace* make_paren(
+static xl::node::NodeIdentIFace* make_paren_parent_node(
         const xl::node::NodeIdentIFace* kernel_node,
         xl::TreeContext*                tc)
 {
@@ -636,23 +636,25 @@ static xl::node::NodeIdentIFace* make_paren(
     //    <symbol type="rule_alts">
     //        <symbol type="rule_alt">
     //            <symbol type="rule_terms">
+    //                <kernel_node/>
     //            </symbol>
-    //            <NULL/>
+    //            <symbol type="rule_action_block">
+    //                <term type="string" value=" $$ = $1; "/>
+    //            </symbol>
     //        </symbol>
     //    </symbol>
     //</symbol>
 
-    // TODO: fix-me! -- ID_RULE_ALT should have 2 children, but this causes crash
     return MAKE_SYMBOL(tc, '(', 1,
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 1,
-                    MAKE_SYMBOL(tc, ID_RULE_ALT, 1, // <-- NOTE: should be 2
+                    MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
                                     kernel_node->clone(tc)
-                                    )
-                            ),
+                                    ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
                                     )
+                            )
                     )
             );
 }
@@ -1184,20 +1186,16 @@ KleeneContext::KleeneContext(
         EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
-    kleene_op             = kleene_node->lexer_id();
-    outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
+    kleene_op            = kleene_node->lexer_id();
+    outermost_paren_node = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
     if(outermost_paren_node->lexer_id() != '(')
     {
-        xl::node::NodeIdentIFace* parent = outermost_paren_node->parent();
-        const_cast<xl::node::NodeIdentIFace*>(outermost_paren_node)->detach();
-        xl::node::NodeIdentIFace* new_parent_node =
-                make_paren(outermost_paren_node, tc);
-        dynamic_cast<xl::node::SymbolNode*>(parent)->push_back(new_parent_node);
-        outermost_paren_node = new_parent_node;
-//        tree_changes->add_change(
-//                TreeChange::NODE_INSERTIONS_NEW_PARENT,
-//                outermost_paren_node,
-//                new_parent_node);
+        xl::node::NodeIdentIFace* paren_parent_node =
+                make_paren_parent_node(outermost_paren_node, tc);
+        tree_changes->add_change(
+                TreeChange::NODE_REPLACEMENTS,
+                outermost_paren_node,
+                paren_parent_node);
         throw ERROR_KLEENE_NODE_WITHOUT_PAREN;
     }
     innermost_paren_node  = get_innermost_paren_node(outermost_paren_node);
@@ -1238,8 +1236,6 @@ static void add_changes_for_kleene_closure(
     }
     catch(const char* e)
     {
-        // TODO: fix-me! -- no other way to notify outside of c-tor failure
-        std::cerr << e << std::endl;
         return;
     }
     add_term_rule(
