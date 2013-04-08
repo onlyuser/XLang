@@ -622,10 +622,10 @@ static xl::node::NodeIdentIFace* make_recursive_rule_optional(
 }
 
 static xl::node::NodeIdentIFace* make_paren_parent_node(
-        const xl::node::NodeIdentIFace* kernel_node,
+        const xl::node::NodeIdentIFace* _node,
         xl::TreeContext*                tc)
 {
-    assert(kernel_node);
+    assert(_node);
     assert(tc);
 
     // EBNF:
@@ -636,7 +636,7 @@ static xl::node::NodeIdentIFace* make_paren_parent_node(
     //    <symbol type="rule_alts">
     //        <symbol type="rule_alt">
     //            <symbol type="rule_terms">
-    //                <kernel_node/>
+    //                <!-- _node -->
     //            </symbol>
     //            <symbol type="rule_action_block">
     //                <term type="string" value=" $$ = $1; "/>
@@ -649,7 +649,7 @@ static xl::node::NodeIdentIFace* make_paren_parent_node(
             MAKE_SYMBOL(tc, ID_RULE_ALTS, 1,
                     MAKE_SYMBOL(tc, ID_RULE_ALT, 2,
                             MAKE_SYMBOL(tc, ID_RULE_TERMS, 1,
-                                    kernel_node->clone(tc)
+                                    _node->clone(tc)
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
                                     MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
