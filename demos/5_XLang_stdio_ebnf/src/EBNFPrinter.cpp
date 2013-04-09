@@ -629,7 +629,7 @@ static xl::node::NodeIdentIFace* make_paren_node(
     assert(tc);
 
     // EBNF:
-    //(kernel_node)
+    //(_node)
     //
     // EBNF-XML:
     //<symbol type="(">
@@ -1282,8 +1282,7 @@ static void add_changes_for_kleene_closure(
                 tc);
     }
     catch(const char* e)
-    {
-    }
+    {}
 }
 
 void EBNFContext::reset()

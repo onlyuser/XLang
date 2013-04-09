@@ -1,0 +1,39 @@
+
+%{
+    #include <stdio.h>
+    int yylex(void);
+    void yyerror(char *);
+%}
+
+%union
+{
+    int iValue;
+}
+
+%token INTEGER
+%token<iValue> program expr qwe asd
+
+%%
+
+program:
+          (expr|qwe|asd)+ '\n' {
+                for(auto p = $1->begin(); p != $1->end(); p++)
+                {
+                    printf("%d\n", std::get<0>(*p));
+                }
+            }
+        ;
+
+expr:
+        INTEGER         { $$ = $1; }
+        | expr '+' expr { $$ = $1 + $3; }
+        | expr '-' expr { $$ = $1 - $3; }
+        ;
+
+%%
+
+int main(void) {
+{
+    yyparse();
+    return 0;
+}
