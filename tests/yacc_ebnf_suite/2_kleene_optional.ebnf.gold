@@ -20,12 +20,12 @@ typedef program_term_0_type_t program_optional_0_type_t;
 %%
 
 program:
-	  program_optional_0 '\n' {
+	  program_optional_0 '\n' { {
                 for(auto p = $1->begin(); p != $1->end(); p++)
                 {
                     printf("%d\n", std::get<0>(*p));
                 }
-            if($1) delete $1;};
+            }; if($1) delete $1;};
 
 program_optional_0:
 	   { $$ = NULL; }

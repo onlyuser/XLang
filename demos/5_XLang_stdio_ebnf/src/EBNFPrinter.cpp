@@ -428,13 +428,12 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                     }
                 }
             }
+            std::stringstream ss;
+            ss << " {" << (*action_string_ptr) << "}; ";
             if(kleene_op == '?')
-            {
-                std::stringstream ss;
                 ss << "if($" << position << ") ";
-                action_string_ptr->append(ss.str());
-            }
-            action_string_ptr->append(gen_delete_rule_rvalue_term(position));
+            ss << gen_delete_rule_rvalue_term(position);
+            (*action_string_ptr) = ss.str();
         }
     }
     xl::node::NodeIdentIFace* replacement_node =

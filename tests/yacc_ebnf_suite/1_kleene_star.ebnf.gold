@@ -21,12 +21,12 @@ typedef std::vector<program_term_0_type_t> program_recursive_0_type_t;
 %%
 
 program:
-	  program_recursive_0 '\n' {
+	  program_recursive_0 '\n' { {
                 for(auto p = $1->begin(); p != $1->end(); p++)
                 {
                     printf("%d\n", std::get<0>(*p));
                 }
-            delete $1;};
+            }; delete $1;};
 
 program_recursive_0:
 	   { $$ = new program_recursive_0_type_t; }
