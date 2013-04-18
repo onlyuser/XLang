@@ -371,7 +371,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //rule_name_lhs:
     //      (
     //            kleene_internal_node ',' { __AAA__ }
-    //      )* kleene_external_node        { __BBB__ }
+    //      )* kleene_external_node        { if($1) delete $1; { __BBB__ } }
     //    ;
     //
     // EBNF-XML:
@@ -398,7 +398,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                <term type="ident" value=kleene_external_node/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" __BBB__ "/>
+    //                <term type="string" value=" if($1) delete $1; { __BBB__ } "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
@@ -455,8 +455,9 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
 
     // EBNF:
     //rule_name_recursive:
-    //      rule_name_term                     { __AAA__ }
-    //    | rule_name_recursive rule_name_term { __BBB__ }
+    //      rule_name_term                     { $$ = new rule_name_recursive_t;
+    //                                           $$->push_back(*$1); delete $1; }
+    //    | rule_name_recursive rule_name_term { $1->push_back(*$2); delete $2; $$ = $1; }
     //    ;
     //
     // EBNF-XML:
@@ -468,7 +469,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" __AAA__ "/>
+    //                <term type="string" value=" $$ = new rule_name_recursive_t; " \
+    //                    "$$->push_back(*$1); delete $1; "/>
     //            </symbol>
     //        </symbol>
     //        <symbol type="rule_alt">
@@ -477,7 +479,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_plus(
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" __BBB__ "/>
+    //                <term type="string" value=" $1->push_back(*$2); delete $2; $$ = $1; "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
@@ -521,8 +523,8 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
 
     // EBNF:
     //rule_name_recursive:
-    //      /* empty */                        { __AAA__ }
-    //    | rule_name_recursive rule_name_term { __BBB__ }
+    //      /* empty */                        { $$ = new rule_name_recursive_t; }
+    //    | rule_name_recursive rule_name_term { $1->push_back(*$2); delete $2; $$ = $1; }
     //    ;
     //
     // EBNF-XML:
@@ -531,7 +533,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
     //    <symbol type="rule_alts">
     //        <symbol type="rule_alt">
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" __AAA__ "/>
+    //                <term type="string" value=" $$ = new rule_name_recursive_t; "/>
     //            </symbol>
     //        </symbol>
     //        <symbol type="rule_alt">
@@ -540,7 +542,7 @@ static xl::node::NodeIdentIFace* make_recursive_rule_star(
     //                <term type="ident" value=rule_name_term/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" __BBB__ "/>
+    //                <term type="string" value=" $1->push_back(*$2); delete $2; $$ = $1; "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
