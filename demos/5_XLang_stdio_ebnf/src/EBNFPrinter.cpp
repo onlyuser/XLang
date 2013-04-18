@@ -371,7 +371,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //rule_name_lhs:
     //      (
     //            kleene_internal_node ',' { __AAA__ }
-    //      )* kleene_external_node        { if($1) delete $1; { __BBB__ } }
+    //      )* kleene_external_node        { { __BBB__ } delete $1; }
     //    ;
     //
     // EBNF-XML:
@@ -398,7 +398,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                <term type="ident" value=kleene_external_node/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" if($1) delete $1; { __BBB__ } "/>
+    //                <term type="string" value=" { __BBB__ } delete $1; "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
