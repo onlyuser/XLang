@@ -303,7 +303,7 @@ static std::string get_string_value_from_term_node(const xl::node::NodeIdentIFac
     }
 }
 
-// kleene_node --> alt_node (up) --> action_node
+// kleene_node --> alt_node (up) --> action_node (down)
 static std::string* get_action_string_ptr_from_kleene_node(
         const xl::node::NodeIdentIFace* kleene_node)
 {
@@ -311,19 +311,23 @@ static std::string* get_action_string_ptr_from_kleene_node(
 
     // EBNF:
     //rule_name_lhs:
-    //      rule_name_rhs { /* AAA */ ... }
+    //      (
+    //          /* AAA */ ...
+    //      )* kleene_external_node { /* BBB */ ... }
     //    ;
     //
     // EBNF-XML:
     //<symbol type="rule_alt"> // <-- alt_node
     //    <symbol type="rule_terms">
-    //        <symbol type="*"> // <-- kleene_node
-    //            <!-- ... -->
+    //        <symbol type="*">     // <-- kleene_node
+    //            <symbol type="("> // <-- paren_node
+    //                <!-- /* AAA */ ... -->
+    //            </symbol type>
     //        </symbol>
-    //        <term type="ident" value=rule_name_rhs/>
+    //        <term type="ident" value=kleene_external_node/>
     //    </symbol>
     //    <symbol type="rule_action_block"> // <-- action_node
-    //        <term type="string" value=" /* AAA */ ... "/>
+    //        <term type="string" value=" /* BBB */ ... "/>
     //    </symbol>
     //</symbol>
 
