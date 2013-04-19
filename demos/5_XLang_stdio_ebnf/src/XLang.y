@@ -296,6 +296,7 @@ rule_terms:
 rule_term:
       ID_INT            { $$ = MAKE_TERM(ID_INT, $1); }
     | ID_FLOAT          { $$ = MAKE_TERM(ID_FLOAT, $1); }
+//    | ID_STRING         { $$ = MAKE_TERM(ID_STRING, $1); } // NOTE: causes shift-reduce conflict
     | ID_CHAR           { $$ = MAKE_TERM(ID_CHAR, $1); }
     | ID_IDENT          { $$ = MAKE_TERM(ID_IDENT, $1); }
     | rule_term '+'     { $$ = MAKE_SYMBOL('+', 1, $1); }

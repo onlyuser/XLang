@@ -689,12 +689,30 @@ static xl::node::NodeIdentIFace* make_paren_node(
             );
 }
 
+static std::string get_symbol_type_from_symbol_name(
+        std::string  symbol_name,
+        EBNFContext* ebnf_context)
+{
+    assert(ebnf_context);
+
+    auto p = ebnf_context->def_symbol_name_to_union_typename.find(symbol_name);
+    if(p == ebnf_context->def_symbol_name_to_union_typename.end())
+        return "";
+    std::string _typename = (*p).second;
+    auto q = ebnf_context->union_typename_to_type.find(_typename);
+    if(q == ebnf_context->union_typename_to_type.end())
+        return "";
+    return (*q).second;
+}
+
 static xl::node::NodeIdentIFace* make_term_rule(
         std::string                     rule_name_term,
         const xl::node::NodeIdentIFace* _alts_node,
+        EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(_alts_node);
+    assert(ebnf_context);
     assert(tc);
 
     const xl::node::NodeIdentIFace* alts_node = _alts_node->clone(tc);
@@ -716,14 +734,20 @@ static xl::node::NodeIdentIFace* make_term_rule(
             if(!terms_symbol)
                 return NULL;
             std::string exploded_vars;
-            for(size_t position = 1; position <= terms_symbol->size(); position++)
+            for(size_t j = 0; j<terms_symbol->size(); j++)
             {
-                exploded_vars.append(gen_positional_var(position));
-//                std::string union_typename =
-//                        ebnf_context->def_symbol_name_to_union_typename[def_symbol_name];
-//                std::string union_type = ebnf_context->union_typename_to_type[union_typename];
-                if((position+1) <= terms_symbol->size())
-                    exploded_vars.append(", ");
+                size_t position = j+1;
+                xl::node::NodeIdentIFace* child_node = (*terms_symbol)[j];
+                if(!child_node)
+                    return NULL;
+                std::string symbol_name = get_string_value_from_term_node(child_node);
+                std::string symbol_type =
+                        get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
+                if(!symbol_type.empty()) {
+                    exploded_vars.append(gen_positional_var(position));
+                    if((position+1) <= terms_symbol->size())
+                        exploded_vars.append(", ");
+                }
             }
             std::stringstream ss;
             ss << " $$ = " << gen_type(rule_name_term) << "(" << exploded_vars << "); ";
@@ -918,7 +942,7 @@ static void add_term_rule(
     const xl::node::NodeIdentIFace* alts_node = get_child(kleene_context->innermost_paren_node);
     if(!alts_node)
         return;
-    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name, alts_node, tc);
+    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name, alts_node, ebnf_context, tc);
     if(!term_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -1164,7 +1188,9 @@ static void add_shared_typedefs_and_headers(
             {
                 case xl::node::NodeIdentIFace::INT:    tuple_type_vec.push_back("int"); break;
                 case xl::node::NodeIdentIFace::FLOAT:  tuple_type_vec.push_back("float"); break;
+#if 0 // NOTE: not supported due to shift-reduce conflict in EBNF grammar
                 case xl::node::NodeIdentIFace::STRING: tuple_type_vec.push_back("std::string"); break;
+#endif
                 case xl::node::NodeIdentIFace::CHAR:   tuple_type_vec.push_back("char"); break;
                 case xl::node::NodeIdentIFace::IDENT:
                     {
@@ -1172,10 +1198,8 @@ static void add_shared_typedefs_and_headers(
                                 *dynamic_cast<
                                         xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
                                         >(child_node)->value();
-                        std::string union_typename =
-                                ebnf_context->def_symbol_name_to_union_typename[def_symbol_name];
-                        std::string union_type = ebnf_context->union_typename_to_type[union_typename];
-                        tuple_type_vec.push_back(union_type);
+                        tuple_type_vec.push_back(
+                                get_symbol_type_from_symbol_name(def_symbol_name, ebnf_context));
                     }
                     break;
                 case xl::node::NodeIdentIFace::SYMBOL:
