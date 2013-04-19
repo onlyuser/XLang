@@ -51,7 +51,7 @@ ifneq ($(strip $(YACC_SUITE)),)
 endif
 ifneq ($(strip $(YACC_EBNF_SUITE)),)
 	TEST_PATH = yacc_ebnf_suite
-	TEST_REGEX_DISABLE = no_union
+	TEST_REGEX_DISABLE = disabled
 endif
 ifneq ($(strip $(YACC_NIEMANN_SUITE)),)
 	TEST_PATH = yacc_niemann_suite

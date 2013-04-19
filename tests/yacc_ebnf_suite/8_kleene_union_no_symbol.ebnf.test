@@ -5,12 +5,18 @@
     void yyerror(char *);
 %}
 
-%token INTEGER program expr
+%union
+{
+    int iValue;
+}
+
+%token INTEGER
+%token<iValue> program expr //qwe asd
 
 %%
 
 program:
-          (expr)+ '\n' {
+          (expr qwe asd { })+ '\n' {
                 for(auto p = $1->begin(); p != $1->end(); p++)
                 {
                     printf("%d\n", std::get<0>(*p));

@@ -743,11 +743,10 @@ static xl::node::NodeIdentIFace* make_term_rule(
                 std::string symbol_name = get_string_value_from_term_node(child_node);
                 std::string symbol_type =
                         get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
-                if(!symbol_type.empty()) {
+                if(!symbol_type.empty())
                     exploded_vars.append(gen_positional_var(position));
-                    if((position+1) <= terms_symbol->size())
-                        exploded_vars.append(", ");
-                }
+                if((position+1) <= terms_symbol->size())
+                    exploded_vars.append(", ");
             }
             std::stringstream ss;
             ss << " $$ = " << gen_type(rule_name_term) << "(" << exploded_vars << "); ";

@@ -1,0 +1,51 @@
+%{
+#include <vector>
+#include <tuple>
+typedef std::tuple<int, , > program_term_0_type_t;
+typedef std::vector<program_term_0_type_t> program_recursive_0_type_t;
+    #include <stdio.h>
+    int yylex(void);
+    void yyerror(char *);
+%}
+%union 
+{
+	int iValue;
+	program_term_0_type_t* program_term_0_type;
+	program_recursive_0_type_t* program_recursive_0_type;
+}
+%token INTEGER
+%token<iValue> program expr
+%token<iValue2> qwe asd
+%type<program_term_0_type> program_term_0
+%type<program_recursive_0_type> program_recursive_0
+
+%%
+
+program:
+	  program_recursive_0 '\n' { {
+                for(auto p = $1->begin(); p != $1->end(); p++)
+                {
+                    printf("%d\n", std::get<0>(*p));
+                }
+            } delete $1;};
+
+program_recursive_0:
+	  program_term_0 { $$ = new program_recursive_0_type_t; $$->push_back(*$1); delete $1; }
+	| program_recursive_0 program_term_0 { $1->push_back(*$2); delete $2; $$ = $1; };
+
+program_term_0:
+	  expr qwe asd { $$ = program_term_0_type_t($1, , ); { } };
+
+expr:
+	  INTEGER { $$ = $1; }
+	| expr '+' expr { $$ = $1 + $3; }
+	| expr '-' expr { $$ = $1 - $3; };
+
+%%
+
+int main(void) {
+{
+    yyparse();
+    return 0;
+}
+
