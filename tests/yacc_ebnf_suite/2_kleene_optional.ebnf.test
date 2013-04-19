@@ -16,7 +16,7 @@
 %%
 
 program:
-          (expr { $$ = $1; })? '\n' {
+          (expr { })? '\n' {
                 if($1)
                 {
                     printf("%d\n", std::get<0>(*p));

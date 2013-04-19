@@ -682,7 +682,7 @@ static xl::node::NodeIdentIFace* make_paren_node(
                                     _node->clone(tc)
                                     ),
                             MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
-                                    MAKE_TERM(ID_STRING, tc->alloc_string(" $$ = $1; "))
+                                    MAKE_TERM(ID_STRING, tc->alloc_string(" "))
                                     )
                             )
                     )

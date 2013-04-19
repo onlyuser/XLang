@@ -16,7 +16,7 @@
 %%
 
 program:
-          (((expr { $$ = $1; })))+ '\n' {
+          (((expr { })))+ '\n' {
                 for(auto p = $1->begin(); p != $1->end(); p++)
                 {
                     printf("%d\n", std::get<0>(*p));
