@@ -27,7 +27,7 @@ program:
                 {
                     printf("%d\n", std::get<0>(*p));
                 }
-            }; delete $1;};
+            } delete $1;};
 
 program_recursive_0:
 	  program_term_0 { $$ = new program_recursive_0_type_t; $$->push_back(*$1); delete $1; }

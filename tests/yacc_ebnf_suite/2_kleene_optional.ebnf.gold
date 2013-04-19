@@ -25,7 +25,7 @@ program:
                 {
                     printf("%d\n", std::get<0>(*p));
                 }
-            }; if($1) delete $1;};
+            } if($1) delete $1;};
 
 program_optional_0:
 	   { $$ = NULL; }

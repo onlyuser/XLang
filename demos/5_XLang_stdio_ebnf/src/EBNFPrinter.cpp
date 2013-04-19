@@ -458,7 +458,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                 }
             }
             std::string new_action;
-            new_action.append(std::string(" {") + (*action_string_ptr) + "}; ");
+            new_action.append(std::string(" {") + (*action_string_ptr) + "} ");
             if(kleene_op == '?')
                 new_action.append(std::string("if(") + gen_positional_var(position) + ") ");
             new_action.append(gen_delete_rule_rvalue_term(position));
