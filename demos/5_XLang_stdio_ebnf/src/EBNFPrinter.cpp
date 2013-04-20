@@ -441,7 +441,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
         std::string* action_string_ptr = get_action_string_ptr_from_kleene_node(find_node_clone);
         if(action_string_ptr)
         {
-            size_t position = 1;
+            size_t position = 0;
             xl::node::NodeIdentIFace* outer_parent_node = find_node->parent();
             if(outer_parent_node)
             {
@@ -459,6 +459,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
                     }
                 }
             }
+            assert(position);
             std::string new_action;
             new_action.append(std::string(" {") + (*action_string_ptr) + "} ");
             if(kleene_op == '?')
@@ -738,7 +739,6 @@ static xl::node::NodeIdentIFace* make_term_rule(
             std::string exploded_vars;
             for(size_t j = 0; j<terms_symbol->size(); j++)
             {
-                size_t position = j+1;
                 xl::node::NodeIdentIFace* term_node = (*terms_symbol)[j];
                 if(!term_node)
                     return NULL;
@@ -746,12 +746,16 @@ static xl::node::NodeIdentIFace* make_term_rule(
                 std::string symbol_type =
                         get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
                 if(!symbol_type.empty())
+                {
+                    size_t position = j+1;
                     exploded_vars.append(gen_positional_var(position));
-                if((position+1) <= terms_symbol->size())
+                }
+                if((j+1) < terms_symbol->size())
                     exploded_vars.append(", ");
             }
             std::string new_action;
-            new_action.append(std::string(" $$ = ") + gen_type(rule_name_term) + "(" + exploded_vars + "); ");
+            new_action.append(
+                    std::string(" $$ = ") + gen_type(rule_name_term) + "(" + exploded_vars + "); ");
             new_action.append(std::string("{") + (*action_string_ptr) + "} ");
             (*action_string_ptr) = new_action;
         }
