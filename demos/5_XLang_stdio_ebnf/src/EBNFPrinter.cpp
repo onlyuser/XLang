@@ -289,6 +289,7 @@ static std::string get_string_value_from_term_node(const xl::node::NodeIdentIFac
                 ss << '\'' << xl::escape(char_term->value()) << '\'';
                 return ss.str();
             }
+#if 1 // NOTE: not supported due to shift-reduce conflict in EBNF grammar, but needed for action node
         case xl::node::NodeIdentIFace::STRING:
             {
                 std::string* string_ptr = get_string_ptr_from_term_node(term_node);
@@ -296,6 +297,7 @@ static std::string get_string_value_from_term_node(const xl::node::NodeIdentIFac
                     return "";
                 return *string_ptr;
             }
+#endif
         case xl::node::NodeIdentIFace::IDENT:
             {
                 const std::string* ident_string_ptr = get_ident_string_ptr_from_term_node(term_node);
@@ -737,10 +739,10 @@ static xl::node::NodeIdentIFace* make_term_rule(
             for(size_t j = 0; j<terms_symbol->size(); j++)
             {
                 size_t position = j+1;
-                xl::node::NodeIdentIFace* child_node = (*terms_symbol)[j];
-                if(!child_node)
+                xl::node::NodeIdentIFace* term_node = (*terms_symbol)[j];
+                if(!term_node)
                     return NULL;
-                std::string symbol_name = get_string_value_from_term_node(child_node);
+                std::string symbol_name = get_string_value_from_term_node(term_node);
                 std::string symbol_type =
                         get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
                 if(!symbol_type.empty())
@@ -748,10 +750,10 @@ static xl::node::NodeIdentIFace* make_term_rule(
                 if((position+1) <= terms_symbol->size())
                     exploded_vars.append(", ");
             }
-            std::stringstream ss;
-            ss << " $$ = " << gen_type(rule_name_term) << "(" << exploded_vars << "); ";
-            ss << "{" << (*action_string_ptr) << "} ";
-            (*action_string_ptr) = ss.str();
+            std::string new_action;
+            new_action.append(std::string(" $$ = ") + gen_type(rule_name_term) + "(" + exploded_vars + "); ");
+            new_action.append(std::string("{") + (*action_string_ptr) + "} ");
+            (*action_string_ptr) = new_action;
         }
     }
     return MAKE_SYMBOL(tc, ID_RULE, 2,
@@ -1122,7 +1124,7 @@ static const xl::node::NodeIdentIFace* get_innermost_paren_node(const xl::node::
     return enter_cyclic_sequence(paren_node, true, '(', ID_RULE_ALTS, ID_RULE_ALT, ID_RULE_TERMS, 0);
 }
 
-static const xl::node::NodeIdentIFace* force_get_innermost_paren_node(
+static const xl::node::NodeIdentIFace* get_or_create_innermost_paren_node(
         TreeChanges*                    tree_changes,
         const xl::node::NodeIdentIFace* _node,
         xl::TreeContext*                tc)
@@ -1182,8 +1184,8 @@ static void add_shared_typedefs_and_headers(
         std::vector<std::string> tuple_type_vec;
         for(size_t j = 0; j<terms_symbol->size(); j++)
         {
-            xl::node::NodeIdentIFace* child_node = (*terms_symbol)[j];
-            switch(child_node->type())
+            xl::node::NodeIdentIFace* term_node = (*terms_symbol)[j];
+            switch(term_node->type())
             {
                 case xl::node::NodeIdentIFace::INT:    tuple_type_vec.push_back("int"); break;
                 case xl::node::NodeIdentIFace::FLOAT:  tuple_type_vec.push_back("float"); break;
@@ -1196,14 +1198,14 @@ static void add_shared_typedefs_and_headers(
                         std::string def_symbol_name =
                                 *dynamic_cast<
                                         xl::node::TermNode<xl::node::NodeIdentIFace::IDENT>*
-                                        >(child_node)->value();
+                                        >(term_node)->value();
                         tuple_type_vec.push_back(
                                 get_symbol_type_from_symbol_name(def_symbol_name, ebnf_context));
                     }
                     break;
                 case xl::node::NodeIdentIFace::SYMBOL:
                     {
-                        const xl::node::NodeIdentIFace* kleene_node = child_node;
+                        const xl::node::NodeIdentIFace* kleene_node = term_node;
                         uint32_t kleene_op = kleene_node->lexer_id();
                         switch(kleene_op)
                         {
@@ -1220,7 +1222,7 @@ static void add_shared_typedefs_and_headers(
                                     const xl::node::NodeIdentIFace* next_outermost_paren_node =
                                             (kleene_op == '(') ? kleene_node : get_child(kleene_node);
                                     const xl::node::NodeIdentIFace* next_innermost_paren_node =
-                                            force_get_innermost_paren_node(
+                                            get_or_create_innermost_paren_node(
                                                     tree_changes, next_outermost_paren_node, tc);
                                     deferred_recursion_args.push_back(deferred_recursion_args_t::value_type(
                                             next_rule_name_recursive,
@@ -1304,7 +1306,7 @@ KleeneContext::KleeneContext(
 {
     kleene_op             = kleene_node->lexer_id();
     outermost_paren_node  = (kleene_node->lexer_id() == '(') ? kleene_node : get_child(kleene_node);
-    innermost_paren_node  = force_get_innermost_paren_node(tree_changes, outermost_paren_node, tc);
+    innermost_paren_node  = get_or_create_innermost_paren_node(tree_changes, outermost_paren_node, tc);
     rule_node             = get_ancestor_node(ID_RULE, outermost_paren_node);
     std::string rule_name = get_rule_name_from_rule_node(rule_node);
     switch(kleene_op)
