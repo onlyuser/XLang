@@ -189,6 +189,18 @@ void SymbolNode::replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replac
         replacement_node->set_parent(this);
 }
 
+void SymbolNode::erase(int index)
+{
+    if(index<0 || index >= m_child_vec.size())
+        return;
+    auto p = m_child_vec.begin()+index;
+    if(p == m_child_vec.end())
+        return;
+    if(*p)
+        (*p)->set_parent(NULL);
+    m_child_vec.erase(p);
+}
+
 NodeIdentIFace* SymbolNode::find_if(bool (*pred)(const NodeIdentIFace* _node)) const
 {
     if(!pred)

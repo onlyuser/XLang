@@ -121,6 +121,8 @@ struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::
     {}
     virtual void replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replacement_node)
     {}
+    virtual void erase(int index)
+    {}
     virtual NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const
     {
         return NULL;

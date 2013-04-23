@@ -32,6 +32,7 @@
 
 #define ENABLE_EBNF
 #define ERROR_KLEENE_NODE_WITHOUT_PAREN "kleene node without paren detected"
+#define ERROR_ALT_NODE_WITHOUT_ACTION   "alt node without action detected"
 
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
@@ -183,12 +184,22 @@ static std::string gen_delete_rule_rvalue_term(size_t position)
     return std::string("delete ") + gen_positional_var(position) + ";";
 }
 
-static std::string gen_name(std::string stem)
+static std::string gen_name(std::string stem, bool reset)
 {
     static std::map<std::string, int> tally_map;
+    if(reset)
+    {
+        for(auto p = tally_map.begin(); p != tally_map.end(); p++)
+            (*p).second = 0;
+    }
     std::stringstream ss;
     ss << stem << '_' << tally_map[stem]++;
     return ss.str();
+}
+
+static std::string gen_name(std::string stem)
+{
+    return gen_name(stem, false);
 }
 
 static std::string gen_typename(std::string stem)
@@ -310,11 +321,34 @@ static std::string get_string_value_from_term_node(const xl::node::NodeIdentIFac
     }
 }
 
+static xl::node::NodeIdentIFace* make_action_node(
+        std::string      action,
+        xl::TreeContext* tc)
+{
+    assert(tc);
+
+    // EBNF:
+    //{ __AAA__ }
+    //
+    // EBNF-XML:
+    //<symbol type="rule_action_block">
+    //    <term type="string" value=" __AAA__ "/>
+    //</symbol>
+
+    return MAKE_SYMBOL(tc, ID_RULE_ACTION_BLOCK, 1,
+            MAKE_TERM(ID_STRING, tc->alloc_string(action))
+            );
+}
+
 // alt_node --> action_node (down)
 static std::string* get_action_string_ptr_from_alt_node(
-        const xl::node::NodeIdentIFace* alt_node)
+        TreeChanges*                    tree_changes,
+        const xl::node::NodeIdentIFace* alt_node,
+        xl::TreeContext*                tc)
 {
+    assert(tree_changes);
     assert(alt_node);
+    assert(tc);
 
     // EBNF:
     //__AAA__ { __BBB__ }
@@ -329,7 +363,20 @@ static std::string* get_action_string_ptr_from_alt_node(
 
     const xl::node::NodeIdentIFace* action_node = get_right_child(alt_node);
     if(!action_node)
-        return NULL;
+    {
+        tree_changes->add_change(
+                TreeChange::NODE_DELETIONS,
+                alt_node->original(), // NOTE: to avoid operating on clones
+                1);
+        xl::node::NodeIdentIFace* action_node = make_action_node("", tc);
+        if(!action_node)
+            return NULL;
+        tree_changes->add_change(
+                TreeChange::NODE_APPENDS_TO_BACK,
+                alt_node->original(), // NOTE: to avoid operating on clones
+                action_node);
+        throw ERROR_ALT_NODE_WITHOUT_ACTION;
+    }
     const xl::node::NodeIdentIFace* action_string_node = get_child(action_node);
     if(!action_string_node)
         return NULL;
@@ -338,9 +385,13 @@ static std::string* get_action_string_ptr_from_alt_node(
 
 // kleene_node --> alt_node (up) --> action_node (down)
 static std::string* get_action_string_ptr_from_kleene_node(
-        const xl::node::NodeIdentIFace* kleene_node)
+        TreeChanges*                    tree_changes,
+        const xl::node::NodeIdentIFace* kleene_node,
+        xl::TreeContext*                tc)
 {
+    assert(tree_changes);
     assert(kleene_node);
+    assert(tc);
 
     // EBNF:
     //rule_name_lhs:
@@ -367,7 +418,7 @@ static std::string* get_action_string_ptr_from_kleene_node(
     const xl::node::NodeIdentIFace* alt_node = get_ancestor_node(ID_RULE_ALT, kleene_node);
     if(!alt_node)
         return NULL;
-    return get_action_string_ptr_from_alt_node(alt_node);
+    return get_action_string_ptr_from_alt_node(tree_changes, alt_node, tc);
 }
 
 static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* rule_node)
@@ -384,12 +435,14 @@ static std::string get_rule_name_from_rule_node(const xl::node::NodeIdentIFace* 
 }
 
 static xl::node::NodeIdentIFace* make_stem_rule(
+        TreeChanges*                    tree_changes,
         std::string                     rule_name_recursive,
         const xl::node::NodeIdentIFace* rule_node,
         char                            kleene_op,
         const xl::node::NodeIdentIFace* outermost_paren_node,
         xl::TreeContext*                tc)
 {
+    assert(tree_changes);
     assert(rule_node);
     assert(outermost_paren_node);
     assert(tc);
@@ -438,7 +491,8 @@ static xl::node::NodeIdentIFace* make_stem_rule(
             find_node_recursive(rule_node_clone, find_node);
     if(kleene_op != '(')
     {
-        std::string* action_string_ptr = get_action_string_ptr_from_kleene_node(find_node_clone);
+        std::string* action_string_ptr =
+                get_action_string_ptr_from_kleene_node(tree_changes, find_node_clone, tc);
         if(action_string_ptr)
         {
             size_t position = 0;
@@ -709,11 +763,13 @@ static std::string get_symbol_type_from_symbol_name(
 }
 
 static xl::node::NodeIdentIFace* make_term_rule(
+        TreeChanges*                    tree_changes,
         std::string                     rule_name_term,
         const xl::node::NodeIdentIFace* _alts_node,
         EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
+    assert(tree_changes);
     assert(_alts_node);
     assert(ebnf_context);
     assert(tc);
@@ -727,7 +783,8 @@ static xl::node::NodeIdentIFace* make_term_rule(
     for(size_t i = 0; i<alts_symbol->size(); i++)
     {
         const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[i];
-        std::string* action_string_ptr = get_action_string_ptr_from_alt_node(alt_node);
+        std::string* action_string_ptr =
+                get_action_string_ptr_from_alt_node(tree_changes, alt_node, tc);
         if(action_string_ptr)
         {
             const xl::node::NodeIdentIFace* terms_node = get_left_child(alt_node);
@@ -947,7 +1004,8 @@ static void add_term_rule(
     const xl::node::NodeIdentIFace* alts_node = get_child(kleene_context->innermost_paren_node);
     if(!alts_node)
         return;
-    xl::node::NodeIdentIFace* term_rule = make_term_rule(rule_name, alts_node, ebnf_context, tc);
+    xl::node::NodeIdentIFace* term_rule =
+            make_term_rule(tree_changes, rule_name, alts_node, ebnf_context, tc);
     if(!term_rule)
         return;
 #ifdef DEBUG_EBNF
@@ -1030,6 +1088,7 @@ static void add_stem_rule(
 
     xl::node::NodeIdentIFace* stem_rule =
             make_stem_rule(
+                    tree_changes,
                     kleene_context->rule_name_recursive,
                     kleene_context->rule_node,
                     kleene_context->kleene_op,
@@ -1345,30 +1404,23 @@ static void add_changes_for_kleene_closure(
     try
     {
         kleene_context = new KleeneContext(tree_changes, kleene_node, ebnf_context, tc);
-    }
-    catch(const char* e)
-    {
-        return;
-    }
-    add_term_rule(
-            tree_changes,
-            (kleene_context->kleene_op == '(') ?
-                    kleene_context->rule_name_recursive : kleene_context->rule_name_term,
-            kleene_context,
-            ebnf_context,
-            tc);
-    if(kleene_context->kleene_op != '(')
-        add_recursive_rule(
+        add_term_rule(
                 tree_changes,
+                (kleene_context->kleene_op == '(') ?
+                        kleene_context->rule_name_recursive : kleene_context->rule_name_term,
                 kleene_context,
                 ebnf_context,
                 tc);
-    add_stem_rule(
-            tree_changes,
-            kleene_context,
-            tc);
-    try
-    {
+        if(kleene_context->kleene_op != '(')
+            add_recursive_rule(
+                    tree_changes,
+                    kleene_context,
+                    ebnf_context,
+                    tc);
+        add_stem_rule(
+                tree_changes,
+                kleene_context,
+                tc);
         add_shared_typedefs_and_headers(
                 tree_changes,
                 kleene_context->rule_name_recursive,
@@ -1379,7 +1431,9 @@ static void add_changes_for_kleene_closure(
                 tc);
     }
     catch(const char* e)
-    {}
+    {
+        gen_name("", true);
+    }
 }
 
 void EBNFContext::reset()

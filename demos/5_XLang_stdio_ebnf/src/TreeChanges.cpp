@@ -68,14 +68,23 @@ void TreeChangeImpl<TreeChange::NODE_APPENDS_TO_BACK>::apply()
         return;
     xl::node::NodeIdentIFace* new_node = m_new_node;
 #ifdef DEBUG_EBNF
+    std::cout << "===[BEFORE]===" << std::endl;
+    xl::mvc::MVCView::print_xml(append_to_node);
+    //xl::mvc::MVCView::print_xml(new_node);
+    std::cout << "===[BEFORE]===" << std::endl;
+
     std::cout << "NODE_APPEND_TO_BACK " << ptr_to_string(append_to_node) << " ==> "
             << ptr_to_string(new_node) << std::endl;
-    //xl::mvc::MVCView::print_xml(append_to_node);
-    //xl::mvc::MVCView::print_xml(new_node);
 #endif
     const_cast<xl::node::SymbolNodeIFace*>( // TODO: fix-me!
             append_to_symbol
             )->push_back(new_node);
+#ifdef DEBUG_EBNF
+    std::cout << "===[AFTER]===" << std::endl;
+    xl::mvc::MVCView::print_xml(append_to_node);
+    //xl::mvc::MVCView::print_xml(new_node);
+    std::cout << "===[AFTER]===" << std::endl;
+#endif
 }
 
 void TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>::apply()
@@ -100,6 +109,33 @@ void TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>::apply()
     parent_symbol->replace_first(
             const_cast<xl::node::NodeIdentIFace*>(find_node), // TODO: fix-me!
             replacement_node);
+}
+
+void TreeChangeImpl<TreeChange::NODE_DELETIONS>::apply()
+{
+    const xl::node::NodeIdentIFace* delete_from_node = m_reference_node;
+    if(!delete_from_node)
+        return;
+    const xl::node::SymbolNodeIFace* delete_from_symbol =
+            dynamic_cast<const xl::node::SymbolNodeIFace*>(delete_from_node);
+    if(!delete_from_symbol)
+        return;
+#ifdef DEBUG_EBNF
+    std::cout << "===[BEFORE]===" << std::endl;
+    xl::mvc::MVCView::print_xml(delete_from_node);
+    std::cout << "===[BEFORE]===" << std::endl;
+
+    std::cout << "NODE_DELETE " << ptr_to_string(delete_from_node) << " ==> "
+            << m_index << std::endl;
+#endif
+    const_cast<xl::node::SymbolNodeIFace*>( // TODO: fix-me!
+            delete_from_symbol
+            )->erase(m_index);
+#ifdef DEBUG_EBNF
+    std::cout << "===[AFTER]===" << std::endl;
+    xl::mvc::MVCView::print_xml(delete_from_node);
+    std::cout << "===[AFTER]===" << std::endl;
+#endif
 }
 
 void TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK>::apply()
@@ -158,9 +194,9 @@ void TreeChanges::reset()
 }
 
 void TreeChanges::add_change(
-        TreeChange::type_t _type,
+        TreeChange::type_t              _type,
         const xl::node::NodeIdentIFace* reference_node,
-        xl::node::NodeIdentIFace* new_node)
+        xl::node::NodeIdentIFace*       new_node)
 {
     switch(_type)
     {
@@ -175,6 +211,22 @@ void TreeChanges::add_change(
         case TreeChange::NODE_REPLACEMENTS:
             m_tree_changes.push_back(
                     new TreeChangeImpl<TreeChange::NODE_REPLACEMENTS>(_type, reference_node, new_node));
+            break;
+        default:
+            break;
+    }
+}
+
+void TreeChanges::add_change(
+        TreeChange::type_t              _type,
+        const xl::node::NodeIdentIFace* reference_node,
+        int                             index)
+{
+    switch(_type)
+    {
+        case TreeChange::NODE_DELETIONS:
+            m_tree_changes.push_back(
+                    new TreeChangeImpl<TreeChange::NODE_DELETIONS>(_type, reference_node, index));
             break;
         default:
             break;

@@ -33,6 +33,7 @@ public:
         NODE_INSERTIONS_AFTER,
         NODE_APPENDS_TO_BACK,
         NODE_REPLACEMENTS,
+        NODE_DELETIONS,
         STRING_APPENDS_TO_BACK,
         STRING_INSERTIONS_TO_FRONT
     } type_t;
@@ -98,6 +99,21 @@ private:
 };
 
 template<>
+class TreeChangeImpl<TreeChange::NODE_DELETIONS> : public TreeChange
+{
+public:
+    TreeChangeImpl(
+            TreeChange::type_t _type, const xl::node::NodeIdentIFace* reference_node,
+            int index)
+        : TreeChange(_type, reference_node), m_index(index)
+    {}
+    void apply();
+
+private:
+    int m_index;
+};
+
+template<>
 class TreeChangeImpl<TreeChange::STRING_APPENDS_TO_BACK> : public TreeChange
 {
 public:
@@ -135,13 +151,17 @@ public:
     ~TreeChanges();
     void reset();
     void add_change(
-            TreeChange::type_t _type,
+            TreeChange::type_t              _type,
             const xl::node::NodeIdentIFace* reference_node,
-            xl::node::NodeIdentIFace* new_node);
+            xl::node::NodeIdentIFace*       new_node);
     void add_change(
-            TreeChange::type_t _type,
+            TreeChange::type_t              _type,
             const xl::node::NodeIdentIFace* reference_node,
-            std::string new_string);
+            int                             index);
+    void add_change(
+            TreeChange::type_t              _type,
+            const xl::node::NodeIdentIFace* reference_node,
+            std::string                     new_string);
     bool apply();
 
 private:

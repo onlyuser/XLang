@@ -64,7 +64,7 @@ public:
     }
     const NodeIdentIFace* original() const
     {
-        return m_original;
+        return m_original ? m_original : this;
     }
 
 protected:
@@ -150,6 +150,7 @@ public:
     void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node);
     void remove_first(NodeIdentIFace* _node);
     void replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
+    void erase(int index);
     NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;
 
     // built-in
