@@ -502,7 +502,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
             if(kleene_op == '?')
                 new_action.append(std::string("if(") + gen_positional_var(position) + ") ");
             new_action.append(gen_delete_rule_rvalue_term(position));
-            (*action_string_ptr) = new_action; // TODO: fix-me!
+            (*action_string_ptr) = new_action;
         }
     }
     xl::node::NodeIdentIFace* replacement_node =
@@ -757,49 +757,49 @@ static xl::node::NodeIdentIFace* make_term_rule(
     assert(ebnf_context);
     assert(tc);
 
-    const xl::node::NodeIdentIFace* alts_node = _alts_node->clone(tc);
-    if(!alts_node)
+    const xl::node::NodeIdentIFace* alts_node_clone = _alts_node->clone(tc);
+    if(!alts_node_clone)
         return NULL;
-    auto alts_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node);
-    if(!alts_symbol)
+    auto alts_symbol_clone = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node_clone);
+    if(!alts_symbol_clone)
         return NULL;
-    for(size_t i = 0; i<alts_symbol->size(); i++)
+    for(size_t i = 0; i<alts_symbol_clone->size(); i++)
     {
-        const xl::node::NodeIdentIFace* alt_node = (*alts_symbol)[i];
+        const xl::node::NodeIdentIFace* alt_node_clone = (*alts_symbol_clone)[i];
         std::string* action_string_ptr =
-                get_action_string_ptr_from_alt_node(tree_changes, alt_node, tc);
+                get_action_string_ptr_from_alt_node(tree_changes, alt_node_clone, tc);
         if(action_string_ptr)
         {
-            const xl::node::NodeIdentIFace* terms_node = get_left_child(alt_node);
-            if(!terms_node)
+            const xl::node::NodeIdentIFace* terms_node_clone = get_left_child(alt_node_clone);
+            if(!terms_node_clone)
                 return NULL;
-            auto terms_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node);
-            if(!terms_symbol)
+            auto terms_symbol_clone = dynamic_cast<const xl::node::SymbolNodeIFace*>(terms_node_clone);
+            if(!terms_symbol_clone)
                 return NULL;
             std::string exploded_vars;
-            for(size_t j = 0; j<terms_symbol->size(); j++)
+            for(size_t j = 0; j<terms_symbol_clone->size(); j++)
             {
-                xl::node::NodeIdentIFace* term_node = (*terms_symbol)[j];
-                if(!term_node)
+                xl::node::NodeIdentIFace* term_node_clone = (*terms_symbol_clone)[j];
+                if(!term_node_clone)
                     return NULL;
-                std::string symbol_name = get_string_value_from_term_node(term_node);
+                std::string symbol_name = get_string_value_from_term_node(term_node_clone);
                 std::string symbol_type =
                         get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
                 if(!symbol_type.empty())
                     exploded_vars.append(gen_positional_var(j+1));
-                if((j+1) < terms_symbol->size())
+                if((j+1) < terms_symbol_clone->size())
                     exploded_vars.append(", ");
             }
             std::string new_action;
             new_action.append(
                     std::string(" $$ = ") + gen_type(rule_name_term) + "(" + exploded_vars + "); ");
             new_action.append(std::string("{") + (*action_string_ptr) + "} ");
-            (*action_string_ptr) = new_action;
+            (*action_string_ptr) = new_action; // TODO: fix-me!
         }
     }
     return MAKE_SYMBOL(tc, ID_RULE, 2,
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_term)),
-            alts_node);
+            alts_node_clone);
 }
 
 // node to be appended to back of union_block_node
