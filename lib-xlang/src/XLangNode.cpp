@@ -54,6 +54,22 @@ void Node::detach()
         parent_symbol->remove_first(this);
 }
 
+int Node::index() const
+{
+    if(!m_parent)
+        return -1;
+    xl::node::SymbolNodeIFace* parent_symbol =
+            dynamic_cast<xl::node::SymbolNodeIFace*>(m_parent);
+    if(!parent_symbol)
+        return -1;
+    for(size_t i = 0; i<parent_symbol->size(); i++)
+    {
+        if((*parent_symbol)[i] == this)
+            return i;
+    }
+    return -1;
+}
+
 template<>
 NodeIdentIFace* TermNode<NodeIdentIFace::STRING>::clone(TreeContext* tc) const
 {
@@ -191,7 +207,7 @@ void SymbolNode::replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replac
 
 void SymbolNode::erase(int index)
 {
-    if(index<0 || index >= m_child_vec.size())
+    if(index<0 || index >= static_cast<int>(m_child_vec.size()))
         return;
     auto p = m_child_vec.begin()+index;
     if(p == m_child_vec.end())

@@ -58,6 +58,7 @@ public:
 
     // optional
     void detach();
+    int index() const;
     void set_original(const NodeIdentIFace* original)
     {
         m_original = original;

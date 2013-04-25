@@ -212,28 +212,29 @@ static std::string gen_type(std::string stem)
     return stem + TYPE_SUFFIX;
 }
 
-static xl::node::NodeIdentIFace* find_node_recursive(
-        const xl::node::NodeIdentIFace* root_node,
+static xl::node::NodeIdentIFace* find_node_clone(
+        const xl::node::NodeIdentIFace* root_node_clone,
         const xl::node::NodeIdentIFace* find_node)
 {
-    assert(root_node);
+    assert(root_node_clone);
     assert(find_node);
 
-    auto root_symbol = dynamic_cast<const xl::node::SymbolNodeIFace*>(root_node);
-    if(!root_symbol)
+    auto root_symbol_clone = dynamic_cast<const xl::node::SymbolNodeIFace*>(root_node_clone);
+    if(!root_symbol_clone)
         return NULL;
     static const xl::node::NodeIdentIFace* temp_node; // NOTE: must be static for compile-time closure!
     temp_node = find_node; // NOTE: do not combine with previous line! -- must assign every time
-    xl::node::NodeIdentIFace* clone_node = root_symbol->find_if([](const xl::node::NodeIdentIFace* _node) {
-            return _node ? (_node->original() == temp_node) : false;
-            });
-    if(clone_node)
-        return clone_node;
-    for(size_t i = 0; i<root_symbol->size(); i++)
+    xl::node::NodeIdentIFace* node_clone = root_symbol_clone->find_if(
+            [](const xl::node::NodeIdentIFace* _node) {
+                    return _node ? (_node->original() == temp_node) : false;
+                    });
+    if(node_clone)
+        return node_clone;
+    for(size_t i = 0; i<root_symbol_clone->size(); i++)
     {
-        clone_node = find_node_recursive((*root_symbol)[i], find_node);
-        if(clone_node)
-            return clone_node;
+        node_clone = find_node_clone((*root_symbol_clone)[i], find_node);
+        if(node_clone)
+            return node_clone;
     }
     return NULL;
 }
@@ -487,44 +488,26 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     xl::node::NodeIdentIFace* rule_node_clone = rule_node->clone(tc);
     const xl::node::NodeIdentIFace* find_node =
             (kleene_op == '(') ? outermost_paren_node : outermost_paren_node->parent();
-    xl::node::NodeIdentIFace* find_node_clone =
-            find_node_recursive(rule_node_clone, find_node);
+    xl::node::NodeIdentIFace* node_clone =
+            find_node_clone(rule_node_clone, find_node);
     if(kleene_op != '(')
     {
         std::string* action_string_ptr =
-                get_action_string_ptr_from_kleene_node(tree_changes, find_node_clone, tc);
+                get_action_string_ptr_from_kleene_node(tree_changes, node_clone, tc);
         if(action_string_ptr)
         {
-            size_t position = 0;
-            xl::node::NodeIdentIFace* outer_parent_node = find_node->parent();
-            if(outer_parent_node)
-            {
-                xl::node::SymbolNodeIFace* outer_parent_symbol =
-                        dynamic_cast<xl::node::SymbolNodeIFace*>(outer_parent_node);
-                if(outer_parent_symbol)
-                {
-                    for(size_t i = 0; i<outer_parent_symbol->size(); i++)
-                    {
-                        if((*outer_parent_symbol)[i] == find_node)
-                        {
-                            position = i+1;
-                            break;
-                        }
-                    }
-                }
-            }
-            assert(position);
+            size_t position = find_node->index()+1;
             std::string new_action;
             new_action.append(std::string(" {") + (*action_string_ptr) + "} ");
             if(kleene_op == '?')
                 new_action.append(std::string("if(") + gen_positional_var(position) + ") ");
             new_action.append(gen_delete_rule_rvalue_term(position));
-            (*action_string_ptr) = new_action;
+            (*action_string_ptr) = new_action; // TODO: fix-me!
         }
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive));
-    replace_node(find_node_clone, replacement_node);
+    replace_node(node_clone, replacement_node);
     return rule_node_clone;
 }
 
@@ -803,10 +786,7 @@ static xl::node::NodeIdentIFace* make_term_rule(
                 std::string symbol_type =
                         get_symbol_type_from_symbol_name(symbol_name, ebnf_context);
                 if(!symbol_type.empty())
-                {
-                    size_t position = j+1;
-                    exploded_vars.append(gen_positional_var(position));
-                }
+                    exploded_vars.append(gen_positional_var(j+1));
                 if((j+1) < terms_symbol->size())
                     exploded_vars.append(", ");
             }

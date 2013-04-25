@@ -45,6 +45,10 @@ struct NodeIdentIFace
     // optional
     virtual void detach()
     {}
+    virtual int index() const
+    {
+        return -1;
+    }
     virtual NodeIdentIFace* clone(TreeContext* tc) const
     {
         return NULL;
@@ -60,7 +64,7 @@ struct NodeIdentIFace
         return NULL;
     }
 
-    // built-in
+    // built-in (part of interface)
     bool is_same_type(const NodeIdentIFace* _node) const
     {
         return type() == _node->type() && lexer_id() == _node->lexer_id();
