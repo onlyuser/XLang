@@ -748,16 +748,16 @@ static std::string get_symbol_type_from_symbol_name(
 static xl::node::NodeIdentIFace* make_term_rule(
         TreeChanges*                    tree_changes,
         std::string                     rule_name_term,
-        const xl::node::NodeIdentIFace* _alts_node,
+        const xl::node::NodeIdentIFace* alts_node,
         EBNFContext*                    ebnf_context,
         xl::TreeContext*                tc)
 {
     assert(tree_changes);
-    assert(_alts_node);
+    assert(alts_node);
     assert(ebnf_context);
     assert(tc);
 
-    const xl::node::NodeIdentIFace* alts_node_clone = _alts_node->clone(tc);
+    const xl::node::NodeIdentIFace* alts_node_clone = alts_node->clone(tc);
     if(!alts_node_clone)
         return NULL;
     auto alts_symbol_clone = dynamic_cast<const xl::node::SymbolNodeIFace*>(alts_node_clone);
