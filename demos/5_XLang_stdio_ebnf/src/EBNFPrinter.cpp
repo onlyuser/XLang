@@ -32,7 +32,6 @@
 
 #define ENABLE_EBNF
 #define ERROR_KLEENE_NODE_WITHOUT_PAREN "kleene node without paren detected"
-#define ERROR_ALT_NODE_WITHOUT_ACTION   "alt node without action detected"
 
 //#define DEBUG_EBNF
 #ifdef DEBUG_EBNF
