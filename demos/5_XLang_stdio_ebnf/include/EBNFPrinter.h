@@ -30,29 +30,29 @@ struct EBNFContext
 {
     void reset();
 
-    const xl::node::NodeIdentIFace*                        definitions_node;
-    const xl::node::NodeIdentIFace*                        proto_block_node;
-    const xl::node::NodeIdentIFace*                        union_block_node;
-    std::map<std::string, const xl::node::NodeIdentIFace*> def_symbol_name_to_node;
-    std::map<std::string, std::string>                     union_typename_to_type;
-    std::map<std::string, std::string>                     def_symbol_name_to_union_typename;
+    xl::node::NodeIdentIFace*                        definitions_node;
+    xl::node::NodeIdentIFace*                        proto_block_node;
+    xl::node::NodeIdentIFace*                        union_block_node;
+    std::map<std::string, xl::node::NodeIdentIFace*> def_symbol_name_to_node;
+    std::map<std::string, std::string>               union_typename_to_type;
+    std::map<std::string, std::string>               def_symbol_name_to_union_typename;
 };
 
 struct KleeneContext
 {
     KleeneContext(
-            TreeChanges*                    tree_changes,
-            const xl::node::NodeIdentIFace* kleene_node,
-            EBNFContext*                    ebnf_context,
-            xl::TreeContext*                tc);
+            TreeChanges*              tree_changes,
+            xl::node::NodeIdentIFace* kleene_node,
+            EBNFContext*              ebnf_context,
+            xl::TreeContext*          tc);
 
-    uint32_t                        kleene_op;
-    const xl::node::NodeIdentIFace* outermost_paren_node;
-    const xl::node::NodeIdentIFace* innermost_paren_node;
-    const xl::node::NodeIdentIFace* rule_node;
-    const xl::node::NodeIdentIFace* rule_def_symbol_node;
-    std::string                     rule_name_recursive;
-    std::string                     rule_name_term;
+    uint32_t                  kleene_op;
+    xl::node::NodeIdentIFace* outermost_paren_node;
+    xl::node::NodeIdentIFace* innermost_paren_node;
+    xl::node::NodeIdentIFace* rule_node;
+    xl::node::NodeIdentIFace* rule_def_symbol_node;
+    std::string               rule_name_recursive;
+    std::string               rule_name_term;
 };
 
 class EBNFPrinter : public xl::visitor::VisitorDFS, public SetTreeChangesIFace
@@ -61,7 +61,7 @@ public:
     EBNFPrinter(xl::TreeContext* tc)
         : m_tc(tc), m_tree_changes(NULL)
     {}
-    void visit(const xl::node::SymbolNodeIFace* _node);
+    void visit(const xl::node::SymbolNodeIFace* __node);
     void setTreeChanges(TreeChanges* tree_changes)
     {
         m_tree_changes = tree_changes;

@@ -54,8 +54,8 @@ void rewrite_tree_until_stable(
         #ifdef DEBUG_EBNF
             std::cout << "(iter #" << n << ") <<<" << std::endl;
         #endif
-        TreeChanges changes;
-        dynamic_cast<SetTreeChangesIFace*>(v)->setTreeChanges(&changes);
+        TreeChanges tree_changes;
+        dynamic_cast<SetTreeChangesIFace*>(v)->setTreeChanges(&tree_changes);
         {
             #ifdef DEBUG_EBNF
                 v->dispatch_visit(ast); // visit while recording changes
@@ -65,7 +65,7 @@ void rewrite_tree_until_stable(
                 captured_stdout = _end_redirect_stdout(); // end capture stdout
             #endif
         }
-        changed = changes.apply(); // apply changes
+        changed = tree_changes.apply(); // apply changes
         #ifdef DEBUG_EBNF
             std::cout << ">>> (iter #" << n << ")" << std::endl;
         #endif
