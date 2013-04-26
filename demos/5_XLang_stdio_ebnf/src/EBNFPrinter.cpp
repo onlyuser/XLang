@@ -448,14 +448,24 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     assert(outermost_paren_node);
     assert(tc);
 
-    // EBNF:
+    // EBNF-SOURCE:
     //rule_name_lhs:
     //      (
     //            kleene_internal_node ',' { __AAA__ }
-    //      )* kleene_external_node        { { __BBB__ } delete $1; }
+    //      )* kleene_external_node        { __BBB__ }
     //    ;
     //
-    // EBNF-XML:
+    // EBNF-TARGET (+ *):
+    //rule_name_lhs_stem_0:
+    //      kleene_node kleene_external_node { { __BBB__ } delete $1; }
+    //    ;
+    //
+    // EBNF-TARGET (?):
+    //rule_name_lhs_stem_0:
+    //      kleene_node kleene_external_node { { __BBB__ } if($1) delete $1; }
+    //    ;
+    //
+    // EBNF-SOURCE-XML:
     //<symbol type="rule">
     //    <term type="ident" value=rule_name_lhs/>
     //    <symbol type="rule_alts">
@@ -479,7 +489,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     //                <term type="ident" value=kleene_external_node/>
     //            </symbol>
     //            <symbol type="rule_action_block">
-    //                <term type="string" value=" { __BBB__ } delete $1; "/>
+    //                <term type="string" value=" __BBB__ "/>
     //            </symbol>
     //        </symbol>
     //    </symbol>
@@ -488,12 +498,12 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     xl::node::NodeIdentIFace* rule_node_clone = rule_node->clone(tc);
     const xl::node::NodeIdentIFace* find_node =
             (kleene_op == '(') ? outermost_paren_node : outermost_paren_node->parent();
-    xl::node::NodeIdentIFace* node_clone =
+    xl::node::NodeIdentIFace* _find_node_clone =
             find_node_clone(rule_node_clone, find_node);
     if(kleene_op != '(')
     {
         std::string* action_string_ptr =
-                get_action_string_ptr_from_kleene_node(tree_changes, node_clone, tc);
+                get_action_string_ptr_from_kleene_node(tree_changes, _find_node_clone, tc);
         if(action_string_ptr)
         {
             size_t position = find_node->index()+1;
@@ -507,7 +517,7 @@ static xl::node::NodeIdentIFace* make_stem_rule(
     }
     xl::node::NodeIdentIFace* replacement_node =
             MAKE_TERM(ID_IDENT, tc->alloc_unique_string(rule_name_recursive));
-    replace_node(node_clone, replacement_node);
+    replace_node(_find_node_clone, replacement_node);
     return rule_node_clone;
 }
 
@@ -756,6 +766,48 @@ static xl::node::NodeIdentIFace* make_term_rule(
     assert(alts_node);
     assert(ebnf_context);
     assert(tc);
+
+    // EBNF-SOURCE:
+    //rule_name_lhs:
+    //      (
+    //            kleene_internal_node ',' { __AAA__ }
+    //      )* kleene_external_node        { __BBB__ }
+    //    ;
+    //
+    // EBNF-TARGET:
+    //rule_name_lhs_term_0:
+    //      kleene_internal_node ',' { $$ = new rule_name_lhs_term_0_type_t($1); { __AAA__ } }
+    //    ;
+    //
+    // EBNF-SOURCE-XML:
+    //<symbol type="rule">
+    //    <term type="ident" value=rule_name_lhs/>
+    //    <symbol type="rule_alts">
+    //        <symbol type="rule_alt">
+    //            <symbol type="rule_terms">
+    //                <symbol type="*">     // <-- kleene_node
+    //                    <symbol type="("> // <-- paren_node
+    //                        <symbol type="rule_alts">
+    //                            <symbol type="rule_alt">
+    //                                <symbol type="rule_terms">
+    //                                    <term type="ident" value=kleene_internal_node/>
+    //                                    <term type="char" value=','/>
+    //                                </symbol>
+    //                                <symbol type="rule_action_block">
+    //                                    <term type="string" value=" __AAA__ "/>
+    //                                </symbol>
+    //                            </symbol>
+    //                        </symbol>
+    //                    </symbol>
+    //                </symbol>
+    //                <term type="ident" value=kleene_external_node/>
+    //            </symbol>
+    //            <symbol type="rule_action_block">
+    //                <term type="string" value=" __BBB__ "/>
+    //            </symbol>
+    //        </symbol>
+    //    </symbol>
+    //</symbol>
 
     const xl::node::NodeIdentIFace* alts_node_clone = alts_node->clone(tc);
     if(!alts_node_clone)
