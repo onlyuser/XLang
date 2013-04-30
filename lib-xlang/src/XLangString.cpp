@@ -19,6 +19,8 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <string.h> // strcpy
+#include <regex.h> // regex_t
+#include <stdarg.h> // va_list
 
 namespace xl {
 
@@ -112,6 +114,38 @@ char unescape(char c)
         case 't': return '\t';
     }
     return c;
+}
+
+bool match_regex(std::string s, std::string pattern, int nmatch, ...)
+{
+    bool result = true;
+    regex_t preg;
+    if(regcomp(&preg, pattern.c_str(), REG_ICASE|REG_EXTENDED))
+        return false;
+    regmatch_t* pmatch = new regmatch_t[nmatch];
+    if(pmatch)
+    {
+        int status = regexec(&preg, s.c_str(), nmatch, pmatch, 0);
+        regfree(&preg);
+        if(!status)
+        {
+            va_list ap;
+            va_start(ap, nmatch);
+            for(int i = 0; i<nmatch; i++)
+            {
+                std::string* ptr = va_arg(ap, std::string*);
+                if(ptr)
+                    *ptr = s.substr(pmatch[i].rm_so, pmatch[i].rm_eo-pmatch[i].rm_so);
+            }
+            va_end(ap);
+        }
+        else
+            result = false;
+        delete[] pmatch;
+    }
+    else
+        result = false;
+    return result;
 }
 
 }

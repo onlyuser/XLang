@@ -15,22 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_STRING_H_
-#define XLANG_STRING_H_
+#ifndef XLANG_SYSTEM_H_
+#define XLANG_SYSTEM_H_
 
+#include <signal.h> // siginfo_t
 #include <string> // std::string
 
-namespace xl {
+namespace xl { namespace system {
 
-std::string escape_xml(std::string s);
-std::string unescape_xml(std::string s);
-std::string escape(std::string s);
-std::string unescape(std::string s);
-std::string escape(char c);
-char        unescape(char c);
+typedef void (*sa_sigaction_t)(int, siginfo_t*, void*);
 
-bool match_regex(std::string s, std::string pattern, int nmatch, ...);
+std::string get_execname();
+std::string shell_capture(std::string cmd);
+std::string get_basename(std::string filename);
+void backtrace_sighandler(int sig, siginfo_t* info, void* secret);
+void gdb_sighandler(int sig, siginfo_t* info, void* secret);
+void add_sighandler(int sig, sa_sigaction_t _sa_sigaction);
 
-}
+} }
 
 #endif

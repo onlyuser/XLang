@@ -37,6 +37,7 @@
 #include <iostream> // std::cout
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
+#include "XLangSystem.h" // xl::system::add_sighandler
 
 #define MAKE_TERM(lexer_id, ...)   xl::mvc::MVCModel::make_term(tree_context(), lexer_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)           xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
@@ -483,8 +484,18 @@ bool do_work(args_t &args)
     return true;
 }
 
+void add_signal_handlers()
+{
+    xl::system::add_sighandler(SIGSEGV, xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGINT,  xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGFPE,  xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGBUS,  xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGILL,  xl::system::backtrace_sighandler);
+} 
+
 int main(int argc, char** argv)
 {
+    add_signal_handlers();
     args_t args;
     if(!parse_args(argc, argv, args))
         return EXIT_FAILURE;

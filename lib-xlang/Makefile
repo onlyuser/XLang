@@ -50,11 +50,11 @@ LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
 
 CXX = g++
 DEBUG = -g
-CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
+CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x -D_GNU_SOURCE
 ifdef EXTERN_INCLUDE_PATH
 	CXXFLAGS := $(CXXFLAGS) -DEXTERN_INCLUDE_PATH
 endif
-LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
+LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS) -rdynamic
 
 SCRIPT_PATH = $(PARENT_PATH)/scripts
 
@@ -88,6 +88,7 @@ CPP_STEMS = \
 		XLangNode \
 		XLangPrinter \
 		XLangString \
+		XLangSystem \
 		XLangVisitorDFS \
 		XLangTreeContext
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
