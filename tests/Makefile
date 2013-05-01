@@ -46,16 +46,6 @@ endif
 ifneq ($(strip $(C_SUITE)),)
 	TEST_PATH = c_suite
 endif
-ifneq ($(strip $(YACC_SUITE)),)
-	TEST_PATH = yacc_suite
-endif
-ifneq ($(strip $(YACC_EBNF_SUITE)),)
-	TEST_PATH = yacc_ebnf_suite
-	TEST_REGEX_DISABLE = disabled
-endif
-ifneq ($(strip $(YACC_NIEMANN_SUITE)),)
-	TEST_PATH = yacc_niemann_suite
-endif
 TEST_FILE_STEMS = \
 		$(shell \
 				find $(TEST_PATH) -mindepth 1 -maxdepth 1 -name "*" -type f | sort \
@@ -120,30 +110,6 @@ import : $(IMPORT_PASS_FILES)
 .PHONY : clean_import
 clean_import :
 	-rm $(IMPORT_PASS_FILES) $(IMPORT_FAIL_FILES)
-
-#==================
-# ebnf
-#==================
-
-EBNF_FILES = $(patsubst %, $(BUILD_PATH)/$(OUT_PREFIX).%.ebnf, $(TEST_FILE_STEMS))
-EBNF_PASS_FILES = $(patsubst %, %.pass, $(EBNF_FILES))
-EBNF_FAIL_FILES = $(patsubst %, %.fail, $(EBNF_FILES))
-TEST_SH := $(SCRIPT_PATH)/test.sh
-
-$(BUILD_PATH)/$(OUT_PREFIX).%.ebnf.pass : $(BINARY) $(TEST_PATH)/%.ebnf.test
-	-$(TEST_SH) $(BINARY) \
-			--yacc \
-			$(INPUT_MODE) \
-			$(TEST_PATH)/$*.ebnf.test \
-			$(TEST_PATH)/$*.ebnf.gold \
-			$(BUILD_PATH)/$(OUT_PREFIX).$*.ebnf
-
-.PHONY : ebnf
-ebnf : $(EBNF_PASS_FILES)
-
-.PHONY : clean_ebnf
-clean_ebnf :
-	-rm $(EBNF_PASS_FILES) $(EBNF_FAIL_FILES)
 
 #==================
 # pure
@@ -217,4 +183,4 @@ clean_xml :
 #==================
 
 .PHONY : clean
-clean : clean_test clean_import clean_ebnf clean_pure clean_dot clean_xml
+clean : clean_test clean_import clean_pure clean_dot clean_xml
