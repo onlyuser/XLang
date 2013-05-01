@@ -1,5 +1,5 @@
-# Variations of a Flex-Bison parser
-# -- based on "A COMPACT GUIDE TO LEX & YACC" by Tom Niemann
+# XLang
+# -- A parser framework for language modeling
 # Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify

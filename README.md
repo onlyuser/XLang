@@ -1,5 +1,5 @@
-Variations of a Lex-Yacc parser
-===============================
+XLang
+=====
 
 Copyright (C) 2011-2013 Jerry Chen <mailto:onlyuser@gmail.com>
 
