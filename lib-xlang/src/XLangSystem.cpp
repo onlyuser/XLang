@@ -155,7 +155,8 @@ void gdb_sighandler(int sig, siginfo_t* info, void* secret)
         std::string execname = get_execname();
         execlp("gdb",
                 "-n",             // skip .gdbinit
-                "-ex", "bt",      // perform backtrace
+                "-ex", "bt",      // show backtrace
+                "-ex", "thread",  // show current thread info
                 execname.c_str(), // exec name
                 pid_str.c_str(),  // process id
                 NULL);
