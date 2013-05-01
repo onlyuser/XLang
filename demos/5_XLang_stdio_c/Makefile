@@ -33,7 +33,7 @@ PARENT_LIB_PATH = $(PARENT_PATH)/lib
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
-BINARY = $(BIN_PATH)/XLang.exe
+BINARY = $(BIN_PATH)/XLang
 
 COMMON = $(PARENT_PATH)/lib-xlang
 COMMON_INCLUDE_PATH = $(COMMON)/include
