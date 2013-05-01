@@ -24,6 +24,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
+#include "XLangSystem.h" // system::add_sighandler
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
@@ -37,7 +38,7 @@
 #include <iostream> // std::cout
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
-#include "XLangSystem.h" // xl::system::add_sighandler
+#include <assert.h> // assert
 
 #define MAKE_TERM(lexer_id, ...)   xl::mvc::MVCModel::make_term(tree_context(), lexer_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)           xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
@@ -486,8 +487,9 @@ bool do_work(args_t &args)
 
 void add_signal_handlers()
 {
-    xl::system::add_sighandler(SIGSEGV, xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGABRT, xl::system::backtrace_sighandler);
     xl::system::add_sighandler(SIGINT,  xl::system::backtrace_sighandler);
+    xl::system::add_sighandler(SIGSEGV, xl::system::backtrace_sighandler);
     xl::system::add_sighandler(SIGFPE,  xl::system::backtrace_sighandler);
     xl::system::add_sighandler(SIGBUS,  xl::system::backtrace_sighandler);
     xl::system::add_sighandler(SIGILL,  xl::system::backtrace_sighandler);

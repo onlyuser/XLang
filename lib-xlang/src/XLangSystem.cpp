@@ -86,8 +86,8 @@ std::string get_basename(std::string filename)
 
 void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
 {
-    std::cout << "stack array for " << get_execname() << " pid=" << getpid() << std::endl;
-    std::cout << "Error: signal " << sig << ":" << std::endl;
+    std::cout << "stack array for " << get_execname() << " pid=" << getpid() << std::endl
+            << "Error: signal " << sig << ":" << std::endl;
     void* array[MAX_BACKTRACE_DEPTH];
     int size = backtrace(array, MAX_BACKTRACE_DEPTH);
     array[1] = reinterpret_cast<void*>(
@@ -97,7 +97,8 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
     {
         std::stringstream ss;
         ss << "addr2line " << array[i] << " -e " << get_execname();
-        std::string exec_basename = get_basename(shell_capture(ss.str()));
+        std::string execname = shell_capture(ss.str());
+        std::string exec_basename = get_basename(execname);
         std::string module, mangled_name, offset, address;
         if(match_regex(symbols[i], "(.*)[\(](.*)[+](.*)[)] [\[](.*)[]]", 5,
                 NULL,
@@ -126,7 +127,7 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
                         << " in " << mangled_name << " at " << exec_basename << std::endl;
             }
         }
-        else if(match_regex(symbols[i], "(.*)() [\[](.*)[]]", 3,
+        else if(match_regex(symbols[i], "(.*)[\(][)] [\[](.*)[]]", 3,
                 NULL,
                 &module,
                 &address))
@@ -147,11 +148,17 @@ void gdb_sighandler(int sig, siginfo_t* info, void* secret)
 {
     std::stringstream ss;
     ss << getpid();
+    std::string pid_str = ss.str();
     int child_pid = fork();
     if(!child_pid)
     {
         std::string execname = get_execname();
-        execlp("gdb", "-n", "-ex", "bt", execname.c_str(), ss.str().c_str(), NULL);
+        execlp("gdb",
+                "-n",             // skip .gdbinit
+                "-ex", "bt",      // perform backtrace
+                execname.c_str(), // exec name
+                pid_str.c_str(),  // process id
+                NULL);
         abort();
     }
     else
