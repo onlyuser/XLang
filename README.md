@@ -13,7 +13,40 @@ XLang is a parser framework for language modeling.
 A Motivating Example:
 ---------------------
 
-<pre>
+<table>
+    <tr>
+        <td>
+            <pre>
+void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
+{
+    if(_node->lexer_id() == ID_UMINUS)
+    {
+        visit_next_child(_node);
+        value = -value;
+        return;
+    }
+    float32_t _value = 0;
+    bool more = visit_next_child(_node);
+    _value = value;
+    while(more)
+    {
+        more = visit_next_child(_node);
+        switch(_node->lexer_id())
+        {
+            case '+': _value += value; break;
+            case '-': _value -= value; break;
+            case '*': _value *= value; break;
+            case '/': _value /= value; break;
+        }
+    }
+    value = _value;
+    if(_node->is_root())
+        std::cout << _value << std::endl;
+}
+            </pre>
+        </td>
+        <td>
+            <pre>
 %%
 
 root:
@@ -44,7 +77,10 @@ expression:
     ;
 
 %%
-</pre>
+            </pre>
+        </td>
+    </tr>
+</table>
 
 Usage:
 ------
