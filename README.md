@@ -19,6 +19,7 @@ input:
 </pre>
 
 output:
+
 ![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
 
 parse tree construction:
