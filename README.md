@@ -68,8 +68,6 @@ Unix tools and 3rd party components (accessible from $PATH):
 Make targets:
 -------------
 
-    all, test, pure, dot, lint, doc, xml, import, clean.
-
 <table>
     <tr><th> target </th><th> action                                                </th></tr>
     <tr><td> all    </td><td> make binaries                                         </td></tr>
