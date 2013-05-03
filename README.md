@@ -13,12 +13,15 @@ XLang is a parser framework for language modeling.
 A Motivating Example:
 ---------------------
 
+input:
 <pre>
 (-b+(b^2-4*a*c))/(2*a)
 </pre>
 
+output:
 ![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
 
+parse tree construction:
 <pre>
 %%
 
