@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo -e "Usage: `basename $0` <EXEC={xlang}> <INPUT_MODE={file|stin|arg}> <INPUT_FILE> \c"
+    echo -e "Usage: `basename $0` <EXEC> <INPUT_MODE={xml|file|stin|arg}> <INPUT_FILE> \c"
     echo "<OUTPUT_FILE_TYPE={bmp|jpg|gif|png|lisp|xml}> <OUTPUT_FILE_STEM>"
 }
 

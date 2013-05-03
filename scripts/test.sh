@@ -19,7 +19,7 @@
 
 show_help()
 {
-    echo "Usage: `basename $0` <EXEC={xlang}> <EXEC_FLAGS> <INPUT_MODE={file|stdin|arg}> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
+    echo "Usage: `basename $0` <EXEC> <EXEC_FLAGS> <INPUT_MODE={xml|file|stdin|arg}> <INPUT_FILE> <GOLD_FILE> <OUTPUT_FILE_STEM>"
 }
 
 if [ $# -ne 6 ]; then
