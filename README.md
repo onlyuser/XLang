@@ -17,69 +17,15 @@ A Motivating Example:
     <tr>
         <td>
             <pre>
-void NodeEvaluator::visit(
-        const xl::node::SymbolNodeIFace* _node)
-{
-    if(_node->lexer_id() == ID_UMINUS)
-    {
-        visit_next_child(_node);
-        value = -value;
-        return;
-    }
-    float32_t _value = 0;
-    bool more = visit_next_child(_node);
-    _value = value;
-    while(more)
-    {
-        more = visit_next_child(_node);
-        switch(_node->lexer_id())
-        {
-            case '+': _value += value; break;
-            case '-': _value -= value; break;
-            case '*': _value *= value; break;
-            case '/': _value /= value; break;
-        }
-    }
-    value = _value;
-    if(_node->is_root())
-        std::cout << _value << std::endl;
-}
+<symbol type="+">
+    <term type="int" value=1/>
+    <term type="int" value=2/>
+    <term type="float" value=3.14/>
+</symbol>
             </pre>
         </td>
         <td>
-            <pre>
-%%
-
-root:
-      program { tree_context()->root() = $1; YYACCEPT; }
-    | error   { yyclearin; /* yyerrok; YYABORT; */ }
-    ;
-
-program:
-      statement             { $$ = $1; }
-    | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
-    ;
-
-statement:
-      expr              { $$ = $1; }
-    | ID_IDENT '=' expr { $$ = MAKE_SYMBOL('=', 2,
-                                MAKE_TERM(ID_IDENT, $1), $3); }
-    ;
-
-expr:
-      ID_INT                   { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                 { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                 { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | '-' expr %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expr '+' expr            { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expr '-' expr            { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expr '*' expr            { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expr '/' expr            { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | '(' expr ')'             { $$ = $2; }
-    ;
-
-%%
-            </pre>
+![picture alt](https://sites.google.com/site/onlyuser/files/ast.png "1+2*3")
         </td>
     </tr>
 </table>
