@@ -14,63 +14,36 @@ A Motivating Example:
 ---------------------
 
 <pre>
-    %%
+%%
 
-    root:
-          program { tree_context()->root() = $1; YYACCEPT; }
-        | error   { yyclearin; /* yyerrok; YYABORT; */ }
-        ;
+root:
+      program { tree_context()->root() = $1; YYACCEPT; }
+    | error   { yyclearin; /* yyerrok; YYABORT; */ }
+    ;
 
-    program:
-          statement             { $$ = $1; }
-        | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
-        ;
+program:
+      statement             { $$ = $1; }
+    | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
+    ;
 
-    statement:
-          expression              { $$ = $1; }
-        | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
-        ;
+statement:
+      expression              { $$ = $1; }
+    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+    ;
 
-    expression:
-          ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
-        | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-        | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
-        | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-        | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-        | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-        | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-        | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-        | '(' expression ')'             { $$ = $2; }
-        ;
+expression:
+      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | '(' expression ')'             { $$ = $2; }
+    ;
 
-    %%
-
-    void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
-    {
-        if(_node->lexer_id() == ID_UMINUS)
-        {
-            visit_next_child(_node);
-            value = -value;
-            return;
-        }
-        float32_t _value = 0;
-        bool more = visit_next_child(_node);
-        _value = value;
-        while(more)
-        {
-            more = visit_next_child(_node);
-            switch(_node->lexer_id())
-            {
-                case '+': _value += value; break;
-                case '-': _value -= value; break;
-                case '*': _value *= value; break;
-                case '/': _value /= value; break;
-            }
-        }
-        value = _value;
-        if(_node->is_root())
-            std::cout << _value << std::endl;
-    }
+%%
 </pre>
 
 Usage:
