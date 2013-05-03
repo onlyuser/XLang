@@ -17,7 +17,8 @@ A Motivating Example:
     <tr>
         <td>
             <pre>
-void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
+void NodeEvaluator::visit(
+        const xl::node::SymbolNodeIFace* _node)
 {
     if(_node->lexer_id() == ID_UMINUS)
     {
@@ -60,20 +61,21 @@ program:
     ;
 
 statement:
-      expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+      expr              { $$ = $1; }
+    | ID_IDENT '=' expr { $$ = MAKE_SYMBOL('=', 2,
+                                MAKE_TERM(ID_IDENT, $1), $3); }
     ;
 
-expression:
-      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | '(' expression ')'             { $$ = $2; }
+expr:
+      ID_INT                   { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                 { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                 { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | '-' expr %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expr '+' expr            { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expr '-' expr            { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expr '*' expr            { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expr '/' expr            { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | '(' expr ')'             { $$ = $2; }
     ;
 
 %%
