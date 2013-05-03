@@ -32,7 +32,7 @@
 %option noyywrap nounput
 
 ws      [ \t\n]+
-literal [,()+\-*/=]
+literal [,()+\-*/^=]
 digit   [0-9]
 alpha   [a-zA-Z]
 id      {alpha}|[_]

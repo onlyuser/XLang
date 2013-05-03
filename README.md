@@ -40,17 +40,20 @@ expression:
     | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
     | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
     | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | expression '^' expression      { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
     | '(' expression ')'             { $$ = $2; }
     ;
 
 %%
 </pre>
 
+![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
+
 Usage:
 ------
 
 <pre>
-cat input | ./XLang -x > output.xml
+echo "(-b+(b^2-4*a*c))/(2*a)" | ./bin/XLang -d | dot -Tpng -oquadratic.png
 </pre>
 
 Requirements:

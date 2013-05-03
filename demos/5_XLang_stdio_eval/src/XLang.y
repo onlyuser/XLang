@@ -71,6 +71,7 @@ std::string id_to_name(uint32_t lexer_id)
         case '-':       return "-";
         case '*':       return "*";
         case '/':       return "/";
+        case '^':       return "^";
         case '=':       return "=";
         case ',':       return ",";
     }
@@ -87,6 +88,7 @@ uint32_t name_to_id(std::string name)
     if(name == "-")      return '-';
     if(name == "*")      return '*';
     if(name == "/")      return '/';
+    if(name == "^")      return '^';
     if(name == "=")      return '=';
     if(name == ",")      return ',';
     throw ERROR_LEXER_NAME_NOT_FOUND;
@@ -123,6 +125,7 @@ xl::TreeContext* &tree_context()
 
 %left '+' '-'
 %left '*' '/'
+%left '^'
 %nonassoc ID_UMINUS
 
 %nonassoc ID_COUNT
@@ -153,6 +156,7 @@ expression:
     | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
     | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
     | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | expression '^' expression      { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
     | '(' expression ')'             { $$ = $2; }
     ;
 

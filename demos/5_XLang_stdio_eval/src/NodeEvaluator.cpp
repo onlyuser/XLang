@@ -19,6 +19,7 @@
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
+#include <math.h> // pow
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
 {
@@ -65,6 +66,7 @@ void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
             case '-': _value -= value; break;
             case '*': _value *= value; break;
             case '/': _value /= value; break;
+            case '^': _value = pow(_value, value); break;
         }
     }
     value = _value;
