@@ -8,86 +8,102 @@ Copyright (C) 2011-2013 Jerry Chen <mailto:onlyuser@gmail.com>
 About:
 ------
 
-![picture alt](https://sites.google.com/site/onlyuser/files/ast.png "1+2*3")
+XLang is a parser framework for language modeling.
 
-XLang is a parser framework for language modeling. It is also a demonstration
-of various ways one could build a yacc-based parser. Seven variations of parser
-are presented, varying in features.
+A Motivating Example:
+---------------------
 
-The first variation (0_XLang_full), is a full-featured parser. With each
-successive variation, non-critical features are stripped until there is
-nothing left but a flex-less parser, the last variation (7_XLang_no-flex).
+<pre>
+%%
 
-    full, no-strings, no-comments, no-locations, no-reentrant, stdio, file, no-flex
+root:
+      program { tree_context()->root() = $1; YYACCEPT; }
+    | error   { yyclearin; /* yyerrok; YYABORT; */ }
+    ;
 
-The order in which features are removed is completely arbitrary. There's no
-good reason one cannot cannot have both "comments" and "file input"
-enabled, or both "reentrant" and "hand-rolled lexer" enabled.
+program:
+      statement             { $$ = $1; }
+    | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
+    ;
 
-The code is organized in a way such that anyone unfamiliar with Lex-Yacc
-can quickly isolate a variation that is most relevent, and most readily
-customizable to his/her specific requirements.
+statement:
+      expression              { $$ = $1; }
+    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+    ;
 
-Variation vs Feature Table:
----------------------------
+expression:
+      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | '(' expression ')'             { $$ = $2; }
+    ;
 
-<table>
-    <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
-    <tr><td> full         </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> yes     </td></tr>
-    <tr><td> no-strings   </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> yes      </td><td> no      </td></tr>
-    <tr><td> no-comments  </td><td> flex        </td><td> buffer </td><td> yes       </td><td> yes       </td><td> no       </td><td> no      </td></tr>
-    <tr><td> no-locations </td><td> flex        </td><td> buffer </td><td> yes       </td><td> no        </td><td> no       </td><td> no      </td></tr>
-    <tr><td> no-reentrant </td><td> flex        </td><td> buffer </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
-    <tr><td> stdio        </td><td> flex        </td><td> stdio  </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
-    <tr><td> file         </td><td> flex        </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
-    <tr><td> no-flex      </td><td> hand-rolled </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
-</table>
+%%
 
-    HINT: The "stdio" variation is easiest to implement -- The flex lexer
-          accepts standard stream input by default. It takes extra effort to
-          hack flex into using "buffer input" or "file input".
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
+{
+    value = _node->value();
+}
 
-Feature Detail:
----------------
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node)
+{
+    value = _node->value();
+}
 
-    lexer:
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* _node)
+{
+    value = 0;
+}
 
-        flex: Use flex to generate a lexer.
-              This option is preferred when regex significantly simplifies the
-              lexer.
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node)
+{
+    value = 0;
+}
 
-        hand-rolled: Use a custom lexer.
-                     This option is preferred when speed is critical -- Flex is
-                     slow. This option is also preferred when unicode support
-                     is needed -- Flex has no unicode support as of the time of
-                     this writing.
+void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node)
+{
+    value = 0;
+}
 
-    input:
+void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
+{
+    if(_node->lexer_id() == ID_UMINUS)
+    {
+        visit_next_child(_node);
+        value = -value;
+        return;
+    }
+    float32_t _value = 0;
+    bool more = visit_next_child(_node);
+    _value = value;
+    while(more)
+    {
+        more = visit_next_child(_node);
+        switch(_node->lexer_id())
+        {
+            case '+': _value += value; break;
+            case '-': _value -= value; break;
+            case '*': _value *= value; break;
+            case '/': _value /= value; break;
+        }
+    }
+    value = _value;
+    if(_node->is_root())
+        std::cout << _value << std::endl;
+}
+</pre>
 
-        buffer: Use in-memory buffer as input.
-                This option is preferred when speed is critical -- Standard
-                streams are slow. This option is also preferred when the input
-                string already resides in memory and does not require passing
-                through a standard stream in order to be used.
+Usage:
+------
 
-        stdio: Use standard input.
-               This is the default behavior.
-
-    reentrant: Tell the parser not to use global variables.
-               This option is required to make the parser multi-thread
-               compliant.
-
-    locations: Tell the parser to provide a location variable "$@" for each BNF
-               production. This option demonstrates the standard way to track
-               syntax error line/column number using Lex-Yacc.
-
-    comments: Tell the lexer to conditionally enable/disable certain lexer
-              rules for stateful scanning. This option demonstrates the
-              standard way to ignore line/block comments.
-
-    strings: Tell the lexer to conditionally enable/disable certain lexer rules
-             for stateful scanning. This option demonstrates *one* of the many
-             ways to handle strings, characters, and escaped characters.
+<pre>
+cat input | ./XLang -x > output.xml
+</pre>
 
 Requirements:
 -------------
@@ -119,167 +135,15 @@ Make targets:
     <tr><td> clean  </td><td> remove all intermediate files                         </td></tr>
 </table>
 
-FAQ:
-----
-
-1.  What is XLang ?
-
-    XLang is a starting point for people looking to construct their own
-    language using Lex-Yacc. XLang is thoroughly tested and comes with its
-    own test suite.
-
-2.  What isn't XLang ?
-
-    XLang isn't a unified parser front-end for every language under the sun.
-    It makes some assumptions about the target language, meaning, literal
-    values must be C-like. Otherwise, it places no restrictions on the
-    grammar.
-
-3.  How should one use XLang ?
-
-    I recommend hacking the "stdio" example to your liking, but any of the
-    other variations equally suitable as a base for beginners.
-
-4.  What licenses apply when using XLang ?
-
-    GPL3.
-
-5.  What's the motivation behind writing XLang ?
-
-    Lex-Yacc is a pragmatic solution that will get the job done, but it
-    doesn't do so right out of the box. It needs some infrastructure to get
-    most sizeable projects going.
-
-    I built XLang out of my own need for a parser SDK that takes care of the
-    tedious tree building business so I could focus more on the fun stuff --
-    AST visitation.
-
-    But one may ask, isn't this exactly what production rule actions are
-    for ? No. In order to perform multi-pass visitation to an AST, using
-    Yacc, one would have to re-parse the input everytime, and that's
-    wasteful. XLang builds an AST for you so you can visit it as many times
-    as needed.
-
-    To make a long answer short, Tom Niemann's Lex-Yacc tutorial is my
-    primary source of inspiration for building XLang. Please visit his site
-    to learn more.
-
-6.  How does XLang differ from the example in Tom's tutorial ?
-
-    a)  XLang uses C++, with unions used only where necessary. Tom's tutorial
-        uses a C-style polymorphism technique where the last member of a
-        class is a union of several types. I prefer C++ polymorphism.
-
-    b)  XLang has its own memory management system based on allocators. Tom's
-        tutorial omits AST node freeing entirely.
-
-    c)  XLang offers several flavors of Lex-Yacc whereas Tom's tutorial
-        offers just one "stdio" parser.
-
-    d)  XLang's ASTs are "flattened", meaning lists are interpreted as lists
-        instead of deep-recursing binary trees. This tree organization lends
-        itself better to AST visitation (less likely to stack-overflow).
-
-        (1+2+3)        (1+2+3)
-        non-flattened: flattened:
-        
-            +             +
-           / \          / | \
-          +   3        1  2  3
-         / \
-        1   2
-
-    e)  XLang's visitor borrows concepts from Anand Shankar Krishnamoorthi's
-        cooperative visitor and Jeremy Blosser's Java Tip 98 to enable
-        visit double-dispatch without the need to implement the "accept"
-        method for every single AST node class.
-
-    f)  XLang uses namespaces and isolates all the AST building code into a
-        static library.
-
-7.  Why allocators ?
-
-    I've incorporated a simple memory allocator in this project because I
-    want to keep my AST node classes as clean as possible, without destructors
-    that delete child nodes. But the way the allocator was written really
-    doesn't improve the program's memory usage patterns. With some effort, I
-    suppose one could upgrade that into a real allocator with true memory
-    pooling.
-
-8.  Why c++0x ?
-
-    Lambda functions are one of the few c++0x feature used here, and only
-    because they solve the problem elegantly. The goal is to deliberately avoid
-    implementing clean-up code within the AST node destructors. This goes
-    along a grander design decision to keep the AST node class clear of
-    method clutter by moving all the predicate code into visitors. Lambdas
-    help provide ad hoc anonymous callbacks for the allocator, whose job is to
-    perform clean-up originally intended for the destructor.
-
-9.  Why coroutines ?
-
-    I needed a way to store the "progress" of a visitation, so it can be
-    suspended temporarily and resumed later. A direct approach would be to
-    keep a reference to the most recently visited child node in a static
-    variable, but this assumes a linear visitation limited to ascending or
-    descending traversals. Enter the coroutine, whose main purpose is to
-    provide flow control for systems that involve pre-emption, even in a
-    single-threaded programming model, exactly what I need for my visitor.
-
-    I use Simon Tatham's excellent implementation of coroutines. Please
-    visit his site to learn more.
-
 References:
 -----------
 
 <dl>
-    <dt>"Flex your lexical analysis muscles"</dt>
-    <dd>http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12717/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
-    <dd>http://www.developer.com/net/cplus/article.php/3636641/Flex-Your-Lexical-Analysis-Muscles.htm</dd>
-
-    <dt>"Classic Parsing with Flex-Bison"</dt>
-    <dd>http://www.codeguru.com/csharp/.net/net_general/patterns/article.php/c12805/Classic-Parsing-with-Flex-and-Bison.htm</dd>
-    <dd>http://www.developer.com/net/cplus/article.php/3642516/Classic-Parsing-with-Flex-and-Bison.htm</dd>
-
     <dt>"Tom Niemann Flex-Bison AST examples"</dt>
     <dd>http://epaperpress.com/lexandyacc/</dd>
-
-    <dt>"UsualCoding.eu Reentrant Flex-Bison example"</dt>
-    <dd>http://www.usualcoding.eu/post/2007/09/03/Building-a-reentrant-parser-in-C-with-Flex/Bison</dd>
-    <dd>(code example needs "void yyerror() {}" inserted in declaration section of parser.y)</dd>
-    <dd>(page seems down as of May 19, 2012)</dd>
-
-    <dt>"Make a reentrant parser with Flex and Bison"</dt>
-    <dd>http://www.lemoda.net/c/reentrant-parser/index.html</dd>
-
-    <dt>"Better error handling using Flex and Bison"</dt>
-    <dd>http://www.ibm.com/developerworks/library/l-flexbison.html</dd>
-
-    <dt>"ProgTools Flex-Bison AST tutorial (with classes)"</dt>
-    <dd>http://www.progtools.org/compilers/tutorials/cxx_and_bison/cxx_and_bison.html</dd>
-
-    <dt>"O-Reilly Lex-Yacc book examples"</dt>
-    <dd>http://examples.oreilly.com/lex/</dd>
-
-    <dt>"Cooperative VisitorIFace: A Template Technique for VisitorIFace Creation"</dt>
-    <dd>http://www.artima.com/cppsource/cooperative_visitor.html</dd>
-
-    <dt>"Java Tip 98: Reflect on the VisitorIFace design pattern"</dt>
-    <dd>http://www.javaworld.com/javaworld/javatips/jw-javatip98.html</dd>
-
-    <dt>"Coroutines in C"</dt>
-    <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
-    <dd>(code originally intended for a C compiler, needs additional c++ style casting for use with g++)</dd>
 </dl>
-
-Additional Reading:
--------------------
-
-* http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
-* http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
-* http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
 Keywords:
 ---------
 
-    Lex, Yacc, Flex, Bison, Parsing, C++, Reentrant C++ Parser
+    Lex, Yacc, Flex, Bison, Parser, Reentrant
