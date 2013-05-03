@@ -14,6 +14,12 @@ A Motivating Example:
 ---------------------
 
 <pre>
+(-b+(b^2-4*a*c))/(2*a)
+</pre>
+
+![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
+
+<pre>
 %%
 
 root:
@@ -46,8 +52,6 @@ expression:
 
 %%
 </pre>
-
-![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
 
 Usage:
 ------
