@@ -146,7 +146,7 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
                 q->GetValue(&attr_value);
                 attr_map[attr_name] = attr_value;
             }
-            if(!attr_map.empty())
+            if(attr_map.size())
             {
                 node_typename = attr_map["type"];
                 node_value = attr_map["value"];

@@ -20,7 +20,7 @@
 #include <stdio.h> // FILE
 #include <stdlib.h> // free
 #include <string.h> // strdup
-#include <iostream> // std::cout
+#include <iostream> // std::cerr
 #include <unistd.h> // getpid
 #include <iomanip> // std::setfill
 #include <string> // std::string
@@ -48,7 +48,7 @@ namespace xl { namespace system {
 std::string get_execname()
 {
     static std::string execname;
-    if(!execname.empty())
+    if(execname.size())
         return execname;
     char buf[MAX_EXECNAME_SIZE];
     int n = readlink("/proc/self/exe", buf, sizeof(buf)-1);
@@ -86,7 +86,7 @@ std::string get_basename(std::string filename)
 
 void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
 {
-    std::cout << "stack array for " << get_execname() << " pid=" << getpid() << std::endl
+    std::cerr << "stack array for " << get_execname() << " pid=" << getpid() << std::endl
             << "Error: signal " << sig << ":" << std::endl;
     void* array[MAX_BACKTRACE_DEPTH];
     int size = backtrace(array, MAX_BACKTRACE_DEPTH);
@@ -100,7 +100,7 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
         std::string execname = shell_capture(ss.str());
         std::string exec_basename = get_basename(execname);
         std::string module, mangled_name, offset, address;
-        if(match_regex(symbols[i], "(.*)[\(](.*)[+](.*)[)] [\[](.*)[]]", 5,
+        if(match_regex(symbols[i], "([^ ]+)[\(]([^ ]+)[+]([^ ]+)[)] [\[]([^ ]+)[]]", 5,
                 NULL,
                 &module,
                 &mangled_name,
@@ -113,7 +113,7 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
             char* demangled_name = abi::__cxa_demangle(mangled_name.c_str(), NULL, 0, &status);
             if(status == 0)
             {
-                std::cout << "#" << i
+                std::cerr << "#" << i
                         << "  0x" << std::setfill('0') << std::setw(16) << std::hex
                         << reinterpret_cast<size_t>(array[i])
                         << " in " << demangled_name << " at " << exec_basename << std::endl;
@@ -121,24 +121,24 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
             }
             else
             {
-                std::cout << "#" << i
+                std::cerr << "#" << i
                         << "  0x" << std::setfill('0') << std::setw(16) << std::hex
                         << reinterpret_cast<size_t>(array[i])
                         << " in " << mangled_name << " at " << exec_basename << std::endl;
             }
         }
-        else if(match_regex(symbols[i], "(.*)[\(][)] [\[](.*)[]]", 3,
+        else if(match_regex(symbols[i], "([^ ]+)[\(][)] [\[]([^ ]+)[]]", 3,
                 NULL,
                 &module,
                 &address))
         {
-            std::cout << "#" << i
+            std::cerr << "#" << i
                     << "  0x" << std::setfill('0') << std::setw(16) << std::hex
                     << reinterpret_cast<size_t>(array[i])
                     << " in ?? at " << exec_basename << std::endl;
         }
         else
-            std::cout << "#" << i << "  " << symbols[i] << std::endl;
+            std::cerr << "#" << i << "  " << symbols[i] << std::endl;
     }
     free(symbols);
     exit(0);
