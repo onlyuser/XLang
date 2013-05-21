@@ -5,8 +5,8 @@ XLang
 
 Copyright (C) 2011-2013 Jerry Chen <mailto:onlyuser@gmail.com>
 
-About:
-------
+About
+-----
 
 ![picture alt](https://sites.google.com/site/onlyuser/files/ast.png "1+2*3")
 
@@ -28,8 +28,8 @@ The code is organized in a way such that anyone unfamiliar with Lex-Yacc
 can quickly isolate a variation that is most relevent, and most readily
 customizable to his/her specific requirements.
 
-Variation vs Feature Table:
----------------------------
+Variation vs Feature Table
+--------------------------
 
 <table>
     <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
@@ -47,8 +47,8 @@ Variation vs Feature Table:
           accepts standard stream input by default. It takes extra effort to
           hack flex into using "buffer input" or "file input".
 
-Feature Detail:
----------------
+Feature Detail
+--------------
 
     lexer:
 
@@ -89,8 +89,8 @@ Feature Detail:
              for stateful scanning. This option demonstrates *one* of the many
              ways to handle strings, characters, and escaped characters.
 
-Requirements:
--------------
+Requirements
+------------
 
 Unix tools and 3rd party components (accessible from $PATH):
 
@@ -101,8 +101,8 @@ Unix tools and 3rd party components (accessible from $PATH):
 * $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
 * $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
-Make targets:
--------------
+Make targets
+------------
 
 <table>
     <tr><th> target </th><th> action                                                </th></tr>
@@ -117,8 +117,8 @@ Make targets:
     <tr><td> clean  </td><td> remove all intermediate files                         </td></tr>
 </table>
 
-FAQ:
-----
+FAQ
+---
 
 1.  What is XLang ?
 
@@ -227,8 +227,8 @@ FAQ:
     I use Simon Tatham's excellent implementation of coroutines. Please
     visit his site to learn more.
 
-References:
------------
+References
+----------
 
 <dl>
     <dt>"Flex your lexical analysis muscles"</dt>
@@ -270,14 +270,14 @@ References:
     <dd>(code originally intended for a C compiler, needs additional c++ style casting for use with g++)</dd>
 </dl>
 
-Additional Reading:
--------------------
+Additional Reading
+------------------
 
 * http://osdir.com/ml/lex.flex.windows/2003-05/msg00017.html
 * http://tldp.org/HOWTO/Lex-YACC-HOWTO-5.html
 * http://net.pku.edu.cn/~course/cs201/2003/mirrorWebster.cs.ucr.edu/Page_softeng/softDevGuide_6.html
 
-Keywords:
----------
+Keywords
+--------
 
     Lex, Yacc, Flex, Bison, Parser, Reentrant

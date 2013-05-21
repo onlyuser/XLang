@@ -5,13 +5,13 @@ XLang
 
 Copyright (C) 2011-2013 Jerry Chen <mailto:onlyuser@gmail.com>
 
-About:
-------
+About
+-----
 
 XLang is a parser framework for language modeling.
 
-A Motivating Example:
----------------------
+A Motivating Example
+--------------------
 
 input:
 <pre>
@@ -22,15 +22,15 @@ output:
 
 ![picture alt](https://sites.google.com/site/onlyuser/files/quadratic.png "(-b+(b^2-4*a*c))/(2*a)")
 
-Usage:
-------
+Usage
+-----
 
 <pre>
 echo "(-b+(b^2-4*a*c))/(2*a)" | ./bin/XLang -d | dot -Tpng -oquadratic.png
 </pre>
 
-Requirements:
--------------
+Requirements
+------------
 
 Unix tools and 3rd party components (accessible from $PATH):
 
@@ -41,8 +41,8 @@ Unix tools and 3rd party components (accessible from $PATH):
 * $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
 * $EXTERN_LIB_PATH     -- where "libticppd.a" resides
 
-Make targets:
--------------
+Make targets
+------------
 
 <table>
     <tr><th> target </th><th> action                                                </th></tr>
@@ -57,15 +57,15 @@ Make targets:
     <tr><td> clean  </td><td> remove all intermediate files                         </td></tr>
 </table>
 
-References:
------------
+References
+----------
 
 <dl>
     <dt>"Tom Niemann Flex-Bison AST examples"</dt>
     <dd>http://epaperpress.com/lexandyacc/</dd>
 </dl>
 
-Keywords:
----------
+Keywords
+--------
 
     Lex, Yacc, Flex, Bison, Parser, Reentrant
