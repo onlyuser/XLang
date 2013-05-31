@@ -35,11 +35,11 @@ BIN_PATH = bin
 BINARY = $(BIN_PATH)/XLang
 
 COMMON = $(PARENT_PATH)/lib-xlang
-COMMON_INCLUDE_PATH = $(COMMON)/include
-COMMON_SRC_PATH = $(COMMON)/src
-COMMON_BUILD_PATH = $(BUILD_PATH)/lib-xlang
+INCLUDE_PATH_COMMON = $(COMMON)/include
+SRC_PATH_COMMON = $(COMMON)/src
+BUILD_PATH_COMMON = $(BUILD_PATH)/lib-xlang
 
-INCLUDE_PATHS = $(INCLUDE_PATH) $(COMMON_INCLUDE_PATH) $(EXTERN_INCLUDE_PATH)
+INCLUDE_PATHS = $(INCLUDE_PATH) $(INCLUDE_PATH_COMMON) $(EXTERN_INCLUDE_PATH)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 
 LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(EXTERN_LIB_PATH)
@@ -112,7 +112,7 @@ clean_lex :
 # objects (common)
 #==================
 
-COMMON_CPP_STEMS = \
+CPP_STEMS_COMMON = \
 		XLangAlloc \
 		XLangMVCView \
 		XLangPrinter \
@@ -121,17 +121,17 @@ COMMON_CPP_STEMS = \
 		XLangTreeContext #\
 		XLangMVCModel \
 		XLangNode
-COMMON_OBJECTS = $(patsubst %, $(COMMON_BUILD_PATH)/%.o, $(COMMON_CPP_STEMS))
-COMMON_LINT_FILES = $(patsubst %, $(COMMON_BUILD_PATH)/%.lint, $(COMMON_CPP_STEMS))
+OBJECTS_COMMON = $(patsubst %, $(BUILD_PATH_COMMON)/%.o, $(CPP_STEMS_COMMON))
+LINT_FILES_COMMON = $(patsubst %, $(BUILD_PATH_COMMON)/%.lint, $(CPP_STEMS_COMMON))
 
-$(COMMON_BUILD_PATH)/%.o : $(COMMON_SRC_PATH)/%.cpp
-	mkdir -p $(COMMON_BUILD_PATH)
+$(BUILD_PATH_COMMON)/%.o : $(SRC_PATH_COMMON)/%.cpp
+	mkdir -p $(BUILD_PATH_COMMON)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-.PHONY : clean_common_objects
-clean_common_objects :
-	-rm $(COMMON_OBJECTS)
-	-rmdir $(COMMON_BUILD_PATH) $(COMMON_BIN_PATH)
+.PHONY : clean_objects_common
+clean_objects_common :
+	-rm $(OBJECTS_COMMON)
+	-rmdir $(BUILD_PATH_COMMON) $(COMMON_BIN_PATH)
 
 #==================
 # objects
@@ -142,7 +142,7 @@ $(BUILD_PATH)/%.o : $(SRC_PATH)/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY : clean_objects
-clean_objects : clean_common_objects clean_yacc clean_lex
+clean_objects : clean_objects_common clean_yacc clean_lex
 	-rm $(OBJECTS)
 
 #==================
@@ -153,7 +153,7 @@ CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel XLangNode
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(OBJECTS) $(COMMON_OBJECTS)
+$(BINARY) : $(OBJECTS) $(OBJECTS_COMMON)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
@@ -305,19 +305,19 @@ clean_xml :
 # lint (common)
 #==================
 
-COMMON_LINT_PASS_FILES = $(patsubst %, %.pass, $(COMMON_LINT_FILES))
-COMMON_LINT_FAIL_FILES = $(patsubst %, %.fail, $(COMMON_LINT_FILES))
+LINT_PASS_FILES_COMMON = $(patsubst %, %.pass, $(LINT_FILES_COMMON))
+LINT_FAIL_FILES_COMMON = $(patsubst %, %.fail, $(LINT_FILES_COMMON))
 
-$(COMMON_BUILD_PATH)/%.lint.pass : $(COMMON_SRC_PATH)/%.cpp
-	mkdir -p $(COMMON_BUILD_PATH)
-	-$(LINT_SH) $(LINT_TOOL) $< $(COMMON_BUILD_PATH)/$*.lint $(LINTFLAGS)
+$(BUILD_PATH_COMMON)/%.lint.pass : $(SRC_PATH_COMMON)/%.cpp
+	mkdir -p $(BUILD_PATH_COMMON)
+	-$(LINT_SH) $(LINT_TOOL) $< $(BUILD_PATH_COMMON)/$*.lint $(LINTFLAGS)
 
-.PHONY : common_lint
-common_lint : $(COMMON_LINT_PASS_FILES)
+.PHONY : lint_common
+lint_common : $(LINT_PASS_FILES_COMMON)
 
-.PHONY : clean_common_lint
-clean_common_lint :
-	-rm $(COMMON_LINT_PASS_FILES) $(COMMON_LINT_FAIL_FILES)
+.PHONY : clean_lint_common
+clean_lint_common :
+	-rm $(LINT_PASS_FILES_COMMON) $(LINT_FAIL_FILES_COMMON)
 
 #==================
 # lint
@@ -332,10 +332,10 @@ $(BUILD_PATH)/%.lint.pass : $(SRC_PATH)/%.cpp
 	-$(LINT_SH) $< $(BUILD_PATH)/$*.lint $(INCLUDE_PATH_FLAGS)
 
 .PHONY : lint
-lint : $(LINT_PASS_FILES) common_lint
+lint : $(LINT_PASS_FILES) lint_common
 
 .PHONY : clean_lint
-clean_lint : clean_common_lint
+clean_lint : clean_lint_common
 	-rm $(LINT_PASS_FILES) $(LINT_FAIL_FILES)
 
 #==================
