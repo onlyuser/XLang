@@ -131,7 +131,7 @@ $(BUILD_PATH_COMMON)/%.o : $(SRC_PATH_COMMON)/%.cpp
 .PHONY : clean_objects_common
 clean_objects_common :
 	-rm $(OBJECTS_COMMON)
-	-rmdir $(BUILD_PATH_COMMON) $(COMMON_BIN_PATH)
+	-rmdir $(BUILD_PATH_COMMON)
 
 #==================
 # objects
