@@ -26,15 +26,15 @@
 # compile flags
 #==================
 
-PARENT_PATH = ..
+PARENT = ..
 INCLUDE_PATH = include
 LIB_PATH = lib
-PARENT_LIB_PATH = $(PARENT_PATH)/lib
+LIB_PATH_PARENT = $(PARENT)/lib
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
 BINARY = $(BIN_PATH)/libxlang.a
-INSTALL_BINARY = $(PARENT_LIB_PATH)/libxlang.a
+INSTALL_BINARY = $(LIB_PATH_PARENT)/libxlang.a
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(INCLUDE_PATH_EXTERN)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
@@ -55,7 +55,7 @@ ifdef INCLUDE_PATH_EXTERN
 endif
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS) -rdynamic
 
-SCRIPT_PATH = $(PARENT_PATH)/scripts
+SCRIPT_PATH = $(PARENT)/scripts
 
 #==================
 # all
@@ -96,7 +96,7 @@ LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 $(BINARY) : $(OBJECTS)
 	mkdir -p $(BIN_PATH)
 	$(AR) -cvq $@ $^
-	mkdir -p $(PARENT_LIB_PATH)
+	mkdir -p $(LIB_PATH_PARENT)
 	cp $@ $(INSTALL_BINARY)
 
 .PHONY : clean_binary
@@ -127,7 +127,7 @@ clean_lint :
 # doc
 #==================
 
-DOC_PATH = $(PARENT_PATH)/doc
+DOC_PATH = $(PARENT)/doc
 DOC_CONFIG_FILE = XLang.config
 DOC_CONFIG_PATCH_FILE = $(DOC_CONFIG_FILE).patch
 DOC_TOOL = doxygen

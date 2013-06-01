@@ -26,31 +26,31 @@
 # compile flags
 #==================
 
-PARENT_PATH = ../..
+PARENT = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
-PARENT_LIB_PATH = $(PARENT_PATH)/lib
+LIB_PATH_PARENT = $(PARENT)/lib
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
 BINARY = $(BIN_PATH)/XLang
 
-COMMON = $(PARENT_PATH)/lib-xlang
+COMMON = $(PARENT)/lib-xlang
 INCLUDE_PATH_COMMON = $(COMMON)/include
 
 INCLUDE_PATHS = $(INCLUDE_PATH) $(INCLUDE_PATH_COMMON) $(INCLUDE_PATH_EXTERN)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 
-LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(LIB_PATH_EXTERN)
+LIB_PATHS = $(LIB_PATH) $(LIB_PATH_PARENT) $(LIB_PATH_EXTERN)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-PARENT_LIB_STEMS = xlang
-PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
+LIB_STEMS_PARENT = xlang
+LIBS_PARENT = $(patsubst %, $(LIB_PATH_PARENT)/lib%.a, $(LIB_STEMS_PARENT))
 ifdef LIB_PATH_EXTERN
 	LIB_STEMS_EXTERN = ticppd
 endif
 LIB_FLAGS = \
-		$(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
+		$(patsubst %, -l%, $(LIB_STEMS_PARENT)) \
 		$(patsubst %, -l%, $(LIB_STEMS_EXTERN))
 
 CXX = g++
@@ -61,8 +61,8 @@ ifdef INCLUDE_PATH_EXTERN
 endif
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
-SCRIPT_PATH = $(PARENT_PATH)/scripts
-TEST_PATH = $(PARENT_PATH)/tests
+SCRIPT_PATH = $(PARENT)/scripts
+TEST_PATH = $(PARENT)/tests
 
 #==================
 # all
@@ -75,7 +75,7 @@ all : $(BINARY)
 # libs
 #==================
 
-$(PARENT_LIBS) :
+$(LIBS_PARENT) :
 	cd $(COMMON); $(MAKE)
 
 .PHONY : clean_parent_libs
@@ -137,7 +137,7 @@ CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS)
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
-$(BINARY) : $(OBJECTS) $(PARENT_LIBS)
+$(BINARY) : $(OBJECTS) $(LIBS_PARENT)
 	mkdir -p $(BIN_PATH)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
@@ -248,7 +248,7 @@ clean_lint :
 # doc
 #==================
 
-DOC_PATH = $(PARENT_PATH)/doc
+DOC_PATH = $(PARENT)/doc
 DOC_CONFIG_FILE = XLang.config
 DOC_CONFIG_PATCH_FILE = $(DOC_CONFIG_FILE).patch
 DOC_TOOL = doxygen

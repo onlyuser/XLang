@@ -26,7 +26,7 @@
 # compile flags
 #==================
 
-PARENT_PATH = ../..
+PARENT = ../..
 INCLUDE_PATH = include
 LIB_PATH = lib
 SRC_PATH = src
@@ -34,7 +34,7 @@ BUILD_PATH = build
 BIN_PATH = bin
 BINARY = $(BIN_PATH)/XLang
 
-COMMON = $(PARENT_PATH)/lib-xlang
+COMMON = $(PARENT)/lib-xlang
 INCLUDE_PATH_COMMON = $(COMMON)/include
 SRC_PATH_COMMON = $(COMMON)/src
 BUILD_PATH_COMMON = $(BUILD_PATH)/lib-xlang
@@ -42,15 +42,15 @@ BUILD_PATH_COMMON = $(BUILD_PATH)/lib-xlang
 INCLUDE_PATHS = $(INCLUDE_PATH) $(INCLUDE_PATH_COMMON) $(INCLUDE_PATH_EXTERN)
 INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 
-LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(LIB_PATH_EXTERN)
+LIB_PATHS = $(LIB_PATH) $(LIB_PATH_PARENT) $(LIB_PATH_EXTERN)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
-PARENT_LIB_STEMS = #xlang
+LIB_STEMS_PARENT = #xlang
 ifdef LIB_PATH_EXTERN
 	LIB_STEMS_EXTERN = ticppd
 endif
 LIB_FLAGS = \
-		$(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
+		$(patsubst %, -l%, $(LIB_STEMS_PARENT)) \
 		$(patsubst %, -l%, $(LIB_STEMS_EXTERN))
 
 CXX = g++
@@ -61,8 +61,8 @@ ifdef INCLUDE_PATH_EXTERN
 endif
 LDFLAGS = -Wall $(DEBUG) $(LIB_PATH_FLAGS) $(LIB_FLAGS)
 
-SCRIPT_PATH = $(PARENT_PATH)/scripts
-TEST_PATH = $(PARENT_PATH)/tests
+SCRIPT_PATH = $(PARENT)/scripts
+TEST_PATH = $(PARENT)/tests
 
 #==================
 # all
@@ -280,7 +280,7 @@ clean_lint : clean_lint_common
 # doc
 #==================
 
-DOC_PATH = $(PARENT_PATH)/doc
+DOC_PATH = $(PARENT)/doc
 DOC_CONFIG_FILE = XLang.config
 DOC_CONFIG_PATCH_FILE = $(DOC_CONFIG_FILE).patch
 DOC_TOOL = doxygen
