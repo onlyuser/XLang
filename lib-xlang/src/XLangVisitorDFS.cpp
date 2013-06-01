@@ -88,7 +88,10 @@ node::NodeIdentIFace* VisitorDFS::get_next_child(const node::SymbolNodeIFace* _n
     int index = get_next_child_index(_node);
     if(index == -1)
         return NULL;
-    return (*_node)[index];
+    node::NodeIdentIFace* child = (*_node)[index];
+    if(index == static_cast<int>(_node->size())-1)
+        abort_visitation(_node);
+    return child;
 }
 
 bool VisitorDFS::visit_next_child(const node::SymbolNodeIFace* _node, node::NodeIdentIFace** ref_node)
