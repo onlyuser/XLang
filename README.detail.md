@@ -98,8 +98,8 @@ Unix tools and 3rd party components (accessible from $PATH):
 
 **Environment variables:**
 
-* $EXTERN_INCLUDE_PATH -- where "ticpp/ticpp.h" resides
-* $EXTERN_LIB_PATH     -- where "libticppd.a" resides
+* $INCLUDE_PATH_EXTERN -- where "ticpp/ticpp.h" resides
+* $LIB_PATH_EXTERN     -- where "libticppd.a" resides
 
 Make targets
 ------------

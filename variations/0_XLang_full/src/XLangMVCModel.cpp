@@ -25,7 +25,7 @@
 #include <string> // std::string
 #include <vector> // std::vector
 
-#ifdef EXTERN_INCLUDE_PATH
+#ifdef INCLUDE_PATH_EXTERN
     #define TIXML_USE_TICPP
 #endif
 #ifdef TIXML_USE_TICPP
