@@ -43,10 +43,9 @@ LIB_PATHS = $(LIB_PATH) $(LIB_PATH_EXTERN)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
 ifdef LIB_PATH_EXTERN
-	EXTERN_LIB_STEMS = ticppd
-	EXTERN_LIBS = $(patsubst %, $(LIB_PATH_EXTERN)/lib%.a, $(EXTERN_LIB_STEMS))
+	LIB_STEMS_EXTERN = ticppd
 endif
-LIB_FLAGS = $(patsubst %, -l%, $(EXTERN_LIB_STEMS))
+LIB_FLAGS = $(patsubst %, -l%, $(LIB_STEMS_EXTERN))
 
 CXX = g++
 DEBUG = -g
