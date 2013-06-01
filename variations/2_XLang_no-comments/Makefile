@@ -45,11 +45,10 @@ INCLUDE_PATH_FLAGS = $(patsubst %, -I%, $(INCLUDE_PATHS))
 LIB_PATHS = $(LIB_PATH) $(PARENT_LIB_PATH) $(LIB_PATH_EXTERN)
 LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 
+PARENT_LIB_STEMS = #xlang
 ifdef LIB_PATH_EXTERN
 	LIB_STEMS_EXTERN = ticppd
 endif
-PARENT_LIB_STEMS = #xlang
-PARENT_LIBS = $(patsubst %, $(PARENT_LIB_PATH)/lib%.a, $(PARENT_LIB_STEMS))
 LIB_FLAGS = \
 		$(patsubst %, -l%, $(PARENT_LIB_STEMS)) \
 		$(patsubst %, -l%, $(LIB_STEMS_EXTERN))
