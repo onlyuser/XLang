@@ -78,8 +78,8 @@ all : $(BINARY)
 $(LIBS_PARENT) :
 	cd $(COMMON); $(MAKE)
 
-.PHONY : clean_parent_libs
-clean_parent_libs :
+.PHONY : clean_libs_parent
+clean_libs_parent :
 	cd $(COMMON); $(MAKE) clean
 
 #==================
@@ -142,7 +142,7 @@ $(BINARY) : $(OBJECTS) $(LIBS_PARENT)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY : clean_binary
-clean_binary : clean_objects clean_parent_libs
+clean_binary : clean_objects clean_libs_parent
 	-rm $(BINARY)
 
 #==================
