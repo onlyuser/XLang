@@ -43,8 +43,7 @@ std::string Node::uid() const
 }
 
 SymbolNode::SymbolNode(uint32_t _lexer_id, YYLTYPE loc, size_t _size, va_list ap)
-    : Node(NodeIdentIFace::SYMBOL, _lexer_id, loc), visitor::Visitable<SymbolNode>(this),
-      m_visit_state(NULL)
+    : Node(NodeIdentIFace::SYMBOL, _lexer_id, loc), visitor::Visitable<SymbolNode>(this)
 {
     for(size_t i = 0; i<_size; i++)
     {

@@ -19,27 +19,6 @@
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 
-//#define USE_COROUTINE
-#ifdef USE_COROUTINE
-    #include "coroutine/coroutine_cpp.h"
-
-    static int _get_next_asc(ccrContParam, const xl::node::SymbolNodeIFace* _node)
-    {
-        ccrBeginContext;
-        int i;
-        ccrEndContext(foo);
-        ccrBegin(foo);
-        for(foo->i = 0; foo->i < static_cast<int>(_node->size()); foo->i++)
-            ccrReturn(foo->i);
-        ccrFinish(-1);
-    }
-
-    static void _stop_asc(ccrContParam)
-    {
-        ccrStopV;
-    }
-#endif
-
 namespace xl { namespace visitor {
 
 void VisitorDFS::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node)
@@ -142,25 +121,17 @@ bool VisitorDFS::visit_next_child(const node::SymbolNodeIFace* _node, node::Node
 
 void VisitorDFS::abort_visitation(const node::SymbolNodeIFace* _node)
 {
-#ifdef USE_COROUTINE
-    _stop_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state());
-#else
     if(m_visit_state.size())
         m_visit_state.top() = -1;
-#endif
 }
 
 int VisitorDFS::get_next_child_index(const node::SymbolNodeIFace* _node)
 {
-#ifdef USE_COROUTINE
-    return _get_next_asc(&const_cast<node::SymbolNodeIFace*>(_node)->visit_state(), _node);
-#else
     if(m_visit_state.empty())
         return -1;
-    if(m_visit_state.top() < _node->size())
+    if(m_visit_state.top() < static_cast<int>(_node->size()))
         return m_visit_state.top()++;
     return m_visit_state.top() = -1;
-#endif
 }
 
 } }

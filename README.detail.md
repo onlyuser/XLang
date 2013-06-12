@@ -214,19 +214,6 @@ FAQ
     help provide ad hoc anonymous callbacks for the allocator, whose job is to
     perform clean-up originally intended for the destructor.
 
-9.  Why coroutines ?
-
-    I needed a way to store the "progress" of a visitation, so it can be
-    suspended temporarily and resumed later. A direct approach would be to
-    keep a reference to the most recently visited child node in a static
-    variable, but this assumes a linear visitation limited to ascending or
-    descending traversals. Enter the coroutine, whose main purpose is to
-    provide flow control for systems that involve pre-emption, even in a
-    single-threaded programming model, exactly what I need for my visitor.
-
-    I use Simon Tatham's excellent implementation of coroutines. Please
-    visit his site to learn more.
-
 References
 ----------
 
@@ -264,10 +251,6 @@ References
 
     <dt>"Java Tip 98: Reflect on the VisitorIFace design pattern"</dt>
     <dd>http://www.javaworld.com/javaworld/javatips/jw-javatip98.html</dd>
-
-    <dt>"Coroutines in C"</dt>
-    <dd>http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html</dd>
-    <dd>(code originally intended for a C compiler, needs additional c++ style casting for use with g++)</dd>
 </dl>
 
 Additional Reading

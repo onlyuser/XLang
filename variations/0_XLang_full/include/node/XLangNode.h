@@ -20,7 +20,6 @@
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitable.h" // visitor::Visitable
-#include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
 #include "XLang.tab.h" // YYLTYPE
@@ -89,8 +88,7 @@ private:
 };
 
 class SymbolNode
-    : public Node, public SymbolNodeIFace, public visitor::Visitable<SymbolNode>,
-      virtual public visitor::VisitStateIFace
+    : public Node, public SymbolNodeIFace, public visitor::Visitable<SymbolNode>
 {
 public:
     SymbolNode(uint32_t _lexer_id, YYLTYPE loc, size_t _size, va_list ap);
@@ -109,10 +107,6 @@ public:
     void push_back(NodeIdentIFace* _node);
 
     // built-in
-    visitor::VisitStateIFace::state_t &visit_state()
-    {
-        return m_visit_state;
-    }
     static NodeIdentIFace* eol()
     {
         static int dummy;
@@ -121,7 +115,6 @@ public:
 
 private:
     std::vector<NodeIdentIFace*> m_child_vec;
-    visitor::VisitStateIFace::state_t m_visit_state;
 };
 
 } }

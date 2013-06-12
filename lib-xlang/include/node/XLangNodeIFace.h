@@ -19,7 +19,6 @@
 #define XLANG_NODE_IFACE_H_
 
 #include "visitor/XLangVisitable.h" // visitor::Visitable
-#include "visitor/XLangVisitStateIFace.h" // visitor::VisitStateIFace
 #include "XLangType.h" // uint32_t
 #include <string> // std::string
 
@@ -101,7 +100,7 @@ struct TermNodeIFace : virtual public NodeIdentIFace
     virtual typename TermInternalType<T>::type value() const = 0;
 };
 
-struct SymbolNodeIFace : virtual public NodeIdentIFace, virtual public visitor::VisitStateIFace
+struct SymbolNodeIFace : virtual public NodeIdentIFace
 {
     virtual ~SymbolNodeIFace()
     {}
