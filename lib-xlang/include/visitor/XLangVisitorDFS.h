@@ -21,6 +21,7 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "visitor/XLangVisitorIFace.h" // visitor::VisitorIFace
 #include <sstream> // std::stringstream
+#include <stack>
 
 namespace xl { namespace visitor {
 
@@ -35,21 +36,25 @@ struct VisitorDFS : public VisitorIFace<const node::NodeIdentIFace>
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _node);
     virtual void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
-    virtual void visit_null();
-    int get_next_child_index(const node::SymbolNodeIFace* _node);
-    node::NodeIdentIFace* get_next_child(const node::SymbolNodeIFace* _node);
-    virtual bool visit_next_child(const node::SymbolNodeIFace* _node,
-            node::NodeIdentIFace** ref_node = NULL);
-    virtual void abort_visitation(const node::SymbolNodeIFace* _node);
     virtual void visit(const node::SymbolNodeIFace* _node);
-    virtual void dispatch_visit(const node::NodeIdentIFace* unknown);
+    virtual void visit_null();
+    void dispatch_visit(const node::NodeIdentIFace* unknown);
     void set_allow_visit_null(bool allow_visit_null)
     {
         m_allow_visit_null = allow_visit_null;
     }
 
+protected:
+    node::NodeIdentIFace* get_next_child(const node::SymbolNodeIFace* _node);
+    bool visit_next_child(const node::SymbolNodeIFace* _node,
+            node::NodeIdentIFace** ref_node = NULL);
+    void abort_visitation(const node::SymbolNodeIFace* _node);
+
 private:
     bool m_allow_visit_null;
+    std::stack<int> m_visit_state;
+
+    int get_next_child_index(const node::SymbolNodeIFace* _node);
 };
 
 } }
