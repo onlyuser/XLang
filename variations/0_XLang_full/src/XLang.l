@@ -62,6 +62,7 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_STRING ST_CHAR
 
 ws      [ \t\n]+
+any     .|[\n]
 literal [,()+\-*/=]
 digit   [0-9]
 alpha   [a-zA-Z]
@@ -77,13 +78,13 @@ _float  {digit}*[.]{digit}+
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"                   { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
-<ST_COMMENT_BLOCK>"*/" { yy_pop_state(yyscanner); }
-<ST_COMMENT_BLOCK>.    ;
+"/*"                    { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
+<ST_COMMENT_BLOCK>"*/"  { yy_pop_state(yyscanner); }
+<ST_COMMENT_BLOCK>{any} ;
 
-"//"                  { yy_push_state(ST_COMMENT_LINE, yyscanner); }
-<ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
-<ST_COMMENT_LINE>.    ;
+"//"                   { yy_push_state(ST_COMMENT_LINE, yyscanner); }
+<ST_COMMENT_LINE>"\n"  { yy_pop_state(yyscanner); }
+<ST_COMMENT_LINE>{any} ;
 
  /*==========================================================================*/
  /* QUOTES */
@@ -147,7 +148,7 @@ _float  {digit}*[.]{digit}+
                 return *yytext;
             }
 
-.           {
+{any}       {
                 begin_token(yyscanner, yyleng);
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
