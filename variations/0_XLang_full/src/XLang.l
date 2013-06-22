@@ -84,7 +84,7 @@ _float  {digit}*[.]{digit}+
 
 "//"                   { yy_push_state(ST_COMMENT_LINE, yyscanner); }
 <ST_COMMENT_LINE>"\n"  { yy_pop_state(yyscanner); }
-<ST_COMMENT_LINE>{any} ;
+<ST_COMMENT_LINE>.     ;
 
  /*==========================================================================*/
  /* QUOTES */
@@ -148,7 +148,7 @@ _float  {digit}*[.]{digit}+
                 return *yytext;
             }
 
-{any}       {
+.           {
                 begin_token(yyscanner, yyleng);
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;

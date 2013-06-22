@@ -47,6 +47,16 @@ void _XLANG_error(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char*
     if(loc)
     {
         std::stringstream ss;
+        int last_line_pos = 0;
+        for(int i = pc->scanner_context().m_pos; i >= 0; i--)
+        {
+            if(pc->scanner_context().m_buf[i] == '\n')
+            {
+                last_line_pos = i+1;
+                break;
+            }
+        }
+        ss << &pc->scanner_context().m_buf[last_line_pos] << std::endl;
         ss << std::string(loc->first_column-1, '-') <<
                 std::string(loc->last_column - loc->first_column + 1, '^') << std::endl <<
                 loc->first_line << ":c" << loc->first_column << " to " <<
