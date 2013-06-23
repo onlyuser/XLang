@@ -180,7 +180,7 @@ FAQ
 
         (1+2+3)        (1+2+3)
         non-flattened: flattened:
-        
+
             +             +
            / \          / | \
           +   3        1  2  3
