@@ -60,15 +60,15 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE
 
-ws      [ \t\n]+
-any     .|[\n]
-literal [,()+\-*/=]
-digit   [0-9]
-alpha   [a-zA-Z]
-id      {alpha}|[_]
-ident   {id}+({digit}|{id})*
-_int    {digit}+
-_float  {digit}*[.]{digit}+
+ws        [ \t\n]+
+any       .|[\n]
+lit_char  [,()+\-*/=]
+digit     [0-9]
+alpha     [a-zA-Z]
+id        {alpha}|[_]
+lit_ident {id}+({digit}|{id})*
+lit_int   {digit}+
+lit_float {digit}*[.]{digit}+
 
 %%
 
@@ -77,42 +77,50 @@ _float  {digit}*[.]{digit}+
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"                    { yy_push_state(ST_COMMENT_BLOCK, yyscanner); }
-<ST_COMMENT_BLOCK>"*/"  { yy_pop_state(yyscanner); }
+"/*"        {
+                yy_push_state(ST_COMMENT_BLOCK, yyscanner);
+            }
+<ST_COMMENT_BLOCK>"*/" {
+                yy_pop_state(yyscanner);
+            }
 <ST_COMMENT_BLOCK>{any} ;
 
-"//"                   { yy_push_state(ST_COMMENT_LINE, yyscanner); }
-<ST_COMMENT_LINE>"\n"  { yy_pop_state(yyscanner); }
-<ST_COMMENT_LINE>.     ;
+"//"        {
+                yy_push_state(ST_COMMENT_LINE, yyscanner);
+            }
+<ST_COMMENT_LINE>"\n" {
+                yy_pop_state(yyscanner);
+            }
+<ST_COMMENT_LINE>. ;
 
  /*==========================================================================*/
- /* PRIMITIVES */
+ /* LITERALS */
 
-{ident}     {
+{lit_ident} {
                 begin_token(yyscanner, yyleng);
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int}      {
+{lit_int}   {
                 begin_token(yyscanner, yyleng);
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float}    {
+{lit_float} {
                 begin_token(yyscanner, yyleng);
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
- /*==========================================================================*/
- /* OTHER */
-
-{literal}   {
+{lit_char}  {
                 begin_token(yyscanner, yyleng);
                 return *yytext;
             }
+
+ /*==========================================================================*/
+ /* OTHER */
 
 .           {
                 begin_token(yyscanner, yyleng);

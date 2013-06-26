@@ -31,41 +31,43 @@
 
 %option noyywrap nounput
 
-ws      [ \t\n]+
-literal [,()+\-*/^=]
-digit   [0-9]
-alpha   [a-zA-Z]
-id      {alpha}|[_]
-ident   {id}+({digit}|{id})*
-_int    {digit}+
-_float  {digit}*[.]{digit}+
+ws        [ \t\n]+
+lit_char  [,()+\-*/^=]
+digit     [0-9]
+alpha     [a-zA-Z]
+id        {alpha}|[_]
+lit_ident {id}+({digit}|{id})*
+lit_int   {digit}+
+lit_float {digit}*[.]{digit}+
 
 %%
 
 {ws}        ;
 
  /*==========================================================================*/
- /* PRIMITIVES */
+ /* LITERALS */
 
-{ident}     {
+{lit_ident} {
                 _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{_int}      {
+{lit_int}   {
                 _XLANG_lval.int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{_float}    {
+{lit_float} {
                 _XLANG_lval.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
+{lit_char}  {
+                return *yytext;
+            }
+
  /*==========================================================================*/
  /* OTHER */
-
-{literal}   { return *yytext; }
 
 .           {
                 _XLANG_error("unknown character");
