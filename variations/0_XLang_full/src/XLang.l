@@ -82,9 +82,9 @@ _float  {digit}*[.]{digit}+
 <ST_COMMENT_BLOCK>"*/"  { yy_pop_state(yyscanner); }
 <ST_COMMENT_BLOCK>{any} ;
 
-"//"                   { yy_push_state(ST_COMMENT_LINE, yyscanner); }
-<ST_COMMENT_LINE>"\n"  { yy_pop_state(yyscanner); }
-<ST_COMMENT_LINE>.     ;
+"//"                  { yy_push_state(ST_COMMENT_LINE, yyscanner); }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(yyscanner); }
+<ST_COMMENT_LINE>.    ;
 
  /*==========================================================================*/
  /* QUOTES */
