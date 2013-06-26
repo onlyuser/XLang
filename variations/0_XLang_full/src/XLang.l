@@ -168,10 +168,10 @@ lit_float {digit}*[.]{digit}+
 void begin_token(yyscan_t yyscanner, size_t length)
 {
     YYLTYPE* loc = yyget_lloc(yyscanner);
-    loc->first_line = PARM.m_line;
-    loc->first_column = PARM.m_prev_column;
-    loc->last_line = PARM.m_line;
-    loc->last_column = PARM.m_prev_column + length - 1;
+    loc->first_line    = PARM.m_line;
+    loc->first_column  = PARM.m_prev_column;
+    loc->last_line     = PARM.m_line;
+    loc->last_column   = PARM.m_prev_column + length - 1;
     PARM.m_prev_column = PARM.m_column;
     if(length > 1)
         PARM.m_prev_column--;
