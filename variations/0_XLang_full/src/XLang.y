@@ -123,7 +123,6 @@ uint32_t name_to_id(std::string name)
 
 // 'pure_parser' tells bison to use no global variables and create a
 // reentrant parser (NOTE: deprecated, use "%define api.pure" instead).
-//
 %define api.pure
 %parse-param {ParserContext* pc}
 %parse-param {yyscan_t scanner}

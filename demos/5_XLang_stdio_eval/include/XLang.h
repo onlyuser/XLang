@@ -28,7 +28,6 @@ namespace xl { class TreeContext; }
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
-//
 int _XLANG_lex();
 int _XLANG_lex_destroy();
 int _XLANG_parse();

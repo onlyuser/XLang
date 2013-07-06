@@ -104,7 +104,6 @@ xl::TreeContext* &tree_context()
 
 // type of yylval to be set by scanner actions
 // implemented as %union in non-reentrant mode
-//
 %union
 {
     xl::node::TermInternalType<xl::node::NodeIdentIFace::INT>::type    int_value;    // int value
