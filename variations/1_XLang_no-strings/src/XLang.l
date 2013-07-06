@@ -85,7 +85,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_BLOCK);
             }
 <ST_COMMENT_BLOCK>"*/" {
-                POP_STATE;
+                POP_STATE();
             }
 <ST_COMMENT_BLOCK>{any} ;
 
@@ -93,7 +93,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_LINE);
             }
 <ST_COMMENT_LINE>"\n" {
-                POP_STATE;
+                POP_STATE();
             }
 <ST_COMMENT_LINE>. ;
 

@@ -86,7 +86,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_BLOCK);
             }
 <ST_COMMENT_BLOCK>"*/" {
-                POP_STATE;
+                POP_STATE();
             }
 <ST_COMMENT_BLOCK>{any} ;
 
@@ -94,7 +94,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_LINE);
             }
 <ST_COMMENT_LINE>"\n" {
-                POP_STATE;
+                POP_STATE();
             }
 <ST_COMMENT_LINE>. ;
 
@@ -111,7 +111,7 @@ lit_float {digit}*[.]{digit}+
                 return ID_STRING;
             }
 <ST_STRING>[\"] {LOC;
-                POP_STATE;
+                POP_STATE();
             }
 
 [\']        {LOC;
@@ -122,7 +122,7 @@ lit_float {digit}*[.]{digit}+
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] {LOC;
-                POP_STATE;
+                POP_STATE();
             }
 
  /*==========================================================================*/
