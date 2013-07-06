@@ -54,7 +54,7 @@
 
 #define LOC           begin_token(yyscanner, yyleng)
 #define PUSH_STATE(x) yy_push_state(x, yyscanner)
-#define POP_STATE     yy_pop_state(yyscanner)
+#define POP_STATE()   yy_pop_state(yyscanner)
 
 void begin_token(yyscan_t yyscanner, size_t length);
 
