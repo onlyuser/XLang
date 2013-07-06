@@ -27,9 +27,9 @@
 
 struct ScannerContext
 {
-    const char* m_buf; // buffer we read from
-    int m_pos; // current position in buf
-    int m_length; // length of buf
+    const char* m_buf;    // buffer we read from
+    int         m_pos;    // current position in buf
+    int         m_length; // length of buf
 
     ScannerContext(const char* buf);
 };
@@ -41,17 +41,22 @@ public:
     ParserContext(xl::Allocator &alloc, const char* buf)
         : m_tree_context(alloc), m_scanner_context(buf)
     {}
-    xl::TreeContext &tree_context() { return m_tree_context; }
-    ScannerContext &scanner_context() { return m_scanner_context; }
+    xl::TreeContext &tree_context()
+    {
+        return m_tree_context;
+    }
+    ScannerContext &scanner_context()
+    {
+        return m_scanner_context;
+    }
 
 private:
     xl::TreeContext m_tree_context;
-    ScannerContext m_scanner_context;
+    ScannerContext  m_scanner_context;
 };
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
-//
 int _XLANG_lex();
 int _XLANG_lex_destroy();
 int _XLANG_parse();

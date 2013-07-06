@@ -27,7 +27,6 @@
 
 // type of yylval to be set by scanner actions
 // implemented as %union in non-reentrant mode
-//
 struct SynthAttrib
 {
     union
@@ -48,9 +47,9 @@ struct ScannerContext
 {
     yyscan_t m_scanner; // state of the lexer
 
-    const char* m_buf; // buffer we read from
-    int m_pos; // current position in buf
-    int m_length; // length of buf
+    const char* m_buf;    // buffer we read from
+    int         m_pos;    // current position in buf
+    int         m_length; // length of buf
 
     ScannerContext(const char* buf);
 };
@@ -62,18 +61,23 @@ public:
     ParserContext(xl::Allocator &alloc, const char* buf)
         : m_tree_context(alloc), m_scanner_context(buf)
     {}
-    xl::TreeContext &tree_context() { return m_tree_context; }
-    ScannerContext &scanner_context() { return m_scanner_context; }
+    xl::TreeContext &tree_context()
+    {
+        return m_tree_context;
+    }
+    ScannerContext &scanner_context()
+    {
+        return m_scanner_context;
+    }
 
 private:
     xl::TreeContext m_tree_context;
-    ScannerContext m_scanner_context;
+    ScannerContext  m_scanner_context;
 };
 #define YY_EXTRA_TYPE ParserContext*
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
-//
 int _XLANG_lex(YYSTYPE*, yyscan_t);
 int _XLANG_lex_init(yyscan_t*);
 int _XLANG_lex_destroy(yyscan_t);
