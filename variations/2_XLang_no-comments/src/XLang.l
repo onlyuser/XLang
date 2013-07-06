@@ -51,6 +51,8 @@
         } \
     } while(0)
 
+#define BEGIN_TOKEN begin_token(yyscanner, yyleng)
+
 void begin_token(yyscan_t yyscanner, size_t length);
 
 %}
@@ -75,25 +77,25 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
 {lit_char}  {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 return *yytext;
             }
 
@@ -101,7 +103,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
             }

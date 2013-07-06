@@ -51,6 +51,10 @@
         } \
     } while(0)
 
+#define BEGIN_TOKEN   begin_token(yyscanner, yyleng)
+#define PUSH_STATE(x) yy_push_state(x, yyscanner)
+#define POP_STATE     yy_pop_state(yyscanner)
+
 void begin_token(yyscan_t yyscanner, size_t length);
 
 %}
@@ -78,18 +82,18 @@ lit_float {digit}*[.]{digit}+
  /* COMMENTS */
 
 "/*"        {
-                yy_push_state(ST_COMMENT_BLOCK, yyscanner);
+                PUSH_STATE(ST_COMMENT_BLOCK);
             }
 <ST_COMMENT_BLOCK>"*/" {
-                yy_pop_state(yyscanner);
+                POP_STATE;
             }
 <ST_COMMENT_BLOCK>{any} ;
 
 "//"        {
-                yy_push_state(ST_COMMENT_LINE, yyscanner);
+                PUSH_STATE(ST_COMMENT_LINE);
             }
 <ST_COMMENT_LINE>"\n" {
-                yy_pop_state(yyscanner);
+                POP_STATE;
             }
 <ST_COMMENT_LINE>. ;
 
@@ -97,25 +101,25 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
 {lit_char}  {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 return *yytext;
             }
 
@@ -123,7 +127,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;

@@ -52,6 +52,10 @@
         } \
     } while(0)
 
+#define BEGIN_TOKEN   begin_token(yyscanner, yyleng)
+#define PUSH_STATE(x) yy_push_state(x, yyscanner)
+#define POP_STATE     yy_pop_state(yyscanner)
+
 void begin_token(yyscan_t yyscanner, size_t length);
 
 %}
@@ -79,18 +83,18 @@ lit_float {digit}*[.]{digit}+
  /* COMMENTS */
 
 "/*"        {
-                yy_push_state(ST_COMMENT_BLOCK, yyscanner);
+                PUSH_STATE(ST_COMMENT_BLOCK);
             }
 <ST_COMMENT_BLOCK>"*/" {
-                yy_pop_state(yyscanner);
+                POP_STATE;
             }
 <ST_COMMENT_BLOCK>{any} ;
 
 "//"        {
-                yy_push_state(ST_COMMENT_LINE, yyscanner);
+                PUSH_STATE(ST_COMMENT_LINE);
             }
 <ST_COMMENT_LINE>"\n" {
-                yy_pop_state(yyscanner);
+                POP_STATE;
             }
 <ST_COMMENT_LINE>. ;
 
@@ -98,58 +102,58 @@ lit_float {digit}*[.]{digit}+
  /* QUOTES */
 
 [\"]        {
-                begin_token(yyscanner, yyleng);
-                yy_push_state(ST_STRING, yyscanner);
+                BEGIN_TOKEN;
+                PUSH_STATE(ST_STRING);
             }
 <ST_STRING>[^\"]* {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(
                         xl::unescape(yytext)
                         );
                 return ID_STRING;
             }
 <ST_STRING>[\"] {
-                begin_token(yyscanner, yyleng);
-                yy_pop_state(yyscanner);
+                BEGIN_TOKEN;
+                POP_STATE;
             }
 
 [\']        {
-                begin_token(yyscanner, yyleng);
-                yy_push_state(ST_CHAR, yyscanner);
+                BEGIN_TOKEN;
+                PUSH_STATE(ST_CHAR);
             }
 <ST_CHAR>[^\']* {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->char_value = xl::unescape(yytext)[0];
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] {
-                begin_token(yyscanner, yyleng);
-                yy_pop_state(yyscanner);
+                BEGIN_TOKEN;
+                POP_STATE;
             }
 
  /*==========================================================================*/
  /* LITERALS */
 
 {lit_ident} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
 {lit_char}  {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 return *yytext;
             }
 
@@ -157,7 +161,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                begin_token(yyscanner, yyleng);
+                BEGIN_TOKEN;
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;
