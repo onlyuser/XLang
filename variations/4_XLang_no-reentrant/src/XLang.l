@@ -39,8 +39,8 @@
         if(PARM.m_pos >= PARM.m_length) \
             (result) = YY_NULL; \
         else { \
-            (result) = std::min(PARM.m_length - PARM.m_pos, static_cast<int>(max_size)); \
-            memcpy((buf), PARM.m_buf + PARM.m_pos, (result)); \
+            (result) = std::min(PARM.m_length-PARM.m_pos, static_cast<int>(max_size)); \
+            memcpy((buf), PARM.m_buf+PARM.m_pos, (result)); \
             PARM.m_pos += (result); \
         } \
     } while(0)

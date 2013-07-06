@@ -39,7 +39,7 @@
         if(PARM.m_pos >= PARM.m_length) \
             (result) = YY_NULL; \
         else { \
-            (result) = std::min(PARM.m_length - PARM.m_pos, static_cast<int>(max_size)); \
+            (result) = std::min(PARM.m_length-PARM.m_pos, static_cast<int>(max_size)); \
             fread((buf), sizeof(char), (result), PARM.m_file); \
             PARM.m_pos += (result); \
         } \
