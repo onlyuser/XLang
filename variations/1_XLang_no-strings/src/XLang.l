@@ -51,7 +51,7 @@
         } \
     } while(0)
 
-#define BEGIN_TOKEN   begin_token(yyscanner, yyleng)
+#define LOC           begin_token(yyscanner, yyleng)
 #define PUSH_STATE(x) yy_push_state(x, yyscanner)
 #define POP_STATE     yy_pop_state(yyscanner)
 
@@ -100,34 +100,29 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* LITERALS */
 
-{lit_ident} {
-                BEGIN_TOKEN;
+{lit_ident} {LOC;
                 yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
-{lit_int}   {
-                BEGIN_TOKEN;
+{lit_int}   {LOC;
                 yylval->int_value = atoi(yytext);
                 return ID_INT;
             }
 
-{lit_float} {
-                BEGIN_TOKEN;
+{lit_float} {LOC;
                 yylval->float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
-{lit_char}  {
-                BEGIN_TOKEN;
+{lit_char}  {LOC;
                 return *yytext;
             }
 
  /*==========================================================================*/
  /* OTHER */
 
-.           {
-                BEGIN_TOKEN;
+.           {LOC;
                 _XLANG_error("unknown character");
                 YY_FLUSH_BUFFER;
                 BEGIN INITIAL;
