@@ -49,7 +49,9 @@
         } \
     } while(0)
 
-#define LOC begin_token(yyscanner, yyleng)
+#define LOC          begin_token(yyscanner, yyleng)
+#define LVAL         (*yylval)
+#define TREE_CONTEXT yyget_extra(yyscanner)->tree_context()
 
 void begin_token(yyscan_t yyscanner, size_t length);
 
@@ -75,17 +77,17 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {LOC;
-                yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {LOC;
-                yylval->int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {LOC;
-                yylval->float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

@@ -43,6 +43,9 @@
         } \
     } while(0)
 
+#define LVAL         (*yylval)
+#define TREE_CONTEXT yyget_extra(yyscanner)->tree_context()
+
 %}
 
 %option noyywrap nounput
@@ -65,17 +68,17 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                yylval->int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                yylval->float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

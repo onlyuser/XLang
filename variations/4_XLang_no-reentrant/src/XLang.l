@@ -43,6 +43,9 @@
         } \
     } while(0)
 
+#define LVAL         _XLANG_lval
+#define TREE_CONTEXT parser_context()->tree_context()
+
 %}
 
 %option noyywrap nounput
@@ -64,17 +67,17 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                _XLANG_lval.int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                _XLANG_lval.float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

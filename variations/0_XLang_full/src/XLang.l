@@ -52,7 +52,9 @@
 
 #define LOC           begin_token(yyscanner, yyleng)
 #define PUSH_STATE(x) yy_push_state(x, yyscanner)
-#define POP_STATE()   yy_pop_state(yyscanner)
+#define POP_STATE     yy_pop_state(yyscanner)
+#define LVAL          (*yylval)
+#define TREE_CONTEXT  yyget_extra(yyscanner)->tree_context()
 
 void begin_token(yyscan_t yyscanner, size_t length);
 
@@ -84,7 +86,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_BLOCK);
             }
 <ST_COMMENT_BLOCK>"*/" {
-                POP_STATE();
+                POP_STATE;
             }
 <ST_COMMENT_BLOCK>{any} ;
 
@@ -92,7 +94,7 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_COMMENT_LINE);
             }
 <ST_COMMENT_LINE>"\n" {
-                POP_STATE();
+                POP_STATE;
             }
 <ST_COMMENT_LINE>. ;
 
@@ -103,41 +105,39 @@ lit_float {digit}*[.]{digit}+
                 PUSH_STATE(ST_STRING);
             }
 <ST_STRING>[^\"]* {LOC;
-                yylval->string_value = yyget_extra(yyscanner)->tree_context().alloc_string(
-                        xl::unescape(yytext)
-                        );
+                LVAL.string_value = TREE_CONTEXT.alloc_string(xl::unescape(yytext));
                 return ID_STRING;
             }
 <ST_STRING>[\"] {LOC;
-                POP_STATE();
+                POP_STATE;
             }
 
 [\']        {LOC;
                 PUSH_STATE(ST_CHAR);
             }
 <ST_CHAR>[^\']* {LOC;
-                yylval->char_value = xl::unescape(yytext)[0];
+                LVAL.char_value = xl::unescape(yytext)[0];
                 return ID_CHAR;
             }
 <ST_CHAR>[\'] {LOC;
-                POP_STATE();
+                POP_STATE;
             }
 
  /*==========================================================================*/
  /* LITERALS */
 
 {lit_ident} {LOC;
-                yylval->ident_value = yyget_extra(yyscanner)->tree_context().alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {LOC;
-                yylval->int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {LOC;
-                yylval->float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
