@@ -63,7 +63,7 @@ lint :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-xlang; $(MAKE) $@
+	cd libxl; $(MAKE) $@
 	find . -name "*.lint.*" | grep fail; if [ $$? -eq 0 ]; then exit 1; fi
 
 .PHONY : doc
@@ -71,12 +71,12 @@ doc :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-xlang; $(MAKE) $@
+	cd libxl; $(MAKE) $@
 
 .PHONY : clean
 clean :
 	@for i in $(SUBPATHS); do \
 	echo "make $@ in $$i..."; \
 	(cd $$i; $(MAKE) $@); done
-	cd lib-xlang; $(MAKE) clean
+	cd libxl; $(MAKE) clean
 	-rmdir $(LIB_PATH)

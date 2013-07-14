@@ -144,7 +144,7 @@ uint32_t name_to_id(std::string name)
 %%
 
 root:
-      program { pc->tree_context().root() = $1; }
+      program { pc->tree_context().root() = $1; YYACCEPT; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 

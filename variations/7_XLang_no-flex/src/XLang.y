@@ -232,7 +232,7 @@ int _XLANG_lex()
 %%
 
 root:
-      program { parser_context()->tree_context().root() = $1; }
+      program { parser_context()->tree_context().root() = $1; YYACCEPT; }
     | error   { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
