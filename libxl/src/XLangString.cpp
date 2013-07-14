@@ -44,13 +44,13 @@ bool read_file(std::string filename, std::string& s)
         return false;
     }
     char* buffer = new char[length+1];
-    buffer[length] = '\0';
     if(!buffer)
     {
         std::cerr << "not enough memory" << std::endl;
         fclose(file);
         return false;
     }
+    buffer[length] = '\0';
     fread(buffer, 1, length, file);
     fclose(file);
     s = buffer;
