@@ -22,6 +22,7 @@
 
 namespace xl {
 
+bool        read_file(std::string filename, std::string& s);
 std::string escape_xml(std::string s);
 std::string unescape_xml(std::string s);
 std::string escape(std::string s);
