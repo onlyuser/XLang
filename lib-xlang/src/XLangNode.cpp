@@ -17,6 +17,7 @@
 
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
+#include "XLangType.h" // uint32_t
 #include <sstream> // std::stringstream
 #include <vector> // std::vector
 #include <algorithm> // std::replace, std::find_if

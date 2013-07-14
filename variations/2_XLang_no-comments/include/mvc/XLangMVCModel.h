@@ -38,6 +38,7 @@ struct MVCModel
                 >(lexer_id, loc, value); // assumes trivial dtor
     }
     static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t lexer_id, YYLTYPE loc, size_t size, ...);
+    static node::SymbolNode* make_symbol(TreeContext* tc, uint32_t lexer_id, YYLTYPE loc, std::vector<node::NodeIdentIFace*>& vec);
     static node::NodeIdentIFace* make_ast(TreeContext* tc, std::string filename);
 };
 

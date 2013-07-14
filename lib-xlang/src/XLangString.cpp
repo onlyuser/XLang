@@ -16,13 +16,47 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "XLangString.h" // Allocator
+#include <iostream> // std::cerr
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <string.h> // strcpy
 #include <regex.h> // regex_t
 #include <stdarg.h> // va_list
+#include <stdio.h> // FILE
 
 namespace xl {
+
+bool read_file(std::string filename, std::string& s)
+{
+    FILE* file = fopen(filename.c_str(), "rb");
+    if(!file)
+    {
+        std::cerr << "cannot open file" << std::endl;
+        return false;
+    }
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    rewind(file);
+    if(!length)
+    {
+        std::cerr << "file empty" << std::endl;
+        fclose(file);
+        return false;
+    }
+    char* buffer = new char[length+1];
+    buffer[length] = '\0';
+    if(!buffer)
+    {
+        std::cerr << "not enough memory" << std::endl;
+        fclose(file);
+        return false;
+    }
+    fread(buffer, 1, length, file);
+    fclose(file);
+    s = buffer;
+    delete[] buffer;
+    return true;
+}
 
 std::string replace(std::string s, const std::string& find_string, const std::string& replace_string)
 {

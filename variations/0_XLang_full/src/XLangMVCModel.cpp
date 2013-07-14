@@ -20,6 +20,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangString.h" // xl::unescape_xml
 #include "XLangType.h" // uint32_t
+#include "XLang.tab.h" // YYLTYPE
 #include <stdarg.h> // va_list
 #include <string.h> // memset
 #include <string> // std::string
@@ -46,6 +47,12 @@ node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t lexer_id, YYLT
             node::SymbolNode(lexer_id, loc, size, ap);
     va_end(ap);
     return node;
+}
+
+node::SymbolNode* MVCModel::make_symbol(TreeContext* tc, uint32_t lexer_id, YYLTYPE loc, std::vector<node::NodeIdentIFace*>& vec)
+{
+    return new (PNEW(tc->alloc(), node::, NodeIdentIFace))
+            node::SymbolNode(lexer_id, loc, vec);
 }
 
 template<>
@@ -109,53 +116,64 @@ static node::NodeIdentIFace* _make_ast_from_ticpp(TreeContext* tc, ticpp::Node* 
     if(dynamic_cast<ticpp::Document*>(ticpp_node))
     {
         uint32_t lexer_id = 0;
-        node::SymbolNode* root_symbol = mvc::MVCModel::make_symbol(tc, lexer_id, dummy_loc, 0);
-        if(!ticpp_node->NoChildren())
+        node::SymbolNode* document_node = mvc::MVCModel::make_symbol(tc, lexer_id, dummy_loc, 0);
+        if(ticpp_node->NoChildren())
+            return document_node;
+        ticpp::Iterator<ticpp::Node> p;
+        for(p = p.begin(ticpp_node); p != p.end(); p++)
+            document_node->push_back(_make_ast_from_ticpp(tc, p.Get()));
+        if(document_node->size() == 1)
         {
-            ticpp::Iterator<ticpp::Node> p;
-            for(p = p.begin(ticpp_node); p != p.end(); p++)
-                root_symbol->push_back(_make_ast_from_ticpp(tc, p.Get()));
-            if(root_symbol->size() == 1)
-            {
-                node::NodeIdentIFace* root_node = (*root_symbol)[0];
-                root_node->detach();
-                tc->alloc()._free(root_symbol);
-                return root_node;
-            }
+            node::NodeIdentIFace* root_node = (*document_node)[0];
+            root_node->detach();
+            tc->alloc()._free(document_node);
+            return root_node;
         }
-        return root_symbol;
+        return document_node;
     }
     if(dynamic_cast<ticpp::Declaration*>(ticpp_node))
         return NULL;
-    std::string node_typename, node_value;
-    uint32_t lexer_id;
-    ticpp::Element* elem = dynamic_cast<ticpp::Element*>(ticpp_node);
-    if(elem)
+    if(dynamic_cast<ticpp::Element*>(ticpp_node))
     {
-        std::map<std::string, std::string> attr_map; // in case you need it
-        ticpp::Iterator<ticpp::Attribute> q;
-        for(q = q.begin(elem); q != q.end(); q++)
+        std::string block_name;
+        ticpp_node->GetValue(&block_name);
+        if(block_name == "NULL")
+            return NULL;
+        std::string node_typename;
+        uint32_t lexer_id = 0;
+        std::string node_value;
+        ticpp::Element* elem = dynamic_cast<ticpp::Element*>(ticpp_node);
+        if(elem)
         {
-            std::string attr_name, attr_value;
-            q->GetName(&attr_name);
-            q->GetValue(&attr_value);
-            attr_map[attr_name] = attr_value;
+            std::map<std::string, std::string> attr_map; // in case you need it
+            ticpp::Iterator<ticpp::Attribute> q;
+            for(q = q.begin(elem); q != q.end(); q++)
+            {
+                std::string attr_name, attr_value;
+                q->GetName(&attr_name);
+                q->GetValue(&attr_value);
+                attr_map[attr_name] = attr_value;
+            }
+            if(attr_map.size())
+            {
+                node_typename = attr_map["type"];
+                node_value = attr_map["value"];
+                lexer_id = name_to_id(node_typename);
+            }
         }
-        node_typename = attr_map["type"];
-        node_value = attr_map["value"];
-        lexer_id = name_to_id(node_typename);
+        node::NodeIdentIFace* term_node = _make_term_from_typename(tc, node_typename, lexer_id, node_value);
+        if(term_node)
+            return term_node;
+        else
+        {
+            node::SymbolNode* symbol_node = mvc::MVCModel::make_symbol(tc, lexer_id, dummy_loc, 0);
+            ticpp::Iterator<ticpp::Node> r;
+            for(r = r.begin(ticpp_node); r != r.end(); r++)
+                symbol_node->push_back(_make_ast_from_ticpp(tc, r.Get()));
+            return symbol_node;
+        }
     }
-    node::NodeIdentIFace* term_node = _make_term_from_typename(tc, node_typename, lexer_id, node_value);
-    if(term_node)
-        return term_node;
-    else
-    {
-        node::SymbolNode* symbol_node = mvc::MVCModel::make_symbol(tc, lexer_id, dummy_loc, 0);
-        ticpp::Iterator<ticpp::Node> r;
-        for(r = r.begin(ticpp_node); r != r.end(); r++)
-            symbol_node->push_back(_make_ast_from_ticpp(tc, r.Get()));
-        return symbol_node;
-    }
+    return NULL;
 }
 #endif
 

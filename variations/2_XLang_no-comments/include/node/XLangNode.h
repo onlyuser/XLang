@@ -33,7 +33,7 @@ class Node : virtual public NodeIdentIFace
 {
 public:
     Node(NodeIdentIFace::type_t _type, uint32_t _lexer_id, YYLTYPE _loc)
-        : m_type(_type), m_lexer_id(_lexer_id), m_parent(NULL), m_loc(_loc)
+        : m_type(_type), m_lexer_id(_lexer_id), m_parent(NULL), m_original(NULL), m_loc(_loc)
     {}
 
     // required
@@ -56,6 +56,18 @@ public:
     }
     std::string uid() const;
 
+    // optional
+    void detach();
+    int index() const;
+    void set_original(const NodeIdentIFace* original)
+    {
+        m_original = original;
+    }
+    const NodeIdentIFace* original() const
+    {
+        return m_original ? m_original : this;
+    }
+
     // built-in
     YYLTYPE loc() const
     {
@@ -66,6 +78,7 @@ protected:
     NodeIdentIFace::type_t m_type;
     uint32_t m_lexer_id;
     NodeIdentIFace* m_parent;
+    const NodeIdentIFace* m_original;
     YYLTYPE m_loc;
 };
 
@@ -82,6 +95,17 @@ public:
     {
         return m_value;
     }
+    NodeIdentIFace* clone(TreeContext* tc) const
+    {
+        return new (PNEW_LOC(tc->alloc()))
+                TermNode<_type>(m_lexer_id, m_loc, m_value); // assumes trivial dtor
+    }
+    bool compare(const NodeIdentIFace* _node) const
+    {
+        if(!is_same_type(_node))
+            return false;
+        return m_value == dynamic_cast<const TermNode<_type>*>(_node)->value();
+    }
 
 private:
     typename TermInternalType<_type>::type m_value;
@@ -92,6 +116,7 @@ class SymbolNode
 {
 public:
     SymbolNode(uint32_t _lexer_id, YYLTYPE loc, size_t _size, va_list ap);
+    SymbolNode(uint32_t _lexer_id, YYLTYPE loc, std::vector<NodeIdentIFace*>& vec);
 
     // required
     NodeIdentIFace* operator[](uint32_t index) const
@@ -104,7 +129,37 @@ public:
     }
 
     // optional
+    NodeIdentIFace* clone(TreeContext* tc) const;
+    bool compare(const NodeIdentIFace* _node) const
+    {
+        if(!is_same_type(_node))
+            return false;
+        auto symbol_node = dynamic_cast<const SymbolNode*>(_node);
+        if(m_child_vec.size() != symbol_node->size())
+            return false;
+        for(size_t i = 0; i<m_child_vec.size(); i++)
+        {
+            if(!m_child_vec[i]->compare(const_cast<const NodeIdentIFace*>((*symbol_node)[i])))
+                return false;
+        }
+        return true;
+    }
+    NodeIdentIFace* find(const NodeIdentIFace* _node) const
+    {
+        for(auto p = m_child_vec.begin(); p != m_child_vec.end(); p++)
+        {
+            if((*p)->compare(_node))
+                return (*p);
+        }
+        return NULL;
+    }
     void push_back(NodeIdentIFace* _node);
+    void push_front(NodeIdentIFace* _node);
+    void insert_after(NodeIdentIFace* after_node, NodeIdentIFace* _node);
+    void remove_first(NodeIdentIFace* _node);
+    void replace_first(NodeIdentIFace* find_node, NodeIdentIFace* replace_node);
+    void erase(int index);
+    NodeIdentIFace* find_if(bool (*pred)(const NodeIdentIFace* _node)) const;
 
     // built-in
     static NodeIdentIFace* eol()
