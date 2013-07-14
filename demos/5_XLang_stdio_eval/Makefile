@@ -47,7 +47,7 @@ LIB_PATH_FLAGS = $(patsubst %, -L%, $(LIB_PATHS))
 ifdef LIB_PATH_EXTERN
 	LIB_STEMS_EXTERN = ticppd
 endif
-LIB_STEMS_PARENT = xlang
+LIB_STEMS_PARENT = xl
 LIBS_PARENT = $(patsubst %, $(LIB_PATH_PARENT)/lib%.a, $(LIB_STEMS_PARENT))
 LIB_FLAGS = \
 		$(patsubst %, -l%, $(LIB_STEMS_PARENT)) \
