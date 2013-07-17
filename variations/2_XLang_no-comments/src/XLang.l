@@ -99,7 +99,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {LOC;
-                _XLANG_error("unknown character");
+                _xl(error)("unknown character");
                 YY_FLUSH_BUFFER;
             }
 

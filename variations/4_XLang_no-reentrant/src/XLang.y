@@ -42,7 +42,7 @@
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
 
 // report error
-void _XLANG_error(const char* s)
+void _xl(error)(const char* s)
 {
     error_messages() << s;
 }
@@ -161,8 +161,8 @@ ScannerContext::ScannerContext(const char* buf)
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
 {
     parser_context() = new (PNEW(alloc, , ParserContext)) ParserContext(alloc, s);
-    int error_code = _XLANG_parse(); // parser entry point
-    _XLANG_lex_destroy();
+    int error_code = _xl(parse)(); // parser entry point
+    _xl(lex_destroy)();
     return (!error_code && error_messages().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 

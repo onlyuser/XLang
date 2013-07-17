@@ -43,7 +43,7 @@
         } \
     } while(0)
 
-#define LVAL         _XLANG_lval
+#define LVAL         _xl(lval)
 #define TREE_CONTEXT parser_context()->tree_context()
 
 %}
@@ -89,7 +89,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                _XLANG_error("unknown character");
+                _xl(error)("unknown character");
                 YY_FLUSH_BUFFER;
             }
 

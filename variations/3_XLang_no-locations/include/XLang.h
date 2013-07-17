@@ -78,13 +78,15 @@ private:
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings
-int _XLANG_lex(YYSTYPE*, yyscan_t);
-int _XLANG_lex_init(yyscan_t*);
-int _XLANG_lex_destroy(yyscan_t);
-void _XLANG_set_extra(YY_EXTRA_TYPE, yyscan_t);
-int _XLANG_parse(ParserContext*, yyscan_t);
-void _XLANG_error(ParserContext* pc, yyscan_t scanner, const char* s);
-void _XLANG_error(const char* s);
+#define _xl(x) _XLANG_##x
+int _xl(lex)(YYSTYPE*, yyscan_t);
+int _xl(lex_init)(yyscan_t*);
+int _xl(lex_destroy)(yyscan_t);
+void _xl(set_extra)(YY_EXTRA_TYPE, yyscan_t);
+int _xl(parse)(ParserContext*, yyscan_t);
+void _xl(error)(ParserContext* pc, yyscan_t scanner, const char* s);
+void _xl(error)(const char* s);
+//#undef _xl
 
 std::stringstream &error_messages();
 std::string id_to_name(uint32_t lexer_id);

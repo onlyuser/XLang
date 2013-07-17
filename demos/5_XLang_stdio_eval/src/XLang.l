@@ -48,17 +48,17 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                _XLANG_lval.ident_value = tree_context()->alloc_unique_string(yytext);
+                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                _XLANG_lval.int_value = atoi(yytext);
+                _xl(lval).int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                _XLANG_lval.float_value = atof(yytext);
+                _xl(lval).float_value = atof(yytext);
                 return ID_FLOAT;
             }
 
@@ -70,7 +70,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                _XLANG_error("unknown character");
+                _xl(error)("unknown character");
                 YY_FLUSH_BUFFER;
             }
 

@@ -47,7 +47,7 @@
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
 
 // report error
-void _XLANG_error(const char* s)
+void _xl(error)(const char* s)
 {
     error_messages() << s;
 }
@@ -126,7 +126,7 @@ ParserContext* &parser_context()
         } \
     } while(0)
 
-int _XLANG_lex()
+int _xl(lex)()
 {
     char yytext[SIZE_BUF_SMALL];
     memset(yytext, 0, sizeof(yytext));
@@ -148,7 +148,7 @@ int _XLANG_lex()
             YY_REWIND(1);
             yytext[PARM.m_pos - start_pos] = '\0';
         }
-        _XLANG_lval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
+        _xl(lval).ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if(isdigit(*cur_ptr))
@@ -168,10 +168,10 @@ int _XLANG_lex()
         }
         if(find_decimal_point)
         {
-            _XLANG_lval.float_value = atof(yytext);
+            _xl(lval).float_value = atof(yytext);
             return ID_FLOAT;
         }
-        _XLANG_lval.int_value = atoi(yytext);
+        _xl(lval).int_value = atoi(yytext);
         return ID_INT;
     }
     else if(*cur_ptr == ' ' || *cur_ptr == '\t' || *cur_ptr == '\n')
@@ -184,7 +184,7 @@ int _XLANG_lex()
         if(bytes_read != 0)
         {
             YY_REWIND(1);
-            return _XLANG_lex();
+            return _xl(lex)();
         }
     }
     else
@@ -197,7 +197,7 @@ int _XLANG_lex()
             case '=':
                 return *cur_ptr;
             default:
-                _XLANG_error("unknown character");
+                _xl(error)("unknown character");
         }
     return -1;
 }
@@ -271,7 +271,7 @@ ScannerContext::ScannerContext(FILE* file)
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, FILE* file)
 {
     parser_context() = new (PNEW(alloc, , ParserContext)) ParserContext(alloc, file);
-    int error_code = _XLANG_parse(); // parser entry point
+    int error_code = _xl(parse)(); // parser entry point
     return (!error_code && error_messages().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 
