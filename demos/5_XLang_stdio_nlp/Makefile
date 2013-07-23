@@ -169,13 +169,13 @@ clean_test :
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 #==================
 # pure
@@ -185,13 +185,13 @@ clean_import :
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 #==================
 # dot
@@ -201,13 +201,13 @@ clean_pure :
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 #==================
 # xml
@@ -217,13 +217,13 @@ clean_dot :
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			BASIC_SUITE=1
+			NLP_SUITE=1
 
 #==================
 # lint
