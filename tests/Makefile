@@ -43,8 +43,8 @@ ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_PATH = advanced_suite
 	TEST_REGEX_ENABLE = strings
 endif
-ifneq ($(strip $(C_SUITE)),)
-	TEST_PATH = c_suite
+ifneq ($(strip $(NLP_SUITE)),)
+	TEST_PATH = nlp_suite
 endif
 TEST_FILE_STEMS = \
 		$(shell \

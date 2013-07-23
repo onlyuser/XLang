@@ -1,0 +1,37 @@
+(S
+    (NP
+        (D
+            the
+        )
+        (A
+            quick
+            brown
+        )
+        (N
+            fox
+        )
+    )
+    (VP
+        (V
+            jumps
+        )
+        (AP
+            (PP
+                (P
+                    over
+                )
+                (NP
+                    (D
+                        the
+                    )
+                    (A
+                        lazy
+                    )
+                    (N
+                        dog
+                    )
+                )
+            )
+        )
+    )
+)
