@@ -40,6 +40,53 @@ lit_ident {id}+({digit}|{id})*
 lit_int   {digit}+
 lit_float {digit}*[.]{digit}+
 
+noun_pron   "i"|"you"|"he"|"she"|"him"|"her"|"it"|"them"|"we"|"us"|"here"|"there"|"everywhere"|"nowhere"|"someone"|"somewhere"
+noun_places "house"|"home"|"school"|"library"|"store"
+noun_actors "boy"|"girl"|"fox"|"dog"|"book"|"apple"
+noun        {noun_pron}|{noun_places}|{noun_actors}
+
+verb_motion_move "move"|"moves"|"moving"|"moved"
+verb_motion_come "come"|"comes"|"coming"|"came"
+verb_motion_go   "go"|"goes"|"going"|"went"|"gone"
+verb_motion_run  "run"|"runs"|"running"|"ran"
+verb_motion_jump "jump"|"jumps"|"jumping"|"jumped"
+verb_motion      {verb_motion_move}|{verb_motion_come}|{verb_motion_go}|{verb_motion_run}|{verb_motion_jump}
+
+verb_access_create  "create"|"creates"|"creating"|"created"
+verb_access_destroy "destroy"|"destroys"|"destroying"|"destroyed"
+verb_access_open    "open"|"opens"|"opening"|"opened"
+verb_access_close   "close"|"closes"|"closing"|"closed"
+verb_access_change  "change"|"changes"|"changing"|"changed"
+verb_access         {verb_access_create}|{verb_access_destroy}|{verb_access_open}|{verb_access_close}|{verb_access_change}
+
+verb_misc_do      "do"|"does"|"doing"|"did"|"done"
+verb_misc_make    "make"|"makes"|"making"|"made"
+verb_misc_get     "get"|"gets"|"getting"|"got"|"gotten"
+verb_misc_put     "put"|"puts"|"putting"
+verb_misc_give    "give"|"gives"|"giving"|"gave"|"given"
+verb_misc_receive "receive"|"receives"|"receiving"|"received"
+verb_misc         {verb_misc_do}|{verb_misc_make}|{verb_misc_get}|{verb_misc_put}|{verb_misc_give}|{verb_misc_receive}
+
+verb {verb_motion}|{verb_access}|{verb_misc}
+
+adj_speed  "fast"|"slow"|"quick"
+adj_color  "red"|"orange"|"yellow"|"green"|"blue"|"purple"|"black"|"white"|"brown"
+adj        {adj_speed}|{adj_color}|"lazy"
+
+prep_basic             "to"|"from"|"of"|"in"|"on"|"at"
+prep_spatial_distance  "near"|"far"
+prep_spatial_motion    "onto"|"into"|"through"
+prep_spatial_container "inside"|"outside"|"within"|"without"
+prep_spatial_vertical  "above"|"below"|"over"|"under"|"underneath"|"beneath"
+prep_spatial_order     "behind"|"before"|"after"|"beyond"|"around"
+prep_spatial           {prep_spatial_distance}|{prep_spatial_motion}|{prep_spatial_container}|{prep_spatial_vertical}|{prep_spatial_order}
+prep                   {prep_basic}|{prep_spatial}
+
+adv  "always"|"must"|"will"|"would"|"may"|"might"|"could"|"can"|"cannot"|"not"|"never"|"very"
+aux  "is"|"was"|"were"
+det  "a"|"the"|"this"|"that"|"these"|"those"
+conj "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
+
 %%
 
 {ws}        ;
@@ -47,42 +94,42 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* LITERALS */
 
-"fox"|"dog" {
+{noun}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_N;
             }
 
-"jumps"|"jumping" {
+{verb}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_V;
+                return ID_VERB;
             }
 
-"quick"|"brown"|"lazy" {
+{adj}       {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_A;
+                return ID_ADJ;
             }
 
-"very"      {
+{adv}       {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_ADV;
             }
 
-"over"      {
+{prep}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_P;
             }
 
-"is"        {
+{aux}       {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_AUX;
             }
 
-"a"|"the"   {
+{det}       {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_D;
             }
 
-"and"      {
+{conj}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
                 return ID_C;
             }

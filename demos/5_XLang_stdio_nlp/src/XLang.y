@@ -66,19 +66,22 @@ std::string id_to_name(uint32_t lexer_id)
         return _id_to_name[index];
     switch(lexer_id)
     {
-        case ID_S:   return "S";
-        case ID_NP:  return "NP";
-        case ID_VP:  return "VP";
-        case ID_AP:  return "AP";
-        case ID_PP:  return "PP";
-        case ID_N:   return "N";
-        case ID_V:   return "V";
-        case ID_A:   return "A";
-        case ID_ADV: return "Adv";
-        case ID_P:   return "P";
-        case ID_AUX: return "Aux";
-        case ID_D:   return "D";
-        case ID_C:   return "C";
+        case ID_S:    return "S";
+        case ID_NP:   return "NP";
+        case ID_VP:   return "VP";
+        case ID_AP:   return "AP";
+        case ID_PP:   return "PP";
+        case ID_N:    return "N";
+        case ID_V:    return "V";
+        case ID_VERB: return "Verb";
+        case ID_CA:   return "A'";
+        case ID_A:    return "A";
+        case ID_ADJ:  return "Adj";
+        case ID_ADV:  return "Adv";
+        case ID_P:    return "P";
+        case ID_AUX:  return "Aux";
+        case ID_D:    return "D";
+        case ID_C:    return "C";
     }
     throw ERROR_LEXER_ID_NOT_FOUND;
     return "";
@@ -95,7 +98,10 @@ uint32_t name_to_id(std::string name)
     if(name == "PP")    return ID_PP;
     if(name == "N")     return ID_N;
     if(name == "V")     return ID_V;
+    if(name == "Verb")  return ID_VERB;
+    if(name == "A'")    return ID_CA;
     if(name == "A")     return ID_A;
+    if(name == "Adj")   return ID_ADJ;
     if(name == "Adv")   return ID_ADV;
     if(name == "P")     return ID_P;
     if(name == "Aux")   return ID_AUX;
@@ -129,10 +135,10 @@ xl::TreeContext* &tree_context()
 
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
-%token<ident_value> ID_IDENT ID_N ID_V ID_A ID_ADV ID_P ID_AUX ID_D ID_C
-%type<symbol_value> S NP VP AP PP N V A Adv P Aux D C
+%token<ident_value> ID_IDENT ID_N ID_V ID_VERB ID_ADJ ID_ADV ID_P ID_AUX ID_D ID_C
+%type<symbol_value> S NP VP AP PP N V Verb CA A Adj Adv P Aux D C
 
-%nonassoc ID_S ID_NP ID_VP ID_AP ID_PP
+%nonassoc ID_S ID_NP ID_VP ID_AP ID_PP ID_CA ID_A
 
 %nonassoc ID_COUNT
 
@@ -150,7 +156,7 @@ S:
 NP:
       D N     { $$ = MAKE_SYMBOL(ID_NP, 2, $1, $2); }
     | N       { $$ = MAKE_SYMBOL(ID_NP, 1, $1); }
-    | D A N   { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
+    | D CA N  { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
     | NP C NP { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
     ;
 
@@ -176,12 +182,26 @@ N:
     ;
 
 V:
-      ID_V { $$ = MAKE_SYMBOL(ID_V, 1, MAKE_TERM(ID_IDENT, $1)); }
+      Adv Verb { $$ = MAKE_SYMBOL(ID_V, 2, $1, $2); }
+    | Verb     { $$ = MAKE_SYMBOL(ID_V, 1, $1); }
+    ;
+
+Verb:
+      ID_VERB { $$ = MAKE_SYMBOL(ID_VERB, 1, MAKE_TERM(ID_IDENT, $1)); }
+    ;
+
+CA:
+      A     { $$ = MAKE_SYMBOL(ID_CA, 1, $1); }
+    | CA CA { $$ = MAKE_SYMBOL(ID_CA, 2, $1, $2); }
     ;
 
 A:
-      ID_A { $$ = MAKE_SYMBOL(ID_A, 1, MAKE_TERM(ID_IDENT, $1)); }
-    | A A  { $$ = MAKE_SYMBOL(ID_A, 2, $1, $2); }
+      Adv Adj { $$ = MAKE_SYMBOL(ID_A, 2, $1, $2); }
+    | Adj     { $$ = MAKE_SYMBOL(ID_A, 1, $1); }
+    ;
+
+Adj:
+      ID_ADJ { $$ = MAKE_SYMBOL(ID_ADJ, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
 Adv:

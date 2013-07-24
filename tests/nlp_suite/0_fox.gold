@@ -3,9 +3,17 @@
         (D
             the
         )
-        (A
-            quick
-            brown
+        (A'
+            (A
+                (Adj
+                    quick
+                )
+            )
+            (A
+                (Adj
+                    brown
+                )
+            )
         )
         (N
             fox
@@ -13,7 +21,9 @@
     )
     (VP
         (V
-            jumps
+            (Verb
+                jumps
+            )
         )
         (AP
             (PP
@@ -24,8 +34,12 @@
                     (D
                         the
                     )
-                    (A
-                        lazy
+                    (A'
+                        (A
+                            (Adj
+                                lazy
+                            )
+                        )
                     )
                     (N
                         dog

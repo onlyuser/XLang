@@ -3,9 +3,17 @@
         <symbol type="D">
             <term type="ident" value=the/>
         </symbol>
-        <symbol type="A">
-            <term type="ident" value=quick/>
-            <term type="ident" value=brown/>
+        <symbol type="A'">
+            <symbol type="A">
+                <symbol type="Adj">
+                    <term type="ident" value=quick/>
+                </symbol>
+            </symbol>
+            <symbol type="A">
+                <symbol type="Adj">
+                    <term type="ident" value=brown/>
+                </symbol>
+            </symbol>
         </symbol>
         <symbol type="N">
             <term type="ident" value=fox/>
@@ -13,7 +21,9 @@
     </symbol>
     <symbol type="VP">
         <symbol type="V">
-            <term type="ident" value=jumps/>
+            <symbol type="Verb">
+                <term type="ident" value=jumps/>
+            </symbol>
         </symbol>
         <symbol type="AP">
             <symbol type="PP">
@@ -24,8 +34,12 @@
                     <symbol type="D">
                         <term type="ident" value=the/>
                     </symbol>
-                    <symbol type="A">
-                        <term type="ident" value=lazy/>
+                    <symbol type="A'">
+                        <symbol type="A">
+                            <symbol type="Adj">
+                                <term type="ident" value=lazy/>
+                            </symbol>
+                        </symbol>
                     </symbol>
                     <symbol type="N">
                         <term type="ident" value=dog/>
