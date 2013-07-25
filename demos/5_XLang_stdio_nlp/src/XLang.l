@@ -42,7 +42,7 @@ lit_float {digit}*[.]{digit}+
 
 noun_pron   "i"|"you"|"he"|"she"|"him"|"her"|"it"|"them"|"we"|"us"|"here"|"there"|"everywhere"|"nowhere"|"someone"|"somewhere"
 noun_places "house"|"home"|"school"|"library"|"store"
-noun_actors "boy"|"girl"|"fox"|"dog"|"book"|"apple"
+noun_actors "boy"|"girl"|"man"|"woman"|"fox"|"dog"|"book"|"apple"
 noun        {noun_pron}|{noun_places}|{noun_actors}
 
 verb_motion_move "move"|"moves"|"moving"|"moved"
@@ -64,14 +64,16 @@ verb_misc_make    "make"|"makes"|"making"|"made"
 verb_misc_get     "get"|"gets"|"getting"|"got"|"gotten"
 verb_misc_put     "put"|"puts"|"putting"
 verb_misc_give    "give"|"gives"|"giving"|"gave"|"given"
+verb_misc_take    "take"|"takes"|"taking"|"took"|"taken"
 verb_misc_receive "receive"|"receives"|"receiving"|"received"
-verb_misc         {verb_misc_do}|{verb_misc_make}|{verb_misc_get}|{verb_misc_put}|{verb_misc_give}|{verb_misc_receive}
+verb_misc         {verb_misc_do}|{verb_misc_make}|{verb_misc_get}|{verb_misc_put}|{verb_misc_give}|{verb_misc_take}|{verb_misc_receive}
 
 verb {verb_motion}|{verb_access}|{verb_misc}
 
-adj_speed  "fast"|"slow"|"quick"
-adj_color  "red"|"orange"|"yellow"|"green"|"blue"|"purple"|"black"|"white"|"brown"
-adj        {adj_speed}|{adj_color}|"lazy"
+adj_size  "big"|"small"
+adj_color "red"|"orange"|"yellow"|"green"|"blue"|"purple"|"black"|"white"|"brown"
+adj_speed "fast"|"slow"|"quick"
+adj       {adj_size}|{adj_color}|{adj_speed}|"lazy"
 
 prep_basic             "to"|"from"|"of"|"in"|"on"|"at"
 prep_spatial_distance  "near"|"far"
@@ -82,10 +84,12 @@ prep_spatial_order     "behind"|"before"|"after"|"beyond"|"around"
 prep_spatial           {prep_spatial_distance}|{prep_spatial_motion}|{prep_spatial_container}|{prep_spatial_vertical}|{prep_spatial_order}
 prep                   {prep_basic}|{prep_spatial}
 
-adv  "always"|"must"|"will"|"would"|"may"|"might"|"could"|"can"|"cannot"|"not"|"never"|"very"
-aux  "is"|"was"|"were"
-det  "a"|"the"|"this"|"that"|"these"|"those"
-conj "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
+adv   "always"|"must"|"will"|"would"|"may"|"might"|"could"|"can"|"cannot"|"not"|"never"|"very"
+aux   "is"|"was"|"were"
+det   "a"|"the"|"this"|"that"|"these"|"those"
+conj  "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
+conj2 "for2"|"and2"|"nor2"|"but2"|"or2"|"yet2"|"so2"
+conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
 
 %%
 
@@ -96,7 +100,7 @@ conj "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
 
 {noun}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_N;
+                return ID_NOUN;
             }
 
 {verb}      {
@@ -116,7 +120,7 @@ conj "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
 
 {prep}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_P;
+                return ID_PREP;
             }
 
 {aux}       {
@@ -126,12 +130,22 @@ conj "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
 
 {det}       {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_D;
+                return ID_DET;
             }
 
 {conj}      {
                 _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
-                return ID_C;
+                return ID_CONJ;
+            }
+
+{conj2}     {
+                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_CONJ_2;
+            }
+
+{conj3}     {
+                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                return ID_CONJ_3;
             }
 
 {lit_ident} {

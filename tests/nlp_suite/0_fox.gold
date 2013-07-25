@@ -1,48 +1,54 @@
-(S
-    (NP
-        (D
-            the
-        )
-        (A'
-            (A
-                (Adj
-                    quick
-                )
+(S'
+    (S
+        (NP
+            (Det
+                the
             )
-            (A
-                (Adj
-                    brown
-                )
-            )
-        )
-        (N
-            fox
-        )
-    )
-    (VP
-        (V
-            (Verb
-                jumps
-            )
-        )
-        (AP
-            (PP
-                (P
-                    over
-                )
-                (NP
-                    (D
-                        the
-                    )
-                    (A'
-                        (A
-                            (Adj
-                                lazy
-                            )
+            (N
+                (A'
+                    (A
+                        (Adj
+                            quick
                         )
                     )
-                    (N
-                        dog
+                    (A
+                        (Adj
+                            brown
+                        )
+                    )
+                )
+                (Noun
+                    fox
+                )
+            )
+        )
+        (VP
+            (V
+                (Verb
+                    jumps
+                )
+            )
+            (AP
+                (PP
+                    (Prep
+                        over
+                    )
+                    (NP
+                        (Det
+                            the
+                        )
+                        (N
+                            (A'
+                                (A
+                                    (Adj
+                                        lazy
+                                    )
+                                )
+                            )
+                            (Noun
+                                dog
+                            )
+                        )
                     )
                 )
             )

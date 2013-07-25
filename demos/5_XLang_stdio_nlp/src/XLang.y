@@ -1,6 +1,6 @@
 // XLang
 // -- A parser framework for language modeling
-// Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+// Copyright (Conj) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -66,47 +66,55 @@ std::string id_to_name(uint32_t lexer_id)
         return _id_to_name[index];
     switch(lexer_id)
     {
-        case ID_S:    return "S";
-        case ID_NP:   return "NP";
-        case ID_VP:   return "VP";
-        case ID_AP:   return "AP";
-        case ID_PP:   return "PP";
-        case ID_N:    return "N";
-        case ID_V:    return "V";
-        case ID_VERB: return "Verb";
-        case ID_CA:   return "A'";
-        case ID_A:    return "A";
-        case ID_ADJ:  return "Adj";
-        case ID_ADV:  return "Adv";
-        case ID_P:    return "P";
-        case ID_AUX:  return "Aux";
-        case ID_D:    return "D";
-        case ID_C:    return "C";
+        case ID_CS:     return "S'";
+        case ID_S:      return "S";
+        case ID_NP:     return "NP";
+        case ID_VP:     return "VP";
+        case ID_AP:     return "AP";
+        case ID_PP:     return "PP";
+        case ID_N:      return "N";
+        case ID_V:      return "V";
+        case ID_CA:     return "A'";
+        case ID_A:      return "A";
+        case ID_NOUN:   return "Noun";
+        case ID_VERB:   return "Verb";
+        case ID_ADJ:    return "Adj";
+        case ID_ADV:    return "Adv";
+        case ID_PREP:   return "Prep";
+        case ID_AUX:    return "Aux";
+        case ID_DET:    return "Det";
+        case ID_CONJ:   return "Conj";
+        case ID_CONJ_2: return "Conj_2";
+        case ID_CONJ_3: return "Conj_3";
     }
     throw ERROR_LEXER_ID_NOT_FOUND;
     return "";
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "int")   return ID_INT;
-    if(name == "float") return ID_FLOAT;
-    if(name == "ident") return ID_IDENT;
-    if(name == "S")     return ID_S;
-    if(name == "NP")    return ID_NP;
-    if(name == "VP")    return ID_VP;
-    if(name == "AP")    return ID_AP;
-    if(name == "PP")    return ID_PP;
-    if(name == "N")     return ID_N;
-    if(name == "V")     return ID_V;
-    if(name == "Verb")  return ID_VERB;
-    if(name == "A'")    return ID_CA;
-    if(name == "A")     return ID_A;
-    if(name == "Adj")   return ID_ADJ;
-    if(name == "Adv")   return ID_ADV;
-    if(name == "P")     return ID_P;
-    if(name == "Aux")   return ID_AUX;
-    if(name == "D")     return ID_D;
-    if(name == "C")     return ID_C;
+    if(name == "int")    return ID_INT;
+    if(name == "float")  return ID_FLOAT;
+    if(name == "ident")  return ID_IDENT;
+    if(name == "S'")     return ID_CS;
+    if(name == "S")      return ID_S;
+    if(name == "NP")     return ID_NP;
+    if(name == "VP")     return ID_VP;
+    if(name == "AP")     return ID_AP;
+    if(name == "PP")     return ID_PP;
+    if(name == "N")      return ID_N;
+    if(name == "V")      return ID_V;
+    if(name == "A'")     return ID_CA;
+    if(name == "A")      return ID_A;
+    if(name == "Noun")   return ID_NOUN;
+    if(name == "Verb")   return ID_VERB;
+    if(name == "Adj")    return ID_ADJ;
+    if(name == "Adv")    return ID_ADV;
+    if(name == "Prep")   return ID_PREP;
+    if(name == "Aux")    return ID_AUX;
+    if(name == "Det")    return ID_DET;
+    if(name == "Conj")   return ID_CONJ;
+    if(name == "Conj_2") return ID_CONJ_2;
+    if(name == "Conj_3") return ID_CONJ_3;
     throw ERROR_LEXER_NAME_NOT_FOUND;
     return 0;
 }
@@ -135,18 +143,38 @@ xl::TreeContext* &tree_context()
 
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
-%token<ident_value> ID_IDENT ID_N ID_V ID_VERB ID_ADJ ID_ADV ID_P ID_AUX ID_D ID_C
-%type<symbol_value> S NP VP AP PP N V Verb CA A Adj Adv P Aux D C
+%token<ident_value> ID_IDENT
 
-%nonassoc ID_S ID_NP ID_VP ID_AP ID_PP ID_CA ID_A
+// lvalues for terminals that don't have rules
+%token<ident_value> ID_N ID_V ID_NOUN ID_VERB
+%token<ident_value> ID_ADJ ID_ADV ID_PREP
+%token<ident_value> ID_AUX ID_DET ID_CONJ ID_CONJ_2 ID_CONJ_3
+
+// lvalues for non-terminals that have rules
+%type<symbol_value> CS S NP VP AP PP
+%type<symbol_value> CA A
+
+// lvalues for terminals that have rules
+%type<symbol_value> N V Noun Verb
+%type<symbol_value> Adj Adv Prep
+%type<symbol_value> Aux Det Conj Conj_2 Conj_3
+
+// lexer IDs non-terminals
+%nonassoc ID_CS ID_S ID_NP ID_VP ID_AP ID_PP
+%nonassoc ID_CA ID_A
 
 %nonassoc ID_COUNT
 
 %%
 
 root:
-      S     { tree_context()->root() = $1; YYACCEPT; }
+      CS    { tree_context()->root() = $1; YYACCEPT; }
     | error { yyclearin; /* yyerrok; YYABORT; */ }
+    ;
+
+CS:
+      S        { $$ = MAKE_SYMBOL(ID_CS, 1, $1); }
+    | CS Conj_3 CS { $$ = MAKE_SYMBOL(ID_CS, 3, $1, $2, $3); }
     ;
 
 S:
@@ -154,40 +182,36 @@ S:
     ;
 
 NP:
-      D N     { $$ = MAKE_SYMBOL(ID_NP, 2, $1, $2); }
-    | N       { $$ = MAKE_SYMBOL(ID_NP, 1, $1); }
-    | D CA N  { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
-    | NP C NP { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
+      N          { $$ = MAKE_SYMBOL(ID_NP, 1, $1); }
+    | Det N      { $$ = MAKE_SYMBOL(ID_NP, 2, $1, $2); }
+    | NP Conj NP { $$ = MAKE_SYMBOL(ID_NP, 3, $1, $2, $3); }
     ;
 
 VP:
-      V       { $$ = MAKE_SYMBOL(ID_VP, 1, $1); }
-    | V NP    { $$ = MAKE_SYMBOL(ID_VP, 2, $1, $2); }
-    | V AP    { $$ = MAKE_SYMBOL(ID_VP, 2, $1, $2); }
-    | VP C VP { $$ = MAKE_SYMBOL(ID_VP, 3, $1, $2, $3); }
+      V            { $$ = MAKE_SYMBOL(ID_VP, 1, $1); }
+    | V NP         { $$ = MAKE_SYMBOL(ID_VP, 2, $1, $2); }
+    | V AP         { $$ = MAKE_SYMBOL(ID_VP, 2, $1, $2); }
+    | VP Conj_2 VP { $$ = MAKE_SYMBOL(ID_VP, 3, $1, $2, $3); }
     ;
 
 AP:
-      A PP { $$ = MAKE_SYMBOL(ID_AP, 2, $1, $2); }
-    | PP   { $$ = MAKE_SYMBOL(ID_AP, 1, $1); }
+      PP   { $$ = MAKE_SYMBOL(ID_AP, 1, $1); }
+    | A PP { $$ = MAKE_SYMBOL(ID_AP, 2, $1, $2); }
     ;
 
 PP:
-      P NP { $$ = MAKE_SYMBOL(ID_PP, 2, $1, $2); }
-    | P PP { $$ = MAKE_SYMBOL(ID_PP, 2, $1, $2); }
+      Prep NP { $$ = MAKE_SYMBOL(ID_PP, 2, $1, $2); }
+    | Prep PP { $$ = MAKE_SYMBOL(ID_PP, 2, $1, $2); }
     ;
 
 N:
-      ID_N { $$ = MAKE_SYMBOL(ID_N, 1, MAKE_TERM(ID_IDENT, $1)); }
+      Noun    { $$ = MAKE_SYMBOL(ID_N, 1, $1); }
+    | CA Noun { $$ = MAKE_SYMBOL(ID_N, 2, $1, $2); }
     ;
 
 V:
-      Adv Verb { $$ = MAKE_SYMBOL(ID_V, 2, $1, $2); }
-    | Verb     { $$ = MAKE_SYMBOL(ID_V, 1, $1); }
-    ;
-
-Verb:
-      ID_VERB { $$ = MAKE_SYMBOL(ID_VERB, 1, MAKE_TERM(ID_IDENT, $1)); }
+      Verb  { $$ = MAKE_SYMBOL(ID_V, 1, $1); }
+    | Adv V { $$ = MAKE_SYMBOL(ID_V, 2, $1, $2); }
     ;
 
 CA:
@@ -196,8 +220,16 @@ CA:
     ;
 
 A:
-      Adv Adj { $$ = MAKE_SYMBOL(ID_A, 2, $1, $2); }
-    | Adj     { $$ = MAKE_SYMBOL(ID_A, 1, $1); }
+      Adj     { $$ = MAKE_SYMBOL(ID_A, 1, $1); }
+    | Adv Adj { $$ = MAKE_SYMBOL(ID_A, 2, $1, $2); }
+    ;
+
+Noun:
+      ID_NOUN { $$ = MAKE_SYMBOL(ID_NOUN, 1, MAKE_TERM(ID_IDENT, $1)); }
+    ;
+
+Verb:
+      ID_VERB { $$ = MAKE_SYMBOL(ID_VERB, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
 Adj:
@@ -208,20 +240,28 @@ Adv:
       ID_ADV { $$ = MAKE_SYMBOL(ID_ADV, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
-P:
-      ID_P { $$ = MAKE_SYMBOL(ID_P, 1, MAKE_TERM(ID_IDENT, $1)); }
+Prep:
+      ID_PREP { $$ = MAKE_SYMBOL(ID_PREP, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
 Aux:
       ID_AUX { $$ = MAKE_SYMBOL(ID_AUX, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
-D:
-      ID_D { $$ = MAKE_SYMBOL(ID_D, 1, MAKE_TERM(ID_IDENT, $1)); }
+Det:
+      ID_DET { $$ = MAKE_SYMBOL(ID_DET, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
-C:
-      ID_C { $$ = MAKE_SYMBOL(ID_C, 1, MAKE_TERM(ID_IDENT, $1)); }
+Conj:
+      ID_CONJ { $$ = MAKE_SYMBOL(ID_CONJ, 1, MAKE_TERM(ID_IDENT, $1)); }
+    ;
+
+Conj_2:
+      ID_CONJ_2 { $$ = MAKE_SYMBOL(ID_CONJ_2, 1, MAKE_TERM(ID_IDENT, $1)); }
+    ;
+
+Conj_3:
+      ID_CONJ_3 { $$ = MAKE_SYMBOL(ID_CONJ_3, 1, MAKE_TERM(ID_IDENT, $1)); }
     ;
 
 %%
