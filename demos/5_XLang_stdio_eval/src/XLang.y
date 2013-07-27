@@ -127,8 +127,6 @@ xl::TreeContext* &tree_context()
 %left '^'
 %nonassoc ID_UMINUS
 
-%nonassoc ID_COUNT
-
 %%
 
 root:
@@ -177,7 +175,7 @@ void display_usage(bool verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << std::endl
                 << "Input control:" << std::endl
-                << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
+                << "  -i, --in-xml FILENAME (de-serialize from xml)" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
                 << "  -e, --eval" << std::endl

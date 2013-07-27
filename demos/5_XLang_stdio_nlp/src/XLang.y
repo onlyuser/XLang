@@ -1,6 +1,6 @@
 // XLang
 // -- A parser framework for language modeling
-// Copyright (Conj) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+// Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@
 #define MAKE_SYMBOL(...)           xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
 #define ERROR_LEXER_ID_NOT_FOUND   "missing lexer id handler, most likely you forgot to register one"
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
-#define EOL                        xl::node::SymbolNode::eol();
 
 // report error
 void _xl(error)(const char* s)
@@ -163,8 +162,6 @@ xl::TreeContext* &tree_context()
 %nonassoc ID_CS ID_S ID_NP ID_VP ID_AP ID_PP
 %nonassoc ID_CA ID_A
 
-%nonassoc ID_COUNT
-
 %%
 
 root:
@@ -282,10 +279,9 @@ void display_usage(bool verbose)
         std::cout << "Parses input and prints a syntax tree to standard out" << std::endl
                 << std::endl
                 << "Input control:" << std::endl
-                << "  -i, --in-xml=FILE (de-serialize from xml)" << std::endl
+                << "  -i, --in-xml FILENAME (de-serialize from xml)" << std::endl
                 << std::endl
                 << "Output control:" << std::endl
-                << "  -e, --eval" << std::endl
                 << "  -l, --lisp" << std::endl
                 << "  -x, --xml" << std::endl
                 << "  -g, --graph" << std::endl

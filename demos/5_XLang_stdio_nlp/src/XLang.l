@@ -27,6 +27,9 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <stdlib.h> // atoi
 
+#define LVAL         _xl(lval)
+#define TREE_CONTEXT (*tree_context())
+
 %}
 
 %option noyywrap nounput
@@ -99,67 +102,67 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
  /* LITERALS */
 
 {noun}      {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_NOUN;
             }
 
 {verb}      {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_VERB;
             }
 
 {adj}       {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_ADJ;
             }
 
 {adv}       {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_ADV;
             }
 
 {prep}      {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_PREP;
             }
 
 {aux}       {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_AUX;
             }
 
 {det}       {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_DET;
             }
 
 {conj}      {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ;
             }
 
 {conj2}     {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ_2;
             }
 
 {conj3}     {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ_3;
             }
 
 {lit_ident} {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                _xl(lval).int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                _xl(lval).float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

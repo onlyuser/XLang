@@ -27,6 +27,9 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <stdlib.h> // atoi
 
+#define LVAL         _xl(lval)
+#define TREE_CONTEXT (*tree_context())
+
 %}
 
 %option noyywrap nounput
@@ -48,17 +51,17 @@ lit_float {digit}*[.]{digit}+
  /* LITERALS */
 
 {lit_ident} {
-                _xl(lval).ident_value = tree_context()->alloc_unique_string(yytext);
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }
 
 {lit_int}   {
-                _xl(lval).int_value = atoi(yytext);
+                LVAL.int_value = atoi(yytext);
                 return ID_INT;
             }
 
 {lit_float} {
-                _xl(lval).float_value = atof(yytext);
+                LVAL.float_value = atof(yytext);
                 return ID_FLOAT;
             }
 

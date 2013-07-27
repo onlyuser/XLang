@@ -21,7 +21,6 @@
 
 %{
 
-#include "XLangType.h" // char*
 #include "XLang.h" // NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::unescape
