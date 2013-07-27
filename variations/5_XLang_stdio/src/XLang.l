@@ -21,8 +21,10 @@
 
 %{
 
-#include "XLang.h" // node::NodeIdentIFace
+#include "XLang.h"
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangTreeContext.h" // TreeContext
 #include <stdlib.h> // atoi
 
 #define LVAL         _xl(lval)

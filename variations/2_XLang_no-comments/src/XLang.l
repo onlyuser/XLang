@@ -21,7 +21,7 @@
 
 %{
 
-#include "XLang.h" // NodeIdentIFace
+#include "XLang.h"
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
