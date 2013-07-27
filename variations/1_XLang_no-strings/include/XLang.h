@@ -19,9 +19,9 @@
 #define XLANG_H_
 
 #include "XLangType.h" // uint32_t
-#include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangAlloc.h" // Allocator
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
 #include <sstream> // std::stringstream
