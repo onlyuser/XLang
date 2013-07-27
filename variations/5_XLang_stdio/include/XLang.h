@@ -20,10 +20,11 @@
 
 #include "XLangType.h" // uint32_t
 #include "XLangAlloc.h" // Allocator
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLangTreeContext.h" // TreeContext
 #include <string> // std::string
 #include <sstream> // std::stringstream
+
+namespace xl { namespace node { class NodeIdentIFace; } }
+namespace xl { class TreeContext; }
 
 // forward declaration of lexer/parser functions
 // so the compiler shuts up about warnings

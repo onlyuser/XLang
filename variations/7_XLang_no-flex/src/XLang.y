@@ -20,7 +20,8 @@
 
 %{
 
-#include "XLang.h" // node::NodeIdentIFace
+#include "XLang.h"
+#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView

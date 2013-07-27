@@ -20,11 +20,12 @@
 
 #include "XLangType.h" // uint32_t
 #include "XLangAlloc.h" // Allocator
-#include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include <stdio.h> // FILE
 #include <string> // std::string
 #include <sstream> // std::stringstream
+
+namespace xl { namespace node { class NodeIdentIFace; } }
 
 struct ScannerContext
 {
