@@ -103,6 +103,7 @@ std::string id_to_name(uint32_t lexer_id)
         case ID_VERB:   return "Verb";
         case ID_ADJ:    return "Adj";
         case ID_ADV:    return "Adv";
+        case ID_MODAL:  return "Modal";
         case ID_PREP:   return "Prep";
         case ID_AUX:    return "Aux";
         case ID_DET:    return "Det";
@@ -132,6 +133,7 @@ uint32_t name_to_id(std::string name)
     if(name == "Verb")   return ID_VERB;
     if(name == "Adj")    return ID_ADJ;
     if(name == "Adv")    return ID_ADV;
+    if(name == "Modal")  return ID_MODAL;
     if(name == "Prep")   return ID_PREP;
     if(name == "Aux")    return ID_AUX;
     if(name == "Det")    return ID_DET;
@@ -165,7 +167,7 @@ uint32_t name_to_id(std::string name)
 
 // lvalues for terminals that don't have rules
 %token<ident_value> ID_N ID_V ID_NOUN ID_VERB
-%token<ident_value> ID_ADJ ID_ADV ID_PREP
+%token<ident_value> ID_ADJ ID_ADV ID_MODAL ID_PREP
 %token<ident_value> ID_AUX ID_DET ID_CONJ ID_CONJ_2 ID_CONJ_3
 
 // lvalues for non-terminals that have rules
@@ -174,7 +176,7 @@ uint32_t name_to_id(std::string name)
 
 // lvalues for terminals that have rules
 %type<symbol_value> N V Noun Verb
-%type<symbol_value> Adj Adv Prep
+%type<symbol_value> Adj Adv Modal Prep
 %type<symbol_value> Aux Det Conj Conj_2 Conj_3
 
 // lexer IDs non-terminals
@@ -189,7 +191,7 @@ root:
     ;
 
 CS:
-      S        { $$ = MAKE_SYMBOL(ID_CS, @$, 1, $1); }
+      S            { $$ = MAKE_SYMBOL(ID_CS, @$, 1, $1); }
     | CS Conj_3 CS { $$ = MAKE_SYMBOL(ID_CS, @$, 3, $1, $2, $3); }
     ;
 
@@ -206,6 +208,7 @@ NP:
 VP:
       V            { $$ = MAKE_SYMBOL(ID_VP, @$, 1, $1); }
     | V NP         { $$ = MAKE_SYMBOL(ID_VP, @$, 2, $1, $2); }
+    | V NP PP      { $$ = MAKE_SYMBOL(ID_VP, @$, 3, $1, $2, $3); }
     | V AP         { $$ = MAKE_SYMBOL(ID_VP, @$, 2, $1, $2); }
     | VP Conj_2 VP { $$ = MAKE_SYMBOL(ID_VP, @$, 3, $1, $2, $3); }
     ;
@@ -226,8 +229,9 @@ N:
     ;
 
 V:
-      Verb  { $$ = MAKE_SYMBOL(ID_V, @$, 1, $1); }
-    | Adv V { $$ = MAKE_SYMBOL(ID_V, @$, 2, $1, $2); }
+      Verb    { $$ = MAKE_SYMBOL(ID_V, @$, 1, $1); }
+    | Adv V   { $$ = MAKE_SYMBOL(ID_V, @$, 2, $1, $2); }
+    | Modal V { $$ = MAKE_SYMBOL(ID_V, @$, 2, $1, $2); }
     ;
 
 CA:
@@ -254,6 +258,10 @@ Adj:
 
 Adv:
       ID_ADV { $$ = MAKE_SYMBOL(ID_ADV, @$, 1, MAKE_TERM(ID_IDENT, @$, $1)); }
+    ;
+
+Modal:
+      ID_MODAL { $$ = MAKE_SYMBOL(ID_MODAL, @$, 1, MAKE_TERM(ID_IDENT, @$, $1)); }
     ;
 
 Prep:

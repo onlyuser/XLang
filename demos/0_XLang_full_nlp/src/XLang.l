@@ -73,7 +73,7 @@ lit_ident {id}+({digit}|{id})*
 lit_int   {digit}+
 lit_float {digit}*[.]{digit}+
 
-noun_pron   "i"|"you"|"he"|"she"|"him"|"her"|"it"|"them"|"we"|"us"|"here"|"there"|"everywhere"|"nowhere"|"someone"|"somewhere"
+noun_pron   "i"|"me"|"you"|"he"|"she"|"him"|"her"|"it"|"them"|"we"|"us"|"here"|"there"|"everywhere"|"nowhere"|"someone"|"somewhere"
 noun_places "house"|"home"|"school"|"library"|"store"
 noun_actors "boy"|"girl"|"man"|"woman"|"fox"|"dog"|"book"|"apple"
 noun        {noun_pron}|{noun_places}|{noun_actors}
@@ -105,7 +105,7 @@ verb {verb_motion}|{verb_access}|{verb_misc}
 
 adj_size  "big"|"small"
 adj_color "red"|"orange"|"yellow"|"green"|"blue"|"purple"|"black"|"white"|"brown"
-adj_speed "fast"|"slow"|"quick"
+adj_speed "fast"|"quick"|"slow"
 adj       {adj_size}|{adj_color}|{adj_speed}|"lazy"
 
 prep_basic             "to"|"from"|"of"|"in"|"on"|"at"
@@ -117,7 +117,8 @@ prep_spatial_order     "behind"|"before"|"after"|"beyond"|"around"
 prep_spatial           {prep_spatial_distance}|{prep_spatial_motion}|{prep_spatial_container}|{prep_spatial_vertical}|{prep_spatial_order}
 prep                   {prep_basic}|{prep_spatial}
 
-adv   "always"|"must"|"will"|"would"|"may"|"might"|"could"|"can"|"cannot"|"not"|"never"|"very"
+adv   "quickly"|"slowly"
+modal "always"|"must"|"will"|"would"|"may"|"might"|"could"|"can"|"cannot"|"not"|"never"|"very"
 aux   "is"|"was"|"were"
 det   "a"|"the"|"this"|"that"|"these"|"those"
 conj  "for"|"and"|"nor"|"but"|"or"|"yet"|"so"
@@ -149,6 +150,11 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
 {adv}       {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_ADV;
+            }
+
+{modal}     {LOC;
+                LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                return ID_MODAL;
             }
 
 {prep}      {LOC;
