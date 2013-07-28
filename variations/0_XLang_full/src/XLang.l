@@ -35,17 +35,18 @@
 // YY_INPUT macro (see section 10 of the flex manual 'The generated scanner')
 #define YY_INPUT(buf, result, max_size) \
     do { \
-        if(PARM.m_pos >= PARM.m_length) \
+        if(PARM.m_pos >= PARM.m_length || (max_size)<1) { \
             (result) = YY_NULL; \
-        else { \
-            (result) = std::min(PARM.m_length-PARM.m_pos, std::min(static_cast<int>(max_size), 1)); \
+            break; \
+        } else { \
             if('\n' == PARM.m_buf[PARM.m_pos]) { \
                 PARM.m_line++; \
                 PARM.m_column = 1; \
             } else \
                 PARM.m_column++; \
-            memcpy((buf), PARM.m_buf+PARM.m_pos, (result)); \
-            PARM.m_pos += (result); \
+            (buf)[0] = PARM.m_buf[PARM.m_pos]; \
+            PARM.m_pos++; \
+            (result) = 1; \
         } \
     } while(0)
 
@@ -163,6 +164,5 @@ void begin_token(yyscan_t yyscanner, size_t length)
     loc->last_line     = PARM.m_line;
     loc->last_column   = PARM.m_prev_column+length-1;
     PARM.m_prev_column = PARM.m_column;
-    if(length > 1)
-        PARM.m_prev_column--;
+    PARM.m_prev_column--; // compensate for 1-char over-read
 }
