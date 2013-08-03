@@ -190,7 +190,7 @@ void display_usage(bool verbose)
         std::cout << "Try `XLang --help\' for more information." << std::endl;
 }
 
-struct args_t
+struct options_t
 {
     typedef enum
     {
@@ -207,12 +207,12 @@ struct args_t
     std::string expr;
     bool dump_memory;
 
-    args_t()
+    options_t()
         : mode(MODE_NONE), dump_memory(false)
     {}
 };
 
-bool parse_args(int argc, char** argv, args_t &args)
+bool get_options_from_args(options_t &options, int argc, char** argv)
 {
     int opt = 0;
     int longIndex = 0;
@@ -233,36 +233,31 @@ bool parse_args(int argc, char** argv, args_t &args)
     {
         switch(opt)
         {
-            case 'i': args.in_xml = optarg; break;
-            case 'e': args.expr = optarg; break;
-            case 'l': args.mode = args_t::MODE_LISP; break;
-            case 'x': args.mode = args_t::MODE_XML; break;
-            case 'g': args.mode = args_t::MODE_GRAPH; break;
-            case 'd': args.mode = args_t::MODE_DOT; break;
-            case 'm': args.dump_memory = true; break;
+            case 'i': options.in_xml = optarg; break;
+            case 'e': options.expr = optarg; break;
+            case 'l': options.mode = options_t::MODE_LISP; break;
+            case 'x': options.mode = options_t::MODE_XML; break;
+            case 'g': options.mode = options_t::MODE_GRAPH; break;
+            case 'd': options.mode = options_t::MODE_DOT; break;
+            case 'm': options.dump_memory = true; break;
             case 'h':
-            case '?': args.mode = args_t::MODE_HELP; break;
+            case '?': options.mode = options_t::MODE_HELP; break;
             case 0: // reserved
             default:
                 break;
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    if(args_t::MODE_NONE == args.mode && !args.dump_memory)
-    {
-        display_usage(false);
-        return false;
-    }
-    return true;
+    return options_t::MODE_NONE != options.mode || options.dump_memory;
 }
 
-bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
+bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
 {
-    if(args.in_xml != "")
+    if(options.in_xml != "")
     {
         ast = xl::mvc::MVCModel::make_ast(
                 new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
-                args.in_xml);
+                options.in_xml);
         if(!ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
@@ -271,7 +266,7 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     }
     else
     {
-        ast = make_ast(alloc, args.expr.c_str());
+        ast = make_ast(alloc, options.expr.c_str());
         if(!ast)
         {
             std::cout << error_messages().str().c_str() << std::endl;
@@ -281,34 +276,34 @@ bool import_ast(args_t &args, xl::Allocator &alloc, xl::node::NodeIdentIFace* &a
     return true;
 }
 
-void export_ast(args_t &args, const xl::node::NodeIdentIFace* ast)
+void export_ast(options_t &options, const xl::node::NodeIdentIFace* ast)
 {
-    switch(args.mode)
+    switch(options.mode)
     {
-        case args_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
-        case args_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
-        case args_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
-        case args_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
+        case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
+        case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
+        case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
+        case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
         default:
             break;
     }
 }
 
-bool do_work(args_t &args)
+bool apply_options(options_t &options)
 {
     try
     {
-        if(args.mode == args_t::MODE_HELP)
+        if(options.mode == options_t::MODE_HELP)
         {
             display_usage(true);
             return true;
         }
         xl::Allocator alloc(__FILE__);
         xl::node::NodeIdentIFace* ast = NULL;
-        if(!import_ast(args, alloc, ast))
+        if(!import_ast(options, alloc, ast))
             return false;
-        export_ast(args, ast);
-        if(args.dump_memory)
+        export_ast(options, ast);
+        if(options.dump_memory)
             alloc.dump(std::string(1, '\t'));
     }
     catch(const char* s)
@@ -321,10 +316,13 @@ bool do_work(args_t &args)
 
 int main(int argc, char** argv)
 {
-    args_t args;
-    if(!parse_args(argc, argv, args))
+    options_t options;
+    if(!get_options_from_args(options, argc, argv))
+    {
+        display_usage(false);
         return EXIT_FAILURE;
-    if(!do_work(args))
+    }
+    if(!apply_options(options))
         return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
