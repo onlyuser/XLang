@@ -239,7 +239,7 @@ bool get_options_from_args(options_t &options, int argc, char** argv)
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    return options_t::MODE_NONE != options.mode || options.dump_memory;
+    return options.mode != options_t::MODE_NONE || options.dump_memory;
 }
 
 bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
