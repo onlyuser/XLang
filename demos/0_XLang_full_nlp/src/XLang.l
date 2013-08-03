@@ -172,6 +172,7 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
                 return ID_DET;
             }
 
+ /*
 {conj}      {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ;
@@ -186,8 +187,24 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ_3;
             }
+ */
 
 {lit_ident} {LOC;
+                if(std::string(yytext) == "and")
+                {
+                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                    return ID_CONJ;
+                }
+                if(std::string(yytext) == "and2")
+                {
+                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                    return ID_CONJ_2;
+                }
+                if(std::string(yytext) == "and3")
+                {
+                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                    return ID_CONJ_3;
+                }
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;
             }

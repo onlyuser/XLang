@@ -147,7 +147,7 @@ clean_objects : clean_objects_common clean_yacc clean_lex
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) XLangMVCModel XLangNode
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) TryAllParses XLangMVCModel XLangNode
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
