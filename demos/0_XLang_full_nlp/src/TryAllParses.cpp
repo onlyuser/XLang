@@ -20,16 +20,19 @@
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
 
-static void gen_permutations(std::string input, std::vector<std::string> &input_permutations)
+void gen_variations(std::string input, std::vector<std::string>* input_vec)
 {
+    if(!input_vec)
+        return;
+    input_vec->push_back(input);
 }
 
 void try_all_parses(
-        std::string input,
         xl::Allocator &alloc,
-        std::vector<xl::node::NodeIdentIFace*> &ast_vec,
-        std::vector<std::string> &input_vec)
+        std::string input,
+        std::vector<std::string> *input_vec,
+        std::vector<xl::node::NodeIdentIFace*> *ast_vec)
 {
-    std::vector<std::string> input_permutations;
-    gen_permutations(input, input_permutations);
+    if(!input_vec || !ast_vec)
+        return;
 }

@@ -22,10 +22,12 @@
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
 
+void gen_variations(std::string input, std::vector<std::string>* input_vec);
+
 void try_all_parses(
-        std::string input,
         xl::Allocator &alloc,
-        std::vector<xl::node::NodeIdentIFace*> &ast_vec,
-        std::vector<std::string> &input_vec);
+        std::string input,
+        std::vector<std::string> *input_vec,
+        std::vector<xl::node::NodeIdentIFace*> *ast_vec);
 
 #endif

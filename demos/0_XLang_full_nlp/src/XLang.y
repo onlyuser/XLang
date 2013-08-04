@@ -28,6 +28,7 @@
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
+#include "TryAllParses.h" // gen_variations
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // strlen
@@ -390,11 +391,13 @@ bool get_options_from_args(options_t &options, int argc, char** argv)
     return options.mode != options_t::MODE_NONE || options.dump_memory;
 }
 
-bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
+bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::NodeIdentIFace*>* ast_vec)
 {
+    if(!ast_vec)
+        return false;
     if(options.in_xml != "")
     {
-        ast = xl::mvc::MVCModel::make_ast(
+        xl::node::NodeIdentIFace* ast = xl::mvc::MVCModel::make_ast(
                 new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
                 options.in_xml);
         if(!ast)
@@ -402,29 +405,45 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
         }
+        ast_vec->push_back(ast);
     }
     else
     {
-        ast = make_ast(alloc, options.expr.c_str());
-        if(!ast)
+        std::vector<std::string> input_vec;
+        gen_variations(options.expr.c_str(), &input_vec);
+        for(auto p = input_vec.begin(); p != input_vec.end(); p++)
         {
-            std::cout << error_messages().str().c_str() << std::endl;
-            return false;
+            xl::node::NodeIdentIFace* ast = make_ast(alloc, (*p).c_str());
+            if(!ast)
+            {
+                std::cout << error_messages().str().c_str() << std::endl;
+                return false;
+            }
+            ast_vec->push_back(ast);
         }
     }
     return true;
 }
 
-void export_ast(options_t &options, const xl::node::NodeIdentIFace* ast)
+void export_ast(options_t &options, const std::vector<xl::node::NodeIdentIFace*> &ast_vec)
 {
-    switch(options.mode)
+    size_t n = 0;
+    for(auto p = ast_vec.begin(); p != ast_vec.end(); p++)
     {
-        case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
-        case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
-        case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
-        case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
-        default:
-            break;
+        if(ast_vec.size() > 1)
+            std::cout << "(export #" << n << ") <<<" << std::endl;
+        switch(options.mode)
+        {
+            case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(*p); break;
+            case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(*p); break;
+            case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(*p); break;
+            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(*p); break;
+            default:
+                break;
+        }
+        if(ast_vec.size() > 1)
+            std::cout << ">>> (export #" << n << ")" << std::endl;
+        n++;
     }
 }
 
@@ -438,10 +457,10 @@ bool apply_options(options_t &options)
             return true;
         }
         xl::Allocator alloc(__FILE__);
-        xl::node::NodeIdentIFace* ast = NULL;
-        if(!import_ast(options, alloc, ast))
+        std::vector<xl::node::NodeIdentIFace*> ast_vec;
+        if(!import_ast(options, alloc, &ast_vec))
             return false;
-        export_ast(options, ast);
+        export_ast(options, ast_vec);
         if(options.dump_memory)
             alloc.dump(std::string(1, '\t'));
     }
