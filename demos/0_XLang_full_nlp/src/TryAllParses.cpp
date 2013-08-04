@@ -16,15 +16,23 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "TryAllParses.h"
+#include "XLang.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
+#include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
+#include <map> // std::map
+#include <string> // std::string
 
-void gen_variations(std::string input, std::vector<std::string>* input_vec)
+void permute_lexer_id_map(
+        std::map<std::string, std::vector<uint32_t>>* all_lexer_id_map,
+        std::map<std::string, uint32_t>*              one_lexer_id_map)
 {
-    if(!input_vec)
+    if(!all_lexer_id_map || !one_lexer_id_map)
         return;
-    input_vec->push_back(input);
+    (*one_lexer_id_map)["and"]  = ID_CONJ;
+    (*one_lexer_id_map)["and2"] = ID_CONJ_2;
+    (*one_lexer_id_map)["and3"] = ID_CONJ_3;
 }
 
 void try_all_parses(

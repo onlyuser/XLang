@@ -59,6 +59,8 @@ struct ScannerContext
     int m_column;
     int m_prev_column;
 
+    std::map<std::string, uint32_t>* m_lexer_id_map;
+
     ScannerContext(const char* buf);
 };
 

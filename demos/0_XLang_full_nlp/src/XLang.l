@@ -50,11 +50,12 @@
         } \
     } while(0)
 
-#define LOC           begin_token(yyscanner, yyleng);
-#define PUSH_STATE(x) yy_push_state(x, yyscanner)
-#define POP_STATE     yy_pop_state(yyscanner)
-#define LVAL          (*yylval)
-#define TREE_CONTEXT  yyget_extra(yyscanner)->tree_context()
+#define LOC             begin_token(yyscanner, yyleng);
+#define PUSH_STATE(x)   yy_push_state(x, yyscanner)
+#define POP_STATE       yy_pop_state(yyscanner)
+#define LVAL            (*yylval)
+#define TREE_CONTEXT    yyget_extra(yyscanner)->tree_context()
+#define SCANNER_CONTEXT yyget_extra(yyscanner)->scanner_context()
 
 void begin_token(yyscan_t yyscanner, size_t length);
 
@@ -190,20 +191,14 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
  */
 
 {lit_ident} {LOC;
-                if(std::string(yytext) == "and")
+                if(SCANNER_CONTEXT.m_lexer_id_map)
                 {
-                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
-                    return ID_CONJ;
-                }
-                if(std::string(yytext) == "and2")
-                {
-                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
-                    return ID_CONJ_2;
-                }
-                if(std::string(yytext) == "and3")
-                {
-                    LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
-                    return ID_CONJ_3;
+                    auto p = SCANNER_CONTEXT.m_lexer_id_map->find(yytext);
+                    if(p != SCANNER_CONTEXT.m_lexer_id_map->end())
+                    {
+                        LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                        return (*p).second;
+                    }
                 }
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_IDENT;

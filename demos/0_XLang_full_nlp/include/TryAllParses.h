@@ -21,8 +21,12 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
+#include <map> // std::map
+#include <string> // std::string
 
-void gen_variations(std::string input, std::vector<std::string>* input_vec);
+void permute_lexer_id_map(
+        std::map<std::string, std::vector<uint32_t>>* all_lexer_id_map,
+        std::map<std::string, uint32_t>*              one_lexer_id_map);
 
 void try_all_parses(
         xl::Allocator &alloc,

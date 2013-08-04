@@ -293,12 +293,15 @@ Conj_3:
 
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
-      m_line(1), m_column(1), m_prev_column(1)
+      m_line(1), m_column(1), m_prev_column(1),
+      m_lexer_id_map(NULL)
 {}
 
-xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
+xl::node::NodeIdentIFace* make_ast(
+        xl::Allocator &alloc, const char* s, std::map<std::string, uint32_t>* lexer_id_map)
 {
     ParserContext parser_context(alloc, s);
+    parser_context.scanner_context().m_lexer_id_map = lexer_id_map;
     yyscan_t scanner = parser_context.scanner_context().m_scanner;
     _xl(lex_init)(&scanner);
     _xl(set_extra)(&parser_context, scanner);
@@ -409,18 +412,16 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
     }
     else
     {
-        std::vector<std::string> input_vec;
-        gen_variations(options.expr.c_str(), &input_vec);
-        for(auto p = input_vec.begin(); p != input_vec.end(); p++)
+        std::map<std::string, std::vector<uint32_t>> all_lexer_id_map;
+        std::map<std::string, uint32_t>              one_lexer_id_map;
+        permute_lexer_id_map(&all_lexer_id_map, &one_lexer_id_map);
+        xl::node::NodeIdentIFace* ast = make_ast(alloc, options.expr.c_str(), &one_lexer_id_map);
+        if(!ast)
         {
-            xl::node::NodeIdentIFace* ast = make_ast(alloc, (*p).c_str());
-            if(!ast)
-            {
-                std::cout << error_messages().str().c_str() << std::endl;
-                return false;
-            }
-            ast_vec->push_back(ast);
+            std::cout << error_messages().str().c_str() << std::endl;
+            return false;
         }
+        ast_vec->push_back(ast);
     }
     return true;
 }
