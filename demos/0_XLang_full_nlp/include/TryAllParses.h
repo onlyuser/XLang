@@ -21,17 +21,32 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
+#include <stack> // std::stack
 #include <map> // std::map
 #include <string> // std::string
 
 void permute_lexer_id_map(
-        std::map<std::string, std::vector<uint32_t>>* all_lexer_id_map,
-        std::map<std::string, uint32_t>*              one_lexer_id_map);
+        std::map<std::string, std::vector<uint32_t>>* lexer_id_maps,
+        std::map<std::string, uint32_t>*              lexer_id_map);
 
-void try_all_parses(
-        xl::Allocator &alloc,
-        std::string input,
-        std::vector<std::string> *input_vec,
-        std::vector<xl::node::NodeIdentIFace*> *ast_vec);
+// eats shoots and leaves
+// V    V      C   V
+//      N          N
+
+// flying saucers are dangerous
+// Adj    N       Aux Adj
+// V
+
+void build_pos_permutations(
+        std::list<std::vector<int>>           &pos_permutations,           // OUT
+        std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
+        std::stack<int>                       &sentence_pos_indices,       // TEMP
+        int                                    word_index);                // TEMP
+
+void build_pos_permutations(
+        std::list<std::vector<int>>           &pos_permutations,            // OUT
+        std::vector<std::vector<std::string>> &sentence_pos_options_table); // IN
+
+void test_build_pos_permutations();
 
 #endif

@@ -128,7 +128,9 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
 
 %%
 
-{ws}        {LOC}
+{ws}        {LOC;
+                SCANNER_CONTEXT.m_word_index++;
+            }
 
  /*==========================================================================*/
  /* LITERALS */
@@ -191,16 +193,10 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
  */
 
 {lit_ident} {LOC;
-                if(SCANNER_CONTEXT.m_lexer_id_map)
-                {
-                    auto p = SCANNER_CONTEXT.m_lexer_id_map->find(yytext);
-                    if(p != SCANNER_CONTEXT.m_lexer_id_map->end())
-                    {
-                        LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
-                        return (*p).second;
-                    }
-                }
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
+                uint32_t lexer_id = SCANNER_CONTEXT.word_to_lexer_id(yytext);
+                if(lexer_id)
+                    return lexer_id;
                 return ID_IDENT;
             }
 

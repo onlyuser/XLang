@@ -293,9 +293,20 @@ Conj_3:
 
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
-      m_line(1), m_column(1), m_prev_column(1),
+      m_line(1), m_column(1), m_prev_column(1), m_word_index(0),
       m_lexer_id_map(NULL)
 {}
+
+uint32_t ScannerContext::word_to_lexer_id(std::string word)
+{
+    // TODO: use m_word_index
+    if(!m_lexer_id_map)
+        return 0;
+    auto p = m_lexer_id_map->find(word);
+    if(p == m_lexer_id_map->end())
+        return 0;
+    return (*p).second;
+}
 
 xl::node::NodeIdentIFace* make_ast(
         xl::Allocator &alloc, const char* s, std::map<std::string, uint32_t>* lexer_id_map)
@@ -412,10 +423,10 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
     }
     else
     {
-        std::map<std::string, std::vector<uint32_t>> all_lexer_id_map;
-        std::map<std::string, uint32_t>              one_lexer_id_map;
-        permute_lexer_id_map(&all_lexer_id_map, &one_lexer_id_map);
-        xl::node::NodeIdentIFace* ast = make_ast(alloc, options.expr.c_str(), &one_lexer_id_map);
+        std::map<std::string, std::vector<uint32_t>> lexer_id_maps;
+        std::map<std::string, uint32_t>              lexer_id_map;
+        permute_lexer_id_map(&lexer_id_maps, &lexer_id_map);
+        xl::node::NodeIdentIFace* ast = make_ast(alloc, options.expr.c_str(), &lexer_id_map);
         if(!ast)
         {
             std::cout << error_messages().str().c_str() << std::endl;
@@ -475,6 +486,9 @@ bool apply_options(options_t &options)
 
 int main(int argc, char** argv)
 {
+    test_build_pos_permutations();
+
+    return 0;
     options_t options;
     if(!get_options_from_args(options, argc, argv))
     {

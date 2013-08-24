@@ -58,10 +58,12 @@ struct ScannerContext
     int m_line;
     int m_column;
     int m_prev_column;
+    int m_word_index;
 
     std::map<std::string, uint32_t>* m_lexer_id_map;
 
     ScannerContext(const char* buf);
+    uint32_t word_to_lexer_id(std::string word);
 };
 
 // context type to hold shared data between bison and flex
