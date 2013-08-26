@@ -57,7 +57,7 @@ void build_pos_permutations(
             sentence_pos_indices.push(*q);
         return;
     }
-    auto word_pos_options = sentence_pos_options_table[word_index];
+    std::vector<std::string> &word_pos_options = sentence_pos_options_table[word_index];
     int pos_index = 0;
     for(auto p = word_pos_options.begin(); p != word_pos_options.end(); p++)
     {
@@ -77,12 +77,12 @@ void build_pos_permutations(
         std::vector<std::vector<std::string>> &sentence_pos_options_table) // IN
 {
     std::stack<int> sentence_pos_indices;
-    int             word_index = 0;
+    int word_index = 0;
     build_pos_permutations(
             pos_permutations,
             sentence_pos_options_table,
             sentence_pos_indices,
-            word_index+1);
+            word_index);
 }
 
 void test_build_pos_permutations()
@@ -93,7 +93,7 @@ void test_build_pos_permutations()
     // eats shoots and leaves
     // V    V      C   V
     //      N          N
-    sentence_pos_options_table.reserve(4);
+    sentence_pos_options_table.resize(4);
     sentence_pos_options_table[0].push_back("V");
     sentence_pos_options_table[1].push_back("V");
     sentence_pos_options_table[1].push_back("N");
@@ -104,7 +104,7 @@ void test_build_pos_permutations()
 //    // flying saucers are dangerous
 //    // Adj    N       Aux Adj
 //    // V
-//    sentence_pos_options_table.reserve(4);
+//    sentence_pos_options_table.resize(4);
 //    sentence_pos_options_table[0].push_back("Adj");
 //    sentence_pos_options_table[0].push_back("V");
 //    sentence_pos_options_table[1].push_back("N");
@@ -119,7 +119,7 @@ void test_build_pos_permutations()
     int permutation_index = 0;
     for(auto p = pos_permutations.begin(); p != pos_permutations.end(); p++)
     {
-        std::cout << "permutation #" << permutation_index << " ";
+        std::cout << "permutation #" << permutation_index << ": ";
         int word_index = 0;
         auto pos_permutation = *p;
         for(auto q = pos_permutation.begin(); q != pos_permutation.end(); q++)
