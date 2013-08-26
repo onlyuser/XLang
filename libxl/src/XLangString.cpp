@@ -20,6 +20,7 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <string.h> // strcpy
+#include <vector> // std::vector
 #include <regex.h> // regex_t
 #include <stdarg.h> // va_list
 #include <stdio.h> // FILE
@@ -63,6 +64,22 @@ std::string replace(std::string s, const std::string& find_string, const std::st
     for(size_t p = 0; (p = s.find(find_string, p)) != std::string::npos; p += replace_string.length())
          s.replace(p, find_string.length(), replace_string);
     return s;
+}
+
+std::vector<std::string> tokenize(const std::string& s, const char* delim)
+{
+    std::vector<std::string> results;
+    size_t prev = 0;
+    size_t next = 0;
+    while((next = s.find_first_of(delim, prev)) != std::string::npos)
+    {
+        if(next-prev != 0)
+            results.push_back(s.substr(prev, next - prev));
+        prev = next+1;
+    }
+    if(prev < s.size())
+        results.push_back(s.substr(prev));
+    return results;
 }
 
 std::string escape_xml(std::string s)

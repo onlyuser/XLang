@@ -487,8 +487,8 @@ bool apply_options(options_t &options)
 int main(int argc, char** argv)
 {
     test_build_pos_permutations();
-
     return 0;
+
     options_t options;
     if(!get_options_from_args(options, argc, argv))
     {

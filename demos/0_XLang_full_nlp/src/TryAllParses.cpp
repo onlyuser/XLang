@@ -20,6 +20,8 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
+#include "XLangString.h" // xl::tokenize
+#include "XLangSystem.h" // xl::system::shell_capture
 #include <vector> // std::vector
 #include <stack> // std::stack
 #include <map> // std::map
@@ -85,21 +87,92 @@ void build_pos_permutations(
             word_index);
 }
 
+bool get_wordnet_pos(std::string word, std::vector<std::string> &pos)
+{
+    if(word.empty())
+        return false;
+    if(
+        word == "for" ||
+        word == "and" ||
+        word == "nor" ||
+        word == "but" ||
+        word == "or"  ||
+        word == "yet" ||
+        word == "so")
+    {
+        pos.push_back("Conj");
+        return true;
+    }
+    if(
+        word == "to"   ||
+        word == "from" ||
+        word == "of")
+    {
+        pos.push_back("Prep");
+        return true;
+    }
+    std::string output_which_wn = xl::system::shell_capture("which wn");
+    if(output_which_wn.empty())
+    {
+        std::cerr << "wordnet not found" << std::endl;
+        return false;
+    }
+    const char* wn_faml_types[] = {"n", "v", "a", "r"};
+    const char* pos_types[] = {"N", "V", "Adj", "Adv"};
+    bool found_match = false;
+    for(int i = 0; i<4; i++)
+    {
+        std::string output_wn_famlx = xl::system::shell_capture("wn \"" + word + "\" -faml" + wn_faml_types[i]);
+        if(output_wn_famlx.size())
+        {
+            pos.push_back(pos_types[i]);
+            found_match = true;
+        }
+    }
+    return found_match;
+}
+
 void test_build_pos_permutations()
+{
+    test_build_pos_permutations("eats shoots and leaves");
+    //test_build_pos_permutations("flying saucers are dangerous");
+}
+
+void test_build_pos_permutations(std::string sentence)
 {
     // prepare input
     std::vector<std::vector<std::string>> sentence_pos_options_table;
 
-    // eats shoots and leaves
-    // V    V      C   V
-    //      N          N
-    sentence_pos_options_table.resize(4);
-    sentence_pos_options_table[0].push_back("V");
-    sentence_pos_options_table[1].push_back("V");
-    sentence_pos_options_table[1].push_back("N");
-    sentence_pos_options_table[2].push_back("C");
-    sentence_pos_options_table[3].push_back("V");
-    sentence_pos_options_table[3].push_back("N");
+    std::vector<std::string> words = xl::tokenize(sentence);
+    sentence_pos_options_table.resize(words.size());
+    int i = 0;
+    for(auto t = words.begin(); t != words.end(); t++)
+    {
+        std::string word = *t;
+        std::cout << word << "<";
+        std::vector<std::string> pos_options;
+        get_wordnet_pos(word, pos_options);
+        for(auto r = pos_options.begin(); r != pos_options.end(); r++)
+        {
+            std::string pos = *r;
+            sentence_pos_options_table[i].push_back(pos);
+            std::cout << pos << " ";
+        }
+        std::cout << ">" << std::endl;
+        i++;
+    }
+//    return;
+
+//    // eats shoots and leaves
+//    // V    V      C   V
+//    //      N          N
+//    sentence_pos_options_table.resize(4);
+//    sentence_pos_options_table[0].push_back("V");
+//    sentence_pos_options_table[1].push_back("V");
+//    sentence_pos_options_table[1].push_back("N");
+//    sentence_pos_options_table[2].push_back("C");
+//    sentence_pos_options_table[3].push_back("V");
+//    sentence_pos_options_table[3].push_back("N");
 
 //    // flying saucers are dangerous
 //    // Adj    N       Aux Adj
