@@ -87,7 +87,7 @@ void build_pos_permutations(
             word_index);
 }
 
-bool get_wordnet_pos(std::string word, std::vector<std::string> &pos)
+bool get_wordnet_pos(std::string word, std::vector<std::string> &word_pos)
 {
     if(word.empty())
         return false;
@@ -100,7 +100,7 @@ bool get_wordnet_pos(std::string word, std::vector<std::string> &pos)
         word == "yet" ||
         word == "so")
     {
-        pos.push_back("Conj");
+        word_pos.push_back("Conj");
         return true;
     }
     if(
@@ -108,7 +108,7 @@ bool get_wordnet_pos(std::string word, std::vector<std::string> &pos)
         word == "from" ||
         word == "of")
     {
-        pos.push_back("Prep");
+        word_pos.push_back("Prep");
         return true;
     }
     std::string output_which_wn = xl::system::shell_capture("which wn");
@@ -125,7 +125,7 @@ bool get_wordnet_pos(std::string word, std::vector<std::string> &pos)
         std::string output_wn_famlx = xl::system::shell_capture("wn \"" + word + "\" -faml" + wn_faml_types[i]);
         if(output_wn_famlx.size())
         {
-            pos.push_back(pos_types[i]);
+            word_pos.push_back(pos_types[i]);
             found_match = true;
         }
     }
@@ -145,21 +145,21 @@ void test_build_pos_permutations(std::string sentence)
 
     std::vector<std::string> words = xl::tokenize(sentence);
     sentence_pos_options_table.resize(words.size());
-    int i = 0;
+    int word_index = 0;
     for(auto t = words.begin(); t != words.end(); t++)
     {
         std::string word = *t;
         std::cout << word << "<";
-        std::vector<std::string> pos_options;
-        get_wordnet_pos(word, pos_options);
-        for(auto r = pos_options.begin(); r != pos_options.end(); r++)
+        std::vector<std::string> word_pos;
+        get_wordnet_pos(word, word_pos);
+        for(auto r = word_pos.begin(); r != word_pos.end(); r++)
         {
             std::string pos = *r;
-            sentence_pos_options_table[i].push_back(pos);
+            sentence_pos_options_table[word_index].push_back(pos);
             std::cout << pos << " ";
         }
         std::cout << ">" << std::endl;
-        i++;
+        word_index++;
     }
 //    return;
 
