@@ -37,18 +37,20 @@ void permute_lexer_id_map(
 // Adj    N       Aux Adj
 // V
 
-void build_pos_paths(
-        std::list<std::vector<int>>           &pos_paths,                  // OUT
+bool get_pos_values(
+        std::string               word,
+        std::vector<std::string>* pos_values);
+void build_pos_paths_from_pos_options(
+        std::list<std::vector<int>>*           pos_paths,                  // OUT
         std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
-        std::stack<int>                       &pos_path,                   // TEMP
+        std::stack<int>*                       pos_path,                   // TEMP
         int                                    word_index);                // TEMP
-
-void build_pos_paths(
-        std::list<std::vector<int>>           &pos_paths,                   // OUT
+void build_pos_paths_from_pos_options(
+        std::list<std::vector<int>>*           pos_paths,                   // OUT
         std::vector<std::vector<std::string>> &sentence_pos_options_table); // IN
-
-bool get_pos_values(std::string word, std::vector<std::string> &word_pos);
+void build_pos_paths_from_sentence(
+        std::string                  sentence,
+        std::list<std::vector<int>>* pos_paths);
 void test_build_pos_paths();
-void test_build_pos_paths(std::string s);
 
 #endif

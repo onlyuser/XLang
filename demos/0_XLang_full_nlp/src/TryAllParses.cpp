@@ -39,57 +39,11 @@ void permute_lexer_id_map(
     (*lexer_id_map)["and3"] = ID_CONJ_3;
 }
 
-void build_pos_paths(
-        std::list<std::vector<int>>           &pos_paths,                  // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
-        std::stack<int>                       &pos_path,                   // TEMP
-        int                                    word_index)                 // TEMP
+bool get_pos_values(
+        std::string               word,
+        std::vector<std::string>* pos_values)
 {
-    if(static_cast<size_t>(word_index) >= sentence_pos_options_table.size())
-    {
-        size_t n = pos_path.size();
-        std::vector<int> pos_path_vec(n);
-        for(int i = 0; i < static_cast<int>(n); i++)
-        {
-            pos_path_vec[n-i-1] = pos_path.top();
-            pos_path.pop();
-        }
-        pos_paths.push_back(pos_path_vec);
-        for(auto q = pos_path_vec.begin(); q != pos_path_vec.end(); q++)
-            pos_path.push(*q);
-        return;
-    }
-    std::vector<std::string> &word_pos_options = sentence_pos_options_table[word_index];
-    int pos_index = 0;
-    for(auto p = word_pos_options.begin(); p != word_pos_options.end(); p++)
-    {
-        pos_path.push(pos_index);
-        build_pos_paths(
-                pos_paths,
-                sentence_pos_options_table,
-                pos_path,
-                word_index+1);
-        pos_path.pop();
-        pos_index++;
-    }
-}
-
-void build_pos_paths(
-        std::list<std::vector<int>>           &pos_paths,                  // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table) // IN
-{
-    std::stack<int> pos_path;
-    int word_index = 0;
-    build_pos_paths(
-            pos_paths,
-            sentence_pos_options_table,
-            pos_path,
-            word_index);
-}
-
-bool get_pos_values(std::string word, std::vector<std::string> &pos_values)
-{
-    if(word.empty())
+    if(word.empty() || !pos_values)
         return false;
     if(
         word == "for" ||
@@ -100,7 +54,7 @@ bool get_pos_values(std::string word, std::vector<std::string> &pos_values)
         word == "yet" ||
         word == "so")
     {
-        pos_values.push_back("Conj");
+        pos_values->push_back("Conj");
         return true;
     }
     if(
@@ -108,7 +62,7 @@ bool get_pos_values(std::string word, std::vector<std::string> &pos_values)
         word == "from" ||
         word == "of")
     {
-        pos_values.push_back("Prep");
+        pos_values->push_back("Prep");
         return true;
     }
     std::string output_which_wn = xl::system::shell_capture("which wn");
@@ -126,24 +80,72 @@ bool get_pos_values(std::string word, std::vector<std::string> &pos_values)
                 xl::system::shell_capture("wn \"" + word + "\" -faml" + wn_faml_types[i]);
         if(output_wn_famlx.size())
         {
-            pos_values.push_back(pos_types[i]);
+            pos_values->push_back(pos_types[i]);
             found_match = true;
         }
     }
     return found_match;
 }
 
-void test_build_pos_paths()
+void build_pos_paths_from_pos_options(
+        std::list<std::vector<int>>*           pos_paths,                  // OUT
+        std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
+        std::stack<int>*                       pos_path,                   // TEMP
+        int                                    word_index)                 // TEMP
 {
-    test_build_pos_paths("eats shoots and leaves");
-    //test_build_pos_paths("flying saucers are dangerous");
+    if(!pos_paths || !pos_path)
+        return;
+    if(static_cast<size_t>(word_index) >= sentence_pos_options_table.size())
+    {
+        size_t n = pos_path->size();
+        std::vector<int> pos_path_vec(n);
+        for(int i = 0; i < static_cast<int>(n); i++)
+        {
+            pos_path_vec[n-i-1] = pos_path->top();
+            pos_path->pop();
+        }
+        pos_paths->push_back(pos_path_vec);
+        for(auto q = pos_path_vec.begin(); q != pos_path_vec.end(); q++)
+            pos_path->push(*q);
+        return;
+    }
+    std::vector<std::string> &word_pos_options = sentence_pos_options_table[word_index];
+    int pos_index = 0;
+    for(auto p = word_pos_options.begin(); p != word_pos_options.end(); p++)
+    {
+        pos_path->push(pos_index);
+        build_pos_paths_from_pos_options(
+                pos_paths,
+                sentence_pos_options_table,
+                pos_path,
+                word_index+1);
+        pos_path->pop();
+        pos_index++;
+    }
 }
 
-void test_build_pos_paths(std::string sentence)
+void build_pos_paths_from_pos_options(
+        std::list<std::vector<int>>*           pos_paths,                  // OUT
+        std::vector<std::vector<std::string>> &sentence_pos_options_table) // IN
 {
-    // prepare input
-    std::vector<std::vector<std::string>> sentence_pos_options_table;
+    if(!pos_paths)
+        return;
+    std::stack<int> pos_path;
+    int word_index = 0;
+    build_pos_paths_from_pos_options(
+            pos_paths,
+            sentence_pos_options_table,
+            &pos_path,
+            word_index);
+}
 
+void build_pos_paths_from_sentence(
+        std::string                  sentence,
+        std::list<std::vector<int>>* pos_paths)
+{
+    if(!pos_paths)
+        return;
+    std::vector<std::vector<std::string>> sentence_pos_options_table;
     std::vector<std::string> words = xl::tokenize(sentence);
     sentence_pos_options_table.resize(words.size());
     int word_index = 0;
@@ -151,7 +153,7 @@ void test_build_pos_paths(std::string sentence)
     {
         std::cout << *t << "<";
         std::vector<std::string> pos_values;
-        get_pos_values(*t, pos_values);
+        get_pos_values(*t, &pos_values);
         for(auto r = pos_values.begin(); r != pos_values.end(); r++)
         {
             sentence_pos_options_table[word_index].push_back(*r);
@@ -160,36 +162,9 @@ void test_build_pos_paths(std::string sentence)
         std::cout << ">" << std::endl;
         word_index++;
     }
-//    return;
-
-//    // eats shoots and leaves
-//    // V    V      C   V
-//    //      N          N
-//    sentence_pos_options_table.resize(4);
-//    sentence_pos_options_table[0].push_back("V");
-//    sentence_pos_options_table[1].push_back("V");
-//    sentence_pos_options_table[1].push_back("N");
-//    sentence_pos_options_table[2].push_back("C");
-//    sentence_pos_options_table[3].push_back("V");
-//    sentence_pos_options_table[3].push_back("N");
-
-//    // flying saucers are dangerous
-//    // Adj    N       Aux Adj
-//    // V
-//    sentence_pos_options_table.resize(4);
-//    sentence_pos_options_table[0].push_back("Adj");
-//    sentence_pos_options_table[0].push_back("V");
-//    sentence_pos_options_table[1].push_back("N");
-//    sentence_pos_options_table[2].push_back("Aux");
-//    sentence_pos_options_table[3].push_back("Adj");
-
-    // run
-    std::list<std::vector<int>> pos_paths;
-    build_pos_paths(pos_paths, sentence_pos_options_table);
-
-    // print results
+    build_pos_paths_from_pos_options(pos_paths, sentence_pos_options_table);
     int path_index = 0;
-    for(auto p = pos_paths.begin(); p != pos_paths.end(); p++)
+    for(auto p = pos_paths->begin(); p != pos_paths->end(); p++)
     {
         std::cout << "path #" << path_index << ": ";
         int word_index = 0;
@@ -203,4 +178,11 @@ void test_build_pos_paths(std::string sentence)
         std::cout << std::endl;
         path_index++;
     }
+}
+
+void test_build_pos_paths()
+{
+    std::list<std::vector<int>> pos_paths;
+    build_pos_paths_from_sentence("eats shoots and leaves", &pos_paths);
+    //test_build_pos_paths("flying saucers are dangerous", pos_paths);
 }

@@ -23,6 +23,9 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLang.tab.h" // YYLTYPE (generated)
 #include "XLangTreeContext.h" // TreeContext
+#include <vector> // std::vector
+#include <list> // std::list
+#include <map> // std::map
 #include <string> // std::string
 #include <sstream> // std::stringstream
 
@@ -61,9 +64,11 @@ struct ScannerContext
     int m_word_index;
 
     std::map<std::string, uint32_t>* m_lexer_id_map;
+    std::vector<int>*                m_pos_path;
 
     ScannerContext(const char* buf);
     uint32_t word_to_lexer_id(std::string word);
+    uint32_t current_lexer_id();
 };
 
 // context type to hold shared data between bison and flex
@@ -102,7 +107,12 @@ void _xl(error)(const char* s);
 
 std::stringstream &error_messages();
 std::string id_to_name(uint32_t lexer_id);
+uint32_t name_to_id(std::string name);
+void remap_pos_path_to_lexer_id(std::vector<int>* pos_path);
 
-xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, char* s);
+xl::node::NodeIdentIFace* make_ast(
+        xl::Allocator &alloc, const char* s,
+        std::map<std::string, uint32_t>* lexer_id_map,
+        std::vector<int>* pos_path);
 
 #endif

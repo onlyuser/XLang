@@ -27,6 +27,7 @@
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
 #include <algorithm> // std::min
+#include <iostream> // std::cout
 
 // When in the lexer you have to access parm through the extra data.
 #define PARM yyget_extra(yyscanner)->scanner_context()
@@ -135,6 +136,7 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
  /*==========================================================================*/
  /* LITERALS */
 
+ /*
 {noun}      {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_NOUN;
@@ -174,6 +176,7 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_DET;
             }
+ */
 
  /*
 {conj}      {LOC;
@@ -194,7 +197,9 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
 
 {lit_ident} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
-                uint32_t lexer_id = SCANNER_CONTEXT.word_to_lexer_id(yytext);
+                //uint32_t lexer_id = SCANNER_CONTEXT.word_to_lexer_id(yytext);
+                uint32_t lexer_id = SCANNER_CONTEXT.current_lexer_id();
+                std::cout << "current lexer id: " << lexer_id << std::endl;
                 if(lexer_id)
                     return lexer_id;
                 return ID_IDENT;

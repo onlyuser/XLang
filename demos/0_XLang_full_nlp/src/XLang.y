@@ -32,6 +32,9 @@
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string.h> // strlen
+#include <vector> // std::vector
+#include <list> // std::list
+#include <map> // std::map
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <iostream> // std::cout
@@ -143,6 +146,17 @@ uint32_t name_to_id(std::string name)
     if(name == "Conj_3") return ID_CONJ_3;
     throw ERROR_LEXER_NAME_NOT_FOUND;
     return 0;
+}
+
+// TODO: fix-me!
+void remap_pos_path_to_lexer_id(std::vector<int>* pos_path)
+{
+    if(!pos_path)
+        return;
+    for(auto p = pos_path->begin(); p != pos_path->end(); p++)
+    {
+        (*p) = 13;
+    }
 }
 
 %}
@@ -294,12 +308,11 @@ Conj_3:
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
       m_line(1), m_column(1), m_prev_column(1), m_word_index(0),
-      m_lexer_id_map(NULL)
+      m_lexer_id_map(NULL), m_pos_path(NULL)
 {}
 
 uint32_t ScannerContext::word_to_lexer_id(std::string word)
 {
-    // TODO: use m_word_index
     if(!m_lexer_id_map)
         return 0;
     auto p = m_lexer_id_map->find(word);
@@ -308,11 +321,20 @@ uint32_t ScannerContext::word_to_lexer_id(std::string word)
     return (*p).second;
 }
 
+uint32_t ScannerContext::current_lexer_id()
+{
+    return (*m_pos_path)[m_word_index];
+}
+
 xl::node::NodeIdentIFace* make_ast(
-        xl::Allocator &alloc, const char* s, std::map<std::string, uint32_t>* lexer_id_map)
+        xl::Allocator &alloc,
+        const char* s,
+        std::map<std::string, uint32_t>* lexer_id_map,
+        std::vector<int>* pos_path)
 {
     ParserContext parser_context(alloc, s);
     parser_context.scanner_context().m_lexer_id_map = lexer_id_map;
+    parser_context.scanner_context().m_pos_path = pos_path;
     yyscan_t scanner = parser_context.scanner_context().m_scanner;
     _xl(lex_init)(&scanner);
     _xl(set_extra)(&parser_context, scanner);
@@ -426,13 +448,20 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
         std::map<std::string, std::vector<uint32_t>> lexer_id_maps;
         std::map<std::string, uint32_t>              lexer_id_map;
         permute_lexer_id_map(&lexer_id_maps, &lexer_id_map);
-        xl::node::NodeIdentIFace* ast = make_ast(alloc, options.expr.c_str(), &lexer_id_map);
-        if(!ast)
+        std::list<std::vector<int>> pos_paths;
+        build_pos_paths_from_sentence(options.expr, &pos_paths);
+        for(auto p = pos_paths.begin(); p != pos_paths.end(); p++)
         {
-            std::cout << error_messages().str().c_str() << std::endl;
-            return false;
+            remap_pos_path_to_lexer_id(&(*p)); // TODO: fix-me!
+            xl::node::NodeIdentIFace* ast =
+                    make_ast(alloc, options.expr.c_str(), &lexer_id_map, &(*p));
+            if(!ast)
+            {
+                std::cout << error_messages().str().c_str() << std::endl;
+                return false;
+            }
+            ast_vec->push_back(ast);
         }
-        ast_vec->push_back(ast);
     }
     return true;
 }
@@ -486,9 +515,6 @@ bool apply_options(options_t &options)
 
 int main(int argc, char** argv)
 {
-    test_build_pos_paths();
-    return 0;
-
     options_t options;
     if(!get_options_from_args(options, argc, argv))
     {
