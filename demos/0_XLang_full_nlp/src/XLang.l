@@ -199,7 +199,7 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 //uint32_t lexer_id = SCANNER_CONTEXT.word_to_lexer_id(yytext);
                 uint32_t lexer_id = SCANNER_CONTEXT.current_lexer_id();
-                std::cout << "current lexer id: " << lexer_id << std::endl;
+                std::cout << "current lexer id: " << id_to_name(lexer_id) << std::endl;
                 if(lexer_id)
                     return lexer_id;
                 return ID_IDENT;

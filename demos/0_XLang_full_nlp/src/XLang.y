@@ -61,6 +61,7 @@ void _xl(error)(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s
                 break;
             }
         }
+        ss << std::endl; // TODO: FIX-ME!
         ss << &pc->scanner_context().m_buf[last_line_pos] << std::endl;
         ss << std::string(loc->first_column-1, '-') <<
                 std::string(loc->last_column - loc->first_column + 1, '^') << std::endl <<
@@ -148,15 +149,14 @@ uint32_t name_to_id(std::string name)
     return 0;
 }
 
-// TODO: fix-me!
-void remap_pos_path_to_lexer_id(std::vector<int>* pos_path)
+static void remap_pos_value_path_to_pos_lexer_id_path(
+        std::vector<std::string> &pos_value_path,    // IN
+        std::vector<uint32_t>*    pos_lexer_id_path) // OUT
 {
-    if(!pos_path)
+    if(!pos_lexer_id_path)
         return;
-    for(auto p = pos_path->begin(); p != pos_path->end(); p++)
-    {
-        (*p) = 13;
-    }
+    for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
+        pos_lexer_id_path->push_back(name_to_id(*p));
 }
 
 %}
@@ -308,7 +308,7 @@ Conj_3:
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
       m_line(1), m_column(1), m_prev_column(1), m_word_index(0),
-      m_lexer_id_map(NULL), m_pos_path(NULL)
+      m_lexer_id_map(NULL), m_pos_lexer_id_path(NULL)
 {}
 
 uint32_t ScannerContext::word_to_lexer_id(std::string word)
@@ -323,18 +323,23 @@ uint32_t ScannerContext::word_to_lexer_id(std::string word)
 
 uint32_t ScannerContext::current_lexer_id()
 {
-    return (*m_pos_path)[m_word_index];
+    if(!m_pos_lexer_id_path)
+    {
+        throw ERROR_LEXER_ID_NOT_FOUND;
+        return 0;
+    }
+    return (*m_pos_lexer_id_path)[m_word_index];
 }
 
 xl::node::NodeIdentIFace* make_ast(
         xl::Allocator &alloc,
         const char* s,
         std::map<std::string, uint32_t>* lexer_id_map,
-        std::vector<int>* pos_path)
+        std::vector<uint32_t> &pos_lexer_id_path)
 {
     ParserContext parser_context(alloc, s);
     parser_context.scanner_context().m_lexer_id_map = lexer_id_map;
-    parser_context.scanner_context().m_pos_path = pos_path;
+    parser_context.scanner_context().m_pos_lexer_id_path = &pos_lexer_id_path;
     yyscan_t scanner = parser_context.scanner_context().m_scanner;
     _xl(lex_init)(&scanner);
     _xl(set_extra)(&parser_context, scanner);
@@ -448,19 +453,23 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
         std::map<std::string, std::vector<uint32_t>> lexer_id_maps;
         std::map<std::string, uint32_t>              lexer_id_map;
         permute_lexer_id_map(&lexer_id_maps, &lexer_id_map);
-        std::list<std::vector<int>> pos_paths;
-        build_pos_paths_from_sentence(options.expr, &pos_paths);
-        for(auto p = pos_paths.begin(); p != pos_paths.end(); p++)
+        std::list<std::vector<std::string>> pos_value_paths;
+        build_pos_paths_from_sentence(&pos_value_paths, options.expr);
+        int path_index = 0;
+        for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)
         {
-            remap_pos_path_to_lexer_id(&(*p)); // TODO: fix-me!
+            std::cout << "try path #" << path_index << std::endl;
+            std::vector<uint32_t> pos_lexer_id_path;
+            remap_pos_value_path_to_pos_lexer_id_path(*p, &pos_lexer_id_path);
             xl::node::NodeIdentIFace* ast =
-                    make_ast(alloc, options.expr.c_str(), &lexer_id_map, &(*p));
+                    make_ast(alloc, options.expr.c_str(), &lexer_id_map, pos_lexer_id_path);
             if(!ast)
             {
                 std::cout << error_messages().str().c_str() << std::endl;
-                return false;
+                continue;
             }
             ast_vec->push_back(ast);
+            path_index++;
         }
     }
     return true;

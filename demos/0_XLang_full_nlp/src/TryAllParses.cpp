@@ -45,6 +45,11 @@ bool get_pos_values(
 {
     if(word.empty() || !pos_values)
         return false;
+    if(word == "the")
+    {
+        pos_values->push_back("Det");
+        return true;
+    }
     if(
         word == "for" ||
         word == "and" ||
@@ -72,7 +77,7 @@ bool get_pos_values(
         return false;
     }
     const char* wn_faml_types[] = {"n", "v", "a", "r"};
-    const char* pos_types[] = {"N", "V", "Adj", "Adv"};
+    const char* pos_types[] = {"Noun", "Verb", "Adj", "Adv"};
     bool found_match = false;
     for(int i = 0; i<4; i++)
     {
@@ -88,10 +93,10 @@ bool get_pos_values(
 }
 
 void build_pos_paths_from_pos_options(
-        std::list<std::vector<int>>*           pos_paths,                  // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
-        std::stack<int>*                       pos_path,                   // TEMP
-        int                                    word_index)                 // TEMP
+        std::list<std::vector<int>>*                 pos_paths,                  // OUT
+        const std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
+        std::stack<int>*                             pos_path,                   // TEMP
+        int                                          word_index)                 // TEMP
 {
     if(!pos_paths || !pos_path)
         return;
@@ -109,7 +114,7 @@ void build_pos_paths_from_pos_options(
             pos_path->push(*q);
         return;
     }
-    std::vector<std::string> &word_pos_options = sentence_pos_options_table[word_index];
+    const std::vector<std::string> &word_pos_options = sentence_pos_options_table[word_index];
     int pos_index = 0;
     for(auto p = word_pos_options.begin(); p != word_pos_options.end(); p++)
     {
@@ -125,8 +130,8 @@ void build_pos_paths_from_pos_options(
 }
 
 void build_pos_paths_from_pos_options(
-        std::list<std::vector<int>>*           pos_paths,                  // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table) // IN
+        std::list<std::vector<int>>*                 pos_paths,                  // OUT
+        const std::vector<std::vector<std::string>> &sentence_pos_options_table) // IN
 {
     if(!pos_paths)
         return;
@@ -140,10 +145,10 @@ void build_pos_paths_from_pos_options(
 }
 
 void build_pos_paths_from_sentence(
-        std::string                  sentence,
-        std::list<std::vector<int>>* pos_paths)
+        std::list<std::vector<std::string>>* pos_value_paths, // OUT
+        std::string                          sentence)        // IN
 {
-    if(!pos_paths)
+    if(!pos_value_paths)
         return;
     std::vector<std::vector<std::string>> sentence_pos_options_table;
     std::vector<std::string> words = xl::tokenize(sentence);
@@ -162,27 +167,31 @@ void build_pos_paths_from_sentence(
         std::cout << ">" << std::endl;
         word_index++;
     }
-    build_pos_paths_from_pos_options(pos_paths, sentence_pos_options_table);
+    std::list<std::vector<int>> pos_paths;
+    build_pos_paths_from_pos_options(&pos_paths, sentence_pos_options_table);
     int path_index = 0;
-    for(auto p = pos_paths->begin(); p != pos_paths->end(); p++)
+    for(auto p = pos_paths.begin(); p != pos_paths.end(); p++)
     {
         std::cout << "path #" << path_index << ": ";
+        std::vector<std::string> pos_value_path;
         int word_index = 0;
         auto pos_indices = *p;
         for(auto q = pos_indices.begin(); q != pos_indices.end(); q++)
         {
             std::string pos_value = sentence_pos_options_table[word_index][*q];
+            pos_value_path.push_back(pos_value);
             std::cout << pos_value << " ";
             word_index++;
         }
         std::cout << std::endl;
+        pos_value_paths->push_back(pos_value_path);
         path_index++;
     }
 }
 
 void test_build_pos_paths()
 {
-    std::list<std::vector<int>> pos_paths;
-    build_pos_paths_from_sentence("eats shoots and leaves", &pos_paths);
+    std::list<std::vector<std::string>> pos_value_paths;
+    build_pos_paths_from_sentence(&pos_value_paths, "eats shoots and leaves");
     //test_build_pos_paths("flying saucers are dangerous", pos_paths);
 }

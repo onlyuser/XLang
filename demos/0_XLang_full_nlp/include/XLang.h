@@ -64,7 +64,7 @@ struct ScannerContext
     int m_word_index;
 
     std::map<std::string, uint32_t>* m_lexer_id_map;
-    std::vector<int>*                m_pos_path;
+    std::vector<uint32_t>*           m_pos_lexer_id_path;
 
     ScannerContext(const char* buf);
     uint32_t word_to_lexer_id(std::string word);
@@ -108,11 +108,10 @@ void _xl(error)(const char* s);
 std::stringstream &error_messages();
 std::string id_to_name(uint32_t lexer_id);
 uint32_t name_to_id(std::string name);
-void remap_pos_path_to_lexer_id(std::vector<int>* pos_path);
 
 xl::node::NodeIdentIFace* make_ast(
         xl::Allocator &alloc, const char* s,
         std::map<std::string, uint32_t>* lexer_id_map,
-        std::vector<int>* pos_path);
+        std::vector<uint32_t> &pos_lexer_id_path);
 
 #endif

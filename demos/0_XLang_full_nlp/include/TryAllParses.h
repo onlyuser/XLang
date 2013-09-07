@@ -41,16 +41,16 @@ bool get_pos_values(
         std::string               word,
         std::vector<std::string>* pos_values);
 void build_pos_paths_from_pos_options(
-        std::list<std::vector<int>>*           pos_paths,                  // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
-        std::stack<int>*                       pos_path,                   // TEMP
-        int                                    word_index);                // TEMP
+        std::list<std::vector<int>>*                 pos_paths,                  // OUT
+        const std::vector<std::vector<std::string>> &sentence_pos_options_table, // IN
+        std::stack<int>*                             pos_path,                   // TEMP
+        int                                          word_index);                // TEMP
 void build_pos_paths_from_pos_options(
-        std::list<std::vector<int>>*           pos_paths,                   // OUT
-        std::vector<std::vector<std::string>> &sentence_pos_options_table); // IN
+        std::list<std::vector<int>>*                 pos_paths,                   // OUT
+        const std::vector<std::vector<std::string>> &sentence_pos_options_table); // IN
 void build_pos_paths_from_sentence(
-        std::string                  sentence,
-        std::list<std::vector<int>>* pos_paths);
+        std::list<std::vector<std::string>>* pos_value_paths, // OUT
+        std::string                          sentence);       // IN
 void test_build_pos_paths();
 
 #endif
