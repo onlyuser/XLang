@@ -23,21 +23,10 @@
 #include "XLangString.h" // xl::tokenize
 #include "XLangSystem.h" // xl::system::shell_capture
 #include <vector> // std::vector
+#include <list> // std::list
 #include <stack> // std::stack
-#include <map> // std::map
 #include <string> // std::string
 #include <iostream> // std::cout
-
-void permute_lexer_id_map(
-        std::map<std::string, std::vector<uint32_t>>* lexer_id_maps,
-        std::map<std::string, uint32_t>*              lexer_id_map)
-{
-    if(!lexer_id_maps || !lexer_id_map)
-        return;
-    (*lexer_id_map)["and"]  = ID_CONJ;
-    (*lexer_id_map)["and2"] = ID_CONJ_2;
-    (*lexer_id_map)["and3"] = ID_CONJ_3;
-}
 
 bool get_pos_values(
         std::string               word,

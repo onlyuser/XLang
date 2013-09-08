@@ -61,7 +61,6 @@ void _xl(error)(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s
                 break;
             }
         }
-        ss << std::endl; // TODO: FIX-ME!
         ss << &pc->scanner_context().m_buf[last_line_pos] << std::endl;
         ss << std::string(loc->first_column-1, '-') <<
                 std::string(loc->last_column - loc->first_column + 1, '^') << std::endl <<
@@ -81,6 +80,11 @@ std::stringstream &error_messages()
 {
     static std::stringstream _error_messages;
     return _error_messages;
+}
+void reset_error_messages()
+{
+    error_messages().str("");
+    error_messages().clear();
 }
 std::string id_to_name(uint32_t lexer_id)
 {
@@ -308,18 +312,8 @@ Conj_3:
 ScannerContext::ScannerContext(const char* buf)
     : m_scanner(NULL), m_buf(buf), m_pos(0), m_length(strlen(buf)),
       m_line(1), m_column(1), m_prev_column(1), m_word_index(0),
-      m_lexer_id_map(NULL), m_pos_lexer_id_path(NULL)
+      m_pos_lexer_id_path(NULL)
 {}
-
-uint32_t ScannerContext::word_to_lexer_id(std::string word)
-{
-    if(!m_lexer_id_map)
-        return 0;
-    auto p = m_lexer_id_map->find(word);
-    if(p == m_lexer_id_map->end())
-        return 0;
-    return (*p).second;
-}
 
 uint32_t ScannerContext::current_lexer_id()
 {
@@ -334,11 +328,9 @@ uint32_t ScannerContext::current_lexer_id()
 xl::node::NodeIdentIFace* make_ast(
         xl::Allocator &alloc,
         const char* s,
-        std::map<std::string, uint32_t>* lexer_id_map,
         std::vector<uint32_t> &pos_lexer_id_path)
 {
     ParserContext parser_context(alloc, s);
-    parser_context.scanner_context().m_lexer_id_map = lexer_id_map;
     parser_context.scanner_context().m_pos_lexer_id_path = &pos_lexer_id_path;
     yyscan_t scanner = parser_context.scanner_context().m_scanner;
     _xl(lex_init)(&scanner);
@@ -432,7 +424,10 @@ bool get_options_from_args(options_t &options, int argc, char** argv)
     return options.mode != options_t::MODE_NONE || options.dump_memory;
 }
 
-bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::NodeIdentIFace*>* ast_vec)
+bool import_ast(
+        options_t &options,
+        xl::Allocator &alloc,
+        std::vector<xl::node::NodeIdentIFace*>* ast_vec)
 {
     if(!ast_vec)
         return false;
@@ -450,24 +445,20 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
     }
     else
     {
-        std::map<std::string, std::vector<uint32_t>> lexer_id_maps;
-        std::map<std::string, uint32_t>              lexer_id_map;
-        permute_lexer_id_map(&lexer_id_maps, &lexer_id_map);
         std::list<std::vector<std::string>> pos_value_paths;
         build_pos_paths_from_sentence(&pos_value_paths, options.expr);
         int path_index = 0;
         for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)
         {
-            std::cout << "try path #" << path_index << std::endl;
+            std::cout << "import path #" << path_index << std::endl;
             std::vector<uint32_t> pos_lexer_id_path;
             remap_pos_value_path_to_pos_lexer_id_path(*p, &pos_lexer_id_path);
             xl::node::NodeIdentIFace* ast =
-                    make_ast(alloc, options.expr.c_str(), &lexer_id_map, pos_lexer_id_path);
+                    make_ast(alloc, options.expr.c_str(), pos_lexer_id_path);
             if(!ast)
             {
                 std::cout << error_messages().str().c_str() << std::endl;
-                error_messages().str("");
-                error_messages().clear();
+                reset_error_messages();
                 //continue;
             }
             ast_vec->push_back(ast);
@@ -477,15 +468,16 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
     return true;
 }
 
-void export_ast(options_t &options, const std::vector<xl::node::NodeIdentIFace*> &ast_vec)
+void export_ast(
+        options_t &options,
+        const std::vector<xl::node::NodeIdentIFace*> &ast_vec)
 {
-    size_t n = 0;
+    int path_index = 0;
     for(auto p = ast_vec.begin(); p != ast_vec.end(); p++)
     {
+        std::cout << "export path #" << path_index << std::endl;
         if(*p)
         {
-            if(ast_vec.size() > 1)
-                std::cout << "(export #" << n << ") <<<" << std::endl;
             switch(options.mode)
             {
                 case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(*p); break;
@@ -495,10 +487,8 @@ void export_ast(options_t &options, const std::vector<xl::node::NodeIdentIFace*>
                 default:
                     break;
             }
-            if(ast_vec.size() > 1)
-                std::cout << ">>> (export #" << n << ")" << std::endl;
         }
-        n++;
+        path_index++;
     }
 }
 

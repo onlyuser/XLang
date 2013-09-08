@@ -21,13 +21,9 @@
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
 #include "XLangAlloc.h" // Allocator
 #include <vector> // std::vector
+#include <list> // std::list
 #include <stack> // std::stack
-#include <map> // std::map
 #include <string> // std::string
-
-void permute_lexer_id_map(
-        std::map<std::string, std::vector<uint32_t>>* lexer_id_maps,
-        std::map<std::string, uint32_t>*              lexer_id_map);
 
 // eats shoots and leaves
 // V    V      C   V

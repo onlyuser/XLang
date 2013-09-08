@@ -63,11 +63,9 @@ struct ScannerContext
     int m_prev_column;
     int m_word_index;
 
-    std::map<std::string, uint32_t>* m_lexer_id_map;
-    std::vector<uint32_t>*           m_pos_lexer_id_path;
+    std::vector<uint32_t>* m_pos_lexer_id_path;
 
     ScannerContext(const char* buf);
-    uint32_t word_to_lexer_id(std::string word);
     uint32_t current_lexer_id();
 };
 
