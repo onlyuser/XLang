@@ -50,9 +50,14 @@ bool get_pos_values(
         pos_values->push_back("Det");
         return true;
     }
+    if(word == "is")
+    {
+        pos_values->push_back("Aux");
+        return true;
+    }
     if(
         word == "for" ||
-        word == "and" ||
+        //word == "and" ||
         word == "nor" ||
         word == "but" ||
         word == "or"  ||
@@ -60,6 +65,13 @@ bool get_pos_values(
         word == "so")
     {
         pos_values->push_back("Conj");
+        return true;
+    }
+    if(word == "and")
+    {
+        pos_values->push_back("Conj");
+        pos_values->push_back("Conj_2");
+        pos_values->push_back("Conj_3");
         return true;
     }
     if(

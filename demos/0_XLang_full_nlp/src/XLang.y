@@ -466,7 +466,9 @@ bool import_ast(options_t &options, xl::Allocator &alloc, std::vector<xl::node::
             if(!ast)
             {
                 std::cout << error_messages().str().c_str() << std::endl;
-                continue;
+                error_messages().str("");
+                error_messages().clear();
+                //continue;
             }
             ast_vec->push_back(ast);
             path_index++;
@@ -480,19 +482,22 @@ void export_ast(options_t &options, const std::vector<xl::node::NodeIdentIFace*>
     size_t n = 0;
     for(auto p = ast_vec.begin(); p != ast_vec.end(); p++)
     {
-        if(ast_vec.size() > 1)
-            std::cout << "(export #" << n << ") <<<" << std::endl;
-        switch(options.mode)
+        if(*p)
         {
-            case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(*p); break;
-            case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(*p); break;
-            case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(*p); break;
-            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(*p); break;
-            default:
-                break;
+            if(ast_vec.size() > 1)
+                std::cout << "(export #" << n << ") <<<" << std::endl;
+            switch(options.mode)
+            {
+                case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(*p); break;
+                case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(*p); break;
+                case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(*p); break;
+                case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(*p); break;
+                default:
+                    break;
+            }
+            if(ast_vec.size() > 1)
+                std::cout << ">>> (export #" << n << ")" << std::endl;
         }
-        if(ast_vec.size() > 1)
-            std::cout << ">>> (export #" << n << ")" << std::endl;
         n++;
     }
 }
