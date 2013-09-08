@@ -154,8 +154,8 @@ uint32_t name_to_id(std::string name)
 }
 
 static void remap_pos_value_path_to_pos_lexer_id_path(
-        std::vector<std::string> &pos_value_path,    // IN
-        std::vector<uint32_t>*    pos_lexer_id_path) // OUT
+        const std::vector<std::string> &pos_value_path,    // IN
+        std::vector<uint32_t>*          pos_lexer_id_path) // OUT
 {
     if(!pos_lexer_id_path)
         return;
@@ -385,8 +385,10 @@ struct options_t
     {}
 };
 
-bool get_options_from_args(options_t &options, int argc, char** argv)
+bool get_options_from_args(options_t* options, int argc, char** argv)
 {
+    if(!options)
+        return false;
     int opt = 0;
     int longIndex = 0;
     static const char *optString = "i:e:lxgdmh?";
@@ -406,30 +408,32 @@ bool get_options_from_args(options_t &options, int argc, char** argv)
     {
         switch(opt)
         {
-            case 'i': options.in_xml = optarg; break;
-            case 'e': options.expr = optarg; break;
-            case 'l': options.mode = options_t::MODE_LISP; break;
-            case 'x': options.mode = options_t::MODE_XML; break;
-            case 'g': options.mode = options_t::MODE_GRAPH; break;
-            case 'd': options.mode = options_t::MODE_DOT; break;
-            case 'm': options.dump_memory = true; break;
+            case 'i': options->in_xml = optarg; break;
+            case 'e': options->expr = optarg; break;
+            case 'l': options->mode = options_t::MODE_LISP; break;
+            case 'x': options->mode = options_t::MODE_XML; break;
+            case 'g': options->mode = options_t::MODE_GRAPH; break;
+            case 'd': options->mode = options_t::MODE_DOT; break;
+            case 'm': options->dump_memory = true; break;
             case 'h':
-            case '?': options.mode = options_t::MODE_HELP; break;
+            case '?': options->mode = options_t::MODE_HELP; break;
             case 0: // reserved
             default:
                 break;
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    return options.mode != options_t::MODE_NONE || options.dump_memory;
+    return options->mode != options_t::MODE_NONE || options->dump_memory;
 }
 
 bool import_ast(
-        options_t &options,
-        xl::Allocator &alloc,
-        std::vector<xl::node::NodeIdentIFace*>* ast_vec)
+        options_t                                 &options,
+        xl::Allocator                             &alloc,
+        std::list<xl::node::NodeIdentIFace*>*      asts,
+        const std::list<std::vector<std::string>> &pos_value_paths,
+        int                                        path_index) // TODO: fix-me!
 {
-    if(!ast_vec)
+    if(!asts)
         return false;
     if(options.in_xml != "")
     {
@@ -441,12 +445,10 @@ bool import_ast(
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
         }
-        ast_vec->push_back(ast);
+        asts->push_back(ast);
     }
     else
     {
-        std::list<std::vector<std::string>> pos_value_paths;
-        build_pos_paths_from_sentence(&pos_value_paths, options.expr);
         int path_index = 0;
         for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)
         {
@@ -461,7 +463,7 @@ bool import_ast(
                 reset_error_messages();
                 //continue;
             }
-            ast_vec->push_back(ast);
+            asts->push_back(ast);
             path_index++;
         }
     }
@@ -469,58 +471,67 @@ bool import_ast(
 }
 
 void export_ast(
-        options_t &options,
-        const std::vector<xl::node::NodeIdentIFace*> &ast_vec)
+        options_t                       &options,
+        const xl::node::NodeIdentIFace*  ast,
+        const std::vector<std::string>  &pos_value_path,
+        int                              path_index)
 {
-    int path_index = 0;
-    for(auto p = ast_vec.begin(); p != ast_vec.end(); p++)
+    std::string pos_value_path_str;
+    for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
+        pos_value_path_str.append(*p + " ");
+    std::cout << "export path #" << path_index << ": <" << pos_value_path_str << ">" << std::endl;
+    if(ast)
     {
-        std::cout << "export path #" << path_index << std::endl;
-        if(*p)
+        switch(options.mode)
         {
-            switch(options.mode)
-            {
-                case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(*p); break;
-                case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(*p); break;
-                case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(*p); break;
-                case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(*p); break;
-                default:
-                    break;
-            }
+            case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
+            case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
+            case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
+            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
+            default:
+                break;
         }
-        path_index++;
     }
 }
 
 bool apply_options(options_t &options)
 {
+    if(options.mode == options_t::MODE_HELP)
+    {
+        display_usage(true);
+        return true;
+    }
+    xl::Allocator alloc(__FILE__);
+    std::list<xl::node::NodeIdentIFace*> asts;
+    std::list<std::vector<std::string>> pos_value_paths;
+    build_pos_paths_from_sentence(&pos_value_paths, options.expr);
     try
     {
-        if(options.mode == options_t::MODE_HELP)
-        {
-            display_usage(true);
-            return true;
-        }
-        xl::Allocator alloc(__FILE__);
-        std::vector<xl::node::NodeIdentIFace*> ast_vec;
-        if(!import_ast(options, alloc, &ast_vec))
+        if(!import_ast(options, alloc, &asts, pos_value_paths, 0))
             return false;
-        export_ast(options, ast_vec);
-        if(options.dump_memory)
-            alloc.dump(std::string(1, '\t'));
     }
     catch(const char* s)
     {
         std::cout << "ERROR: " << s << std::endl;
         return false;
     }
+    int path_index = 0;
+    auto p = asts.begin();
+    auto q = pos_value_paths.begin();
+    for(; p != asts.end() && q != pos_value_paths.end(); p++, q++)
+    {
+        export_ast(options, *p, *q, path_index);
+        path_index++;
+    }
+    if(options.dump_memory)
+        alloc.dump(std::string(1, '\t'));
     return true;
 }
 
 int main(int argc, char** argv)
 {
     options_t options;
-    if(!get_options_from_args(options, argc, argv))
+    if(!get_options_from_args(&options, argc, argv))
     {
         display_usage(false);
         return EXIT_FAILURE;
