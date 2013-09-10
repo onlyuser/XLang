@@ -427,53 +427,52 @@ bool get_options_from_args(options_t* options, int argc, char** argv)
 }
 
 bool import_ast(
-        options_t                                 &options,
-        xl::Allocator                             &alloc,
-        std::list<xl::node::NodeIdentIFace*>*      asts,
-        const std::list<std::vector<std::string>> &pos_value_paths,
-        int                                        path_index) // TODO: fix-me!
+        options_t                      &options,
+        xl::Allocator                  &alloc,
+        const std::vector<std::string> &pos_value_path,
+        xl::node::NodeIdentIFace**      ast,
+        int                             path_index) // TODO: fix-me!
 {
-    if(!asts)
+    if(!ast)
         return false;
     if(options.in_xml != "")
     {
-        xl::node::NodeIdentIFace* ast = xl::mvc::MVCModel::make_ast(
+        xl::node::NodeIdentIFace* _ast = xl::mvc::MVCModel::make_ast(
                 new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
                 options.in_xml);
-        if(!ast)
+        if(!_ast)
         {
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
         }
-        asts->push_back(ast);
+        *ast = _ast;
     }
     else
     {
-        int path_index = 0;
-        for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)
+        std::string pos_value_path_str;
+        for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
+            pos_value_path_str.append(*p + " ");
+        std::cout << "import path #" << path_index << ": <" << pos_value_path_str << ">" << std::endl;
+        std::vector<uint32_t> pos_lexer_id_path;
+        remap_pos_value_path_to_pos_lexer_id_path(pos_value_path, &pos_lexer_id_path);
+        xl::node::NodeIdentIFace* _ast =
+                make_ast(alloc, options.expr.c_str(), pos_lexer_id_path);
+        if(!_ast)
         {
-            std::cout << "import path #" << path_index << std::endl;
-            std::vector<uint32_t> pos_lexer_id_path;
-            remap_pos_value_path_to_pos_lexer_id_path(*p, &pos_lexer_id_path);
-            xl::node::NodeIdentIFace* ast =
-                    make_ast(alloc, options.expr.c_str(), pos_lexer_id_path);
-            if(!ast)
-            {
-                std::cout << error_messages().str().c_str() << std::endl;
-                reset_error_messages();
-                //continue;
-            }
-            asts->push_back(ast);
-            path_index++;
+            //std::cout << error_messages().str().c_str() << std::endl;
+            reset_error_messages();
+            *ast = _ast;
+            return false;
         }
+        *ast = _ast;
     }
     return true;
 }
 
 void export_ast(
         options_t                       &options,
-        const xl::node::NodeIdentIFace*  ast,
         const std::vector<std::string>  &pos_value_path,
+        const xl::node::NodeIdentIFace*  ast,
         int                              path_index)
 {
     std::string pos_value_path_str;
@@ -505,21 +504,26 @@ bool apply_options(options_t &options)
     std::list<xl::node::NodeIdentIFace*> asts;
     std::list<std::vector<std::string>> pos_value_paths;
     build_pos_paths_from_sentence(&pos_value_paths, options.expr);
-    try
-    {
-        if(!import_ast(options, alloc, &asts, pos_value_paths, 0))
-            return false;
-    }
-    catch(const char* s)
-    {
-        std::cout << "ERROR: " << s << std::endl;
-        return false;
-    }
+    asts.resize(pos_value_paths.size());
     int path_index = 0;
-    auto p = asts.begin();
-    auto q = pos_value_paths.begin();
-    for(; p != asts.end() && q != pos_value_paths.end(); p++, q++)
+    auto p = pos_value_paths.begin();
+    auto q = asts.begin();
+    for(; p != pos_value_paths.end() && q != asts.end(); p++, q++)
     {
+        try
+        {
+            if(!import_ast(options, alloc, *p, &(*q), path_index))
+            {
+                path_index++;
+                continue;
+            }
+        }
+        catch(const char* s)
+        {
+            std::cout << "ERROR: " << s << std::endl;
+            path_index++;
+            continue;
+        }
         export_ast(options, *p, *q, path_index);
         path_index++;
     }
