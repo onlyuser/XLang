@@ -426,13 +426,25 @@ bool get_options_from_args(options_t* options, int argc, char** argv)
     return options->mode != options_t::MODE_NONE || options->dump_memory;
 }
 
-typedef std::pair<std::vector<std::string>, xl::node::NodeIdentIFace*> pos_value_path_ast_tuple_t;
+struct pos_value_path_ast_tuple_t
+{
+    std::vector<std::string>  m_pos_value_path;
+    xl::node::NodeIdentIFace* m_ast;
+    int                       m_path_index;
+
+    pos_value_path_ast_tuple_t(
+            std::vector<std::string>  &pos_value_path,
+            xl::node::NodeIdentIFace*  ast,
+            int                        path_index) :
+            m_pos_value_path(pos_value_path),
+            m_ast(ast),
+            m_path_index(path_index) {}
+};
 
 bool import_ast(
         options_t                   &options,
         xl::Allocator               &alloc,
-        pos_value_path_ast_tuple_t*  pos_value_path_ast_tuple,
-        int                          path_index) // TODO: fix-me!
+        pos_value_path_ast_tuple_t*  pos_value_path_ast_tuple)
 {
     if(!pos_value_path_ast_tuple)
         return false;
@@ -446,15 +458,16 @@ bool import_ast(
             std::cout << "de-serialize from xml fail!" << std::endl;
             return false;
         }
-        pos_value_path_ast_tuple->second = _ast;
+        pos_value_path_ast_tuple->m_ast = _ast;
     }
     else
     {
-        std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple->first;
+        std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple->m_pos_value_path;
         std::string pos_value_path_str;
         for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
             pos_value_path_str.append(*p + " ");
-        std::cout << "import path #" << path_index << ": <" << pos_value_path_str << ">" << std::endl;
+        std::cout << "import path #" <<
+                pos_value_path_ast_tuple->m_path_index << ": <" << pos_value_path_str << ">" << std::endl;
         std::vector<uint32_t> pos_lexer_id_path;
         remap_pos_value_path_to_pos_lexer_id_path(pos_value_path, &pos_lexer_id_path);
         xl::node::NodeIdentIFace* _ast =
@@ -463,25 +476,25 @@ bool import_ast(
         {
             //std::cout << error_messages().str().c_str() << std::endl;
             reset_error_messages();
-            pos_value_path_ast_tuple->second = _ast;
+            pos_value_path_ast_tuple->m_ast = _ast;
             return false;
         }
-        pos_value_path_ast_tuple->second = _ast;
+        pos_value_path_ast_tuple->m_ast = _ast;
     }
     return true;
 }
 
 void export_ast(
         options_t                  &options,
-        pos_value_path_ast_tuple_t &pos_value_path_ast_tuple,
-        int                         path_index)
+        pos_value_path_ast_tuple_t &pos_value_path_ast_tuple)
 {
-    std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.first;
+    std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.m_pos_value_path;
     std::string pos_value_path_str;
     for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
         pos_value_path_str.append(*p + " ");
-    std::cout << "export path #" << path_index << ": <" << pos_value_path_str << ">" << std::endl;
-    xl::node::NodeIdentIFace* ast = pos_value_path_ast_tuple.second;
+    std::cout << "export path #" <<
+            pos_value_path_ast_tuple.m_path_index << ": <" << pos_value_path_str << ">" << std::endl;
+    xl::node::NodeIdentIFace* ast = pos_value_path_ast_tuple.m_ast;
     if(ast)
     {
         switch(options.mode)
@@ -506,28 +519,26 @@ bool apply_options(options_t &options)
     xl::Allocator alloc(__FILE__);
     std::list<std::vector<std::string>> pos_value_paths;
     build_pos_paths_from_sentence(&pos_value_paths, options.expr);
+    int path_index = 0;
     std::list<pos_value_path_ast_tuple_t> pos_value_path_ast_tuples;
     for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)
-        pos_value_path_ast_tuples.push_back(pos_value_path_ast_tuple_t(*p, NULL));
-    int path_index = 0;
+    {
+        pos_value_path_ast_tuples.push_back(pos_value_path_ast_tuple_t(*p, NULL, path_index));
+        path_index++;
+    }
     for(auto q = pos_value_path_ast_tuples.begin(); q != pos_value_path_ast_tuples.end(); q++)
     {
         try
         {
-            if(!import_ast(options, alloc, &(*q), path_index))
-            {
-                path_index++;
+            if(!import_ast(options, alloc, &(*q)))
                 continue;
-            }
         }
         catch(const char* s)
         {
             std::cout << "ERROR: " << s << std::endl;
-            path_index++;
             continue;
         }
-        export_ast(options, *q, path_index);
-        path_index++;
+        export_ast(options, *q);
     }
     if(options.dump_memory)
         alloc.dump(std::string(1, '\t'));
