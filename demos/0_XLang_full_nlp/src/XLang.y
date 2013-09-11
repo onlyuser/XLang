@@ -504,7 +504,6 @@ bool apply_options(options_t &options)
         return true;
     }
     xl::Allocator alloc(__FILE__);
-    std::list<xl::node::NodeIdentIFace*> asts;
     std::list<std::vector<std::string>> pos_value_paths;
     build_pos_paths_from_sentence(&pos_value_paths, options.expr);
     std::list<pos_value_path_ast_tuple_t> pos_value_path_ast_tuples;
