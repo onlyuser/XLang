@@ -385,7 +385,7 @@ struct options_t
     {}
 };
 
-bool get_options_from_args(options_t* options, int argc, char** argv)
+bool extract_options_from_args(options_t* options, int argc, char** argv)
 {
     if(!options)
         return false;
@@ -548,7 +548,7 @@ bool apply_options(options_t &options)
 int main(int argc, char** argv)
 {
     options_t options;
-    if(!get_options_from_args(&options, argc, argv))
+    if(!extract_options_from_args(&options, argc, argv))
     {
         display_usage(false);
         return EXIT_FAILURE;

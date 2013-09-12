@@ -205,8 +205,10 @@ struct options_t
     {}
 };
 
-bool get_options_from_args(options_t &options, int argc, char** argv)
+bool extract_options_from_args(options_t* options, int argc, char** argv)
 {
+    if(!options)
+        return false;
     int opt = 0;
     int longIndex = 0;
     static const char *optString = "i:lxgdmh?";
@@ -225,21 +227,21 @@ bool get_options_from_args(options_t &options, int argc, char** argv)
     {
         switch(opt)
         {
-            case 'i': options.in_xml = optarg; break;
-            case 'l': options.mode = options_t::MODE_LISP; break;
-            case 'x': options.mode = options_t::MODE_XML; break;
-            case 'g': options.mode = options_t::MODE_GRAPH; break;
-            case 'd': options.mode = options_t::MODE_DOT; break;
-            case 'm': options.dump_memory = true; break;
+            case 'i': options->in_xml = optarg; break;
+            case 'l': options->mode = options_t::MODE_LISP; break;
+            case 'x': options->mode = options_t::MODE_XML; break;
+            case 'g': options->mode = options_t::MODE_GRAPH; break;
+            case 'd': options->mode = options_t::MODE_DOT; break;
+            case 'm': options->dump_memory = true; break;
             case 'h':
-            case '?': options.mode = options_t::MODE_HELP; break;
+            case '?': options->mode = options_t::MODE_HELP; break;
             case 0: // reserved
             default:
                 break;
         }
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    return options.mode != options_t::MODE_NONE || options.dump_memory;
+    return options->mode != options_t::MODE_NONE || options->dump_memory;
 }
 
 bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
@@ -308,7 +310,7 @@ bool apply_options(options_t &options)
 int main(int argc, char** argv)
 {
     options_t options;
-    if(!get_options_from_args(options, argc, argv))
+    if(!extract_options_from_args(&options, argc, argv))
     {
         display_usage(false);
         return EXIT_FAILURE;
