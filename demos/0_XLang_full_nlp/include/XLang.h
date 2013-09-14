@@ -101,11 +101,13 @@ void _xl(set_extra)(YY_EXTRA_TYPE, yyscan_t);
 int _xl(parse)(ParserContext*, yyscan_t);
 void _xl(error)(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s);
 void _xl(error)(const char* s);
+int _xl(lex)(YYSTYPE* yylval_param, YYLTYPE* yylloc_param, yyscan_t yyscanner);
 //#undef _xl
 
 std::stringstream &error_messages();
 std::string id_to_name(uint32_t lexer_id);
 uint32_t name_to_id(std::string name);
+uint32_t quick_lex(const char* s);
 
 xl::node::NodeIdentIFace* make_ast(
         xl::Allocator &alloc, const char* s,

@@ -33,6 +33,12 @@
 // Adj    N       Aux Adj
 // V
 
+bool get_pos_values_from_lexer(
+        std::string               word,
+        std::vector<std::string>* pos_values);
+bool get_pos_values_from_wordnet(
+        std::string               word,
+        std::vector<std::string>* pos_values);
 bool get_pos_values(
         std::string               word,
         std::vector<std::string>* pos_values);

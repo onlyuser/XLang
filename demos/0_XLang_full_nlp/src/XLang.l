@@ -65,6 +65,7 @@ void begin_token(yyscan_t yyscanner, size_t length);
 %option noyywrap nounput noyy_top_state
 %option reentrant bison-bridge bison-locations
 %option stack
+%x ST_ALT
 
 ws        [ \t\n]+
 lit_char  [,()+\-*/^=]
@@ -136,64 +137,68 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
  /*==========================================================================*/
  /* LITERALS */
 
- /*
-{noun}      {LOC;
+"<"         {
+                PUSH_STATE(ST_ALT);
+            }
+
+<ST_ALT>">" {
+                POP_STATE;
+            }
+
+<ST_ALT>{noun} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_NOUN;
             }
 
-{verb}      {LOC;
+<ST_ALT>{verb} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_VERB;
             }
 
-{adj}       {LOC;
+<ST_ALT>{adj} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_ADJ;
             }
 
-{adv}       {LOC;
+<ST_ALT>{adv} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_ADV;
             }
 
-{modal}     {LOC;
+<ST_ALT>{modal} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_MODAL;
             }
 
-{prep}      {LOC;
+<ST_ALT>{prep} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_PREP;
             }
 
-{aux}       {LOC;
+<ST_ALT>{aux} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_AUX;
             }
 
-{det}       {LOC;
+<ST_ALT>{det} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_DET;
             }
- */
 
- /*
-{conj}      {LOC;
+<ST_ALT>{conj} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ;
             }
 
-{conj2}     {LOC;
+<ST_ALT>{conj2} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ_2;
             }
 
-{conj3}     {LOC;
+<ST_ALT>{conj3} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 return ID_CONJ_3;
             }
- */
 
 {lit_ident} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);

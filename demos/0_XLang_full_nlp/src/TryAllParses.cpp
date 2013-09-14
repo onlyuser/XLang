@@ -28,34 +28,58 @@
 #include <string> // std::string
 #include <iostream> // std::cout
 
+bool get_pos_values_from_lexer(
+        std::string               word,
+        std::vector<std::string>* pos_values)
+{
+    if(word.empty() || !pos_values)
+        return false;
+    std::string pos_value;
+    try
+    {
+        std::string word_alt = std::string("<") + word + ">";
+        uint32_t lexer_id = quick_lex(word_alt.c_str());
+        pos_value = id_to_name(lexer_id);
+    }
+    catch(const char* s)
+    {
+        std::cerr << "ERROR: " << s << std::endl;
+    }
+    if(!pos_value.empty())
+        pos_values->push_back(pos_value);
+    return pos_values->size();
+}
+
+bool get_pos_values_from_wordnet(
+        std::string               word,
+        std::vector<std::string>* pos_values)
+{
+    if(word.empty() || !pos_values)
+        return false;
+    std::string output_which_wn = xl::system::shell_capture("which wn");
+    if(output_which_wn.empty())
+    {
+        std::cerr << "ERROR: wordnet not found" << std::endl;
+        return pos_values->size();
+    }
+    const char* wordnet_faml_types[] = {"n", "v", "a", "r"};
+    const char* pos_values_arr[]     = {"Noun", "Verb", "Adj", "Adv"};
+    for(int i = 0; i<4; i++)
+    {
+        std::string wordnet_stdout =
+                xl::system::shell_capture("wn \"" + word + "\" -faml" + wordnet_faml_types[i]);
+        if(wordnet_stdout.size())
+            pos_values->push_back(pos_values_arr[i]);
+    }
+    return pos_values->size();
+}
+
 bool get_pos_values(
         std::string               word,
         std::vector<std::string>* pos_values)
 {
     if(word.empty() || !pos_values)
         return false;
-    if(word == "the")
-    {
-        pos_values->push_back("Det");
-        return true;
-    }
-    if(word == "is")
-    {
-        pos_values->push_back("Aux");
-        return true;
-    }
-    if(
-        word == "for" ||
-        //word == "and" ||
-        word == "nor" ||
-        word == "but" ||
-        word == "or"  ||
-        word == "yet" ||
-        word == "so")
-    {
-        pos_values->push_back("Conj");
-        return true;
-    }
     if(word == "and")
     {
         pos_values->push_back("Conj");
@@ -63,34 +87,18 @@ bool get_pos_values(
         pos_values->push_back("Conj_3");
         return true;
     }
-    if(
-        word == "to"   ||
-        word == "from" ||
-        word == "of")
-    {
-        pos_values->push_back("Prep");
-        return true;
-    }
-    std::string output_which_wn = xl::system::shell_capture("which wn");
-    if(output_which_wn.empty())
-    {
-        std::cerr << "wordnet not found" << std::endl;
-        return false;
-    }
-    const char* wn_faml_types[] = {"n", "v", "a", "r"};
-    const char* pos_types[] = {"Noun", "Verb", "Adj", "Adv"};
-    bool found_match = false;
-    for(int i = 0; i<4; i++)
-    {
-        std::string output_wn_famlx =
-                xl::system::shell_capture("wn \"" + word + "\" -faml" + wn_faml_types[i]);
-        if(output_wn_famlx.size())
-        {
-            pos_values->push_back(pos_types[i]);
-            found_match = true;
-        }
-    }
-    return found_match;
+    std::vector<std::string> pos_values_from_lexer;
+    get_pos_values_from_lexer(word, &pos_values_from_lexer);
+    std::vector<std::string> pos_values_from_wordnet;
+    get_pos_values_from_wordnet(word, &pos_values_from_wordnet);
+    std::set<std::string> unique_pos_values;
+    for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
+        unique_pos_values.insert(*p);
+    for(auto q = pos_values_from_wordnet.begin(); q != pos_values_from_wordnet.end(); q++)
+        unique_pos_values.insert(*q);
+    for(auto r = unique_pos_values.begin(); r != unique_pos_values.end(); r++)
+        pos_values->push_back(*r);
+    return pos_values->size();
 }
 
 void build_pos_paths_from_pos_options(

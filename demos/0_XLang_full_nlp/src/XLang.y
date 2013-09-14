@@ -325,9 +325,23 @@ uint32_t ScannerContext::current_lexer_id()
     return (*m_pos_lexer_id_path)[m_word_index];
 }
 
+uint32_t quick_lex(const char* s)
+{
+    xl::Allocator alloc(__FILE__);
+    ParserContext parser_context(alloc, s);
+    yyscan_t scanner = parser_context.scanner_context().m_scanner;
+    _xl(lex_init)(&scanner);
+    _xl(set_extra)(&parser_context, scanner);
+    YYSTYPE dummy_sa;
+    YYLTYPE dummy_loc;
+    uint32_t lexer_id = _xl(lex)(&dummy_sa, &dummy_loc, scanner); // scanner entry point
+    _xl(lex_destroy)(scanner);
+    return lexer_id;
+}
+
 xl::node::NodeIdentIFace* make_ast(
-        xl::Allocator &alloc,
-        const char* s,
+        xl::Allocator         &alloc,
+        const char*            s,
         std::vector<uint32_t> &pos_lexer_id_path)
 {
     ParserContext parser_context(alloc, s);
@@ -375,10 +389,10 @@ struct options_t
         MODE_HELP
     } mode_e;
 
-    mode_e mode;
+    mode_e      mode;
     std::string in_xml;
     std::string expr;
-    bool dump_memory;
+    bool        dump_memory;
 
     options_t()
         : mode(MODE_NONE), dump_memory(false)
@@ -435,10 +449,10 @@ struct pos_value_path_ast_tuple_t
     pos_value_path_ast_tuple_t(
             std::vector<std::string>  &pos_value_path,
             xl::node::NodeIdentIFace*  ast,
-            int                        path_index) :
-            m_pos_value_path(pos_value_path),
-            m_ast(ast),
-            m_path_index(path_index) {}
+            int                        path_index)
+        : m_pos_value_path(pos_value_path),
+          m_ast(ast),
+          m_path_index(path_index) {}
 };
 
 bool import_ast(
