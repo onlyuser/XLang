@@ -311,10 +311,10 @@ struct options_t
         MODE_HELP
     } mode_e;
 
-    mode_e mode;
+    mode_e      mode;
     std::string in_file;
     std::string in_xml;
-    bool dump_memory;
+    bool        dump_memory;
 
     options_t()
         : mode(MODE_NONE), dump_memory(false)
