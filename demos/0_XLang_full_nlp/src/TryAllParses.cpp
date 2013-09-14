@@ -35,19 +35,21 @@ bool get_pos_values_from_lexer(
     if(word.empty() || !pos_values)
         return false;
     std::string pos_value;
+    std::string word_alt = std::string("<") + word + ">";
     try
     {
-        std::string word_alt = std::string("<") + word + ">";
         uint32_t lexer_id = quick_lex(word_alt.c_str());
         pos_value = id_to_name(lexer_id);
     }
     catch(const char* s)
     {
         std::cerr << "ERROR: " << s << std::endl;
+        return false;
     }
-    if(!pos_value.empty())
-        pos_values->push_back(pos_value);
-    return pos_values->size();
+    if(pos_value.empty())
+        return false;
+    pos_values->push_back(pos_value);
+    return true;
 }
 
 bool get_pos_values_from_wordnet(
@@ -60,8 +62,9 @@ bool get_pos_values_from_wordnet(
     if(output_which_wn.empty())
     {
         std::cerr << "ERROR: wordnet not found" << std::endl;
-        return pos_values->size();
+        return false;
     }
+    bool found_match = false;
     const char* wordnet_faml_types[] = {"n", "v", "a", "r"};
     const char* pos_values_arr[]     = {"Noun", "Verb", "Adj", "Adv"};
     for(int i = 0; i<4; i++)
@@ -69,9 +72,12 @@ bool get_pos_values_from_wordnet(
         std::string wordnet_stdout =
                 xl::system::shell_capture("wn \"" + word + "\" -faml" + wordnet_faml_types[i]);
         if(wordnet_stdout.size())
+        {
             pos_values->push_back(pos_values_arr[i]);
+            found_match = true;
+        }
     }
-    return pos_values->size();
+    return found_match;
 }
 
 bool get_pos_values(
@@ -87,17 +93,32 @@ bool get_pos_values(
         pos_values->push_back("Conj_3");
         return true;
     }
-    std::vector<std::string> pos_values_from_lexer;
-    get_pos_values_from_lexer(word, &pos_values_from_lexer);
-    std::vector<std::string> pos_values_from_wordnet;
-    get_pos_values_from_wordnet(word, &pos_values_from_wordnet);
     std::set<std::string> unique_pos_values;
-    for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
-        unique_pos_values.insert(*p);
-    for(auto q = pos_values_from_wordnet.begin(); q != pos_values_from_wordnet.end(); q++)
-        unique_pos_values.insert(*q);
-    for(auto r = unique_pos_values.begin(); r != unique_pos_values.end(); r++)
-        pos_values->push_back(*r);
+    bool found_in_lexer = false;
+    {
+        std::vector<std::string> pos_values_from_lexer;
+        found_in_lexer = get_pos_values_from_lexer(word, &pos_values_from_lexer);
+        if(found_in_lexer)
+        {
+            for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
+                unique_pos_values.insert(*p);
+        }
+    }
+    bool found_in_wordnet = false;
+    {
+        std::vector<std::string> pos_values_from_wordnet;
+        found_in_wordnet = get_pos_values_from_wordnet(word, &pos_values_from_wordnet);
+        if(found_in_wordnet)
+        {
+            for(auto q = pos_values_from_wordnet.begin(); q != pos_values_from_wordnet.end(); q++)
+                unique_pos_values.insert(*q);
+        }
+    }
+    if(found_in_lexer || found_in_wordnet)
+    {
+        for(auto r = unique_pos_values.begin(); r != unique_pos_values.end(); r++)
+            pos_values->push_back(*r);
+    }
     return pos_values->size();
 }
 
