@@ -58,8 +58,8 @@ bool get_pos_values_from_wordnet(
 {
     if(word.empty() || !pos_values)
         return false;
-    std::string output_which_wn = xl::system::shell_capture("which wn");
-    if(output_which_wn.empty())
+    std::string which_wn_stdout = xl::system::shell_capture("which wn");
+    if(which_wn_stdout.empty())
     {
         std::cerr << "ERROR: wordnet not found" << std::endl;
         return false;
