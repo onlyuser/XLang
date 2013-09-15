@@ -26,6 +26,7 @@
 #include <list> // std::list
 #include <stack> // std::stack
 #include <string> // std::string
+#include <algorithm> // std::sort
 #include <iostream> // std::cout
 
 bool get_pos_values_from_lexer(
@@ -39,7 +40,8 @@ bool get_pos_values_from_lexer(
     try
     {
         uint32_t lexer_id = quick_lex(word_alt.c_str());
-        pos_value = id_to_name(lexer_id);
+        if(lexer_id)
+            pos_value = id_to_name(lexer_id);
     }
     catch(const char* s)
     {
@@ -51,6 +53,17 @@ bool get_pos_values_from_lexer(
     pos_values->push_back(pos_value);
     return true;
 }
+
+typedef std::vector<std::pair<std::string, int>> pos_value_faml_tuples_t;
+struct pos_value_faml_tuples_less_than
+{
+    bool operator()(
+            const pos_value_faml_tuples_t::value_type& x,
+            const pos_value_faml_tuples_t::value_type& y) const
+    {
+        return x.second > y.second;
+    }
+};
 
 bool get_pos_values_from_wordnet(
         std::string               word,
@@ -64,6 +77,7 @@ bool get_pos_values_from_wordnet(
         std::cerr << "ERROR: wordnet not found" << std::endl;
         return false;
     }
+    pos_value_faml_tuples_t pos_value_faml_tuples;
     bool found_match = false;
     const char* wordnet_faml_types[] = {"n", "v", "a", "r"};
     const char* pos_values_arr[]     = {"Noun", "Verb", "Adj", "Adv"};
@@ -71,12 +85,22 @@ bool get_pos_values_from_wordnet(
     {
         std::string wordnet_stdout =
                 xl::system::shell_capture("wn \"" + word + "\" -faml" + wordnet_faml_types[i]);
+        std::string polysemy_count_str;
+        xl::match_regex(wordnet_stdout, "[\(]polysemy count = ([0-9]+)[)]", 2,
+                NULL,
+                &polysemy_count_str);
+        int polysemy_count = atoi(polysemy_count_str.c_str());
         if(wordnet_stdout.size())
         {
-            pos_values->push_back(pos_values_arr[i]);
+            pos_value_faml_tuples.push_back(
+                    pos_value_faml_tuples_t::value_type(pos_values_arr[i], polysemy_count));
             found_match = true;
         }
     }
+    std::sort(pos_value_faml_tuples.begin(), pos_value_faml_tuples.end(),
+            pos_value_faml_tuples_less_than());
+    for(auto p = pos_value_faml_tuples.begin(); p != pos_value_faml_tuples.end(); p++)
+        pos_values->push_back((*p).first);
     return found_match;
 }
 
@@ -94,30 +118,33 @@ bool get_pos_values(
         return true;
     }
     std::set<std::string> unique_pos_values;
-    bool found_in_lexer = false;
     {
         std::vector<std::string> pos_values_from_lexer;
-        found_in_lexer = get_pos_values_from_lexer(word, &pos_values_from_lexer);
-        if(found_in_lexer)
+        if(get_pos_values_from_lexer(word, &pos_values_from_lexer))
         {
             for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
-                unique_pos_values.insert(*p);
+            {
+                if(unique_pos_values.find(*p) == unique_pos_values.end())
+                {
+                    pos_values->push_back(*p);
+                    unique_pos_values.insert(*p);
+                }
+            }
         }
     }
-    bool found_in_wordnet = false;
     {
         std::vector<std::string> pos_values_from_wordnet;
-        found_in_wordnet = get_pos_values_from_wordnet(word, &pos_values_from_wordnet);
-        if(found_in_wordnet)
+        if(get_pos_values_from_wordnet(word, &pos_values_from_wordnet))
         {
             for(auto q = pos_values_from_wordnet.begin(); q != pos_values_from_wordnet.end(); q++)
-                unique_pos_values.insert(*q);
+            {
+                if(unique_pos_values.find(*q) == unique_pos_values.end())
+                {
+                    pos_values->push_back(*q);
+                    unique_pos_values.insert(*q);
+                }
+            }
         }
-    }
-    if(found_in_lexer || found_in_wordnet)
-    {
-        for(auto r = unique_pos_values.begin(); r != unique_pos_values.end(); r++)
-            pos_values->push_back(*r);
     }
     return pos_values->size();
 }

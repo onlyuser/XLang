@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <XLangSystem.h> // xl::system::add_sighandler
-#include <XLangString.h> // xl::match_regex
+#include "XLangSystem.h" // xl::system::add_sighandler
+#include "XLangString.h" // xl::match_regex
 #include <stdio.h> // FILE
 #include <stdlib.h> // free
 #include <string.h> // strdup
@@ -107,6 +107,7 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
                 &offset,
                 &address))
         {
+            // addr2line output format: "module(mangled_name+offset) [address]"
             if(mangled_name == LIBC_START_MAIN)
                 break;
             int status;
@@ -132,6 +133,7 @@ void backtrace_sighandler(int sig, siginfo_t* info, void* secret)
                 &module,
                 &address))
         {
+            // addr2line output format: "module() [address]"
             std::cerr << "#" << i
                     << "  0x" << std::setfill('0') << std::setw(16) << std::hex
                     << reinterpret_cast<size_t>(array[i])
