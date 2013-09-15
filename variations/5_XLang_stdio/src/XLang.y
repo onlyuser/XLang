@@ -253,7 +253,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
                 options.in_xml);
         if(!ast)
         {
-            std::cout << "de-serialize from xml fail!" << std::endl;
+            std::cerr << "ERROR: de-serialize from xml fail!" << std::endl;
             return false;
         }
     }
@@ -262,7 +262,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
         ast = make_ast(alloc);
         if(!ast)
         {
-            std::cout << error_messages().str().c_str() << std::endl;
+            std::cerr << "ERROR: " << error_messages().str().c_str() << std::endl;
             return false;
         }
     }
@@ -301,7 +301,7 @@ bool apply_options(options_t &options)
     }
     catch(const char* s)
     {
-        std::cout << "ERROR: " << s << std::endl;
+        std::cerr << "ERROR: " << s << std::endl;
         return false;
     }
     return true;
