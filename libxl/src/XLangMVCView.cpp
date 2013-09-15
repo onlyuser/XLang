@@ -52,9 +52,9 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node)
     v.dispatch_visit(_node);
 }
 
-void MVCView::print_dot(const node::NodeIdentIFace* _node)
+void MVCView::print_dot(const node::NodeIdentIFace* _node, bool horizontal)
 {
-    visitor::DotPrinter v(true);
+    visitor::DotPrinter v(horizontal);
     v.dispatch_visit(_node);
 }
 

@@ -123,7 +123,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _no
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t\tshape=\"box\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
@@ -132,7 +132,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->value() << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t\tshape=\"box\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
@@ -141,7 +141,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* 
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << xl::escape(*_node->value()) << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t\tshape=\"box\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
@@ -150,7 +150,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>* _n
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << xl::escape(_node->value()) << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t\tshape=\"box\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
@@ -159,7 +159,7 @@ void DotPrinter::visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _
 {
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << *_node->value() << "\"," << std::endl <<
-            "\t\tshape=\"ellipse\"" << std::endl <<
+            "\t\tshape=\"box\"" << std::endl <<
             "\t];" << std::endl;
     std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
 }
