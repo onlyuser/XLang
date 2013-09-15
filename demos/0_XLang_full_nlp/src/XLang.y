@@ -41,6 +41,8 @@
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
 
+//#define DEBUG
+
 #define MAKE_TERM(lexer_id, ...)   xl::mvc::MVCModel::make_term(&pc->tree_context(), lexer_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)           xl::mvc::MVCModel::make_symbol(&pc->tree_context(), ##__VA_ARGS__)
 #define ERROR_LEXER_ID_NOT_FOUND   "missing lexer id handler, most likely you forgot to register one"
@@ -469,7 +471,7 @@ bool import_ast(
                 options.in_xml);
         if(!_ast)
         {
-            std::cout << "de-serialize from xml fail!" << std::endl;
+            std::cerr << "ERROR: de-serialize from xml fail!" << std::endl;
             return false;
         }
         pos_value_path_ast_tuple->m_ast = _ast;
@@ -480,15 +482,20 @@ bool import_ast(
         std::string pos_value_path_str;
         for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
             pos_value_path_str.append(*p + " ");
-        std::cout << "import path #" <<
-                pos_value_path_ast_tuple->m_path_index << ": <" << pos_value_path_str << ">" << std::endl;
+        #ifdef DEBUG
+            std::cerr << "INFO: import path #" <<
+                    pos_value_path_ast_tuple->m_path_index <<
+                    ": <" << pos_value_path_str << ">" << std::endl;
+        #endif
         std::vector<uint32_t> pos_lexer_id_path;
         remap_pos_value_path_to_pos_lexer_id_path(pos_value_path, &pos_lexer_id_path);
         xl::node::NodeIdentIFace* _ast =
                 make_ast(alloc, options.expr.c_str(), pos_lexer_id_path);
         if(!_ast)
         {
-            //std::cout << error_messages().str().c_str() << std::endl;
+            #ifdef DEBUG
+                std::cerr << "ERROR: " << error_messages().str().c_str() << std::endl;
+            #endif
             reset_error_messages();
             pos_value_path_ast_tuple->m_ast = _ast;
             return false;
@@ -506,8 +513,9 @@ void export_ast(
     std::string pos_value_path_str;
     for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
         pos_value_path_str.append(*p + " ");
-    std::cout << "export path #" <<
-            pos_value_path_ast_tuple.m_path_index << ": <" << pos_value_path_str << ">" << std::endl;
+    std::cerr << "INFO: export path #" <<
+            pos_value_path_ast_tuple.m_path_index <<
+            ": <" << pos_value_path_str << ">" << std::endl;
     xl::node::NodeIdentIFace* ast = pos_value_path_ast_tuple.m_ast;
     if(ast)
     {
@@ -549,7 +557,7 @@ bool apply_options(options_t &options)
         }
         catch(const char* s)
         {
-            std::cout << "ERROR: " << s << std::endl;
+            std::cerr << "ERROR: " << s << std::endl;
             continue;
         }
         export_ast(options, *q);

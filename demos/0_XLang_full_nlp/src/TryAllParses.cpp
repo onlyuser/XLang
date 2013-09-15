@@ -27,7 +27,7 @@
 #include <stack> // std::stack
 #include <string> // std::string
 #include <algorithm> // std::sort
-#include <iostream> // std::cout
+#include <iostream> // std::cerr
 
 typedef std::vector<std::pair<std::string, int>> pos_value_faml_tuples_t;
 struct pos_value_faml_tuples_greater_than
@@ -216,15 +216,15 @@ void build_pos_value_paths_from_sentence(
     int word_index = 0;
     for(auto t = words.begin(); t != words.end(); t++)
     {
-        std::cout << *t << "<";
+        std::cerr << "INFO: " << *t << "<";
         std::vector<std::string> pos_values;
         get_pos_values(*t, &pos_values);
         for(auto r = pos_values.begin(); r != pos_values.end(); r++)
         {
             sentence_pos_options_table[word_index].push_back(*r);
-            std::cout << *r << " ";
+            std::cerr << *r << " ";
         }
-        std::cout << ">" << std::endl;
+        std::cerr << ">" << std::endl;
         word_index++;
     }
     std::list<std::vector<int>> pos_paths;
@@ -232,7 +232,7 @@ void build_pos_value_paths_from_sentence(
     int path_index = 0;
     for(auto p = pos_paths.begin(); p != pos_paths.end(); p++)
     {
-        std::cout << "path #" << path_index << ": ";
+        std::cerr << "INFO: path #" << path_index << ": ";
         std::vector<std::string> pos_value_path;
         int word_index = 0;
         auto pos_indices = *p;
@@ -240,10 +240,10 @@ void build_pos_value_paths_from_sentence(
         {
             std::string pos_value = sentence_pos_options_table[word_index][*q];
             pos_value_path.push_back(pos_value);
-            std::cout << pos_value << " ";
+            std::cerr << pos_value << " ";
             word_index++;
         }
-        std::cout << std::endl;
+        std::cerr << std::endl;
         pos_value_paths->push_back(pos_value_path);
         path_index++;
     }
