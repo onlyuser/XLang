@@ -200,6 +200,10 @@ conj3 "for3"|"and3"|"nor3"|"but3"|"or3"|"yet3"|"so3"
                 return ID_CONJ_3;
             }
 
+<ST_ALT>[^>] {LOC;
+                return 0;
+            }
+
 {lit_ident} {LOC;
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 uint32_t lexer_id = SCANNER_CONTEXT.current_lexer_id();

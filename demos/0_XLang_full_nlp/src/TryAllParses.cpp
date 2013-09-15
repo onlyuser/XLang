@@ -29,33 +29,8 @@
 #include <algorithm> // std::sort
 #include <iostream> // std::cout
 
-bool get_pos_values_from_lexer(
-        std::string               word,
-        std::vector<std::string>* pos_values)
-{
-    if(word.empty() || !pos_values)
-        return false;
-    std::string pos_value;
-    std::string word_alt = std::string("<") + word + ">";
-    try
-    {
-        uint32_t lexer_id = quick_lex(word_alt.c_str());
-        if(lexer_id)
-            pos_value = id_to_name(lexer_id);
-    }
-    catch(const char* s)
-    {
-        std::cerr << "ERROR: " << s << std::endl;
-        return false;
-    }
-    if(pos_value.empty())
-        return false;
-    pos_values->push_back(pos_value);
-    return true;
-}
-
 typedef std::vector<std::pair<std::string, int>> pos_value_faml_tuples_t;
-struct pos_value_faml_tuples_less_than
+struct pos_value_faml_tuples_greater_than
 {
     bool operator()(
             const pos_value_faml_tuples_t::value_type& x,
@@ -98,10 +73,35 @@ bool get_pos_values_from_wordnet(
         }
     }
     std::sort(pos_value_faml_tuples.begin(), pos_value_faml_tuples.end(),
-            pos_value_faml_tuples_less_than());
+            pos_value_faml_tuples_greater_than());
     for(auto p = pos_value_faml_tuples.begin(); p != pos_value_faml_tuples.end(); p++)
         pos_values->push_back((*p).first);
     return found_match;
+}
+
+bool get_pos_values_from_lexer(
+        std::string               word,
+        std::vector<std::string>* pos_values)
+{
+    if(word.empty() || !pos_values)
+        return false;
+    std::string pos_value;
+    std::string word_alt = std::string("<") + word + ">";
+    try
+    {
+        uint32_t lexer_id = quick_lex(word_alt.c_str());
+        if(lexer_id)
+            pos_value = id_to_name(lexer_id);
+    }
+    catch(const char* s)
+    {
+        std::cerr << "ERROR: " << s << std::endl;
+        return false;
+    }
+    if(pos_value.empty())
+        return false;
+    pos_values->push_back(pos_value);
+    return true;
 }
 
 bool get_pos_values(
@@ -110,28 +110,8 @@ bool get_pos_values(
 {
     if(word.empty() || !pos_values)
         return false;
-    if(word == "and")
-    {
-        pos_values->push_back("Conj");
-        pos_values->push_back("Conj_2");
-        pos_values->push_back("Conj_3");
-        return true;
-    }
     std::set<std::string> unique_pos_values;
-    {
-        std::vector<std::string> pos_values_from_lexer;
-        if(get_pos_values_from_lexer(word, &pos_values_from_lexer))
-        {
-            for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
-            {
-                if(unique_pos_values.find(*p) == unique_pos_values.end())
-                {
-                    pos_values->push_back(*p);
-                    unique_pos_values.insert(*p);
-                }
-            }
-        }
-    }
+    // lookup POS in wordnet and use familiarity score for POS ranking
     {
         std::vector<std::string> pos_values_from_wordnet;
         if(get_pos_values_from_wordnet(word, &pos_values_from_wordnet))
@@ -142,6 +122,29 @@ bool get_pos_values(
                 {
                     pos_values->push_back(*q);
                     unique_pos_values.insert(*q);
+                }
+            }
+        }
+    }
+    // lookup POS in lexer hard coded categorizations in case wordnet missed it
+    {
+        std::vector<std::string> pos_values_from_lexer;
+        if(get_pos_values_from_lexer(word, &pos_values_from_lexer))
+        {
+            for(auto p = pos_values_from_lexer.begin(); p != pos_values_from_lexer.end(); p++)
+            {
+                if(unique_pos_values.find(*p) == unique_pos_values.end())
+                {
+                    pos_values->push_back(*p);
+                    unique_pos_values.insert(*p);
+                    // consider conjugations at the NP/VP/S' level
+                    if(*p == "Conj")
+                    {
+                        pos_values->push_back("Conj_2");
+                        pos_values->push_back("Conj_3");
+                        unique_pos_values.insert("Conj_2");
+                        unique_pos_values.insert("Conj_3");
+                    }
                 }
             }
         }
