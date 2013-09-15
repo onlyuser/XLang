@@ -171,12 +171,8 @@ void DotPrinter::visit_null()
 
 void DotPrinter::visit(const node::SymbolNodeIFace* _node)
 {
-    if(_node->is_root())
-    {
-        std::cout << "digraph g {" << std::endl;
-        if(m_horizontal)
-            std::cout << "\tgraph [rankdir = \"LR\"];" << std::endl;
-    }
+    if(m_print_digraph_block && _node->is_root())
+        print_header(m_horizontal);
     std::cout << "\t" << _node->uid() << " [" << std::endl <<
             "\t\tlabel=\"" << _node->name() << "\"," << std::endl <<
             "\t\tshape=\"ellipse\"" << std::endl <<
@@ -184,8 +180,20 @@ void DotPrinter::visit(const node::SymbolNodeIFace* _node)
     VisitorDFS::visit(_node);
     if(!_node->is_root())
         std::cout << '\t' << _node->parent()->uid() << "->" << _node->uid() << ";" << std::endl;
-    if(_node->is_root())
-        std::cout << "}" << std::endl;
+    if(m_print_digraph_block && _node->is_root())
+        print_footer();
+}
+
+void DotPrinter::print_header(bool horizontal)
+{
+    std::cout << "digraph g {" << std::endl;
+    if(horizontal)
+        std::cout << "\tgraph [rankdir = \"LR\"];" << std::endl;
+}
+
+void DotPrinter::print_footer()
+{
+    std::cout << "}" << std::endl;
 }
 
 } }

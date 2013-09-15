@@ -55,7 +55,8 @@ private:
 struct DotPrinter : public VisitorDFS
 {
 public:
-    DotPrinter(bool horizontal = false) : m_horizontal(horizontal)
+    DotPrinter(bool horizontal = false, bool print_digraph_block = true)
+        : m_horizontal(horizontal), m_print_digraph_block(print_digraph_block)
     {}
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>* _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>* _node);
@@ -64,9 +65,12 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>* _node);
     void visit_null();
     void visit(const node::SymbolNodeIFace* _node);
+    static void print_header(bool horizontal);
+    static void print_footer();
 
 private:
     bool m_horizontal;
+    bool m_print_digraph_block;
 };
 
 } }

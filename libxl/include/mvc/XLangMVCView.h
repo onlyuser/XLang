@@ -26,7 +26,12 @@ struct MVCView
 {
     static void print_lisp(const node::NodeIdentIFace* _node);
     static void print_xml(const node::NodeIdentIFace* _node);
-    static void print_dot(const node::NodeIdentIFace* _node, bool horizontal = false);
+    static void print_dot(
+            const node::NodeIdentIFace* _node,
+            bool horizontal = false,
+            bool print_digraph_block = true);
+    static void print_dot_header(bool horizontal);
+    static void print_dot_footer();
     static void print_graph(const node::NodeIdentIFace* p);
 };
 

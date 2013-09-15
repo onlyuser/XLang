@@ -52,10 +52,23 @@ void MVCView::print_xml(const node::NodeIdentIFace* _node)
     v.dispatch_visit(_node);
 }
 
-void MVCView::print_dot(const node::NodeIdentIFace* _node, bool horizontal)
+void MVCView::print_dot(
+        const node::NodeIdentIFace* _node,
+        bool horizontal,
+        bool print_digraph_block)
 {
-    visitor::DotPrinter v(horizontal);
+    visitor::DotPrinter v(horizontal, print_digraph_block);
     v.dispatch_visit(_node);
+}
+
+void MVCView::print_dot_header(bool horizontal)
+{
+    visitor::DotPrinter::print_header(horizontal);
+}
+
+void MVCView::print_dot_footer()
+{
+    visitor::DotPrinter::print_footer();
 }
 
 typedef const node::NodeIdentIFace nodeType;

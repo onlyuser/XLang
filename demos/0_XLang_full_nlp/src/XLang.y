@@ -524,7 +524,7 @@ void export_ast(
             case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
             case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
             case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
-            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
+            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast, false, false); break;
             default:
                 break;
         }
@@ -548,6 +548,8 @@ bool apply_options(options_t &options)
         pos_value_path_ast_tuples.push_back(pos_value_path_ast_tuple_t(*p, NULL, path_index));
         path_index++;
     }
+    if(options.mode == options_t::MODE_DOT)
+        xl::mvc::MVCView::print_dot_header(false);
     for(auto q = pos_value_path_ast_tuples.begin(); q != pos_value_path_ast_tuples.end(); q++)
     {
         try
@@ -562,6 +564,8 @@ bool apply_options(options_t &options)
         }
         export_ast(options, *q);
     }
+    if(options.mode == options_t::MODE_DOT)
+        xl::mvc::MVCView::print_dot_footer();
     if(options.dump_memory)
         alloc.dump(std::string(1, '\t'));
     return true;
