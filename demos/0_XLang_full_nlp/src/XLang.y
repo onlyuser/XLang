@@ -532,7 +532,7 @@ bool apply_options(options_t &options)
     }
     xl::Allocator alloc(__FILE__);
     std::list<std::vector<std::string>> pos_value_paths;
-    build_pos_paths_from_sentence(&pos_value_paths, options.expr);
+    build_pos_value_paths_from_sentence(&pos_value_paths, options.expr);
     int path_index = 0;
     std::list<pos_value_path_ast_tuple_t> pos_value_path_ast_tuples;
     for(auto p = pos_value_paths.begin(); p != pos_value_paths.end(); p++)

@@ -174,7 +174,7 @@ void build_pos_paths_from_pos_options(
             word_index);
 }
 
-void build_pos_paths_from_sentence(
+void build_pos_value_paths_from_sentence(
         std::list<std::vector<std::string>>* pos_value_paths, // OUT
         std::string                          sentence)        // IN
 {
@@ -219,9 +219,9 @@ void build_pos_paths_from_sentence(
     }
 }
 
-void test_build_pos_paths()
+void test_build_pos_value_paths()
 {
     std::list<std::vector<std::string>> pos_value_paths;
-    build_pos_paths_from_sentence(&pos_value_paths, "eats shoots and leaves");
+    build_pos_value_paths_from_sentence(&pos_value_paths, "eats shoots and leaves");
     //test_build_pos_paths("flying saucers are dangerous", pos_paths);
 }

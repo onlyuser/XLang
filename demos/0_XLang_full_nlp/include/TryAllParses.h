@@ -50,9 +50,9 @@ void build_pos_paths_from_pos_options(
 void build_pos_paths_from_pos_options(
         std::list<std::vector<int>>*                 pos_paths,                   // OUT
         const std::vector<std::vector<std::string>> &sentence_pos_options_table); // IN
-void build_pos_paths_from_sentence(
+void build_pos_value_paths_from_sentence(
         std::list<std::vector<std::string>>* pos_value_paths, // OUT
         std::string                          sentence);       // IN
-void test_build_pos_paths();
+void test_build_pos_value_paths();
 
 #endif
