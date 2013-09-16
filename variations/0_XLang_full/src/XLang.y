@@ -285,7 +285,7 @@ bool extract_options_from_args(options_t* options, int argc, char** argv)
 
 bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFace* &ast)
 {
-    if(options.in_xml != "")
+    if(options.in_xml.size())
     {
         ast = xl::mvc::MVCModel::make_ast(
                 new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
