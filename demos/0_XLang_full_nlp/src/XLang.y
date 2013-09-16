@@ -121,6 +121,7 @@ std::string id_to_name(uint32_t lexer_id)
         case ID_CONJ:   return "Conj";
         case ID_CONJ_2: return "Conj_2";
         case ID_CONJ_3: return "Conj_3";
+        case ID_PERIOD: return "$";
     }
     throw ERROR_LEXER_ID_NOT_FOUND;
     return "";
@@ -151,6 +152,7 @@ uint32_t name_to_id(std::string name)
     if(name == "Conj")   return ID_CONJ;
     if(name == "Conj_2") return ID_CONJ_2;
     if(name == "Conj_3") return ID_CONJ_3;
+    if(name == "$")      return ID_PERIOD;
     throw ERROR_LEXER_NAME_NOT_FOUND;
     return 0;
 }
@@ -190,6 +192,7 @@ static void remap_pos_value_path_to_pos_lexer_id_path(
 %token<ident_value> ID_N ID_V ID_NOUN ID_VERB
 %token<ident_value> ID_ADJ ID_ADV ID_MODAL ID_PREP
 %token<ident_value> ID_AUX ID_DET ID_CONJ ID_CONJ_2 ID_CONJ_3
+%token<ident_value> ID_PERIOD
 
 // lvalues for non-terminals that have rules
 %type<symbol_value> CS S NP VP AP PP
@@ -199,6 +202,7 @@ static void remap_pos_value_path_to_pos_lexer_id_path(
 %type<symbol_value> N V Noun Verb
 %type<symbol_value> Adj Adv Modal Prep
 %type<symbol_value> Aux Det Conj Conj_2 Conj_3
+%type<symbol_value> Period
 
 // lexer IDs non-terminals
 %nonassoc ID_CS ID_S ID_NP ID_VP ID_AP ID_PP
@@ -217,7 +221,7 @@ CS:
     ;
 
 S:
-      NP VP { $$ = MAKE_SYMBOL(ID_S, @$, 2, $1, $2); }
+      NP VP Period { $$ = MAKE_SYMBOL(ID_S, @$, 3, $1, $2, $3); }
     ;
 
 NP:
@@ -307,6 +311,10 @@ Conj_2:
 
 Conj_3:
       ID_CONJ_3 { $$ = MAKE_SYMBOL(ID_CONJ_3, @$, 1, MAKE_TERM(ID_IDENT, @$, $1)); }
+    ;
+
+Period:
+      ID_PERIOD { $$ = MAKE_SYMBOL(ID_PERIOD, @$, 1, MAKE_TERM(ID_IDENT, @$, $1)); }
     ;
 
 %%
@@ -509,16 +517,16 @@ void export_ast(
         options_t                  &options,
         pos_value_path_ast_tuple_t &pos_value_path_ast_tuple)
 {
-    std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.m_pos_value_path;
-    std::string pos_value_path_str;
-    for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
-        pos_value_path_str.append(*p + " ");
-    std::cerr << "INFO: export path #" <<
-            pos_value_path_ast_tuple.m_path_index <<
-            ": <" << pos_value_path_str << ">" << std::endl;
     xl::node::NodeIdentIFace* ast = pos_value_path_ast_tuple.m_ast;
     if(ast)
     {
+        std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.m_pos_value_path;
+        std::string pos_value_path_str;
+        for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
+            pos_value_path_str.append(*p + " ");
+        std::cerr << "INFO: export path #" <<
+                pos_value_path_ast_tuple.m_path_index <<
+                ": <" << pos_value_path_str << ">" << std::endl;
         switch(options.mode)
         {
             case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
@@ -548,8 +556,6 @@ bool apply_options(options_t &options)
         pos_value_path_ast_tuples.push_back(pos_value_path_ast_tuple_t(*p, NULL, path_index));
         path_index++;
     }
-    if(options.mode == options_t::MODE_DOT)
-        xl::mvc::MVCView::print_dot_header(false);
     for(auto q = pos_value_path_ast_tuples.begin(); q != pos_value_path_ast_tuples.end(); q++)
     {
         try
@@ -562,10 +568,19 @@ bool apply_options(options_t &options)
             std::cerr << "ERROR: " << s << std::endl;
             continue;
         }
-        export_ast(options, *q);
     }
     if(options.mode == options_t::MODE_DOT)
+    {
+        xl::mvc::MVCView::print_dot_header(false);
+        for(auto r = pos_value_path_ast_tuples.begin(); r != pos_value_path_ast_tuples.end(); r++)
+            export_ast(options, *r);
         xl::mvc::MVCView::print_dot_footer();
+    }
+    else
+    {
+        for(auto r = pos_value_path_ast_tuples.begin(); r != pos_value_path_ast_tuples.end(); r++)
+            export_ast(options, *r);
+    }
     if(options.dump_memory)
         alloc.dump(std::string(1, '\t'));
     return true;
@@ -579,6 +594,7 @@ int main(int argc, char** argv)
         display_usage(false);
         return EXIT_FAILURE;
     }
+    options.expr.append(" .");
     if(!apply_options(options))
         return EXIT_FAILURE;
     return EXIT_SUCCESS;

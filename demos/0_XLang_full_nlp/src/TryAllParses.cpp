@@ -110,6 +110,11 @@ bool get_pos_values(
 {
     if(word.empty() || !pos_values)
         return false;
+    if(word == ".")
+    {
+        pos_values->push_back("$");
+        return true;
+    }
     std::set<std::string> unique_pos_values;
     // lookup POS in wordnet and use familiarity score for POS ranking
     {
