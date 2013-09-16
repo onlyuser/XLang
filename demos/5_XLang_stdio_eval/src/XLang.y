@@ -291,7 +291,7 @@ void export_ast(options_t &options, const xl::node::NodeIdentIFace* ast)
         case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
         case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
         case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
-        case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast); break;
+        case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast, true); break;
         default:
             break;
     }
