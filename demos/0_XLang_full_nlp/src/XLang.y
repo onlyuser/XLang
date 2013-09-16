@@ -472,17 +472,19 @@ bool import_ast(
 {
     if(!pos_value_path_ast_tuple)
         return false;
-    if(options.in_xml != "")
+    if(options.in_xml.size())
     {
-        xl::node::NodeIdentIFace* _ast = xl::mvc::MVCModel::make_ast(
-                new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
-                options.in_xml);
-        if(!_ast)
-        {
-            std::cerr << "ERROR: de-serialize from xml fail!" << std::endl;
-            return false;
-        }
-        pos_value_path_ast_tuple->m_ast = _ast;
+        #if 0 // NOTE: not supported
+            xl::node::NodeIdentIFace* _ast = xl::mvc::MVCModel::make_ast(
+                    new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc),
+                    options.in_xml);
+            if(!_ast)
+            {
+                std::cerr << "ERROR: de-serialize from xml fail!" << std::endl;
+                return false;
+            }
+            pos_value_path_ast_tuple->m_ast = _ast;
+        #endif
     }
     else
     {
@@ -518,24 +520,23 @@ void export_ast(
         pos_value_path_ast_tuple_t &pos_value_path_ast_tuple)
 {
     xl::node::NodeIdentIFace* ast = pos_value_path_ast_tuple.m_ast;
-    if(ast)
+    if(!ast)
+        return;
+    std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.m_pos_value_path;
+    std::string pos_value_path_str;
+    for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
+        pos_value_path_str.append(*p + " ");
+    std::cerr << "INFO: export path #" <<
+            pos_value_path_ast_tuple.m_path_index <<
+            ": <" << pos_value_path_str << ">" << std::endl;
+    switch(options.mode)
     {
-        std::vector<std::string> &pos_value_path = pos_value_path_ast_tuple.m_pos_value_path;
-        std::string pos_value_path_str;
-        for(auto p = pos_value_path.begin(); p != pos_value_path.end(); p++)
-            pos_value_path_str.append(*p + " ");
-        std::cerr << "INFO: export path #" <<
-                pos_value_path_ast_tuple.m_path_index <<
-                ": <" << pos_value_path_str << ">" << std::endl;
-        switch(options.mode)
-        {
-            case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
-            case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
-            case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
-            case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast, false, false); break;
-            default:
-                break;
-        }
+        case options_t::MODE_LISP:  xl::mvc::MVCView::print_lisp(ast); break;
+        case options_t::MODE_XML:   xl::mvc::MVCView::print_xml(ast); break;
+        case options_t::MODE_GRAPH: xl::mvc::MVCView::print_graph(ast); break;
+        case options_t::MODE_DOT:   xl::mvc::MVCView::print_dot(ast, false, false); break;
+        default:
+            break;
     }
 }
 
@@ -547,6 +548,13 @@ bool apply_options(options_t &options)
         return true;
     }
     xl::Allocator alloc(__FILE__);
+    if(options.expr.empty() || options.in_xml.size())
+    {
+        std::cerr << "ERROR: mode not supported!" << std::endl;
+        if(options.dump_memory)
+            alloc.dump(std::string(1, '\t'));
+        return false;
+    }
     std::list<std::vector<std::string>> pos_value_paths;
     build_pos_value_paths_from_sentence(&pos_value_paths, options.expr);
     int path_index = 0;
