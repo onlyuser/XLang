@@ -43,9 +43,6 @@ ifneq ($(strip $(ADVANCED_SUITE_STRINGS)),)
 	TEST_PATH = advanced_suite
 	TEST_REGEX_ENABLE = strings
 endif
-ifneq ($(strip $(NLP_SUITE)),)
-	TEST_PATH = nlp_suite
-endif
 TEST_FILE_STEMS = \
 		$(shell \
 				find $(TEST_PATH) -mindepth 1 -maxdepth 1 -name "*" -type f | sort \
