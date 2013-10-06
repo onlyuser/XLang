@@ -15,26 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef XLANG_STRING_H_
-#define XLANG_STRING_H_
+#ifndef XLANG_VISIT_STATE_IFACE_H_
+#define XLANG_VISIT_STATE_IFACE_H_
 
-#include <string> // std::string
-#include <vector> // std::vector
+namespace xl { namespace visitor {
 
-namespace xl {
+class VisitStateIFace
+{
+public:
+    typedef void* state_t;
 
-bool                     read_file(std::string filename, std::string &s);
-std::string              replace(std::string &s, std::string find_string, std::string replace_string);
-std::vector<std::string> tokenize(const std::string &s, const char* delim = " ");
-std::string              escape_xml(std::string &s);
-std::string              unescape_xml(std::string &s);
-std::string              escape(std::string &s);
-std::string              unescape(std::string &s);
-std::string              escape(char c);
-char                     unescape(char c);
+    virtual ~VisitStateIFace()
+    {}
+    virtual state_t &visit_state() = 0;
+};
 
-bool match_regex(std::string &s, std::string pattern, int nmatch, ...);
-
-}
+} }
 
 #endif
