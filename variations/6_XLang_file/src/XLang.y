@@ -274,7 +274,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
         FILE* file = fopen(options.in_file.c_str(), "rb");
         if(!file)
         {
-            std::cerr << ""ERROR: cannot open file" << std::endl;
+            std::cerr << "ERROR: cannot open file" << std::endl;
             return false;
         }
         ast = make_ast(alloc, file);
