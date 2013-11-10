@@ -40,21 +40,41 @@
 
 namespace xl { namespace mvc {
 
+void MVCView::annotate_tree(
+        const node::NodeIdentIFace*      _node,
+        visitor::Filterable::filter_cb_t filter_cb)
+{
+    visitor::TreeAnnotator v;
+    if(filter_cb)
+        v.set_filter_cb(filter_cb);
+    v.dispatch_visit(_node);
+    auto symbol = dynamic_cast<const node::SymbolNodeIFace*>(_node);
+    if(!symbol)
+        return;
+    visitor::TreeAnnotatorBFS v_bfs;
+    if(filter_cb)
+        v_bfs.set_filter_cb(filter_cb);
+    if(v_bfs.visit_next_child(symbol))
+        while(v_bfs.visit_next_child());
+}
+
 void MVCView::print_lisp(
-        const node::NodeIdentIFace* _node,
-        bool                        skip_singleton)
+        const node::NodeIdentIFace*      _node,
+        visitor::Filterable::filter_cb_t filter_cb)
 {
     visitor::LispPrinter v;
-    v.set_skip_singleton(skip_singleton);
+    if(filter_cb)
+        v.set_filter_cb(filter_cb);
     v.dispatch_visit(_node);
 }
 
 void MVCView::print_xml(
-        const node::NodeIdentIFace* _node,
-        bool                        skip_singleton)
+        const node::NodeIdentIFace*      _node,
+        visitor::Filterable::filter_cb_t filter_cb)
 {
     visitor::XMLPrinter v;
-    v.set_skip_singleton(skip_singleton);
+    if(filter_cb)
+        v.set_filter_cb(filter_cb);
     v.dispatch_visit(_node);
 }
 

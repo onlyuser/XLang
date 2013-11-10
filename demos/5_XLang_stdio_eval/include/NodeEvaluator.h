@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EVAL_VISITOR_H_
-#define EVAL_VISITOR_H_
+#ifndef NODE_EVALUATOR_H_
+#define NODE_EVALUATOR_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
+#include "visitor/XLangVisitor.h" // visitor::VisitorDFS
 
 struct NodeEvaluator : public xl::visitor::VisitorDFS
 {

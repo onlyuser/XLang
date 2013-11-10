@@ -19,9 +19,51 @@
 #define XLANG_PRINTER_H_
 
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "visitor/XLangVisitorDFS.h" // visitor::VisitorDFS
+#include "visitor/XLangVisitor.h" // visitor::VisitorDFS
 
 namespace xl { namespace visitor {
+
+class TreeAnnotator : public VisitorDFS
+{
+public:
+    TreeAnnotator() : m_depth(0)
+    {}
+    void visit(const node::SymbolNodeIFace*                             _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>*    _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>*  _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>*   _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*  _node);
+    void visit_null();
+    bool is_printer() const
+    {
+        return false;
+    }
+
+private:
+    size_t m_depth;
+};
+
+class TreeAnnotatorBFS : public VisitorBFS
+{
+public:
+    TreeAnnotatorBFS() : m_bfs_index(0)
+    {}
+    void visit(const node::SymbolNodeIFace*                             _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::INT>*    _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::FLOAT>*  _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::STRING>* _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>*   _node);
+    void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*  _node);
+    void visit_null();
+    bool is_printer() const
+    {
+        return false;
+    }
+
+private:
+    size_t m_bfs_index;
+};
 
 class LispPrinter : public VisitorDFS
 {
@@ -35,6 +77,10 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>*   _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*  _node);
     void visit_null();
+    bool is_printer() const
+    {
+        return true;
+    }
 
 private:
     size_t m_depth;
@@ -52,6 +98,10 @@ public:
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::CHAR>*   _node);
     void visit(const node::TermNodeIFace<node::NodeIdentIFace::IDENT>*  _node);
     void visit_null();
+    bool is_printer() const
+    {
+        return true;
+    }
 
 private:
     size_t m_depth;
@@ -72,6 +122,10 @@ public:
     void visit_null();
     static void print_header(bool horizontal);
     static void print_footer();
+    bool is_printer() const
+    {
+        return true;
+    }
 
 private:
     bool m_horizontal;
