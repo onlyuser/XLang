@@ -20,7 +20,7 @@ input:
 
 output:
 
-![picture alt](https://sites.google.com/site/onlyuser/files/ast_math.png "(-b+(b^2-4*a*c))/(2*a)")
+![picture alt](https://sites.google.com/site/onlyuser/files/ast_math.png "ast_math")
 
 Usage
 -----
