@@ -40,6 +40,7 @@ Variation vs Feature Table
     <tr><td> no-reentrant </td><td> flex        </td><td> buffer </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
     <tr><td> stdio        </td><td> flex        </td><td> stdio  </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
     <tr><td> file         </td><td> flex        </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
+    <tr><td> file-yyin    </td><td> flex        </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
     <tr><td> no-flex      </td><td> hand-rolled </td><td> file   </td><td> no        </td><td> no        </td><td> no       </td><td> no      </td></tr>
 </table>
 
