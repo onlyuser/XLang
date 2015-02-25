@@ -272,6 +272,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
             return false;
         }
         ast = make_ast(alloc);
+        fclose(_xl(in));
         if(!ast)
         {
             std::cerr << "ERROR: " << error_messages().str().c_str() << std::endl;
