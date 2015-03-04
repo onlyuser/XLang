@@ -30,9 +30,17 @@
 #define LVAL         _xl(lval)
 #define TREE_CONTEXT (*tree_context())
 
+extern FILE* _xl(in);
+
+extern "C" int _xl(wrap)()
+{
+    fclose(_xl(in));
+    return 1;
+}
+
 %}
 
-%option noyywrap nounput
+%option nounput
 
 ws        [ \t\n]+
 lit_char  [,()+\-*/=]
@@ -71,6 +79,10 @@ lit_float {digit}*[.]{digit}+
 
  /*==========================================================================*/
  /* OTHER */
+
+<<EOF>>     {
+                yyterminate();
+            }
 
 .           {
                 _xl(error)("unknown character");

@@ -308,7 +308,6 @@ bool apply_options(options_t &options)
         if(!import_ast(options, alloc, ast))
             return false;
         export_ast(options, ast);
-        fclose(_xl(in));
         if(options.dump_memory)
             alloc.dump(std::string(1, '\t'));
     }
