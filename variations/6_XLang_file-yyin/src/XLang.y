@@ -215,7 +215,7 @@ bool extract_options_from_args(options_t* options, int argc, char** argv)
         return false;
     int opt = 0;
     int longIndex = 0;
-    static const char *optString = "i:lxgdmh?";
+    static const char *optString = "i:f:lxgdmh?";
     static const struct option longOpts[] = {
                 { "in-xml",  required_argument, NULL, 'i' },
                 { "in-file", required_argument, NULL, 'f' },
