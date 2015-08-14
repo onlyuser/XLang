@@ -10,6 +10,8 @@ About
 
 XLang is a parser framework for language modeling.
 
+It handles the boring mechanical aspects of parsing, so you can focus on the fun parts, such as tuning the grammar.
+
 A Motivating Example
 --------------------
 
