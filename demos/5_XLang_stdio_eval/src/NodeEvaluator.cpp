@@ -55,21 +55,19 @@ void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
         return;
     }
     float32_t _value = 0;
-    bool more = visit_next_child(_node);
-    _value = value;
-    while(more)
+    if(visit_next_child(_node))
     {
-        more = visit_next_child();
-        if(!more) {
-            break;
-        }
-        switch(_node->lexer_id())
+        _value = value;
+        while(visit_next_child())
         {
-            case '+': _value += value; break;
-            case '-': _value -= value; break;
-            case '*': _value *= value; break;
-            case '/': _value /= value; break;
-            case '^': _value = pow(_value, value); break;
+            switch(_node->lexer_id())
+            {
+                case '+': _value += value; break;
+                case '-': _value -= value; break;
+                case '*': _value *= value; break;
+                case '/': _value /= value; break;
+                case '^': _value = pow(_value, value); break;
+            }
         }
     }
     value = _value;
