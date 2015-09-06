@@ -59,7 +59,10 @@ void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
     _value = value;
     while(more)
     {
-        more = visit_next_child(_node);
+        more = visit_next_child();
+        if(!more) {
+            break;
+        }
         switch(_node->lexer_id())
         {
             case '+': _value += value; break;
