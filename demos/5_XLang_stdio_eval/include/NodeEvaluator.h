@@ -32,6 +32,10 @@ public:
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node);
     void visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node);
     void visit(const xl::node::SymbolNodeIFace* _node);
+    bool is_printer() const
+    {
+        return false;
+    }
 
 private:
     float32_t value;
