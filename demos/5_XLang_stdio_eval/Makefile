@@ -54,7 +54,7 @@ LIB_FLAGS = \
 		$(patsubst %, -l%, $(LIB_STEMS_EXTERN))
 
 CXX = g++
-#DEBUG = -g
+DEBUG = -g
 CXXFLAGS = -Wall $(DEBUG) $(INCLUDE_PATH_FLAGS) -std=c++0x
 ifdef INCLUDE_PATH_EXTERN
 	CXXFLAGS := $(CXXFLAGS) -DINCLUDE_PATH_EXTERN
