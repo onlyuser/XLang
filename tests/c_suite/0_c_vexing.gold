@@ -1,0 +1,20 @@
+(;
+    (func_decl
+        void
+        g
+        void
+    )
+    (struct_decl
+        g2
+    )
+    (var_decl
+        void
+        f
+        g
+    )
+    (func_decl
+        g2
+        f2
+        g2
+    )
+)

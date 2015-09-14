@@ -1,0 +1,4 @@
+void g(void); // function
+struct g2;    // type
+void f(g());  // variable
+g2 f2(g2());  // function
