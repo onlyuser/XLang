@@ -65,9 +65,12 @@ References
 <dl>
     <dt>"Tom Niemann Flex-Bison AST examples"</dt>
     <dd>http://epaperpress.com/lexandyacc/</dd>
+
+    <dt>"Most vexing parse"</dt>
+    <dd>https://en.wikipedia.org/wiki/Most_vexing_parse</dd>
 </dl>
 
 Keywords
 --------
 
-    Lex, Yacc, Flex, Bison, Parser, Reentrant
+    Lex, Yacc, Flex, Bison, Parser, Reentrant, Scott Meyer's "Most Vexing Parse"
