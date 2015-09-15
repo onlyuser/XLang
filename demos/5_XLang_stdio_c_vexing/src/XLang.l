@@ -93,6 +93,7 @@ lit_float {digit}*[.]{digit}+
                     switch(type) {
                         case Symbol::TYPE: return ID_TYPE;
                         case Symbol::FUNC: return ID_FUNC;
+                        case Symbol::VAR:  return ID_VAR;
                         default:
                             break;
                     }

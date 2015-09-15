@@ -131,7 +131,7 @@ xl::TreeContext* &tree_context()
 
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
-%token<ident_value> ID_IDENT ID_TYPE ID_FUNC
+%token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
 %type<symbol_value> program statement expression declaration struct_decl func_decl var_decl
 
 %left '+' '-'

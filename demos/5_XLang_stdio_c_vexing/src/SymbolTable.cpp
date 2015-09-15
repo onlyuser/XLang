@@ -39,37 +39,30 @@ SymbolTable* SymbolTable::instance()
     return &g_symbol_table;
 }
 
-bool SymbolTable::add_type(std::string name)
+bool SymbolTable::_add_name(Symbol::type_t type, std::string name)
 {
     symbols_t::iterator p = m_symbols.find(name);
     if(p != m_symbols.end()) {
-        std::cout << "Error: Type \"" << name << "\" already exists in symbol table!" << std::endl;
+        std::cout << "Error: Name \"" << name << "\" already exists in symbol table!" << std::endl;
         return false;
     }
-    m_symbols.insert(p, symbols_t::value_type(name, new Symbol(Symbol::TYPE, name)));
+    m_symbols.insert(p, symbols_t::value_type(name, new Symbol(type, name)));
     return true;
+}
+
+bool SymbolTable::add_type(std::string name)
+{
+    return _add_name(Symbol::TYPE, name);
 }
 
 bool SymbolTable::add_func(std::string name)
 {
-    symbols_t::iterator p = m_symbols.find(name);
-    if(p != m_symbols.end()) {
-        std::cout << "Error: Func \"" << name << "\" already exists in symbol table!" << std::endl;
-        return false;
-    }
-    m_symbols.insert(p, symbols_t::value_type(name, new Symbol(Symbol::FUNC, name)));
-    return true;
+    return _add_name(Symbol::FUNC, name);
 }
 
 bool SymbolTable::add_var(std::string name)
 {
-    symbols_t::iterator p = m_symbols.find(name);
-    if(p != m_symbols.end()) {
-        std::cout << "Error: Var \"" << name << "\" already exists in symbol table!" << std::endl;
-        return false;
-    }
-    m_symbols.insert(p, symbols_t::value_type(name, new Symbol(Symbol::VAR, name)));
-    return true;
+    return _add_name(Symbol::VAR, name);
 }
 
 bool SymbolTable::lookup(Symbol::type_t *type, std::string name)
