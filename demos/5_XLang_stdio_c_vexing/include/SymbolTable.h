@@ -44,7 +44,7 @@ public:
     bool add_type(std::string name);
     bool add_func(std::string name);
     bool add_var(std::string name);
-    bool lookup(Symbol::type_t *type, std::string name);
+    bool lookup_symbol(Symbol::type_t *type, std::string name);
     void print() const;
     void reset();
 

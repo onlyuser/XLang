@@ -65,7 +65,7 @@ bool SymbolTable::add_var(std::string name)
     return _add_symbol(Symbol::VAR, name);
 }
 
-bool SymbolTable::lookup(Symbol::type_t *type, std::string name)
+bool SymbolTable::lookup_symbol(Symbol::type_t *type, std::string name)
 {
     if(!type) {
         return false;

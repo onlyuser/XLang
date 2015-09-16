@@ -89,7 +89,7 @@ lit_float {digit}*[.]{digit}+
 {lit_ident} {
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 Symbol::type_t type;
-                if(SymbolTable::instance()->lookup(&type, yytext)) {
+                if(SymbolTable::instance()->lookup_symbol(&type, yytext)) {
                     switch(type) {
                         case Symbol::TYPE: return ID_TYPE;
                         case Symbol::FUNC: return ID_FUNC;
