@@ -39,7 +39,7 @@ SymbolTable* SymbolTable::instance()
     return &g_symbol_table;
 }
 
-bool SymbolTable::_add_name(Symbol::type_t type, std::string name)
+bool SymbolTable::_add_symbol(Symbol::type_t type, std::string name)
 {
     symbols_t::iterator p = m_symbols.find(name);
     if(p != m_symbols.end()) {
@@ -52,17 +52,17 @@ bool SymbolTable::_add_name(Symbol::type_t type, std::string name)
 
 bool SymbolTable::add_type(std::string name)
 {
-    return _add_name(Symbol::TYPE, name);
+    return _add_symbol(Symbol::TYPE, name);
 }
 
 bool SymbolTable::add_func(std::string name)
 {
-    return _add_name(Symbol::FUNC, name);
+    return _add_symbol(Symbol::FUNC, name);
 }
 
 bool SymbolTable::add_var(std::string name)
 {
-    return _add_name(Symbol::VAR, name);
+    return _add_symbol(Symbol::VAR, name);
 }
 
 bool SymbolTable::lookup(Symbol::type_t *type, std::string name)

@@ -53,7 +53,7 @@ private:
     symbols_t m_symbols;
 
     SymbolTable();
-    bool _add_name(Symbol::type_t type, std::string name);
+    bool _add_symbol(Symbol::type_t type, std::string name);
 };
 
 #endif
