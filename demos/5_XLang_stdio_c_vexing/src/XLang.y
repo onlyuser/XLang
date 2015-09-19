@@ -132,7 +132,7 @@ xl::TreeContext* &tree_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
-%type<symbol_value> program statement expression declaration struct_decl func_decl var_decl
+%type<symbol_value> program statement declaration struct_decl func_decl var_decl
 
 %left '+' '-'
 %left '*' '/'
@@ -152,63 +152,43 @@ program:
     ;
 
 statement:
-      declaration             { $$ = $1; }
-    | expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+      declaration ';' { $$ = $1; }
     ;
 
 declaration:
-      struct_decl ';' { $$ = $1; }
-    | func_decl ';'   { $$ = $1; }
-    | var_decl ';'    { $$ = $1; }
+      struct_decl { $$ = $1; }
+    | func_decl   { $$ = $1; }
+    | var_decl    { $$ = $1; }
     ;
 
 struct_decl:
-      ID_STRUCT ID_IDENT {
+      ID_STRUCT ID_IDENT { // struct g2
           SymbolTable::instance()->add_type(*$2);
           $$ = MAKE_SYMBOL(ID_STRUCT_DECL, 1, MAKE_TERM(ID_IDENT, $2)); }
     ;
 
 func_decl:
-      ID_TYPE ID_IDENT ID_LB ID_TYPE ID_LB ID_RB ID_RB {
+      ID_TYPE ID_IDENT ID_LB ID_TYPE ID_LB ID_RB ID_RB { // void f2(g2())
           SymbolTable::instance()->add_func(*$2);
           $$ = MAKE_SYMBOL(ID_FUNC_DECL, 3,
                                          MAKE_TERM(ID_TYPE, $1),
                                          MAKE_TERM(ID_IDENT, $2),
                                          MAKE_TERM(ID_TYPE, $4)); }
-    | ID_TYPE ID_IDENT ID_LB ID_TYPE ID_RB {
+    | ID_TYPE ID_IDENT ID_LB ID_TYPE ID_RB { // void g(void)
           SymbolTable::instance()->add_func(*$2);
           $$ = MAKE_SYMBOL(ID_FUNC_DECL, 3,
                                          MAKE_TERM(ID_TYPE, $1),
                                          MAKE_TERM(ID_IDENT, $2),
                                          MAKE_TERM(ID_TYPE, $4)); }
-    | ID_TYPE ID_IDENT ID_LB ID_RB {
-          SymbolTable::instance()->add_func(*$2);
-          $$ = MAKE_SYMBOL(ID_FUNC_DECL, 2,
-                                         MAKE_TERM(ID_TYPE, $1),
-                                         MAKE_TERM(ID_IDENT, $2)); }
     ;
 
 var_decl:
-      ID_TYPE ID_IDENT ID_LB ID_FUNC ID_LB ID_RB ID_RB {
+      ID_TYPE ID_IDENT ID_LB ID_FUNC ID_LB ID_RB ID_RB { // void f(g())
           SymbolTable::instance()->add_var(*$2);
           $$ = MAKE_SYMBOL(ID_VAR_DECL, 3,
                                          MAKE_TERM(ID_TYPE, $1),
                                          MAKE_TERM(ID_IDENT, $2),
                                          MAKE_TERM(ID_FUNC, $4)); }
-    ;
-
-expression:
-      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | expression '^' expression      { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
-    | '(' expression ')'             { $$ = $2; }
     ;
 
 %%
