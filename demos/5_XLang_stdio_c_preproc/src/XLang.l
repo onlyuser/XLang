@@ -85,10 +85,20 @@ lit_float {digit}*[.]{digit}+
             }
 <ST_INCLUDE>[ \t]* ;
 <ST_INCLUDE>[^ \t\n]+ {
-                std::string filename = _dirname + "/" + yytext;
-                _xl(in) = fopen(filename.c_str(), "r");
+                std::string filename = yytext;
+                if(
+                    filename.length() >= 2 && (
+                        (filename[0] == '\"' && filename[filename.length()-1] == '\"') ||
+                        (filename[0] == '<' && filename[filename.length()-1] == '>')
+                        )
+                ) {
+                    filename = filename.substr(1, filename.length()-2);
+                }
+                std::string full_filename = _dirname + "/" + filename;
+                _xl(in) = fopen(full_filename.c_str(), "r");
                 if(!_xl(in)) {
-                    printf("Error: Can't open include file\n");
+                    _xl(error)("can't open include file");
+                    yyterminate();
                 }
                 yypush_buffer_state(yy_create_buffer(_xl(in), YY_BUF_SIZE));
                 POP_STATE;
