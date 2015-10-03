@@ -152,14 +152,14 @@ clean_binary : clean_objects clean_libs_parent
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE_VEXING=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
+			C_SUITE_PREPROC=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 #==================
 # import
@@ -169,13 +169,13 @@ clean_test :
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 #==================
 # pure
@@ -185,13 +185,13 @@ clean_import :
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 #==================
 # dot
@@ -201,13 +201,13 @@ clean_pure :
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 #==================
 # xml
@@ -217,13 +217,13 @@ clean_dot :
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_VEXING=1
+			C_SUITE_PREPROC=1
 
 #==================
 # lint

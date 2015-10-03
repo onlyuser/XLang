@@ -68,9 +68,12 @@ References
 
     <dt>"Most vexing parse"</dt>
     <dd>https://en.wikipedia.org/wiki/Most_vexing_parse</dd>
+
+    <dt>"Multiple Input Buffers"</dt>
+    <dd>http://flex.sourceforge.net/manual/Multiple-Input-Buffers.html</dd>
 </dl>
 
 Keywords
 --------
 
-    Lex, Yacc, Flex, Bison, Parser, Reentrant, Scott Meyer's "Most Vexing Parse"
+    Lex, Yacc, Flex, Bison, Parser, Reentrant, Scott Meyer's "Most Vexing Parse", Multiple Input Buffers

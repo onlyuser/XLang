@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 LIB_PATH = lib
-CHILD_PATH = variations
+CHILD_PATH = demos variations
 SUBPATHS = $(shell find $(CHILD_PATH) -mindepth 1 -maxdepth 1 -name "*" -type d | sort)
 
 .DEFAULT_GOAL : all

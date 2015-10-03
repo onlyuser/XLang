@@ -35,8 +35,13 @@ TEST_REGEX_DISABLE = "phony_regex_should_never_occur"
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
 endif
-ifneq ($(strip $(C_SUITE)),)
+ifneq ($(strip $(C_SUITE_VEXING)),)
 	TEST_PATH = c_suite
+	TEST_REGEX_ENABLE = vexing
+endif
+ifneq ($(strip $(C_SUITE_PREPROC)),)
+	TEST_PATH = c_suite
+	TEST_REGEX_ENABLE = preproc
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)
 	TEST_PATH = advanced_suite

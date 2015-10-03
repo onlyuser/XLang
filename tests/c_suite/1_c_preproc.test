@@ -1,0 +1,4 @@
+struct qwe;
+#include header.h //#define sum(a,b) a+b
+struct zxc;
+//sum(sum(2,3),4)

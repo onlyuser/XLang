@@ -1,0 +1,11 @@
+(;
+    (struct_decl
+        qwe
+    )
+    (struct_decl
+        asd
+    )
+    (struct_decl
+        zxc
+    )
+)
