@@ -97,7 +97,7 @@ lit_float {digit}*[.]{digit}+
                 std::string full_filename = _dirname + "/" + filename;
                 _xl(in) = fopen(full_filename.c_str(), "r");
                 if(!_xl(in)) {
-                    _xl(error)("can't open include file");
+                    _xl(error)("can't open file");
                     yyterminate();
                 }
                 yypush_buffer_state(yy_create_buffer(_xl(in), YY_BUF_SIZE));
