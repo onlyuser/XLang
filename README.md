@@ -10,7 +10,7 @@ About
 
 XLang is a parser framework for language modeling.
 
-It handles the boring mechanical aspects of parsing, so you can focus on the fun parts, such as tuning the grammar.
+It handles AST MVC, so as a language developer, you can focus on more important things, such as tuning the grammar.
 
 A Motivating Example
 --------------------
@@ -76,4 +76,4 @@ References
 Keywords
 --------
 
-    Lex, Yacc, Flex, Bison, Parser, Reentrant, Scott Meyer's "Most Vexing Parse", Multiple Input Buffers
+    Lex, Yacc, Flex, Bison, Parser, Reentrant, Abstract Syntax Tree, Model-View-Controller, Scott Meyer's "Most Vexing Parse", Multiple Input Buffers
