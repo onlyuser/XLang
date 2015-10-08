@@ -107,11 +107,11 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* PREPROC DEFINE */
 
-"#define"              { PUSH_STATE(ST_DEFINE); }      // begin define
-<ST_DEFINE>[ \t]+      ;                               // white space
-<ST_DEFINE>[^ \t\n\\]+ { _define_stack.push(yytext); } // non white space (exclude line continuation)
-<ST_DEFINE>\\[ \t]*\n  ;                               // line continuation (include carriage return)
-<ST_DEFINE>\n {                                        // end define
+"#define"               { PUSH_STATE(ST_DEFINE); }      // begin define
+<ST_DEFINE>[ \t]+       ;                               // white space
+<ST_DEFINE>[^ \t\n\\]+  { _define_stack.push(yytext); } // non white space (exclude line continuation)
+<ST_DEFINE>"\\"[ \t]*\n ;                               // line continuation (include carriage return)
+<ST_DEFINE>"\n" {                                       // end define
                 POP_STATE;
                 unput('$'); // push end define token to back of input stream
                 while(_define_stack.size()) {
