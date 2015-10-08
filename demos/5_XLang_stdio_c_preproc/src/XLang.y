@@ -76,6 +76,13 @@ std::string id_to_name(uint32_t lexer_id)
         case ID_VAR_DECL:    return "var_decl";
         case ID_LB:          return "(";
         case ID_RB:          return ")";
+        case ID_DEFINE:      return "#define";
+        case ID_IF:          return "#if";
+        case ID_IFDEF:       return "#ifdef";
+        case ID_IFNDEF:      return "#ifndef";
+        case ID_ENDIF:       return "#endif";
+        case ID_ELSE:        return "#else";
+        case ID_ELSEIF:      return "#elseif";
         case '+':            return "+";
         case '-':            return "-";
         case '*':            return "*";
@@ -99,6 +106,13 @@ uint32_t name_to_id(std::string name)
     if(name == "var_decl")    return ID_VAR_DECL;
     if(name == "(")           return ID_LB;
     if(name == ")")           return ID_RB;
+    if(name == "#define")     return ID_DEFINE;
+    if(name == "#if")         return ID_IF;
+    if(name == "#ifdef")      return ID_IFDEF;
+    if(name == "#ifndef")     return ID_IFNDEF;
+    if(name == "#endif")      return ID_ENDIF;
+    if(name == "#else")       return ID_ELSE;
+    if(name == "#elseif")     return ID_ELSEIF;
     if(name == "+")           return '+';
     if(name == "-")           return '-';
     if(name == "*")           return '*';
@@ -137,27 +151,45 @@ std::string _dirname;
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
-%type<symbol_value> program statement declaration struct_decl func_decl var_decl
+%type<symbol_value> block statement expression declaration struct_decl func_decl var_decl
 
 %left '+' '-'
 %left '*' '/'
 %left '^'
 %nonassoc ID_UMINUS ID_STRUCT ID_STRUCT_DECL ID_FUNC_DECL ID_VAR_DECL ID_LB ID_RB
+%nonassoc ID_DEFINE ID_ENDDEF ID_IF ID_IFDEF ID_IFNDEF ID_ENDIF ID_ELSE ID_ELSEIF
 
 %%
 
 root:
-      program { tree_context()->root() = $1; YYACCEPT; }
-    | error   { yyclearin; /* yyerrok; YYABORT; */ }
+      block { tree_context()->root() = $1; YYACCEPT; }
+    | error { yyclearin; /* yyerrok; YYABORT; */ }
     ;
 
-program:
-      statement         { $$ = $1; }
-    | program statement { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
+block:
+      statement       { $$ = $1; }
+    | block statement { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
     ;
 
 statement:
-      declaration ';' { $$ = $1; }
+      declaration ';'                                { $$ = $1; }
+    | ID_DEFINE ID_IDENT expression ID_ENDDEF        { $$ = MAKE_SYMBOL(ID_DEFINE, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IF expression block ID_ENDIF                { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
+    | ID_IFDEF ID_IDENT block ID_ENDIF               { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IFDEF ID_IDENT block ID_ELSE block ID_ENDIF { $$ = MAKE_SYMBOL(ID_IFDEF, 3, MAKE_TERM(ID_IDENT, $2), $3, $5); }
+    ;
+
+expression:
+      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | expression '^' expression      { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
+    | '(' expression ')'             { $$ = $2; }
     ;
 
 declaration:

@@ -27,6 +27,7 @@
 #include "XLangTreeContext.h" // TreeContext
 #include "SymbolTable.h" // SymbolTable
 #include <stdlib.h> // atoi
+#include <stack> // std::stack
 
 #define PUSH_STATE(x) yy_push_state(x)
 #define POP_STATE     yy_pop_state()
@@ -36,14 +37,17 @@
 extern FILE* _xl(in);
 extern std::string _dirname;
 
+std::stack<std::string> _define_stack;
+
 %}
 
-%option noyywrap nounput noyy_top_state
+%option noyywrap noyy_top_state
 %option stack
-%x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_INCLUDE
+%x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_INCLUDE ST_DEFINE
 
 ws        [ \t\n]+
 any       .|[\n]
+enddef    [\$]
 lit_char  [;()+\-*/^=]
 digit     [0-9]
 alpha     [a-zA-Z]
@@ -61,30 +65,20 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"        {
-                PUSH_STATE(ST_COMMENT_BLOCK);
-            }
-<ST_COMMENT_BLOCK>"*/" {
-                POP_STATE;
-            }
+"/*"                    { PUSH_STATE(ST_COMMENT_BLOCK); }
 <ST_COMMENT_BLOCK>{any} ;
+<ST_COMMENT_BLOCK>"*/"  { POP_STATE; }
 
-"//"        {
-                PUSH_STATE(ST_COMMENT_LINE);
-            }
-<ST_COMMENT_LINE>"\n" {
-                POP_STATE;
-            }
-<ST_COMMENT_LINE>. ;
+"//"                  { PUSH_STATE(ST_COMMENT_LINE); }
+<ST_COMMENT_LINE>.    ;
+<ST_COMMENT_LINE>"\n" { POP_STATE; }
 
  /*==========================================================================*/
- /* PREPROC */
+ /* PREPROC INCLUDE */
 
-"#include"  {
-                PUSH_STATE(ST_INCLUDE);
-            }
-<ST_INCLUDE>[ \t]* ;
-<ST_INCLUDE>[^ \t\n]+ {
+"#include"            { PUSH_STATE(ST_INCLUDE); } // begin include
+<ST_INCLUDE>[ \t]+    ;                           // white space
+<ST_INCLUDE>[^ \t\n]+ {                           // non white space
                 std::string filename = yytext;
                 if(
                     filename.length() >= 2 && (
@@ -103,13 +97,51 @@ lit_float {digit}*[.]{digit}+
                 yypush_buffer_state(yy_create_buffer(_xl(in), YY_BUF_SIZE));
                 POP_STATE;
             }
+<<EOF>>     { // end include
+                yypop_buffer_state();
+                if(!YY_CURRENT_BUFFER) {
+                    yyterminate();
+                }
+            }
+
+ /*==========================================================================*/
+ /* PREPROC DEFINE */
+
+"#define"              { PUSH_STATE(ST_DEFINE); }      // begin define
+<ST_DEFINE>[ \t]+      ;                               // white space
+<ST_DEFINE>[^ \t\n\\]+ { _define_stack.push(yytext); } // non white space (exclude line continuation)
+<ST_DEFINE>\\[ \t]*\n  ;                               // line continuation (include carriage return)
+<ST_DEFINE>\n {                                        // end define
+                POP_STATE;
+                unput('$'); // push end define token to back of input stream
+                while(_define_stack.size()) {
+                    std::string s = _define_stack.top();
+                    for(int i = static_cast<int>(s.length())-1; i >= 0; i--) { // unwind stack
+                        unput(s[i]);
+                    }
+                    if(_define_stack.size() > 1) { // push space between tokens
+                        unput(' ');
+                    }
+                    _define_stack.pop();
+                }
+                return ID_DEFINE;
+            }
+{enddef}    { return ID_ENDDEF; } // end define token
+
+ /*==========================================================================*/
+ /* PREPROC OTHER */
+
+"#if"       { return ID_IF; } // NOTE: why isn't yyless needed here?
+"#ifdef"    { return ID_IFDEF; }
+"#ifndef"   { return ID_IFNDEF; }
+"#endif"    { return ID_ENDIF; }
+"#else"     { return ID_ELSE; }
+"#elseif"   { return ID_ELSEIF; }
 
  /*==========================================================================*/
  /* LITERALS */
 
-"struct"    {
-                return ID_STRUCT;
-            }
+"struct"    { return ID_STRUCT; }
 
 "void"      {
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
@@ -141,27 +173,12 @@ lit_float {digit}*[.]{digit}+
                 return ID_FLOAT;
             }
 
-{lb}        {
-                return ID_LB;
-            }
-
-{rb}        {
-                return ID_RB;
-            }
-
-{lit_char}  {
-                return *yytext;
-            }
+{lb}        { return ID_LB; }
+{rb}        { return ID_RB; }
+{lit_char}  { return *yytext; }
 
  /*==========================================================================*/
  /* OTHER */
-
-<<EOF>>     {
-                yypop_buffer_state();
-                if(!YY_CURRENT_BUFFER) {
-                    yyterminate();
-                }
-            }
 
 .           {
                 _xl(error)("unknown character");

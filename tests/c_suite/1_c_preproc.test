@@ -1,4 +1,16 @@
 struct qwe;
 #include "header.h" //#define sum(a,b) a+b
 struct zxc;
+#define \
+    abc \
+    123
+#ifdef x
+    struct aaa;
+#else
+    struct bbb;
+    #if 1
+        struct ccc;
+    #endif
+#endif
+struct ddd;
 //sum(sum(2,3),4)

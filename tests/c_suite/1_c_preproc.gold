@@ -8,4 +8,28 @@
     (struct_decl
         zxc
     )
+    (#define
+        abc
+        123
+    )
+    (#ifdef
+        x
+        (struct_decl
+            aaa
+        )
+        (;
+            (struct_decl
+                bbb
+            )
+            (#if
+                1
+                (struct_decl
+                    ccc
+                )
+            )
+        )
+    )
+    (struct_decl
+        ddd
+    )
 )
