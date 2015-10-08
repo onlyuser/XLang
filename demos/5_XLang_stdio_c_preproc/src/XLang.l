@@ -114,13 +114,13 @@ lit_float {digit}*[.]{digit}+
 <ST_DEFINE>"\n" {                                       // end define
                 POP_STATE;
                 unput('$'); // push end define token to back of input stream
-                while(_define_stack.size()) {
+                while(_define_stack.size()) { // unwind stack
                     std::string s = _define_stack.top();
-                    for(int i = static_cast<int>(s.length())-1; i >= 0; i--) { // unwind stack
+                    for(int i = static_cast<int>(s.length())-1; i >= 0; i--) {
                         unput(s[i]);
                     }
-                    if(_define_stack.size() > 1) { // push space between tokens
-                        unput(' ');
+                    if(_define_stack.size() > 1) {
+                        unput(' '); // push space between tokens
                     }
                     _define_stack.pop();
                 }
