@@ -69,8 +69,14 @@ References
     <dt>"Most vexing parse"</dt>
     <dd>https://en.wikipedia.org/wiki/Most_vexing_parse</dd>
 
+    <dt>"Lexical Analysis With Flex - Start Conditions"</dt>
+    <dd>http://flex.sourceforge.net/manual/Start-Conditions.html</dd>
+
     <dt>"Multiple Input Buffers"</dt>
     <dd>http://flex.sourceforge.net/manual/Multiple-Input-Buffers.html</dd>
+
+    <dt>"Flex, A fast scanner generator - Actions"</dt>
+    <dd>http://dinosaur.compilertools.net/flex/flex_9.html</dd>
 </dl>
 
 Keywords
