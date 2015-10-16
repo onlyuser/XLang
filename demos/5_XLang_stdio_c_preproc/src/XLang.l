@@ -101,7 +101,7 @@ lit_float {digit}*[.]{digit}+
                     yyterminate();
                 }
                 yypush_buffer_state(yy_create_buffer(_xl(in), YY_BUF_SIZE));
-                POP_STATE;
+                POP_STATE; // NOTE: necessary to continue lexing include file
             }
 <<EOF>>     { // end include
                 if(!yy_buffer_stack_top) { // NOTE: necessary to avoid deleting top buffer
