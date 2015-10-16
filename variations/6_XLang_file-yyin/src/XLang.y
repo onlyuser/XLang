@@ -265,7 +265,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
     }
     else
     {
-        _xl(in) = fopen(options.in_file.c_str(), "rb");
+        _xl(in) = fopen(options.in_file.c_str(), "rb"); // NOTE: fclose in yywrap
         if(!_xl(in))
         {
             std::cerr << "ERROR: cannot open file" << std::endl;

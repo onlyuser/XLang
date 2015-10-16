@@ -34,7 +34,7 @@ extern FILE* _xl(in);
 
 extern "C" int _xl(wrap)()
 {
-    fclose(_xl(in));
+    fclose(_xl(in)); // NOTE: both for top and included file
     return 1;
 }
 

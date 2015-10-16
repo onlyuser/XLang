@@ -39,9 +39,15 @@ extern std::string _dirname;
 
 std::stack<std::string> _define_stack;
 
+extern "C" int _xl(wrap)()
+{
+    fclose(_xl(in)); // NOTE: both for top and included file
+    return 1;
+}
+
 %}
 
-%option noyywrap noyy_top_state
+%option noyy_top_state
 %option stack
 %x ST_COMMENT_BLOCK ST_COMMENT_LINE ST_INCLUDE ST_DEFINE
 
