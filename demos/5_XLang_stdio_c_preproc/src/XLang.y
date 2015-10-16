@@ -234,7 +234,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
 {
     tree_context() = new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc);
     int error_code = _xl(parse)(); // parser entry point
-    _xl(lex_destroy)();
+    //_xl(lex_destroy)(); // NOTE: causes yyin to become invalid
     return (!error_code && error_messages().str().empty()) ? tree_context()->root() : NULL;
 }
 
@@ -356,6 +356,7 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
             std::cerr << "ERROR: " << error_messages().str().c_str() << std::endl;
             return false;
         }
+        fclose(_xl(in)); // NOTE: must remember to do this
     }
     return true;
 }

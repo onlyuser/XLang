@@ -98,6 +98,9 @@ lit_float {digit}*[.]{digit}+
                 POP_STATE;
             }
 <<EOF>>     { // end include
+                if(!yy_buffer_stack_top) { // NOTE: avoid deleting top buffer
+                    return 0;
+                }
                 yypop_buffer_state();
                 if(!YY_CURRENT_BUFFER) {
                     yyterminate();
