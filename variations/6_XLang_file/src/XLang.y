@@ -166,7 +166,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, FILE* file)
 {
     parser_context() = new (PNEW(alloc, , ParserContext)) ParserContext(alloc, file);
     int error_code = _xl(parse)(); // parser entry point
-    _xl(lex_destroy)();
+    _xl(lex_destroy)(); // NOTE: necessary to avoid memory leak
     return (!error_code && error_messages().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 

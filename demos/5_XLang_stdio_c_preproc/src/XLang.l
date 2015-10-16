@@ -41,7 +41,7 @@ std::stack<std::string> _define_stack;
 
 extern "C" int _xl(wrap)()
 {
-    fclose(_xl(in)); // NOTE: both for top and included file
+    fclose(_xl(in)); // NOTE: for both top and include file
     return 1;
 }
 
@@ -104,7 +104,7 @@ lit_float {digit}*[.]{digit}+
                 POP_STATE;
             }
 <<EOF>>     { // end include
-                if(!yy_buffer_stack_top) { // NOTE: avoid deleting top buffer
+                if(!yy_buffer_stack_top) { // NOTE: necessary to avoid deleting top buffer
                     return 0;
                 }
                 yypop_buffer_state();

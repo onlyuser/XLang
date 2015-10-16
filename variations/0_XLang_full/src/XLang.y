@@ -193,7 +193,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
     _xl(lex_init)(&scanner);
     _xl(set_extra)(&parser_context, scanner);
     int error_code = _xl(parse)(&parser_context, scanner); // parser entry point
-    _xl(lex_destroy)(scanner);
+    _xl(lex_destroy)(scanner); // NOTE: necessary to avoid memory leak
     return (!error_code && error_messages().str().empty()) ? parser_context.tree_context().root() : NULL;
 }
 

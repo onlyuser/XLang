@@ -234,7 +234,7 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
 {
     tree_context() = new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc);
     int error_code = _xl(parse)(); // parser entry point
-    _xl(lex_destroy)();
+    _xl(lex_destroy)(); // NOTE: necessary to avoid memory leak
     return (!error_code && error_messages().str().empty()) ? tree_context()->root() : NULL;
 }
 
