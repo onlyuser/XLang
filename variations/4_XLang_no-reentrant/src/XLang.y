@@ -118,7 +118,7 @@ ParserContext* &parser_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT
-%type<symbol_value> program statement expression
+%type<symbol_value> program stmt expr
 
 %left '+' '-'
 %left '*' '/'
@@ -132,25 +132,25 @@ root:
     ;
 
 program:
-      statement             { $$ = $1; }
-    | program ',' statement { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
+      stmt             { $$ = $1; }
+    | program ',' stmt { $$ = MAKE_SYMBOL(',', 2, $1, $3); }
     ;
 
-statement:
-      expression              { $$ = $1; }
-    | ID_IDENT '=' expression { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
+stmt:
+      expr              { $$ = $1; }
+    | ID_IDENT '=' expr { $$ = MAKE_SYMBOL('=', 2, MAKE_TERM(ID_IDENT, $1), $3); }
     ;
 
-expression:
-      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | '(' expression ')'             { $$ = $2; }
+expr:
+      ID_INT                   { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                 { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                 { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | '-' expr %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expr '+' expr            { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expr '-' expr            { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expr '*' expr            { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expr '/' expr            { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | '(' expr ')'             { $$ = $2; }
     ;
 
 %%

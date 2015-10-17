@@ -132,7 +132,7 @@ xl::TreeContext* &tree_context()
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
-%type<symbol_value> program statement declaration struct_decl func_decl var_decl
+%type<symbol_value> program stmt decl struct_decl func_decl var_decl
 
 %left '+' '-'
 %left '*' '/'
@@ -147,15 +147,15 @@ root:
     ;
 
 program:
-      statement         { $$ = $1; }
-    | program statement { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
+      stmt         { $$ = $1; }
+    | program stmt { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
     ;
 
-statement:
-      declaration ';' { $$ = $1; }
+stmt:
+      decl ';' { $$ = $1; }
     ;
 
-declaration:
+decl:
       struct_decl { $$ = $1; }
     | func_decl   { $$ = $1; }
     | var_decl    { $$ = $1; }
