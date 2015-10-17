@@ -69,57 +69,61 @@ std::string id_to_name(uint32_t lexer_id)
         return _id_to_name[index];
     switch(lexer_id)
     {
-        case ID_UMINUS:      return "uminus";
-        case ID_STRUCT:      return "struct";
-        case ID_STRUCT_DECL: return "struct_decl";
-        case ID_FUNC_DECL:   return "func_decl";
-        case ID_VAR_DECL:    return "var_decl";
-        case ID_LB:          return "(";
-        case ID_RB:          return ")";
-        case ID_DEFINE:      return "#define";
-        case ID_IF:          return "#if";
-        case ID_IFDEF:       return "#ifdef";
-        case ID_IFNDEF:      return "#ifndef";
-        case ID_ENDIF:       return "#endif";
-        case ID_ELSE:        return "#else";
-        case ID_ELSEIF:      return "#elseif";
-        case '+':            return "+";
-        case '-':            return "-";
-        case '*':            return "*";
-        case '/':            return "/";
-        case '^':            return "^";
-        case '=':            return "=";
-        case ';':            return ";";
+        case ID_UMINUS:         return "uminus";
+        case ID_STRUCT:         return "struct";
+        case ID_STRUCT_DECL:    return "struct_decl";
+        case ID_FUNC_DECL:      return "func_decl";
+        case ID_VAR_DECL:       return "var_decl";
+        case ID_LB:             return "(";
+        case ID_RB:             return ")";
+        case ID_DEFINE:         return "#define";
+        case ID_IF:             return "#if";
+        case ID_IFDEF:          return "#ifdef";
+        case ID_IFNDEF:         return "#ifndef";
+        case ID_ENDIF:          return "#endif";
+        case ID_ELSE:           return "#else";
+        case ID_ELIF:           return "#elif";
+        case ID_ELIF_STMT_LIST: return "elif_stmt_list";
+        case ID_DEFINED:        return "defined";
+        case '+':               return "+";
+        case '-':               return "-";
+        case '*':               return "*";
+        case '/':               return "/";
+        case '^':               return "^";
+        case '=':               return "=";
+        case ';':               return ";";
     }
     throw ERROR_LEXER_ID_NOT_FOUND;
     return "";
 }
 uint32_t name_to_id(std::string name)
 {
-    if(name == "int")         return ID_INT;
-    if(name == "float")       return ID_FLOAT;
-    if(name == "ident")       return ID_IDENT;
-    if(name == "uminus")      return ID_UMINUS;
-    if(name == "struct")      return ID_STRUCT;
-    if(name == "struct_decl") return ID_STRUCT_DECL;
-    if(name == "func_decl")   return ID_FUNC_DECL;
-    if(name == "var_decl")    return ID_VAR_DECL;
-    if(name == "(")           return ID_LB;
-    if(name == ")")           return ID_RB;
-    if(name == "#define")     return ID_DEFINE;
-    if(name == "#if")         return ID_IF;
-    if(name == "#ifdef")      return ID_IFDEF;
-    if(name == "#ifndef")     return ID_IFNDEF;
-    if(name == "#endif")      return ID_ENDIF;
-    if(name == "#else")       return ID_ELSE;
-    if(name == "#elseif")     return ID_ELSEIF;
-    if(name == "+")           return '+';
-    if(name == "-")           return '-';
-    if(name == "*")           return '*';
-    if(name == "/")           return '/';
-    if(name == "^")           return '^';
-    if(name == "=")           return '=';
-    if(name == ";")           return ';';
+    if(name == "int")            return ID_INT;
+    if(name == "float")          return ID_FLOAT;
+    if(name == "ident")          return ID_IDENT;
+    if(name == "uminus")         return ID_UMINUS;
+    if(name == "struct")         return ID_STRUCT;
+    if(name == "struct_decl")    return ID_STRUCT_DECL;
+    if(name == "func_decl")      return ID_FUNC_DECL;
+    if(name == "var_decl")       return ID_VAR_DECL;
+    if(name == "(")              return ID_LB;
+    if(name == ")")              return ID_RB;
+    if(name == "#define")        return ID_DEFINE;
+    if(name == "#if")            return ID_IF;
+    if(name == "#ifdef")         return ID_IFDEF;
+    if(name == "#ifndef")        return ID_IFNDEF;
+    if(name == "#endif")         return ID_ENDIF;
+    if(name == "#else")          return ID_ELSE;
+    if(name == "#elif")          return ID_ELIF;
+    if(name == "elif_stmt_list") return ID_ELIF_STMT_LIST;
+    if(name == "defined")        return ID_DEFINED;
+    if(name == "+")              return '+';
+    if(name == "-")              return '-';
+    if(name == "*")              return '*';
+    if(name == "/")              return '/';
+    if(name == "^")              return '^';
+    if(name == "=")              return '=';
+    if(name == ";")              return ';';
     throw ERROR_LEXER_NAME_NOT_FOUND;
     return 0;
 }
@@ -151,13 +155,15 @@ std::string _dirname;
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
 %token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
-%type<symbol_value> block statement expression declaration struct_decl func_decl var_decl
+%type<symbol_value> block stmt expr
+%type<symbol_value> decl struct_decl func_decl var_decl
+%type<symbol_value> opt_elif_stmt_list elif_stmt_list elif_stmt
 
 %left '+' '-'
 %left '*' '/'
 %left '^'
 %nonassoc ID_UMINUS ID_STRUCT ID_STRUCT_DECL ID_FUNC_DECL ID_VAR_DECL ID_LB ID_RB
-%nonassoc ID_DEFINE ID_ENDDEF ID_IF ID_IFDEF ID_IFNDEF ID_ENDIF ID_ELSE ID_ELSEIF
+%nonassoc ID_DEFINE ID_ENDDEF ID_IF ID_IFDEF ID_IFNDEF ID_ENDIF ID_ELSE ID_ELIF ID_ELIF_STMT_LIST ID_DEFINED
 
 %%
 
@@ -167,32 +173,49 @@ root:
     ;
 
 block:
-      statement       { $$ = $1; }
-    | block statement { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
+      stmt       { $$ = $1; }
+    | block stmt { $$ = MAKE_SYMBOL(';', 2, $1, $2); }
     ;
 
-statement:
-      declaration ';'                                { $$ = $1; }
-    | ID_DEFINE ID_IDENT expression ID_ENDDEF        { $$ = MAKE_SYMBOL(ID_DEFINE, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | ID_IF expression block ID_ENDIF                { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
-    | ID_IFDEF ID_IDENT block ID_ENDIF               { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | ID_IFDEF ID_IDENT block ID_ELSE block ID_ENDIF { $$ = MAKE_SYMBOL(ID_IFDEF, 3, MAKE_TERM(ID_IDENT, $2), $3, $5); }
+stmt:
+      decl ';'                          { $$ = $1; }
+    | ID_DEFINE ID_IDENT expr ID_ENDDEF { $$ = MAKE_SYMBOL(ID_DEFINE, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IF expr block ID_ENDIF         { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
+    | ID_IFDEF ID_IDENT block ID_ENDIF  { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IFDEF ID_IDENT block opt_elif_stmt_list ID_ELSE block ID_ENDIF {
+          $$ = MAKE_SYMBOL(ID_IFDEF, 4, MAKE_TERM(ID_IDENT, $2), $3, $4, $6);
+      }
     ;
 
-expression:
-      ID_INT                         { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                       { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                       { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | '-' expression %prec ID_UMINUS { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expression '+' expression      { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expression '-' expression      { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expression '*' expression      { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expression '/' expression      { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | expression '^' expression      { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
-    | '(' expression ')'             { $$ = $2; }
+opt_elif_stmt_list:
+      /*empty*/      { $$ = NULL; }
+    | elif_stmt_list { $$ = $1; }
     ;
 
-declaration:
+elif_stmt_list:
+      elif_stmt                { $$ = $1; }
+    | elif_stmt_list elif_stmt { $$ = MAKE_SYMBOL(ID_ELIF_STMT_LIST, 2, $1, $2); }
+    ;
+
+elif_stmt:
+      ID_ELIF expr block { $$ = MAKE_SYMBOL(ID_ELIF, 2, $2, $3); }
+    ;
+
+expr:
+      ID_INT                          { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                        { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                        { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | ID_DEFINED ID_LB ID_IDENT ID_RB { $$ = MAKE_SYMBOL(ID_DEFINED, 1, MAKE_TERM(ID_IDENT, $3)); }
+    | '-' expr %prec ID_UMINUS        { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expr '+' expr                   { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expr '-' expr                   { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expr '*' expr                   { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expr '/' expr                   { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | expr '^' expr                   { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
+    | ID_LB expr ID_RB                { $$ = $2; }
+    ;
+
+decl:
       struct_decl { $$ = $1; }
     | func_decl   { $$ = $1; }
     | var_decl    { $$ = $1; }

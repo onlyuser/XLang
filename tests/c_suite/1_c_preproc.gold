@@ -13,9 +13,27 @@
         123
     )
     (#ifdef
-        x
+        xxx
         (struct_decl
             aaa
+        )
+        (elif_stmt_list
+            (#elif
+                (defined
+                    yyy
+                )
+                (struct_decl
+                    aaa2
+                )
+            )
+            (#elif
+                (defined
+                    zzz
+                )
+                (struct_decl
+                    aaa3
+                )
+            )
         )
         (;
             (struct_decl
@@ -25,6 +43,14 @@
                 1
                 (struct_decl
                     ccc
+                )
+            )
+            (#if
+                (defined
+                    abc
+                )
+                (struct_decl
+                    ccc2
                 )
             )
         )

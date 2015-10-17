@@ -145,10 +145,12 @@ lit_float {digit}*[.]{digit}+
 "#ifndef"   { return ID_IFNDEF; }
 "#endif"    { return ID_ENDIF; }
 "#else"     { return ID_ELSE; }
-"#elseif"   { return ID_ELSEIF; }
+"#elif"     { return ID_ELIF; }
 
  /*==========================================================================*/
  /* LITERALS */
+
+"defined"   { return ID_DEFINED; }
 
 "struct"    { return ID_STRUCT; }
 

@@ -4,12 +4,19 @@ struct zxc;
 #define \
     abc \
     123
-#ifdef x
+#ifdef xxx
     struct aaa;
+#elif defined(yyy)
+    struct aaa2;
+#elif defined(zzz)
+    struct aaa3;
 #else
     struct bbb;
     #if 1
         struct ccc;
+    #endif
+    #if defined(abc)
+        struct ccc2;
     #endif
 #endif
 struct ddd;
