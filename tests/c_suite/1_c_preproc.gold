@@ -40,7 +40,14 @@
                 bbb
             )
             (#if
-                1
+                (||
+                    (defined
+                        xxx
+                    )
+                    (defined
+                        yyy
+                    )
+                )
                 (struct_decl
                     ccc
                 )

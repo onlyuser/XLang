@@ -85,6 +85,8 @@ std::string id_to_name(uint32_t lexer_id)
         case ID_ELIF:           return "#elif";
         case ID_ELIF_STMT_LIST: return "elif_stmt_list";
         case ID_DEFINED:        return "defined";
+        case ID_AND:            return "&&";
+        case ID_OR:             return "||";
         case '+':               return "+";
         case '-':               return "-";
         case '*':               return "*";
@@ -117,6 +119,8 @@ uint32_t name_to_id(std::string name)
     if(name == "#elif")          return ID_ELIF;
     if(name == "elif_stmt_list") return ID_ELIF_STMT_LIST;
     if(name == "defined")        return ID_DEFINED;
+    if(name == "&&")             return ID_AND;
+    if(name == "||")             return ID_OR;
     if(name == "+")              return '+';
     if(name == "-")              return '-';
     if(name == "*")              return '*';
@@ -159,6 +163,7 @@ std::string _dirname;
 %type<symbol_value> decl struct_decl func_decl var_decl
 %type<symbol_value> opt_elif_stmt_list elif_stmt_list elif_stmt
 
+%left ID_AND ID_OR
 %left '+' '-'
 %left '*' '/'
 %left '^'
@@ -207,6 +212,8 @@ expr:
     | ID_IDENT                        { $$ = MAKE_TERM(ID_IDENT, $1); }
     | ID_DEFINED ID_LB ID_IDENT ID_RB { $$ = MAKE_SYMBOL(ID_DEFINED, 1, MAKE_TERM(ID_IDENT, $3)); }
     | '-' expr %prec ID_UMINUS        { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expr ID_AND expr                { $$ = MAKE_SYMBOL(ID_AND, 2, $1, $3); }
+    | expr ID_OR expr                 { $$ = MAKE_SYMBOL(ID_OR, 2, $1, $3); }
     | expr '+' expr                   { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
     | expr '-' expr                   { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
     | expr '*' expr                   { $$ = MAKE_SYMBOL('*', 2, $1, $3); }

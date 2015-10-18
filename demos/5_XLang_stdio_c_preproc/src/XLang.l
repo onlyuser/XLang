@@ -159,6 +159,10 @@ lit_float {digit}*[.]{digit}+
                 return ID_TYPE;
             }
 
+"&&"        { return ID_AND; }
+
+"||"        { return ID_OR; }
+
 {lit_ident} {
                 LVAL.ident_value = TREE_CONTEXT.alloc_unique_string(yytext);
                 Symbol::type_t type;

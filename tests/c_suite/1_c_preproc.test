@@ -12,7 +12,7 @@ struct zxc;
     struct aaa3;
 #else
     struct bbb;
-    #if 1
+    #if defined(xxx) || defined(yyy)
         struct ccc;
     #endif
     #if defined(abc)
