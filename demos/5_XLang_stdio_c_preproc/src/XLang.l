@@ -54,7 +54,7 @@ extern "C" int _xl(wrap)()
 ws        [ \t\n]+
 any       .|[\n]
 enddef    [\$]
-lit_char  [;()+\-*/^=]
+lit_char  [;,()+\-*/^=]
 digit     [0-9]
 alpha     [a-zA-Z]
 id        {alpha}|[_]

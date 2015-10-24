@@ -8,9 +8,23 @@
     (struct_decl
         zxc
     )
-    (#define
+    (define_symbol
         abc
         123
+    )
+    (define_macro
+        abc2
+        (NULL)
+        456
+    )
+    (define_macro
+        abc3
+        (ident_list
+            x
+            y
+            z
+        )
+        789
     )
     (#ifdef
         xxx

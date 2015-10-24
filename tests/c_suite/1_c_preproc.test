@@ -4,6 +4,14 @@ struct zxc;
 #define \
     abc \
     123
+#define \
+    abc2() \
+    456
+#define \
+    abc3(x, \
+        y, \
+        z) \
+    789
 #ifdef xxx
     struct aaa;
 #elif defined(yyy)

@@ -77,6 +77,9 @@ std::string id_to_name(uint32_t lexer_id)
         case ID_LB:             return "(";
         case ID_RB:             return ")";
         case ID_DEFINE:         return "#define";
+        case ID_DEFINE_SYMBOL:  return "define_symbol";
+        case ID_DEFINE_MACRO:   return "define_macro";
+        case ID_IDENT_LIST:     return "ident_list";
         case ID_IF:             return "#if";
         case ID_IFDEF:          return "#ifdef";
         case ID_IFNDEF:         return "#ifndef";
@@ -95,6 +98,7 @@ std::string id_to_name(uint32_t lexer_id)
         case '=':               return "=";
         case ';':               return ";";
     }
+    std::cout << lexer_id << std::endl;
     throw ERROR_LEXER_ID_NOT_FOUND;
     return "";
 }
@@ -111,6 +115,9 @@ uint32_t name_to_id(std::string name)
     if(name == "(")              return ID_LB;
     if(name == ")")              return ID_RB;
     if(name == "#define")        return ID_DEFINE;
+    if(name == "define_symbol")  return ID_DEFINE_SYMBOL;
+    if(name == "define_macro")   return ID_DEFINE_MACRO;
+    if(name == "ident_list")     return ID_IDENT_LIST;
     if(name == "#if")            return ID_IF;
     if(name == "#ifdef")         return ID_IFDEF;
     if(name == "#ifndef")        return ID_IFNDEF;
@@ -162,13 +169,14 @@ std::string _dirname;
 %type<symbol_value> block stmt expr
 %type<symbol_value> decl struct_decl func_decl var_decl
 %type<symbol_value> opt_elif_stmt_list elif_stmt_list elif_stmt
+%type<symbol_value> opt_ident_list ident_list
 
 %left ID_AND ID_OR
 %left '+' '-'
 %left '*' '/'
 %left '^'
 %nonassoc ID_UMINUS ID_STRUCT ID_STRUCT_DECL ID_FUNC_DECL ID_VAR_DECL ID_LB ID_RB
-%nonassoc ID_DEFINE ID_ENDDEF ID_IF ID_IFDEF ID_IFNDEF ID_ENDIF ID_ELSE ID_ELIF ID_ELIF_STMT_LIST ID_DEFINED
+%nonassoc ID_DEFINE ID_DEFINE_SYMBOL ID_DEFINE_MACRO ID_IDENT_LIST ID_ENDDEF ID_IF ID_IFDEF ID_IFNDEF ID_ENDIF ID_ELSE ID_ELIF ID_ELIF_STMT_LIST ID_DEFINED
 
 %%
 
@@ -183,13 +191,24 @@ block:
     ;
 
 stmt:
-      decl ';'                          { $$ = $1; }
-    | ID_DEFINE ID_IDENT expr ID_ENDDEF { $$ = MAKE_SYMBOL(ID_DEFINE, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | ID_IF expr block ID_ENDIF         { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
-    | ID_IFDEF ID_IDENT block ID_ENDIF  { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+      decl ';'                                                     { $$ = $1; }
+    | ID_DEFINE ID_IDENT expr ID_ENDDEF                            { $$ = MAKE_SYMBOL(ID_DEFINE_SYMBOL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_DEFINE ID_IDENT ID_LB opt_ident_list ID_RB expr ID_ENDDEF { $$ = MAKE_SYMBOL(ID_DEFINE_MACRO, 3, MAKE_TERM(ID_IDENT, $2), $4, $6); }
+    | ID_IF expr block ID_ENDIF                                    { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
+    | ID_IFDEF ID_IDENT block ID_ENDIF                             { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
     | ID_IFDEF ID_IDENT block opt_elif_stmt_list ID_ELSE block ID_ENDIF {
           $$ = MAKE_SYMBOL(ID_IFDEF, 4, MAKE_TERM(ID_IDENT, $2), $3, $4, $6);
       }
+    ;
+
+opt_ident_list:
+      /*empty*/  { $$ = NULL; }
+    | ident_list { $$ = $1; }
+    ;
+
+ident_list:
+      ID_IDENT                { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | ident_list ',' ID_IDENT { $$ = MAKE_SYMBOL(ID_IDENT_LIST, 2, $1, MAKE_TERM(ID_IDENT, $3)); }
     ;
 
 opt_elif_stmt_list:
