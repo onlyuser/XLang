@@ -29,6 +29,7 @@
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
 #include "SymbolTable.h" // SymbolTable
+#include "NodeEvaluator.h" // NodeEvaluator
 #include <stdio.h> // size_t
 #include <stdarg.h> // va_start
 #include <string> // std::string
@@ -194,8 +195,12 @@ stmt:
       decl ';'                                                     { $$ = $1; }
     | ID_DEFINE ID_IDENT expr ID_ENDDEF                            { $$ = MAKE_SYMBOL(ID_DEFINE_SYMBOL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
     | ID_DEFINE ID_IDENT ID_LB opt_ident_list ID_RB expr ID_ENDDEF { $$ = MAKE_SYMBOL(ID_DEFINE_MACRO, 3, MAKE_TERM(ID_IDENT, $2), $4, $6); }
-    | ID_IF expr block ID_ENDIF                                    { $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3); }
-    | ID_IFDEF ID_IDENT block ID_ENDIF                             { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IF expr block ID_ENDIF {
+          NodeEvaluator v;
+          v.dispatch_visit($2);
+          $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3);
+      }
+    | ID_IFDEF ID_IDENT block ID_ENDIF { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
     | ID_IFDEF ID_IDENT block opt_elif_stmt_list ID_ELSE block ID_ENDIF {
           $$ = MAKE_SYMBOL(ID_IFDEF, 4, MAKE_TERM(ID_IDENT, $2), $3, $4, $6);
       }

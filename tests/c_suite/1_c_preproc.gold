@@ -1,3 +1,6 @@
+0
+0
+5
 (;
     (struct_decl
         qwe
@@ -76,7 +79,13 @@
             )
         )
     )
-    (struct_decl
-        ddd
+    (#if
+        (+
+            2
+            3
+        )
+        (struct_decl
+            ddd
+        )
     )
 )

@@ -27,5 +27,7 @@ struct zxc;
         struct ccc2;
     #endif
 #endif
-struct ddd;
+#if 2+3
+    struct ddd;
+#endif
 //sum(sum(2,3),4)
