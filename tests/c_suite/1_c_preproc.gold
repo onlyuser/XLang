@@ -1,6 +1,9 @@
 0
+QWE: 0
 0
-5
+QWE: 0
+-20
+QWE: -20
 (;
     (struct_decl
         qwe
@@ -56,6 +59,10 @@
             (struct_decl
                 bbb
             )
+            (define_symbol
+                xxx
+                1
+            )
             (#if
                 (||
                     (defined
@@ -80,9 +87,14 @@
         )
     )
     (#if
-        (+
-            2
-            3
+        (*
+            (uminus
+                (+
+                    2
+                    3
+                )
+            )
+            4
         )
         (struct_decl
             ddd

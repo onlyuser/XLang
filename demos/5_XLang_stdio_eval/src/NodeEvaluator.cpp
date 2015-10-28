@@ -23,54 +23,51 @@
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::INT>* _node)
 {
-    value = _node->value();
+    m_value = _node->value();
 }
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::FLOAT>* _node)
 {
-    value = _node->value();
+    m_value = _node->value();
 }
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::STRING>* _node)
 {
-    value = 0;
+    m_value = 0;
 }
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::CHAR>* _node)
 {
-    value = 0;
+    m_value = 0;
 }
 
 void NodeEvaluator::visit(const xl::node::TermNodeIFace<xl::node::NodeIdentIFace::IDENT>* _node)
 {
-    value = 0;
+    m_value = 0;
 }
 
 void NodeEvaluator::visit(const xl::node::SymbolNodeIFace* _node)
 {
-    if(_node->lexer_id() == ID_UMINUS)
-    {
-        visit_next_child(_node);
-        value = -value;
+    if(_node->lexer_id() == ID_UMINUS) {
+        VisitorDFS::visit(_node);
+        m_value = -m_value;
         return;
     }
-    float32_t _value = 0;
-    if(visit_next_child(_node))
-    {
-        _value = value;
-        while(visit_next_child())
-        {
-            switch(_node->lexer_id())
-            {
-                case '+': _value += value; break;
-                case '-': _value -= value; break;
-                case '*': _value *= value; break;
-                case '/': _value /= value; break;
-                case '^': _value = pow(_value, value); break;
+    float32_t value = 0;
+    if(visit_next_child(_node)) {
+        value = m_value;
+        while(visit_next_child()) {
+            switch(_node->lexer_id()) {
+                case '+': value += m_value; break;
+                case '-': value -= m_value; break;
+                case '*': value *= m_value; break;
+                case '/': value /= m_value; break;
+                case '^': value = pow(value, m_value); break;
             }
         }
     }
-    value = _value;
-    if(_node->is_root())
-        std::cout << _value << std::endl;
+    m_value = value;
+    if(_node->is_root()) {
+        std::cout << value << std::endl;
+    }
 }

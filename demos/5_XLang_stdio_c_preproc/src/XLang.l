@@ -168,9 +168,10 @@ lit_float {digit}*[.]{digit}+
                 Symbol::type_t type;
                 if(SymbolTable::instance()->lookup_symbol(&type, yytext)) {
                     switch(type) {
-                        case Symbol::TYPE: return ID_TYPE;
-                        case Symbol::FUNC: return ID_FUNC;
-                        case Symbol::VAR:  return ID_VAR;
+                        case Symbol::TYPE:        return ID_TYPE;
+                        case Symbol::FUNC:        return ID_FUNC;
+                        case Symbol::VAR:         return ID_VAR;
+                        case Symbol::PREPROC_SYM: return ID_PREPROC_SYM;
                         default:
                             break;
                     }

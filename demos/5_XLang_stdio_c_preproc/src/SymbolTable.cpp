@@ -14,9 +14,10 @@ void Symbol::print() const
     std::stringstream ss;
     ss << "\"" << m_name << "\"\t: ";
     switch(m_type) {
-        case TYPE: ss << "type"; break;
-        case FUNC: ss << "func"; break;
-        case VAR:  ss << "var"; break;
+        case TYPE:        ss << "type"; break;
+        case FUNC:        ss << "func"; break;
+        case VAR:         ss << "var"; break;
+        case PREPROC_SYM: ss << "preproc_sym"; break;
         default:
             break;
     }
@@ -63,6 +64,11 @@ bool SymbolTable::add_func(std::string name)
 bool SymbolTable::add_var(std::string name)
 {
     return _add_symbol(Symbol::VAR, name);
+}
+
+bool SymbolTable::add_preproc_sym(std::string name)
+{
+    return _add_symbol(Symbol::PREPROC_SYM, name);
 }
 
 bool SymbolTable::lookup_symbol(Symbol::type_t *type, std::string name)

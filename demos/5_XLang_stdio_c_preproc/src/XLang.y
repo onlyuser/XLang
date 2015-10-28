@@ -63,7 +63,8 @@ std::string id_to_name(uint32_t lexer_id)
     static const char* _id_to_name[] = {
         "int",
         "float",
-        "ident"
+        "ident",
+        "preproc_sym"
         };
     int index = static_cast<int>(lexer_id)-ID_BASE-1;
     if(index >= 0 && index < static_cast<int>(sizeof(_id_to_name)/sizeof(*_id_to_name)))
@@ -108,6 +109,7 @@ uint32_t name_to_id(std::string name)
     if(name == "int")            return ID_INT;
     if(name == "float")          return ID_FLOAT;
     if(name == "ident")          return ID_IDENT;
+    if(name == "preproc_sym")    return ID_PREPROC_SYM;
     if(name == "uminus")         return ID_UMINUS;
     if(name == "struct")         return ID_STRUCT;
     if(name == "struct_decl")    return ID_STRUCT_DECL;
@@ -166,7 +168,7 @@ std::string _dirname;
 
 %token<int_value>   ID_INT
 %token<float_value> ID_FLOAT
-%token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR
+%token<ident_value> ID_IDENT ID_TYPE ID_FUNC ID_VAR ID_PREPROC_SYM
 %type<symbol_value> block stmt expr
 %type<symbol_value> decl struct_decl func_decl var_decl
 %type<symbol_value> opt_elif_stmt_list elif_stmt_list elif_stmt
@@ -192,15 +194,24 @@ block:
     ;
 
 stmt:
-      decl ';'                                                     { $$ = $1; }
-    | ID_DEFINE ID_IDENT expr ID_ENDDEF                            { $$ = MAKE_SYMBOL(ID_DEFINE_SYMBOL, 2, MAKE_TERM(ID_IDENT, $2), $3); }
-    | ID_DEFINE ID_IDENT ID_LB opt_ident_list ID_RB expr ID_ENDDEF { $$ = MAKE_SYMBOL(ID_DEFINE_MACRO, 3, MAKE_TERM(ID_IDENT, $2), $4, $6); }
+      decl ';' { $$ = $1; }
+    | ID_DEFINE ID_IDENT expr ID_ENDDEF {
+          SymbolTable::instance()->add_preproc_sym(*$2);
+          $$ = MAKE_SYMBOL(ID_DEFINE_SYMBOL, 2, MAKE_TERM(ID_IDENT, $2), $3);
+      }
+    | ID_DEFINE ID_IDENT ID_LB opt_ident_list ID_RB expr ID_ENDDEF {
+          SymbolTable::instance()->add_preproc_sym(*$2);
+          $$ = MAKE_SYMBOL(ID_DEFINE_MACRO, 3, MAKE_TERM(ID_IDENT, $2), $4, $6);
+      }
     | ID_IF expr block ID_ENDIF {
           NodeEvaluator v;
           v.dispatch_visit($2);
+          std::cout << "QWE: " << v.get_value() << std::endl;
           $$ = MAKE_SYMBOL(ID_IF, 2, $2, $3);
       }
-    | ID_IFDEF ID_IDENT block ID_ENDIF { $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3); }
+    | ID_IFDEF ID_IDENT block ID_ENDIF {
+          $$ = MAKE_SYMBOL(ID_IFDEF, 2, MAKE_TERM(ID_IDENT, $2), $3);
+      }
     | ID_IFDEF ID_IDENT block opt_elif_stmt_list ID_ELSE block ID_ENDIF {
           $$ = MAKE_SYMBOL(ID_IFDEF, 4, MAKE_TERM(ID_IDENT, $2), $3, $4, $6);
       }
@@ -231,19 +242,26 @@ elif_stmt:
     ;
 
 expr:
-      ID_INT                          { $$ = MAKE_TERM(ID_INT, $1); }
-    | ID_FLOAT                        { $$ = MAKE_TERM(ID_FLOAT, $1); }
-    | ID_IDENT                        { $$ = MAKE_TERM(ID_IDENT, $1); }
-    | ID_DEFINED ID_LB ID_IDENT ID_RB { $$ = MAKE_SYMBOL(ID_DEFINED, 1, MAKE_TERM(ID_IDENT, $3)); }
-    | '-' expr %prec ID_UMINUS        { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
-    | expr ID_AND expr                { $$ = MAKE_SYMBOL(ID_AND, 2, $1, $3); }
-    | expr ID_OR expr                 { $$ = MAKE_SYMBOL(ID_OR, 2, $1, $3); }
-    | expr '+' expr                   { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
-    | expr '-' expr                   { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
-    | expr '*' expr                   { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
-    | expr '/' expr                   { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
-    | expr '^' expr                   { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
-    | ID_LB expr ID_RB                { $$ = $2; }
+      ID_INT                                { $$ = MAKE_TERM(ID_INT, $1); }
+    | ID_FLOAT                              { $$ = MAKE_TERM(ID_FLOAT, $1); }
+    | ID_IDENT                              { $$ = MAKE_TERM(ID_IDENT, $1); }
+    | ID_DEFINED ID_LB ID_IDENT ID_RB {
+          $$ = MAKE_SYMBOL(ID_DEFINED, 1, MAKE_TERM(ID_IDENT, $3));
+          //$$ = MAKE_TERM(ID_INT, 0);
+      }
+    | ID_DEFINED ID_LB ID_PREPROC_SYM ID_RB {
+          $$ = MAKE_SYMBOL(ID_DEFINED, 1, MAKE_TERM(ID_PREPROC_SYM, $3));
+          //$$ = MAKE_TERM(ID_INT, 1);
+      }
+    | '-' expr %prec ID_UMINUS              { $$ = MAKE_SYMBOL(ID_UMINUS, 1, $2); }
+    | expr ID_AND expr                      { $$ = MAKE_SYMBOL(ID_AND, 2, $1, $3); }
+    | expr ID_OR expr                       { $$ = MAKE_SYMBOL(ID_OR, 2, $1, $3); }
+    | expr '+' expr                         { $$ = MAKE_SYMBOL('+', 2, $1, $3); }
+    | expr '-' expr                         { $$ = MAKE_SYMBOL('-', 2, $1, $3); }
+    | expr '*' expr                         { $$ = MAKE_SYMBOL('*', 2, $1, $3); }
+    | expr '/' expr                         { $$ = MAKE_SYMBOL('/', 2, $1, $3); }
+    | expr '^' expr                         { $$ = MAKE_SYMBOL('^', 2, $1, $3); }
+    | ID_LB expr ID_RB                      { $$ = $2; }
     ;
 
 decl:

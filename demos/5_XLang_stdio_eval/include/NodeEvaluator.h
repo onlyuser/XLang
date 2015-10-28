@@ -36,9 +36,13 @@ public:
     {
         return false;
     }
+    float32_t get_value() const
+    {
+        return m_value;
+    }
 
 private:
-    float32_t value;
+    float32_t m_value;
 };
 
 #endif
