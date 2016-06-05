@@ -265,6 +265,10 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
     }
     else
     {
+        if(options.expr.empty()) {
+            std::cerr << "ERROR: cannot parse empty string" << std::endl;
+            return false;
+        }
         //std::cout << "SEND: \"" << options.expr << "\"" << std::endl;
         int p[2];
         pipe(p);
@@ -272,8 +276,12 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
         if(!child_pid) { // child process
             close(p[0]); // close read-channel -- we're writing
             FILE* file = fdopen(p[1], "wb");
-            //fwrite(options.expr.c_str(), sizeof(char), options.expr.length()+1, file);
+#if 0
+            // NOTE: chokes on null terminal with this for some reason
+            fwrite(options.expr.c_str(), sizeof(char), options.expr.length()+1, file);
+#else
             fwrite(options.expr.c_str(), sizeof(char), options.expr.length(), file);
+#endif
             exit(0);
         }
         close(p[1]); // close write-channel -- we're reading
