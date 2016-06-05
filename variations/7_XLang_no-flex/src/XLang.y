@@ -312,8 +312,8 @@ struct options_t
     } mode_e;
 
     mode_e      mode;
-    std::string in_file;
     std::string in_xml;
+    std::string in_file;
     bool        dump_memory;
 
     options_t()
