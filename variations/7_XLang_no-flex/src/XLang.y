@@ -16,13 +16,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //%output="XLang.tab.c"
-%name-prefix="_XLANG_"
+%name-prefix "_XLANG_"
 
 %{
 
 #include "XLang.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangLexerIDWrapper.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel

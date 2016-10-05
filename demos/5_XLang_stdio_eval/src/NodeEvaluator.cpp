@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "NodeEvaluator.h" // NodeEvaluator
-#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangLexerIDWrapper.h" // ID_XXX (yacc generated)
 #include "XLangString.h" // xl::escape
 #include <iostream> // std::cout
 #include <math.h> // pow

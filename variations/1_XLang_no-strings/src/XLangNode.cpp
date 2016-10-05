@@ -18,7 +18,7 @@
 #include "node/XLangNode.h" // node::NodeIdentIFace
 #include "XLangTreeContext.h" // TreeContext
 #include "XLangType.h" // uint32_t
-#include "XLang.tab.h" // YYLTYPE
+#include "XLangLexerIDWrapper.h" // YYLTYPE
 #include <sstream> // std::stringstream
 #include <vector> // std::vector
 #include <algorithm> // std::replace, std::find_if

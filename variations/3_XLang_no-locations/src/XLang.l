@@ -22,7 +22,7 @@
 %{
 
 #include "XLang.h"
-#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangLexerIDWrapper.h" // ID_XXX (yacc generated)
 #include <string.h> // memcpy
 #include <stdlib.h> // atoi
 #include <algorithm> // std::min

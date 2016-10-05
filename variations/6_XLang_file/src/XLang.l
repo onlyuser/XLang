@@ -23,7 +23,7 @@
 
 #include "XLang.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangLexerIDWrapper.h" // ID_XXX (yacc generated)
 #include <stdio.h> // fread
 #include <stdlib.h> // atoi
 #include <algorithm> // std::min

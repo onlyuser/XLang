@@ -16,13 +16,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //%output="XLang.tab.c"
-%name-prefix="_XLANG_"
+%name-prefix "_XLANG_"
 
 %{
 
 #include "XLang.h"
 #include "node/XLangNodeIFace.h" // node::NodeIdentIFace
-#include "XLang.tab.h" // ID_XXX (yacc generated)
+#include "XLangLexerIDWrapper.h" // ID_XXX (yacc generated)
 #include "XLangAlloc.h" // Allocator
 #include "mvc/XLangMVCView.h" // mvc::MVCView
 #include "mvc/XLangMVCModel.h" // mvc::MVCModel
@@ -35,6 +35,7 @@
 #include <iostream> // std::cout
 #include <stdlib.h> // EXIT_SUCCESS
 #include <getopt.h> // getopt_long
+#include <unistd.h> // pipe
 
 #define MAKE_TERM(lexer_id, ...)   xl::mvc::MVCModel::make_term(tree_context(), lexer_id, ##__VA_ARGS__)
 #define MAKE_SYMBOL(...)           xl::mvc::MVCModel::make_symbol(tree_context(), ##__VA_ARGS__)
