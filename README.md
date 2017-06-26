@@ -36,7 +36,7 @@ Requirements
 
 Unix tools and 3rd party components (accessible from $PATH):
 
-    gcc (with -std=c++0x support), flex, bison, valgrind, cppcheck, doxygen, graphviz, ticpp
+    gcc flex bison valgrind cppcheck doxygen graphviz ticpp
 
 **Environment variables:**
 
@@ -70,16 +70,12 @@ References
 <dl>
     <dt>"Tom Niemann Flex-Bison AST examples"</dt>
     <dd>http://epaperpress.com/lexandyacc/</dd>
-
     <dt>"Most vexing parse"</dt>
     <dd>https://en.wikipedia.org/wiki/Most_vexing_parse</dd>
-
     <dt>"Lexical Analysis With Flex - Start Conditions"</dt>
     <dd>http://flex.sourceforge.net/manual/Start-Conditions.html</dd>
-
     <dt>"Multiple Input Buffers"</dt>
     <dd>http://flex.sourceforge.net/manual/Multiple-Input-Buffers.html</dd>
-
     <dt>"Flex, A fast scanner generator - Actions"</dt>
     <dd>http://dinosaur.compilertools.net/flex/flex_9.html</dd>
 </dl>
