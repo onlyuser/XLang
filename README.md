@@ -48,7 +48,7 @@ Unix tools and 3rd party components (accessible from $PATH):
 * sudo apt-get install flex
 * sudo apt-get install bison
 
-Make targets
+Make Targets
 ------------
 
 <table>

@@ -28,8 +28,8 @@ The code is organized in a way such that anyone unfamiliar with Lex-Yacc
 can quickly isolate a variation that is most relevent, and most readily
 customizable to his/her specific requirements.
 
-Variation vs Feature Table
---------------------------
+Variation vs. Feature Table
+---------------------------
 
 <table>
     <tr><th> variation    </th><th> lexer       </th><th> input  </th><th> reentrant </th><th> locations </th><th> comments </th><th> strings </th></tr>
@@ -102,7 +102,7 @@ Unix tools and 3rd party components (accessible from $PATH):
 * $INCLUDE_PATH_EXTERN -- where "ticpp/ticpp.h" resides
 * $LIB_PATH_EXTERN     -- where "libticppd.a" resides
 
-Make targets
+Make Targets
 ------------
 
 <table>
