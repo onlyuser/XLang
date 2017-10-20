@@ -1,6 +1,6 @@
 // XLang
 // -- A parser framework for language modeling
-// Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+// Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //%output="XLang.tab.c"
-%name-prefix "_XLANG_"
 
 %{
 
@@ -43,7 +42,7 @@
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
 
 // report error
-void _xl(error)(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
+void yyerror(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s)
 {
     if(loc)
     {
@@ -66,9 +65,9 @@ void _xl(error)(YYLTYPE* loc, ParserContext* pc, yyscan_t scanner, const char* s
     }
     error_messages() << s;
 }
-void _xl(error)(const char* s)
+void yyerror(const char* s)
 {
-    _xl(error)(NULL, NULL, NULL, s);
+    yyerror(NULL, NULL, NULL, s);
 }
 
 // get resource
@@ -182,10 +181,10 @@ xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, const char* s)
 {
     ParserContext parser_context(alloc, s);
     yyscan_t scanner = parser_context.scanner_context().m_scanner;
-    _xl(lex_init)(&scanner);
-    _xl(set_extra)(&parser_context, scanner);
-    int error = _xl(parse)(&parser_context, scanner); // parser entry point
-    _xl(lex_destroy)(scanner); // NOTE: necessary to avoid memory leak
+    yylex_init(&scanner);
+    yyset_extra(&parser_context, scanner);
+    int error = yyparse(&parser_context, scanner); // parser entry point
+    yylex_destroy(scanner); // NOTE: necessary to avoid memory leak
     return (!error && error_messages().str().empty()) ? parser_context.tree_context().root() : NULL;
 }
 

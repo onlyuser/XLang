@@ -1,6 +1,6 @@
 # XLang
 # -- A parser framework for language modeling
-# Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+# Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 LIB_PATH = lib
-CHILD_PATH = demos variations
+CHILD_PATH = demo variations
 SUBPATHS = $(shell find $(CHILD_PATH) -mindepth 1 -maxdepth 1 -name "*" -type d | sort)
 
 .DEFAULT_GOAL : all

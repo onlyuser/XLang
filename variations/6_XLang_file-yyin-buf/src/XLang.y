@@ -1,6 +1,6 @@
 // XLang
 // -- A parser framework for language modeling
-// Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+// Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //%output="XLang.tab.c"
-%name-prefix "_XLANG_"
 
 %{
 
@@ -42,10 +41,10 @@
 #define ERROR_LEXER_ID_NOT_FOUND   "missing lexer id handler, most likely you forgot to register one"
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
 
-extern FILE* _xl(in);
+extern FILE* yyin;
 
 // report error
-void _xl(error)(const char* s)
+void yyerror(const char* s)
 {
     error_messages() << s;
 }
@@ -160,8 +159,8 @@ expr:
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc)
 {
     tree_context() = new (PNEW(alloc, xl::, TreeContext)) xl::TreeContext(alloc);
-    int error_code = _xl(parse)(); // parser entry point
-    _xl(lex_destroy)(); // NOTE: necessary to avoid memory leak
+    int error_code = yyparse(); // parser entry point
+    yylex_destroy(); // NOTE: necessary to avoid memory leak
     return (!error_code && error_messages().str().empty()) ? tree_context()->root() : NULL;
 }
 
@@ -286,15 +285,15 @@ bool import_ast(options_t &options, xl::Allocator &alloc, xl::node::NodeIdentIFa
             exit(0);
         }
         close(p[1]); // close write-channel -- we're reading
-        _xl(in) = fdopen(p[0], "rb"); // NOTE: fclose in yywrap
+        yyin = fdopen(p[0], "rb"); // NOTE: fclose in yywrap
 #if 0
         // NOTE: disabled as FIFO stream cannot be reread after rewind
         #define BUF_MAX 80
         char buf[BUF_MAX];
-        fread(buf, sizeof(char), sizeof(buf)/sizeof(char), _xl(in));
+        fread(buf, sizeof(char), sizeof(buf)/sizeof(char), yyin));
         //std::cout << "RECEIVE: \"" << buf << "\"" << std::endl;
 #endif
-        if(!_xl(in))
+        if(!yyin)
         {
             std::cerr << "ERROR: cannot open file" << std::endl;
             return false;

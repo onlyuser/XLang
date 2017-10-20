@@ -1,6 +1,6 @@
 /* XLang
  * -- A parser framework for language modeling
- * Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+ * Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 
 %option outfile="lex.XLang.c"
-%option prefix="_XLANG_"
 
 %{
 
@@ -27,7 +26,7 @@
 #include "XLangTreeContext.h" // TreeContext
 #include <stdlib.h> // atoi
 
-#define LVAL         _xl(lval)
+#define LVAL         yylval
 #define TREE_CONTEXT (*tree_context())
 
 %}
@@ -73,7 +72,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                _xl(error)("unknown character");
+                yyerror("unknown character");
                 YY_FLUSH_BUFFER;
             }
 

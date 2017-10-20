@@ -1,6 +1,6 @@
 // XLang
 // -- A parser framework for language modeling
-// Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+// Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //%output="XLang.tab.c"
-%name-prefix "_XLANG_"
 
 %{
 
@@ -48,7 +47,7 @@
 #define ERROR_LEXER_NAME_NOT_FOUND "missing lexer name handler, most likely you forgot to register one"
 
 // report error
-void _xl(error)(const char* s)
+void yyerror(const char* s)
 {
     error_messages() << s;
 }
@@ -127,7 +126,7 @@ ParserContext* &parser_context()
         } \
     } while(0)
 
-int _xl(lex)()
+int yylex()
 {
     char yytext[SIZE_BUF_SMALL];
     memset(yytext, 0, sizeof(yytext));
@@ -149,7 +148,7 @@ int _xl(lex)()
             YY_REWIND(1);
             yytext[PARM.m_pos - start_pos] = '\0';
         }
-        _xl(lval).ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
+        yylval.ident_value = parser_context()->tree_context().alloc_unique_string(yytext);
         return ID_IDENT;
     }
     else if(isdigit(*cur_ptr))
@@ -169,10 +168,10 @@ int _xl(lex)()
         }
         if(find_decimal_point)
         {
-            _xl(lval).float_value = atof(yytext);
+            yylval.float_value = atof(yytext);
             return ID_FLOAT;
         }
-        _xl(lval).int_value = atoi(yytext);
+        yylval.int_value = atoi(yytext);
         return ID_INT;
     }
     else if(*cur_ptr == ' ' || *cur_ptr == '\t' || *cur_ptr == '\n')
@@ -185,7 +184,7 @@ int _xl(lex)()
         if(bytes_read != 0)
         {
             YY_REWIND(1);
-            return _xl(lex)();
+            return yylex();
         }
     }
     else
@@ -198,7 +197,7 @@ int _xl(lex)()
             case '=':
                 return *cur_ptr;
             default:
-                _xl(error)("unknown character");
+                yyerror("unknown character");
         }
     return -1;
 }
@@ -272,7 +271,7 @@ ScannerContext::ScannerContext(FILE* file)
 xl::node::NodeIdentIFace* make_ast(xl::Allocator &alloc, FILE* file)
 {
     parser_context() = new (PNEW(alloc, , ParserContext)) ParserContext(alloc, file);
-    int error_code = _xl(parse)(); // parser entry point
+    int error_code = yyparse(); // parser entry point
     return (!error_code && error_messages().str().empty()) ? parser_context()->tree_context().root() : NULL;
 }
 

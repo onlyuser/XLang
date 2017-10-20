@@ -1,6 +1,6 @@
 # XLang
 # -- A parser framework for language modeling
-# Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+# Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ TEST_REGEX_DISABLE = "phony_regex_should_never_occur"
 ifneq ($(strip $(BASIC_SUITE)),)
 	TEST_PATH = basic_suite
 endif
-ifneq ($(strip $(C_SUITE_VEXING)),)
-	TEST_PATH = c_suite
+ifneq ($(strip $(DEMOS_SUITE_VEXING)),)
+	TEST_PATH = demo_suite
 	TEST_REGEX_ENABLE = vexing
 endif
-ifneq ($(strip $(C_SUITE_PREPROC)),)
-	TEST_PATH = c_suite
+ifneq ($(strip $(DEMOS_SUITE_PREPROC)),)
+	TEST_PATH = demo_suite
 	TEST_REGEX_ENABLE = preproc
 endif
 ifneq ($(strip $(ADVANCED_SUITE_COMMENTS)),)

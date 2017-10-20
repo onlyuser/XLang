@@ -1,6 +1,6 @@
 /* XLang
  * -- A parser framework for language modeling
- * Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+ * Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 
 %option outfile="lex.XLang.c"
-%option prefix="_XLANG_"
 
 %{
 
@@ -29,19 +28,17 @@
 #include <stdlib.h> // atoi
 #include <stack> // std::stack
 
-#define PUSH_STATE(x) yy_push_state(x)
-#define POP_STATE     yy_pop_state()
-#define LVAL         _xl(lval)
+#define LVAL         yylval
 #define TREE_CONTEXT (*tree_context())
 
-extern FILE* _xl(in);
+extern FILE* yyin;
 extern std::string _dirname;
 
 std::stack<std::string> _define_stack;
 
-extern "C" int _xl(wrap)()
+extern "C" int yywrap()
 {
-    fclose(_xl(in)); // NOTE: for both top and include file
+    fclose(yyin); // NOTE: for both top and include file
     return 1;
 }
 
@@ -71,18 +68,18 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* COMMENTS */
 
-"/*"                    { PUSH_STATE(ST_COMMENT_BLOCK); }
+"/*"                    { yy_push_state(ST_COMMENT_BLOCK); }
 <ST_COMMENT_BLOCK>{any} ;
-<ST_COMMENT_BLOCK>"*/"  { POP_STATE; }
+<ST_COMMENT_BLOCK>"*/"  { yy_pop_state(); }
 
-"//"                  { PUSH_STATE(ST_COMMENT_LINE); }
+"//"                  { yy_push_state(ST_COMMENT_LINE); }
 <ST_COMMENT_LINE>.    ;
-<ST_COMMENT_LINE>"\n" { POP_STATE; }
+<ST_COMMENT_LINE>"\n" { yy_pop_state(); }
 
  /*==========================================================================*/
  /* PREPROC INCLUDE */
 
-"#include"            { PUSH_STATE(ST_INCLUDE); } // begin include
+"#include"            { yy_push_state(ST_INCLUDE); } // begin include
 <ST_INCLUDE>[ \t]+    ;                           // white space
 <ST_INCLUDE>[^ \t\n]+ {                           // non white space
                 std::string filename = yytext;
@@ -95,13 +92,13 @@ lit_float {digit}*[.]{digit}+
                     filename = filename.substr(1, filename.length()-2);
                 }
                 std::string full_filename = _dirname + "/" + filename;
-                _xl(in) = fopen(full_filename.c_str(), "r");
-                if(!_xl(in)) {
-                    _xl(error)("can't open file");
+                yyin = fopen(full_filename.c_str(), "r");
+                if(!yyin) {
+                    yyerror("can't open file");
                     yyterminate();
                 }
-                yypush_buffer_state(yy_create_buffer(_xl(in), YY_BUF_SIZE));
-                POP_STATE; // NOTE: necessary to continue lexing include file
+                yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
+                yy_pop_state(); // NOTE: necessary to continue lexing include file
             }
 <<EOF>>     { // end include
                 if(!yy_buffer_stack_top) { // NOTE: necessary to avoid deleting top buffer
@@ -116,12 +113,12 @@ lit_float {digit}*[.]{digit}+
  /*==========================================================================*/
  /* PREPROC DEFINE */
 
-"#define"               { PUSH_STATE(ST_DEFINE); }      // begin define
+"#define"               { yy_push_state(ST_DEFINE); }      // begin define
 <ST_DEFINE>[ \t]+       ;                               // white space
 <ST_DEFINE>[^ \t\n\\]+  { _define_stack.push(yytext); } // non white space (exclude line continuation)
 <ST_DEFINE>"\\"[ \t]*\n ;                               // line continuation (include carriage return)
 <ST_DEFINE>"\n" {                                       // end define
-                POP_STATE;
+                yy_pop_state();
                 unput('$'); // push end define token to back of input stream
                 while(_define_stack.size()) { // unwind stack
                     std::string s = _define_stack.top();
@@ -197,7 +194,7 @@ lit_float {digit}*[.]{digit}+
  /* OTHER */
 
 .           {
-                _xl(error)("unknown character");
+                yyerror("unknown character");
                 YY_FLUSH_BUFFER;
             }
 

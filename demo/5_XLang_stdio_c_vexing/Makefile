@@ -1,6 +1,6 @@
 # XLang
 # -- A parser framework for language modeling
-# Copyright (C) 2011 Jerry Chen <mailto:onlyuser@gmail.com>
+# Copyright (C) 2011 onlyuser <mailto:onlyuser@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ clean_objects : clean_yacc clean_lex
 # binary
 #==================
 
-CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) SymbolTable NodeEvaluator
+CPP_STEMS = $(YACC_STEMS) $(LEX_STEMS) SymbolTable
 OBJECTS = $(patsubst %, $(BUILD_PATH)/%.o, $(CPP_STEMS))
 LINT_FILES = $(patsubst %, $(BUILD_PATH)/%.lint, $(CPP_STEMS))
 
@@ -152,14 +152,14 @@ clean_binary : clean_objects clean_libs_parent
 .PHONY : test
 test : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			C_SUITE_PREPROC=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			DEMOS_SUITE_VEXING=1
 
 .PHONY : clean_test
 clean_test :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 #==================
 # import
@@ -169,13 +169,13 @@ clean_test :
 import : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="xml" \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 .PHONY : clean_import
 clean_import :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 #==================
 # pure
@@ -184,14 +184,14 @@ clean_import :
 .PHONY : pure
 pure : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			C_SUITE_PREPROC=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			DEMOS_SUITE_VEXING=1
 
 .PHONY : clean_pure
 clean_pure :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 #==================
 # dot
@@ -200,14 +200,14 @@ clean_pure :
 .PHONY : dot
 dot : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			C_SUITE_PREPROC=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			DEMOS_SUITE_VEXING=1
 
 .PHONY : clean_dot
 clean_dot :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 #==================
 # xml
@@ -216,14 +216,14 @@ clean_dot :
 .PHONY : xml
 xml : $(BINARY)
 	cd $(TEST_PATH); $(MAKE) $@ \
-			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="file" \
-			C_SUITE_PREPROC=1
+			BUILD_PATH=$(abspath $(BUILD_PATH)) BINARY=$(abspath $(BINARY)) INPUT_MODE="stdin" \
+			DEMOS_SUITE_VEXING=1
 
 .PHONY : clean_xml
 clean_xml :
 	cd $(TEST_PATH); $(MAKE) $@ \
 			BUILD_PATH=$(abspath $(BUILD_PATH)) \
-			C_SUITE_PREPROC=1
+			DEMOS_SUITE_VEXING=1
 
 #==================
 # lint
